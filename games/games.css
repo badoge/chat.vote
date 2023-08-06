@@ -1,0 +1,19 @@
+body {
+  margin-bottom: 300px;
+}
+
+.card-img-top {
+  cursor: pointer;
+  width: 100%;
+  height: 230px;
+}
+
+.custom-popover {
+  --bs-popover-border-color: var(--bs-warning);
+  --bs-popover-header-bg: var(--bs-warning);
+  --bs-popover-header-color: var(--bs-white);
+}
+
+.tooltip.show {
+  opacity: 1;
+}

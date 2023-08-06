@@ -1,0 +1,46 @@
+html,
+body,
+.container-fluid {
+  height: 100%;
+}
+
+.container-fluid {
+  width: 100%;
+  overflow: hidden;
+}
+
+#toastContainer {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1056;
+  font-weight: bold;
+}
+
+#toastContainer > div > div {
+  font-size: 1.5em;
+}
+
+.row {
+  height: 100%;
+}
+
+#twitch-embed {
+  height: 100%;
+}
+
+.vid {
+  width: 82.3%;
+}
+
+.chat {
+  width: 17.7%;
+}
+
+.topright {
+  margin-right: 5px;
+}
+
+#modal2body > * > * {
+  color: white;
+}

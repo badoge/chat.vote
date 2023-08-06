@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: https://ogp.me/ns#" data-bs-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <title>chat.vote Trivia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="chat.vote/trivia is a simple site that allows you to write trivia questions and then lets your Twitch viewers answer by typing the answers in chat" />
+    <meta name="keywords" content="chatvote, chat.vote, Twitch, trivia" />
+    <meta property="og:title" content="chat.vote Trivia" />
+    <meta property="og:site_name" content="chat.vote Trivia" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://chat.vote/trivia/" />
+    <meta property="og:image" content="https://chat.vote/pics/ogimage.png" />
+    <meta property="og:locale" content="en_US" />
+    <meta
+      property="og:description"
+      content="chat.vote/trivia is a simple site that allows you to write trivia questions and then lets your Twitch viewers answer by typing the answers in chat"
+    />
+
+    <link rel="apple-touch-icon" sizes="152x152" href="/pics/icon/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/pics/icon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/pics/icon/favicon-16x16.png" />
+    <link rel="manifest" href="/pics/icon/site.webmanifest" />
+    <link rel="mask-icon" href="/pics/icon/safari-pinned-tab.svg" color="#ffd100" />
+    <link rel="shortcut icon" href="/pics/icon/favicon.ico" />
+    <meta name="msapplication-TileColor" content="#2b5797" />
+    <meta name="msapplication-config" content="/pics/icon/browserconfig.xml" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/icons.css" />
+    <link rel="stylesheet" href="/css/common.min.css" />
+    <link rel="stylesheet" href="/trivia/trivia.min.css" />
+  </head>
+
+  <body>
+    <noscript>
+      <div class="alert alert-danger" role="alert">WARNING! JavaScript is disabled. This site will not work properly without it.</div>
+    </noscript>
+
+    <div class="modal" id="modal2" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Not logged in / Login expired</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">You need to go the <a href="/" target="_blank" rel="noopener noreferrer">main page</a> and login to use this page.</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand notranslate" href="#"><img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" /> chat.vote/trivia</a>
+        <div class="collapse navbar-collapse">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="Polls that you vote on by typing in Twitch chat"
+                target="_blank"
+                href="/"
+              >
+                <img style="height: 1.2em; filter: invert(0.25)" id="twitchLogo" alt="twitch" src="/pics/twitch.png" /> Twitch chat polls
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Straw polls with shareable links" target="_blank" href="/poll/">
+                <i class="material-icons notranslate">how_to_vote</i>Polls
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Mini games with chat interaction" target="_blank" href="/games/">
+                <i class="material-icons notranslate">videogame_asset</i> Games
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Twitch chat raffles" target="_blank" href="/raffles/">
+                <i class="material-icons notranslate">local_activity</i> Raffles
+              </a>
+            </li>
+          </ul>
+          <div class="mx-auto d-inline-flex">
+            <div id="twitchStatus" style="margin-top: 5px">
+              <h4><span class="badge bg-danger">Chat not connected :(</span></h4>
+            </div>
+          </div>
+        </div>
+        <div class="navbar-nav ms-auto">
+          <div id="topRight">
+            <div class="btn-group" role="group" aria-label="login options">
+              <button
+                disabled
+                id="loginButton"
+                class="btn btn-twitch"
+                tabindex="0"
+                data-bs-toggle="tooltip"
+                data-bs-placement="bottom"
+                data-bs-custom-class="custom-tooltip"
+                data-bs-title="Go to the main page and login :)"
+              >
+                <span class="twitch-icon"></span>Sign in with Twitch
+              </button>
+              <div class="btn-group" role="group">
+                <button
+                  disabled
+                  id="btnGroupDroplogin"
+                  type="button"
+                  class="btn btn-twitch dropdown-toggle"
+                  data-bs-toggle="dropdown"
+                  aria-label="other login option, connect manually"
+                  aria-expanded="false"
+                ></button>
+                <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="btnGroupDroplogin">
+                  <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal1" href="#">Connect manually</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row" id="mainrow">
+        <div class="col-xl-2"></div>
+        <div class="col-xl-8">
+          <div class="card" id="questionCard">
+            <div class="card-body">
+              <h3 class="card-title" id="questionNumber">Question 0/0</h3>
+              <h2 id="question">Add questions by clicking settings bottom left :)</h2>
+            </div>
+          </div>
+          <div class="card" id="controlsCard">
+            <div class="card-body" id="controlsCardBody">
+              <button type="button" id="start" class="btn btn-success" onclick="start()">Start</button>
+              <button type="button" class="btn btn-warning" onclick="showAnswer()"><i class="material-icons notranslate">visibility</i>Show answer</button>
+              <button type="button" class="btn btn-primary" onclick="next()"><i class="material-icons notranslate">arrow_forward_ios</i>Next question</button>
+            </div>
+          </div>
+          <div class="card" id="scoreCard">
+            <div class="card-body">
+              <h4 class="card-title"><i class="material-icons notranslate">leaderboard</i>Scores</h4>
+              <div id="usersDiv">
+                <ul class="list-group" id="users"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-2"></div>
+      </div>
+      <div aria-live="polite" aria-atomic="true" class="position-relative">
+        <div id="toastContainer" class="toast-container"></div>
+      </div>
+
+      <button id="openOffcanvasbtn" title="Settings" class="btn btn-warning" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" aria-controls="offcanvas">
+        <i class="material-icons notranslate">settings</i> Settings<i class="material-icons notranslate">arrow_forward_ios</i>
+      </button>
+
+      <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas" data-bs-backdrop="false" aria-labelledby="offcanvasLabel">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasLabel"><i class="material-icons notranslate">settings</i> Settings</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <h3>points</h3>
+          <div class="form-floating">
+            <input type="number" class="form-control" id="points" value="10" />
+            <label for="points">Points for 1st answer</label>
+          </div>
+          <small>1st user to answer will get this amount of points, each following answer will get 1 fewer points till it gets to 0</small>
+
+          <h3 class="mt-3">Questions:</h3>
+          <small class="text-info">Hint: Post an image link in the question field and press enter to embed it</small><br />
+          <button type="button" class="btn btn-warning" onclick="hideAnswers()">Hide/show answers</button>
+
+          <div id="optionsDiv">
+            <div class="card option-card" data-option-id="1">
+              <div class="card-body">
+                <div class="input-group">
+                  <input type="text" class="form-control questions" onkeydown="handleInput(event)" data-option-id="1" placeholder="Question" aria-label="Question" />
+                  <input type="text" class="form-control answers" onkeydown="handleInput(event)" data-option-id="1" placeholder="Answer" aria-label="Answer" />
+
+                  <span class="input-group-text poll-image" data-option-id="1" data-image-url="" style="display: none"> </span>
+                  <button type="button" class="remove-image btn btn-warning" onclick="deleteImage(event)" data-option-id="1" style="display: none">
+                    <i data-option-id="1" class="material-icons notranslate">hide_image</i>
+                  </button>
+                  <button type="button" class="remove-input btn btn-danger" onclick="deleteInput(event)" data-option-id="1">
+                    <i class="material-icons notranslate" data-option-id="1">delete_forever</i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="card option-card" data-option-id="2">
+              <div class="card-body">
+                <div class="input-group">
+                  <input type="text" class="form-control questions" onkeydown="handleInput(event)" data-option-id="2" placeholder="Question" aria-label="Question" />
+                  <input type="text" class="form-control answers" onkeydown="handleInput(event)" data-option-id="2" placeholder="Answer" aria-label="Answer" />
+
+                  <span class="input-group-text poll-image" data-option-id="2" data-image-url="" style="display: none"> </span>
+                  <button type="button" class="remove-image btn btn-warning" onclick="deleteImage(event)" data-option-id="2" style="display: none">
+                    <i data-option-id="2" class="material-icons notranslate">hide_image</i>
+                  </button>
+                  <button type="button" class="remove-input btn btn-danger" onclick="deleteInput(event)" data-option-id="2">
+                    <i class="material-icons notranslate" data-option-id="2">delete_forever</i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button type="button" onclick="saveSettings()" class="btn btn-success"><i class="material-icons notranslate">save</i>Save</button>
+          <button type="button" onclick="resetSettings()" class="btn btn-danger"><i class="material-icons notranslate">warning</i>Delete all questions</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/tmi.min.js"></script>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/functions.min.js"></script>
+    <script src="/trivia/trivia.js"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H43YN7FSSP"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-H43YN7FSSP");
+    </script>
+  </body>
+</html>

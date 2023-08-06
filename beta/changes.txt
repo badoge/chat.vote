@@ -1,0 +1,47 @@
+chatvote changes:
+removed vote with command mode but kept it supported
+raffles is now its own site
+fixed emotes in suggestions not working properly
+fixed link previews getting stuck sometimes
+fixed option order getting messed up when restarting poll
+performance improvements :)
+hide score button now unsorts the chart and hides the bars/slices instead of blurring
+removed text shadow
+added dark/light theme toggle top right
+yes/no mode is now its own tab
+hide score and random option are now attached to the restart and reset buttons
+added dropdown to start voting
+moved timer settings to start voting dropdown
+added dropdown to enable suggestions 
+moved suggestion settings to enable suggestions dropdown
+replaced 1/unlimited suggestion user limit with per user customizable limit
+moved pause/play/stop buttons to timer card
+removed settings pinning
+added more space between main cards
+moved direct login to dropdown instead of modal
+moved settings to be inline with main buttons and quick actions
+removed confetti checkbox and added off option to the confetti level select
+timer now automatically starts when you start voting if it has a value greater than 0
+replaced "me :)" with channel name for options added on the site
+removed bot
+you can now @ mention a twitch user to make the site link to their channel
+you can now use emotes (3rd party only) when adding options to the poll
+fixed emotes going away after restarting poll
+added option to allow vote changing
+
+raffles changes:
+site is now standalone
+added bonus tickets for more roles
+added tier specific sub raffle
+added follow age restriction
+added sub age restriction
+animate drawing with donk pfp is now on by default and twitch pfp is optional
+added option to enable bot winner announcements and join confirmation
+
+
+
+issues:
+direct login dropdown broken on narrow screens
+number of suggestions should decrement when a suggestion is removed
+dont show option input in yesno mode
+voting hint gets reset sometimes when it should be shown

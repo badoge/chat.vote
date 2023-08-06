@@ -1,0 +1,12 @@
+#maincol {
+  height: 90vh;
+  overflow-y: scroll;
+}
+
+#tableOfContents {
+  margin-bottom: 12px;
+}
+
+#mainrow {
+  margin-top: 10px;
+}

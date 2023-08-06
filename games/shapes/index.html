@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: https://ogp.me/ns#" data-bs-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <title>chat.vote Games - 🟥⏹️🔴🔴⭕⏹️</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="A very weird logic puzzle. Finish the row of shapes, which has been formed using a pre-determined hidden rule." />
+    <meta name="keywords" content="chatvote, chat.vote, interactive, games, Twitch, chat" />
+    <meta property="og:title" content="chat.vote Games - 🟥⏹️🔴🔴⭕⏹️" />
+    <meta property="og:site_name" content="chat.vote Games - 🟥⏹️🔴🔴⭕⏹️" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://chat.vote/games/shapes/" />
+    <meta property="og:image" content="https://chat.vote/pics/ogimage.png" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:description" content="A very weird logic puzzle. Finish the row of shapes, which has been formed using a pre-determined hidden rule." />
+
+    <link rel="apple-touch-icon" sizes="152x152" href="/pics/icon/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/pics/icon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/pics/icon/favicon-16x16.png" />
+    <link rel="manifest" href="/pics/icon/site.webmanifest" />
+    <link rel="mask-icon" href="/pics/icon/safari-pinned-tab.svg" color="#ffd100" />
+    <link rel="shortcut icon" href="/pics/icon/favicon.ico" />
+    <meta name="msapplication-TileColor" content="#2b5797" />
+    <meta name="msapplication-config" content="/pics/icon/browserconfig.xml" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/icons.css" />
+    <link rel="stylesheet" href="/css/common.min.css" />
+    <link rel="stylesheet" href="/games/shapes/shapes.min.css" />
+  </head>
+
+  <body>
+    <noscript>
+      <div class="alert alert-danger" role="alert">WARNING! JavaScript is disabled. This site will not work properly without it.</div>
+    </noscript>
+
+    <div class="modal" id="loginExpiredModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Login expired</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row justify-content-center">
+              Renew login:<br />
+              <button type="button" data-bs-dismiss="modal" id="loginExpiredRenew" class="btn btn-twitch"><span class="twitch-icon"></span>Sign in with Twitch</button>
+              <br /><small class="text-body-secondary">Logins expire after 2 months.<br />Or after you change your password.</small>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-danger"
+              data-bs-toggle="tooltip"
+              data-bs-delay="200"
+              data-bs-placement="top"
+              data-bs-title="Will reset everything so you can login again."
+              data-bs-dismiss="modal"
+              id="loginExpiredReset"
+            >
+              Reset
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="howToPlayModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="howToPlayTitle">How to play - 🟥⏹️🔴🔴⭕⏹️</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="howToPlayBody">
+            <p>There is a list of geometric shapes. You will have to finish this list by adding more shapes.</p>
+            <p>The list is built according to a predefined hidden rule (e.g. "next shape cannot be the same color as the last one")</p>
+            <p>Use first shapes to figure out which rule is in order, then click on the shape which you think will fit.</p>
+            <p>This game does not have separate streamer and chat turns, you can play it together at the same time</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="aboutModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">About</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="card mb-3">
+              <div class="card-body">
+                <h5>Contact info:</h5>
+                <p>
+                  Site by <a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/badoge">badoge</a> :) <br />If you find any issues or if you have suggestions or questions,
+                  you can contact me: <br /><a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/popout/badoge/chat?popout=">in this chat</a> <br />or on
+                  <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/eF54kvd">discord</a> <br />or by <a href="mailto:games@chat.vote">email</a>
+                </p>
+              </div>
+            </div>
+            <div class="card mb-3">
+              <div class="card-body">
+                <h5>Other stuff by me :)</h5>
+                <p>
+                  <a target="_blank" rel="noopener noreferrer" href="https://chat.vote/">chat.vote</a><br />
+                  <small>Polls that you vote on by typing in Twitch chat.</small><br />
+                  <a target="_blank" rel="noopener noreferrer" href="https://chat.vote/poll/">chat.vote/poll</a><br />
+                  <small>Like normal chat.vote but you vote by visiting the site instead of typing in chat.</small><br />
+                  <a target="_blank" rel="noopener noreferrer" href="https://chat.vote/vts/">chat.vote/vts</a><br />
+                  <small>A site that lets viewers control your VTube Studio model using chat commands or channel points.</small><br />
+                  <a target="_blank" rel="noopener noreferrer" href="https://okayeg.com">OkayegBOT</a><br />
+                  <small>Fun/utility Twitch chat bot.</small><br />
+                  <a target="_blank" rel="noopener noreferrer" href="https://zero.chat.vote">0weebs</a><br />
+                  <small>Twitch moderation bot that bans weebs.</small><br />
+                </p>
+              </div>
+            </div>
+
+            <div class="card mb-3">
+              <div class="card-body">
+                <p>more games soon™ :)</p>
+                <p>tictactoe based on <a target="_blank" rel="noopener noreferrer" href="https://github.com/michaelwhyte/tic_tac_toe">github.com/michaelwhyte/tic_tac_toe</a></p>
+                <p>connect4 based on <a target="_blank" rel="noopener noreferrer" href="https://github.com/mennovanslooten/connect4">github.com/mennovanslooten/connect4</a></p>
+                <p>not wordle based on <a target="_blank" rel="noopener noreferrer" href="https://www.nytimes.com/games/wordle/index.html">wordle</a></p>
+                <p>🟥⏹️🔴🔴⭕⏹️, Donk Hunt, Nim and Arena by <a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/g7eternal">g7eternal</a></p>
+                <h5>Stuff used:</h5>
+                <ul>
+                  <li><a target="_blank" rel="noopener noreferrer" href="https://getbootstrap.com/">Bootstrap</a></li>
+                  <li><a target="_blank" rel="noopener noreferrer" href="https://tmijs.com/">tmi.js</a> to read twitch chat</li>
+                  <li><a target="_blank" rel="noopener noreferrer" href="http://fabricjs.com/">Fabric.js</a> Drawing canvas</li>
+                  <li><a target="_blank" rel="noopener noreferrer" href="https://github.com/twitter/twemoji">Twemoji</a> emoji</li>
+                  <li><a target="_blank" rel="noopener noreferrer" href="https://phaser.io/">Phaser</a> Arena engine</li>
+                  <li><a target="_blank" rel="noopener noreferrer" href="https://www.chartjs.org/">Chart.js</a> to display the results graphs</li>
+                  <li><a target="_blank" rel="noopener noreferrer" href="https://github.com/validatorjs/validator.js">validator.js</a> sanitizer</li>
+                  <li><a target="_blank" rel="noopener noreferrer" href="https://github.com/albert-gonzalez/easytimer.js">EasyTimer.js</a> for the countdown timers</li>
+                  <li><a target="_blank" rel="noopener noreferrer" href="https://fonts.google.com/icons">Material Icons</a> icons</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
+      <div class="container-fluid">
+        <a class="navbar-brand notranslate site-link" href="/games/" target="_self" rel="noopener noreferrer"
+          ><img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" /> chat.vote games
+        </a>
+        <div class="collapse navbar-collapse">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a
+                class="nav-link site-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="Polls that you vote on by typing in Twitch chat"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/"
+              >
+                <img style="height: 1.2em; filter: invert(0.25)" id="twitchLogo" alt="twitch" src="/pics/twitch.png" /> Twitch chat polls
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link site-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="Straw polls with shareable links"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/poll/"
+              >
+                <i class="material-icons notranslate">how_to_vote</i>Polls
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link site-link active"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="Mini games with chat interaction"
+                aria-current="page"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/games/"
+              >
+                <i class="material-icons notranslate">videogame_asset</i> Games
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link site-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="Twitch chat raffles"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/raffles/"
+              >
+                <i class="material-icons notranslate">local_activity</i> Raffles
+              </a>
+            </li>
+            <li class="nav-item" id="vtsLink" style="display: none">
+              <a
+                class="nav-link site-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="A VTS plugin that allows your viewers to control your model (recommended based on your stream tags)"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/vts/"
+              >
+                <span class="vts-icon"></span>VTube Studio Plugin
+              </a>
+            </li>
+          </ul>
+          <div class="mx-auto d-inline-flex">
+            <div id="status" style="margin-top: 5px">
+              <h4><span class="badge bg-danger">Not connected :(</span></h4>
+            </div>
+          </div>
+        </div>
+        <div id="topRight" class="navbar-nav">
+          <div class="btn-group" role="group" aria-label="login options">
+            <a
+              role="button"
+              id="loginButton"
+              class="btn btn-twitch"
+              tabindex="0"
+              data-bs-container="body"
+              data-bs-custom-class="custom-popover"
+              data-bs-placement="bottom"
+              data-bs-trigger="manual"
+              data-bs-toggle="popover"
+              data-bs-title="Not signed in"
+              data-bs-content="You need sign in first before adding options or enabling voting/suggestions"
+              ><span class="twitch-icon"></span>Sign in with Twitch</a
+            >
+            <div class="btn-group" role="group">
+              <button
+                id="btnGroupDropLogin"
+                type="button"
+                class="btn btn-twitch dropdown-toggle"
+                data-bs-toggle="dropdown"
+                data-bs-auto-close="outside"
+                aria-label="other login option, connect manually"
+                aria-expanded="false"
+              ></button>
+              <div class="dropdown-menu dropdown-menu-end" aria-labelledby="btnGroupDropLogin">
+                <div class="p-3" style="width: 300px">
+                  <label for="channelName" class="form-label">Connect to chat directly</label>
+                  <div class="input-group mb-3">
+                    <span class="input-group-text" id="directLoginChannel">twitch.tv/</span>
+                    <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
+                  </div>
+                  <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
+                  <button type="button" id="connectbtn" class="btn btn-primary float-end">Connect</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="navbar-nav">
+          <div id="theme-label-container">
+            <label id="theme-label">
+              <input id="darkTheme" type="checkbox" checked />
+              <div class="planet"></div>
+              <div class="theme-elements">
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div class="container-fluid">
+      <div id="grid" class="mt-3" style="display: none">
+        <div class="row row-cols-1 row-cols-xl-4 row-cols-lg-3 row-cols-sm-3 g-4">
+          <div class="col">
+            <div class="card h-100">
+              <img src="/games/pics/draw.png" onclick="switchGame('draw')" class="card-img-top" alt="Draw" />
+              <div class="card-body">
+                <h5 class="card-title">Draw</h5>
+                <p class="card-text">Streamer draws a random emote, chat has to guess the emote. Can you draw well enough?</p>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card h-100">
+              <img src="/games/pics/arena.png" onclick="switchGame('arena')" class="card-img-top" alt="Arena" />
+              <div class="card-body">
+                <h5 class="card-title">Arena</h5>
+                <p class="card-text">Fight your chatters in a "battle royale" arena, where only one can win!</p>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card h-100">
+              <img src="/games/pics/eb.png" onclick="switchGame('eb')" class="card-img-top" alt="Emote benchmark" />
+              <div class="card-body">
+                <h5 class="card-title">Emote benchmark</h5>
+                <p class="card-text">A test of reaction speed and emote knowledge. Type the appearing emotes in chat as fast as you can.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card h-100">
+              <img src="/games/pics/dh.png" style="cursor: not-allowed" class="card-img-top" alt="Donk Hunt" />
+              <div class="card-body">
+                <h5 class="card-title">Donk Hunt</h5>
+                <p class="card-text">[WIP] Scary looking creatures are trying to trap their prey. Are you the hunter or the hunted one?</p>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card h-100 bg-body-tertiary border-light">
+              <img src="/games/pics/shapes.png" onclick="toggleGrid()" class="card-img-top" alt="🟥⏹️🔴🔴⭕⏹️" />
+              <div class="card-body">
+                <h5 class="card-title">🟥⏹️🔴🔴⭕⏹️</h5>
+                <p class="card-text">A very weird logic puzzle. Finish the row of shapes, which has been formed using a pre-determined hidden rule.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card h-100">
+              <img src="/games/pics/nim.png" onclick="switchGame('nim')" class="card-img-top" alt="Nim" />
+              <div class="card-body">
+                <h5 class="card-title">Nim</h5>
+                <p class="card-text">Classic. Remove popsicles until there's one left. Whoever takes the last one - loses!</p>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card h-100">
+              <img src="/games/pics/nw.png" onclick="switchGame('nw')" class="card-img-top" alt="Not Wordle :)" />
+              <div class="card-body">
+                <h5 class="card-title">Not Wordle :)</h5>
+                <p class="card-text">A twist of a well-known game: try to guess a word in several attempts. Your chat will choose the hidden word.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card h-100">
+              <img src="/games/pics/c4.png" onclick="switchGame('c4')" class="card-img-top" alt="Connect 4" />
+              <div class="card-body">
+                <h5 class="card-title">Connect 4</h5>
+                <p class="card-text">Players take turns to drop their pieces into the container, attempting to connect 4 of their pieces in a row.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card h-100">
+              <img src="/games/pics/ttt.png" onclick="switchGame('ttt')" class="card-img-top" alt="tic tac toe" />
+              <div class="card-body">
+                <h5 class="card-title">tic tac toe</h5>
+                <p class="card-text">An ancient game of wits. Will you outsmart the hive mind - which is your chat?</p>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card h-100">
+              <img src="/pics/donk.png" style="width: 180px; height: 180px; align-self: center" onclick="switchGame('about')" class="card-img-top" alt="About" />
+              <div class="card-body">
+                <h5 class="card-title">About</h5>
+                <p class="card-text">About section</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container-fluid p-0" id="gameDiv">
+        <div class="row mt-2 mb-2" id="navrow">
+          <div class="col">
+            <div class="card">
+              <div class="card-body p-1">
+                <button type="button" onclick="toggleGrid()" class="btn btn-primary"><i class="material-icons notranslate">arrow_back</i>Back</button>
+                <button type="button" onclick="showHowToPlay()" class="btn btn-info"><i class="material-icons notranslate">help_outline</i>How To Play</button>
+                <b id="gameName">🟥⏹️🔴🔴⭕⏹️</b>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row" id="gameRow">
+          <div class="row" id="shapesrow">
+            <div id="field" class="figure-container">
+              <div class="figure unknown"></div>
+              <div class="figure unknown"></div>
+              <div class="figure unknown"></div>
+              <div class="figure unknown"></div>
+              <div class="figure unknown"></div>
+              <div class="figure unknown"></div>
+              <div class="figure unknown"></div>
+              <div class="figure unknown"></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6" id="shapescol1">
+              <div id="lives">Lives: ❤❤❤</div>
+              <h3>Choose which figure will go next:</h3>
+              <div id="variants" class="figure-container">
+                <div class="figure unknown shapesoptions" data-choice="0">1</div>
+                <div class="figure unknown shapesoptions" data-choice="1">2</div>
+                <div class="figure unknown shapesoptions" data-choice="2">3</div>
+              </div>
+              <div id="shapesgameResult" style="visibility: hidden">
+                <h2 id="endMessage">You are not supposed to see this...yet! You filthy cheater!</h2>
+                <h4>The rule was:</h4>
+                <h5 id="rule">If THIS, do THAT, else THESE or THOSE</h5>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="card">
+                <div class="card-body">
+                  <h3>Difficulty:</h3>
+                  <select id="difficulty" class="form-select" aria-label="difficulty select">
+                    <option selected value="0">Simple rules</option>
+                    <option value="1">Harder rules</option>
+                    <option value="2">Absolutely dank rules</option>
+                  </select>
+                  <label for="shapeslength" class="form-label text-body-secondary mt-3">Length: <span id="shapeslengthlabel">8</span></label>
+                  <input disabled type="range" class="form-range" min="4" max="12" value="8" id="shapeslength" />
+                  <button id="startshapesbtn" onclick="SHAPES.start()" type="button" class="btn btn-success">Start new game</button>
+                </div>
+              </div>
+              <div id="shapeschartdiv" class="chart-container">
+                <canvas id="shapeschartCanvas"></canvas>
+              </div>
+              <span id="totalvotesshapes">Total votes: 0</span><br />
+              <button type="button" onclick="SHAPES.playTurn()" class="btn btn-success">Play chat's pick</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div aria-live="polite" aria-atomic="true" class="position-relative">
+      <div id="toastContainer" class="toast-container"></div>
+    </div>
+
+    <script src="/js/tmi.min.js"></script>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/chart.umd.js"></script>
+    <script src="/js/functions.min.js"></script>
+    <script src="/games/shapes/shapes.js"></script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H43YN7FSSP"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-H43YN7FSSP");
+    </script>
+  </body>
+</html>

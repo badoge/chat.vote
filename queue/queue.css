@@ -1,0 +1,154 @@
+.table {
+  word-break: break-all;
+}
+
+.removebtn {
+  width: 90%;
+  margin: 0px;
+}
+
+.card-header,
+.cursorPointer {
+  cursor: pointer;
+}
+
+.arrows {
+  font-size: 2rem;
+}
+
+[data-placeholder]:empty:before {
+  content: attr(data-placeholder);
+}
+
+.blur {
+  -webkit-filter: blur(10px) grayscale(100%);
+  -moz-filter: blur(10px) grayscale(100%);
+  -o-filter: blur(10px) grayscale(100%);
+  -ms-filter: blur(10px) grayscale(100%);
+  filter: blur(10px) grayscale(100%);
+  position: absolute;
+}
+
+.undertwitchbtn {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border: 0;
+  border-top: 1px solid rgba(150, 147, 147, 0.3);
+}
+
+.defaultbtn {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: 5px;
+  margin-right: 0;
+  vertical-align: middle;
+}
+
+#linkpreview {
+  padding: 10px;
+  display: none;
+  position: fixed;
+  pointer-events: none;
+  z-index: 1;
+  max-width: 400px;
+}
+
+.previewThumbnail {
+  max-width: 100%;
+}
+
+#openOffcanvasbtn {
+  position: fixed;
+  bottom: 10px;
+  left: 0;
+  transform-origin: bottom left;
+  border-radius: 0 1em 1em 0;
+  z-index: 0;
+}
+
+.values {
+  margin: -10px;
+}
+
+.offcanvas {
+  width: 80% !important;
+}
+
+#toastContainer {
+  z-index: 1056;
+  position: fixed;
+  top: 1%;
+  width: 15vw;
+}
+
+.custom-popover {
+  --bs-popover-border-color: var(--bs-warning);
+  --bs-popover-header-bg: var(--bs-warning);
+  --bs-popover-header-color: var(--bs-white);
+}
+
+.accordion-button,
+.accordion-button i {
+  padding: 5px;
+  font-size: 2rem;
+}
+
+.redborder {
+  border-color: #e74c3c;
+}
+
+.blueborder {
+  border-color: #3498db;
+}
+
+.tooltip.show {
+  opacity: 1;
+}
+
+.deletebtn {
+  color: #e74c3c;
+}
+
+.deletebtn:hover {
+  color: #c44133;
+  cursor: pointer;
+}
+
+.offcanvas-body {
+  padding-top: 5px;
+  padding-left: 5px;
+}
+
+#queueList {
+  height: 85vh;
+  overflow-y: scroll;
+  margin-top: 10px;
+}
+
+#profileLink > i,
+#copyLinkButton {
+  color: #000000;
+  border-color: #d3c22e;
+  background-color: #ebda44;
+}
+
+#profileLink {
+  border-color: #d3c22e;
+  cursor: pointer;
+}
+
+#copyLinkButton:hover {
+  background-color: #cabb36;
+  border-color: #d3c22e;
+}
+
+#playersCard {
+  margin-top: 10px;
+  height: 85vh;
+}
+
+#offcanvasSettings {
+  width: 50% !important;
+  height: 50% !important;
+  overflow-y: scroll;
+}

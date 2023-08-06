@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: https://ogp.me/ns#" data-bs-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <title>chat.vote Polls</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Create shareable polls easily and quickly using chat.vote/poll" />
+    <meta name="keywords" content="poll, polls, chatvote, chat.vote" />
+    <meta property="og:title" content="chat.vote Polls" />
+    <meta property="og:site_name" content="chat.vote Polls" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://chat.vote/poll/" />
+    <meta property="og:image" content="https://chat.vote/pics/ogimage.png" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:description" content="Create shareable polls easily and quickly using chat.vote/poll" />
+
+    <link rel="apple-touch-icon" sizes="152x152" href="/pics/icon/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/pics/icon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/pics/icon/favicon-16x16.png" />
+    <link rel="manifest" href="/pics/icon/site.webmanifest" />
+    <link rel="mask-icon" href="/pics/icon/safari-pinned-tab.svg" color="#ffd100" />
+    <link rel="shortcut icon" href="/pics/icon/favicon.ico" />
+    <meta name="msapplication-TileColor" content="#2b5797" />
+    <meta name="msapplication-config" content="/pics/icon/browserconfig.xml" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/icons.css" />
+    <link rel="stylesheet" href="/css/common.min.css" />
+    <link rel="stylesheet" href="/poll/poll.min.css" />
+  </head>
+
+  <body>
+    <noscript>
+      <div class="alert alert-danger" role="alert">WARNING! JavaScript is disabled. This site will not work properly without it.</div>
+    </noscript>
+
+    <div class="modal" id="modal1" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Are you sure?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>All poll options will be deleted</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="reset()">Delete all</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" data-bs-backdrop="static" id="modal2" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Poll info</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="modal2body">
+            <div class="text-danger" id="errorDiv"></div>
+            <h4>Poll link:</h4>
+            <div id="pollLinkDiv">
+              <p class="placeholder-glow">
+                <span class="placeholder placeholder-lg col-12 bg-warning"></span>
+              </p>
+            </div>
+            <h5>Poll info:</h5>
+            <h6>Title:</h6>
+            <div id="pollTitleDiv">
+              <p class="placeholder-glow">
+                <span class="placeholder col-12"></span>
+              </p>
+            </div>
+            <h6>Options:</h6>
+            <div id="pollOptionsDiv">
+              <p class="placeholder-glow">
+                <span class="placeholder col-12"></span>
+              </p>
+            </div>
+            <h6>Settings:</h6>
+            <div id="pollSettingsDiv">
+              <p class="placeholder-glow">
+                <span class="placeholder col-12"></span>
+              </p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" data-bs-backdrop="static" id="modal3" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Could not get user ID</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="modal3body">
+            Could not get your user ID, maybe you are using some extension that is blocking the script?<br />
+            The server uses device fingerprints to identify users, and it might not be able to verify that you made this poll without it.<br />
+            Try disabling any extension that might blocking it and refresh :)<br />
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-warning" onclick="ignoreModal()" data-bs-dismiss="modal">Ignore</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="modal4" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Failed to run reCAPTCHA</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="modal4body">
+            It seems that you are blocking reCAPTCHA, the server won't accept any request that is not verified by reCAPTCHA.<br />
+            Try disabling any extension that might be blocking it and refresh :)<br />
+          </div>
+          <div class="modal-footer"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="modal5" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Duplicates detected</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Some of the options you entered were duplicate</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-warning" data-bs-dismiss="modal" onclick="removeDuplicates()">Remove duplicate options</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand notranslate site-link" href="/poll/" target="_self" rel="noopener noreferrer">
+          <img src="/pics/donk.png" alt="donk" height="24" class="d-inline-block align-top" /> chat.vote Polls
+        </a>
+        <div class="collapse navbar-collapse">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a
+                class="nav-link site-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="Polls that you vote on by typing in Twitch chat"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/"
+              >
+                <img style="height: 1.2em; filter: invert(0.25)" id="twitchLogo" alt="twitch" src="/pics/twitch.png" /> Twitch chat polls
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link site-link active"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="Straw polls with shareable links"
+                aria-current="page"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/poll/"
+              >
+                <i class="material-icons notranslate">how_to_vote</i>Polls
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link site-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="Mini games with chat interaction"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/games/"
+              >
+                <i class="material-icons notranslate">videogame_asset</i> Games
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link site-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="Twitch chat raffles"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/raffles/"
+              >
+                <i class="material-icons notranslate">local_activity</i> Raffles
+              </a>
+            </li>
+            <li class="nav-item" style="display: none">
+              <a
+                class="nav-link site-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="A VTS plugin that allows your viewers to control your model"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/vts/"
+              >
+                <span class="vts-icon"></span>VTube Studio Plugin
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row" id="mainrow">
+        <div class="col-xl-2"></div>
+
+        <div class="col-xl-6" id="main">
+          <div class="card bg-dark-subtle border-dark-subtle" id="titleCard">
+            <div class="card-body">
+              <div class="input-group input-group-lg">
+                <input type="text" id="pollTitle" class="form-control" placeholder="Poll title" aria-label="Poll title" />
+              </div>
+            </div>
+          </div>
+
+          <div id="optionsDiv">
+            <div class="card bg-dark-subtle border-dark-subtle option-card" data-option-id="1">
+              <div class="card-body">
+                <div class="input-group">
+                  <input type="text" class="form-control poll-option" onkeydown="handleInput(event)" data-option-id="1" placeholder="Enter poll option" aria-label="Poll option" />
+                  <span class="input-group-text poll-image" data-option-id="1" data-image-url="" style="display: none"> </span>
+                  <button type="button" class="remove-image btn btn-warning" onclick="deleteImage(event)" data-option-id="1" style="display: none">
+                    <i data-option-id="1" class="material-icons notranslate">hide_image</i>
+                  </button>
+                  <button type="button" class="remove-input btn btn-danger" onclick="deleteInput(event)" data-option-id="1">
+                    <i class="material-icons notranslate" data-option-id="1">delete_forever</i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="card bg-dark-subtle border-dark-subtle option-card" data-option-id="2">
+              <div class="card-body">
+                <div class="input-group">
+                  <input type="text" class="form-control poll-option" onkeydown="handleInput(event)" data-option-id="2" placeholder="Enter poll option" aria-label="Poll option" />
+                  <span class="input-group-text poll-image" data-option-id="2" data-image-url="" style="display: none"> </span>
+                  <button type="button" class="remove-image btn btn-warning" onclick="deleteImage(event)" data-option-id="2" style="display: none">
+                    <i data-option-id="2" class="material-icons notranslate">hide_image</i>
+                  </button>
+                  <button type="button" class="remove-input btn btn-danger" onclick="deleteInput(event)" data-option-id="2">
+                    <i class="material-icons notranslate" data-option-id="2">delete_forever</i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="underOptions">
+            <button id="createpollbtn" class="btn btn-success btn-lg" type="button" onclick="createPoll()"><i class="material-icons notranslate">create</i>Create Poll</button>
+
+            <button type="button" class="btn add-btn bg-dark-subtle border-dark-subtle" onclick="addInput()"><i class="material-icons notranslate">add</i></button>
+
+            <div class="float-end">
+              <div class="btn-group" role="group" aria-label="Delete all or restart buttons">
+                <button
+                  type="button"
+                  class="btn btn-outline-danger"
+                  onclick="showModal1()"
+                  data-bs-toggle="tooltip"
+                  data-bs-delay="200"
+                  data-bs-placement="top"
+                  data-bs-title="Remove all options from the poll"
+                >
+                  <i class="material-icons notranslate">delete_forever</i>ALL
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-3">
+          <div class="container-fluid" id="settings">
+            <div class="accordion" id="accordion1">
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                    <i class="material-icons notranslate">settings</i>Settings
+                  </button>
+                </h2>
+
+                <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordion1">
+                  <div class="accordion-body">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                      <li class="nav-item" role="presentation">
+                        <a class="nav-link active" id="basic-tab" data-bs-toggle="tab" href="#basic" role="tab" aria-controls="basic" aria-selected="true">Settings</a>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="contact-tab" data-bs-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">About/Contact</a>
+                      </li>
+                    </ul>
+
+                    <div class="tab-content" id="myTabContent">
+                      <div class="tab-pane fade show active" id="basic" role="tabpanel" aria-labelledby="basic-tab">
+                        <div class="row">
+                          <div class="col">
+                            <div class="card border settingscard">
+                              <div class="card-body" id="basicsettings">
+                                <small class="text-info">Hint: Add an image link at the start of a poll option and press enter to embed it</small>
+                                <hr />
+                                <div class="form-check form-switch">
+                                  <input class="form-check-input" type="checkbox" id="multipleAnswersAllowed" />
+                                  <label class="form-check-label" for="multipleAnswersAllowed"><i class="material-icons notranslate">plus_one</i>Allow multiple answers</label>
+                                  <br /><small class="form-text text-body-secondary">Lets users vote for more than 1 option from the poll.</small>
+                                </div>
+                                <br />
+                                <h4>Poll timer</h4>
+                                <div class="mb-3">
+                                  <div class="input-group flex-nowrap timer">
+                                    <input type="number" aria-label="poll timer value" id="pollTimerValue" placeholder="0" min="0" class="form-control" />
+                                    <select class="form-select timer" id="pollTimerUnit">
+                                      <option selected value="m">Minutes</option>
+                                      <option value="h">Hours</option>
+                                      <option value="d">Days</option>
+                                    </select>
+                                  </div>
+
+                                  <small class="form-text text-body-secondary">Poll will close after the timer runs out.</small>
+                                </div>
+                                <br />
+                                <h4>Results visibility</h4>
+                                <div class="form-check">
+                                  <input class="form-check-input" type="radio" name="resultsVisibility" value="0" id="results_anyone" checked />
+                                  <label class="form-check-label" for="results_anyone"><i class="material-icons notranslate">visibility</i>Visible to anyone</label>
+                                </div>
+                                <div class="form-check">
+                                  <input class="form-check-input" type="radio" name="resultsVisibility" value="1" id="results_voters" />
+                                  <label class="form-check-label" for="results_voters"><i class="material-icons notranslate">how_to_vote</i>Visible after voting</label>
+                                </div>
+                                <div class="form-check">
+                                  <input class="form-check-input" type="radio" name="resultsVisibility" value="2" id="results_timer" disabled />
+                                  <label class="form-check-label" for="results_timer"><i class="material-icons notranslate">timer</i>Reveal after timer runs out</label>
+                                </div>
+                                <div class="form-check">
+                                  <input class="form-check-input" type="radio" name="resultsVisibility" value="3" id="results_creator" />
+                                  <label class="form-check-label" for="results_creator"><i class="material-icons notranslate">person</i>Visible to me only</label>
+                                </div>
+                                <br />
+                                <h4 style="display: none">Duplicate detection level</h4>
+                                <small style="display: none" class="text-warning">not ready yet :)</small>
+                                <div class="form-check" style="display: none">
+                                  <input class="form-check-input" type="radio" name="duplicateDetectionLevel" value="0" id="detect_low" disabled />
+                                  <label class="form-check-label" for="results_anyone"><i class="material-icons notranslate">remove_moderator</i>Low</label>
+                                  <br /><small class="form-text text-body-secondary">Low protection against duplicate votes, only very obvious bots will be blocked.</small>
+                                </div>
+
+                                <div class="form-check" style="display: none">
+                                  <input class="form-check-input" type="radio" name="duplicateDetectionLevel" value="1" id="detect_high" checked disabled />
+                                  <label class="form-check-label" for="results_timer"><i class="material-icons notranslate">security</i>High</label>
+                                  <br /><small class="form-text text-body-secondary">Users on the same network might not be able to vote.</small>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="card border settingscard">
+                              <div class="card-body">
+                                <label for="bulkOptions">Add poll options in bulk</label>
+                                <textarea class="form-control" placeholder="1 option per line" id="bulkOptions" style="white-space: pre-wrap" rows="7"></textarea>
+                                <button type="button" onclick="addOptionBulk()" data-bs-toggle="collapse" data-bs-target="#collapseOne" class="btn btn-primary mt-2">
+                                  <i class="material-icons notranslate">add</i>Add
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                        <div class="row">
+                          <div class="col">
+                            <div class="card border settingscard">
+                              <div class="card-body">
+                                <h5>Contact info:</h5>
+                                <p>
+                                  Site by <a href="https://www.twitch.tv/badoge">badoge</a> :) <br />
+                                  If you find any issues or if you have suggestions or questions, you can contact me:<br />
+                                  <a href="https://www.twitch.tv/popout/badoge/chat?popout=">in this chat</a> <br />
+                                  or on <a href="https://discord.gg/eF54kvd">discord</a> <br />
+                                  or by <a href="mailto:poll@chat.vote">email</a>
+                                </p>
+                              </div>
+                            </div>
+                            <div class="card border settingscard">
+                              <div class="card-body">
+                                <h5>Other stuff by me :)</h5>
+                                <p>
+                                  <a target="_blank" rel="noopener noreferrer" href="https://chat.vote/">chat.vote</a><br />
+                                  <small>Polls that you vote on by typing in Twitch chat.</small><br />
+                                  <a target="_blank" rel="noopener noreferrer" href="https://chat.vote/games/">chat.vote/games</a><br />
+                                  <small>Mini games with chat interaction.</small><br />
+                                  <a target="_blank" rel="noopener noreferrer" href="https://chat.vote/vts/">chat.vote/vts</a><br />
+                                  <small>A site that lets viewers control your VTube Studio model using chat commands or channel points.</small><br />
+                                  <a target="_blank" rel="noopener noreferrer" href="https://okayeg.com">OkayegBOT</a><br />
+                                  <small>Fun/utility Twitch chat bot.</small><br />
+                                  <a target="_blank" rel="noopener noreferrer" href="https://zero.chat.vote">0weebs</a><br />
+                                  <small>Twitch moderation bot that bans weebs.</small><br />
+                                </p>
+                              </div>
+                            </div>
+                            <div class="card border settingscard">
+                              <div class="card-body">
+                                <h5>About:</h5>
+                                <h6>This site uses:</h6>
+                                <ul>
+                                  <li><a target="_blank" rel="noopener noreferrer" href="https://workers.cloudflare.com/">Cloudflare Workers + Durable Objects</a></li>
+                                  <li><a target="_blank" rel="noopener noreferrer" href="https://getbootstrap.com/">Bootstrap</a></li>
+                                  <li><a target="_blank" rel="noopener noreferrer" href="https://www.chartjs.org/">Chart.js</a> to display the results graph</li>
+                                  <li><a target="_blank" rel="noopener noreferrer" href="https://github.com/albert-gonzalez/easytimer.js">EasyTimer.js</a> for the countdown timer</li>
+                                  <li><a target="_blank" rel="noopener noreferrer" href="https://github.com/validatorjs/validator.js">validator.js</a> sanitizer</li>
+                                  <li><a target="_blank" rel="noopener noreferrer" href="https://github.com/cure53/DOMPurify">DOMPurify</a> sanitizer</li>
+                                  <li><a target="_blank" rel="noopener noreferrer" href="https://github.com/fingerprintjs/fingerprintjs/">FingerprintJS</a> to identify users</li>
+                                  <li><a target="_blank" rel="noopener noreferrer" href="https://developers.google.com/recaptcha/docs/v3">reCAPTCHA</a> to protect against bots</li>
+                                  <li><a target="_blank" rel="noopener noreferrer" href="https://fonts.google.com/icons">Material Icons</a> icons</li>
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-1"></div>
+      </div>
+      <div aria-live="polite" aria-atomic="true" class="position-relative">
+        <div id="toastContainer" class="toast-container"></div>
+      </div>
+    </div>
+
+    <script src="https://www.google.com/recaptcha/api.js?render=6LdzxrwdAAAAADyHX2t8ZS4U5QxTNLVWNrGOeNp0"></script>
+    <script src="/js/validator.min.js"></script>
+    <script src="/js/purify.min.js"></script>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/functions.min.js"></script>
+    <script src="/poll/poll.min.js"></script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H43YN7FSSP"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-H43YN7FSSP");
+    </script>
+  </body>
+</html>

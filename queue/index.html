@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: https://ogp.me/ns#" data-bs-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <title>chat.vote/queue</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Create twitch chat polls and vote through chat commands easily and quickly using chat.vote" />
+    <meta name="keywords" content="twitch, chat, poll, chatvote, chat.vote" />
+    <meta property="og:title" content="chat.vote/queue" />
+    <meta property="og:site_name" content="chat.vote queue" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://chat.vote/queue/" />
+    <meta property="og:image" content="https://chat.vote/pics/ogimage.png" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:description" content="Create twitch chat polls and vote through chat commands easily and quickly using chat.vote" />
+
+    <link rel="apple-touch-icon" sizes="152x152" href="/pics/icon/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/pics/icon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/pics/icon/favicon-16x16.png" />
+    <link rel="manifest" href="/pics/icon/site.webmanifest" />
+    <link rel="mask-icon" href="/pics/icon/safari-pinned-tab.svg" color="#ffd100" />
+    <link rel="shortcut icon" href="/pics/icon/favicon.ico" />
+    <meta name="msapplication-TileColor" content="#2b5797" />
+    <meta name="msapplication-config" content="/pics/icon/browserconfig.xml" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/icons.css" />
+    <link rel="stylesheet" href="/css/common.min.css" />
+    <link rel="stylesheet" href="/queue/queue.min.css" />
+  </head>
+
+  <body>
+    <noscript><div class="alert alert-danger" role="alert">WARNING! JavaScript is disabled. This site will not work properly without it.</div></noscript>
+
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand notranslate site-link" href="/queue/" target="_self" rel="noopener noreferrer"
+          ><img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" /> chat.vote/queue</a
+        >
+        <div class="collapse navbar-collapse">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a
+                class="nav-link site-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="Polls that you vote on by typing in Twitch chat"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/"
+              >
+                <img style="height: 1.2em; filter: invert(0.25)" id="twitchLogo" alt="twitch" src="/pics/twitch.png" /> Twitch chat polls
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link site-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="Straw polls with shareable links"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/poll/"
+              >
+                <i class="material-icons notranslate">how_to_vote</i>Polls
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link site-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="Mini games with chat interaction"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/games/"
+              >
+                <i class="material-icons notranslate">videogame_asset</i> Games
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link site-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="Twitch chat raffles"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/raffles/"
+              >
+                <i class="material-icons notranslate">local_activity</i> Raffles
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link site-link active"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="queue"
+                aria-current="page"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/queue/"
+              >
+                <i class="material-icons notranslate">question_mark</i> Queue
+              </a>
+            </li>
+            <li class="nav-item" id="vtsLink" style="display: none">
+              <a
+                class="nav-link site-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="A VTS plugin that allows your viewers to control your model (recommended based on your stream tags)"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/vts/"
+              >
+                <span class="vts-icon"></span>VTube Studio Plugin
+              </a>
+            </li>
+          </ul>
+          <div class="mx-auto d-inline-flex">
+            <div id="status" style="margin-top: 5px">
+              <h4><span class="badge bg-danger">Not connected :(</span></h4>
+            </div>
+            <div id="botStatus" style="margin-left: 5px; margin-top: 5px"></div>
+          </div>
+        </div>
+
+        <div id="topright">
+          <a
+            role="button"
+            id="loginButton"
+            onclick="login()"
+            class="btn btn-twitch"
+            tabindex="0"
+            data-bs-container="body"
+            data-bs-custom-class="custom-popover"
+            data-bs-placement="bottom"
+            data-bs-trigger="manual"
+            data-bs-toggle="popover"
+            data-bs-title="Not signed in"
+            data-bs-content="You need sign in first"
+            ><span class="twitch-icon"></span>Sign in with Twitch</a
+          >
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-xl-9">
+          <div class="card" id="playersCard">
+            <div class="card-body">
+              <iframe
+                width="100%"
+                height="100%"
+                src="https://www.youtube-nocookie.com/embed/oyJf72je2U0"
+                title="YouTube video player"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3">
+          <div class="card" id="queueList">
+            <div class="card-body">
+              <button type="button" class="btn btn-success">Open queue</button>
+              <button type="button" class="btn btn-warning">Reset queue</button>
+
+              <label for="addLink" class="form-label">Add songs or videos to the queue:</label>
+              <div class="input-group mb-3">
+                <input type="text" id="addLink" class="form-control" placeholder="Link" aria-label="Add link input text field" aria-describedby="addLink" />
+                <button class="btn btn-secondary" type="button" id="addLink" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="top" data-bs-title="or just press enter :)">
+                  Add
+                </button>
+              </div>
+
+              <h4>Add songs or videos to the queue using "<span style="color: #00bc8c; cursor: pointer" id="queueCommand" class="notranslate">!request</span> [link]" in chat</h4>
+
+              <ul class="list-group">
+                <li class="list-group-item">An item</li>
+                <li class="list-group-item">A second item</li>
+                <li class="list-group-item">A third item</li>
+                <li class="list-group-item">A fourth item</li>
+                <li class="list-group-item">And a fifth one</li>
+                <li class="list-group-item">An item</li>
+                <li class="list-group-item">A second item</li>
+                <li class="list-group-item">A third item</li>
+                <li class="list-group-item">A fourth item</li>
+                <li class="list-group-item">And a fifth one</li>
+                <li class="list-group-item">An item</li>
+                <li class="list-group-item">A second item</li>
+                <li class="list-group-item">A third item</li>
+                <li class="list-group-item">A fourth item</li>
+                <li class="list-group-item">And a fifth one</li>
+                <li class="list-group-item">An item</li>
+                <li class="list-group-item">A second item</li>
+                <li class="list-group-item">A third item</li>
+                <li class="list-group-item">A fourth item</li>
+                <li class="list-group-item">And a fifth one</li>
+                <li class="list-group-item">An item</li>
+                <li class="list-group-item">A second item</li>
+                <li class="list-group-item">A third item</li>
+                <li class="list-group-item">A fourth item</li>
+                <li class="list-group-item">And a fifth one</li>
+                <li class="list-group-item">An item</li>
+                <li class="list-group-item">A second item</li>
+                <li class="list-group-item">A third item</li>
+                <li class="list-group-item">A fourth item</li>
+                <li class="list-group-item">And a fifth one</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row fixed-bottom">
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-5 d-flex justify-content-start">
+                <button class="btn btn-primary" id="settingsButton" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSettings" aria-controls="offcanvasSettings">
+                  Settings
+                </button>
+
+                <div class="input-group">
+                  <input type="text" class="form-control" id="profileLink" onclick="copyLink('https://queue.chat.vote/username')" value="https://queue.chat.vote/username" />
+                  <button
+                    type="button"
+                    id="copyLinkButton"
+                    class="btn btn-outline-secondary"
+                    data-bs-toggle="tooltip"
+                    data-bs-delay="200"
+                    data-bs-trigger="manual"
+                    data-bs-placement="bottom"
+                    data-bs-title="Link copied :)"
+                    onclick="copyLink('https://queue.chat.vote/username')"
+                  >
+                    <i class="material-icons notranslate">content_copy</i>
+                  </button>
+                </div>
+              </div>
+              <div class="col-2 d-flex justify-content-center">
+                <button type="button" class="btn btn-secondary"><i class="material-icons notranslate">skip_previous</i></button>
+                <button type="button" class="btn btn-secondary"><i class="material-icons notranslate">play_arrow</i></button>
+                <button type="button" class="btn btn-secondary"><i class="material-icons notranslate">skip_next</i></button>
+              </div>
+              <div class="col-5 d-flex justify-content-end">
+                <input type="range" class="form-range" id="customRange1" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="offcanvas offcanvas-bottom" tabindex="-1" id="offcanvasSettings" aria-labelledby="offcanvasSettingsLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasSettingsLabel">Settings</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body">
+        <div class="container">
+          <div class="row">
+            <div class="col-xl-6">
+              <div class="card border">
+                <div class="card-header">Enabled Platforms</div>
+                <div class="card-body">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked />
+                    <label class="form-check-label" for="flexSwitchCheckChecked">Youtube</label>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked />
+                    <label class="form-check-label" for="flexSwitchCheckChecked">Spotify</label>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked />
+                    <label class="form-check-label" for="flexSwitchCheckChecked">SoundCloud</label>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked />
+                    <label class="form-check-label" for="flexSwitchCheckChecked">Twitch</label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card border">
+                <div class="card-header">Queue Settings</div>
+                <div class="card-body">
+                  <div class="form-check form-switch">
+                    <input type="checkbox" class="form-check-input" id="subMode" aria-describedby="submodedesc" />
+                    <label class="form-check-label" for="subMode"><i class="material-icons notranslate">attach_money</i>Subscribers only queue</label>
+                    <small id="submodedesc" class="text-body-secondary"><br />asdasd</small>
+                  </div>
+
+                  <div class="input-group">
+                    <span class="input-group-text">Request limit</span>
+                    <input
+                      type="number"
+                      id="suggestionLimit"
+                      style="max-width: 5em"
+                      class="form-control"
+                      min="1"
+                      placeholder="1"
+                      value="1"
+                      aria-label="Text input with checkbox for suggestion limit"
+                    />
+                  </div>
+                  <small class="text-body-secondary">asdasd.</small>
+                </div>
+              </div>
+
+              <div class="card border">
+                <div class="card-header">Channel Points Requests</div>
+                <div class="card-body">
+                  <button class="btn btn-info mainbuttons" data-bs-dismiss="modal" id="createReward">
+                    <svg class="pointsIcon" type="color-fill-current" width="25px" height="25px" version="1.1" viewBox="0 0 20 20" x="0px" y="0px">
+                      <g>
+                        <path d="M10 6a4 4 0 014 4h-2a2 2 0 00-2-2V6z"></path>
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-2 0a6 6 0 11-12 0 6 6 0 0112 0z" clip-rule="evenodd"></path>
+                      </g>
+                    </svg>
+                    Create New Reward
+                  </button>
+                </div>
+              </div>
+
+              <div class="input-group mb-0">
+                <span class="input-group-text redborder"><i class="material-icons notranslate">restore</i>Restore default settings</span>
+                <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#modal5">
+                  <i class="material-icons notranslate">delete_forever</i>Reset settings
+                </button>
+              </div>
+              <small class="text-body-secondary">Resets all settings and signs you out.</small>
+            </div>
+            <div class="col-xl-6">
+              <div class="card border">
+                <div class="card-header">Chat Commands</div>
+
+                <div class="card-body">
+                  <div class="form-group mb-3">
+                    <label for="votePrefix">Song Request</label>
+                    <input type="text" class="form-control notranslate" id="votePrefix" value="!sr" aria-describedby="description2" />
+                    <small id="description2" class="text-body-secondary">asdasd</small>
+                  </div>
+                  <div class="form-group mb-3">
+                    <label for="votePrefix">Song Request</label>
+                    <input type="text" class="form-control notranslate" id="votePrefix" value="!sr" aria-describedby="description2" />
+                    <small id="description2" class="text-body-secondary">asdasd</small>
+                  </div>
+                  <div class="form-group mb-3">
+                    <label for="votePrefix">Song Request</label>
+                    <input type="text" class="form-control notranslate" id="votePrefix" value="!sr" aria-describedby="description2" />
+                    <small id="description2" class="text-body-secondary">asdasd</small>
+                  </div>
+                  <div class="form-group mb-3">
+                    <label for="votePrefix">Song Request</label>
+                    <input type="text" class="form-control notranslate" id="votePrefix" value="!sr" aria-describedby="description2" />
+                    <small id="description2" class="text-body-secondary">asdasd</small>
+                  </div>
+                  <div class="form-group mb-3">
+                    <label for="votePrefix">Song Request</label>
+                    <input type="text" class="form-control notranslate" id="votePrefix" value="!sr" aria-describedby="description2" />
+                    <small id="description2" class="text-body-secondary">asdasd</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/tmi.min.js"></script>
+    <script src="/js/purify.min.js"></script>
+    <script src="/js/validator.min.js"></script>
+    <script src="/js/linkify.min.js"></script>
+    <script src="/js/linkify-element.min.js"></script>
+    <script src="/js/linkify-plugin-mention.min.js"></script>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/functions.min.js"></script>
+    <script src="/queue/queue.js"></script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H43YN7FSSP"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-H43YN7FSSP");
+    </script>
+  </body>
+</html>

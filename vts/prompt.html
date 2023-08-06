@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Create twitch chat polls and vote through chat commands easily and quickly using chat.vote" />
+    <meta name="keywords" content="twitch, chat, poll, chatvote, chat.vote" />
+    <title>chat.vote/vts login prompt</title>
+
+    <link rel="apple-touch-icon" sizes="152x152" href="/pics/icon/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/pics/icon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/pics/icon/favicon-16x16.png" />
+    <link rel="manifest" href="/pics/icon/site.webmanifest" />
+    <link rel="mask-icon" href="/pics/icon/safari-pinned-tab.svg" color="#ffd100" />
+    <link rel="shortcut icon" href="/pics/icon/favicon.ico" />
+    <meta name="msapplication-TileColor" content="#2b5797" />
+    <meta name="msapplication-config" content="/pics/icon/browserconfig.xml" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/icons.css" />
+    <link rel="stylesheet" href="/css/common.min.css" />
+    <link rel="stylesheet" href="/vts/vts.min.css" />
+
+    <style>
+      html,
+      body {
+        margin: 10px;
+        height: 100%;
+        overflow: hidden;
+      }
+    </style>
+
+    <script src="/js/bootstrap.bundle.min.js"></script>
+  </head>
+
+  <body>
+    <div class="container d-flex justify-content-center align-items-center" style="height: 70%">
+      <div class="row">
+        <strong class="text-danger" style="font-size: 2rem; margin-bottom: 10px; text-align: center">
+          Don't show this on stream<img src="/pics/donk.png" alt="donk" style="height: 1.5em" />
+        </strong>
+        <br />
+        <a
+          class="btn btn-twitch"
+          href="https://id.twitch.tv/oauth2/authorize?client_id=qn0wimnszbqlwfnszdz3wwfz430eqr&redirect_uri=https://chat.vote/vts/login.html&response_type=token&scope=channel:manage:redemptions"
+        >
+          <span class="twitch-icon"></span> Sign in with Twitch
+        </a>
+        <span class="text-body-secondary" style="text-align: center">Address bar will show sensitive data</span>
+      </div>
+    </div>
+    <script>
+      window.onbeforeunload = function (e) {
+        window.opener.loadPFP();
+      };
+    </script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H43YN7FSSP"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-H43YN7FSSP");
+    </script>
+  </body>
+</html>

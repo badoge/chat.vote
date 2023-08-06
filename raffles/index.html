@@ -1,0 +1,735 @@
+﻿<!DOCTYPE html>
+<html lang="en" prefix="og: https://ogp.me/ns#" data-bs-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <title>chat.vote Raffles</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="chat.vote Raffles" />
+    <meta name="keywords" content="twitch, chat, raffles, raffle, giveaway, giveaways, chatvote, chat.vote" />
+    <meta property="og:title" content="chat.vote Raffles" />
+    <meta property="og:site_name" content="chat.vote Raffles" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://chat.vote/raffles/" />
+    <meta property="og:image" content="https://chat.vote/pics/ogimage.png" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:description" content="chat.vote Raffles" />
+
+    <link rel="apple-touch-icon" sizes="152x152" href="/pics/icon/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/pics/icon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/pics/icon/favicon-16x16.png" />
+    <link rel="manifest" href="/pics/icon/site.webmanifest" />
+    <link rel="mask-icon" href="/pics/icon/safari-pinned-tab.svg" color="#ffd100" />
+    <link rel="shortcut icon" href="/pics/icon/favicon.ico" />
+    <meta name="msapplication-TileColor" content="#2b5797" />
+    <meta name="msapplication-config" content="/pics/icon/browserconfig.xml" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/icons.css" />
+    <link rel="stylesheet" href="/css/common.min.css" />
+    <link rel="stylesheet" href="/raffles/raffles.min.css" />
+  </head>
+
+  <body>
+    <noscript><div class="alert alert-danger" role="alert">WARNING! JavaScript is disabled. This site will not work properly without it.</div></noscript>
+
+    <div class="modal" id="resetSettingsModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Are you sure?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>All settings will be reset and the page will reload</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="resetSettings">Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="loginExpiredModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Login expired</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row justify-content-center">
+              Renew login:<br />
+              <button type="button" data-bs-dismiss="modal" id="loginExpiredRenew" class="btn btn-twitch"><span class="twitch-icon"></span>Sign in with Twitch</button>
+              <br /><small class="text-body-secondary">Logins expire after 2 months.<br />Or after you change your password.</small>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-danger"
+              data-bs-toggle="tooltip"
+              data-bs-delay="200"
+              data-bs-placement="top"
+              data-bs-title="Will reset everything so you can login again."
+              data-bs-dismiss="modal"
+              id="loginExpiredReset"
+            >
+              Reset
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="restartRaffleModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Are you sure?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>All winners and entrants will get removed from the raffle.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-warning" data-bs-dismiss="modal" id="restartRaffle">Restart raffle</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" data-bs-backdrop="static" id="fancyRaffleModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog widemodal modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body">
+            <section>
+              <div id="claw"></div>
+              <div class="half" id="slot">
+                <div class="spinner-border" style="width: 10rem; height: 10rem; position: relative; left: 45%" role="status"><span class="sr-only"></span></div>
+              </div>
+            </section>
+            <section class="result">
+              <div></div>
+              <div class="result-container" id="fancyRaffleWinner"></div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
+      <div class="container-fluid">
+        <a class="navbar-brand notranslate site-link" href="/raffles/" target="_self" rel="noopener noreferrer">
+          <img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" /> chat.vote Raffles
+        </a>
+        <div class="collapse navbar-collapse">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a
+                class="nav-link site-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="Polls that you vote on by typing in Twitch chat"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/"
+              >
+                <img style="height: 1.2em; filter: invert(0.25)" id="twitchLogo" alt="twitch" src="/pics/twitch.png" /> Twitch chat polls
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link site-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="Straw polls with shareable links"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/poll/"
+              >
+                <i class="material-icons notranslate">how_to_vote</i>Polls
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link site-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="Mini games with chat interaction"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/games/"
+              >
+                <i class="material-icons notranslate">videogame_asset</i> Games
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link site-link active"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="Raffles"
+                aria-current="page"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/raffles/"
+              >
+                <i class="material-icons notranslate">local_activity</i> Raffles
+              </a>
+            </li>
+            <li class="nav-item" id="vtsLink" style="display: none">
+              <a
+                class="nav-link site-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="A VTS plugin that allows your viewers to control your model (recommended based on your stream tags)"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/vts/"
+              >
+                <span class="vts-icon"></span>VTube Studio Plugin
+              </a>
+            </li>
+          </ul>
+          <div class="mx-auto d-inline-flex">
+            <div id="status" style="margin-top: 5px">
+              <h4><span class="badge bg-danger">Not connected :(</span></h4>
+            </div>
+          </div>
+        </div>
+        <div id="topRight" class="navbar-nav">
+          <div class="btn-group" role="group" aria-label="login options">
+            <a
+              role="button"
+              id="loginButton"
+              class="btn btn-twitch"
+              tabindex="0"
+              data-bs-container="body"
+              data-bs-custom-class="custom-popover"
+              data-bs-placement="bottom"
+              data-bs-trigger="manual"
+              data-bs-toggle="popover"
+              data-bs-title="Not signed in"
+              data-bs-content="You need sign in first before enabling the raffle"
+              ><span class="twitch-icon"></span>Sign in with Twitch</a
+            >
+            <div class="btn-group" role="group">
+              <button
+                id="btnGroupDropLogin"
+                type="button"
+                class="btn btn-twitch dropdown-toggle"
+                data-bs-toggle="dropdown"
+                data-bs-auto-close="outside"
+                aria-label="other login option, connect manually"
+                aria-expanded="false"
+              ></button>
+              <div class="dropdown-menu dropdown-menu-end" aria-labelledby="btnGroupDropLogin">
+                <div class="p-3" style="width: 300px">
+                  <label for="channelName" class="form-label">Connect to chat directly</label>
+                  <div class="input-group mb-3">
+                    <span class="input-group-text" id="directLoginChannel">twitch.tv/</span>
+                    <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
+                  </div>
+                  <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
+                  <button type="button" id="connectbtn" class="btn btn-primary float-end">Connect</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="navbar-nav">
+          <div id="theme-label-container">
+            <label id="theme-label">
+              <input id="darkTheme" type="checkbox" checked />
+              <div class="planet"></div>
+              <div class="theme-elements">
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div aria-live="polite" aria-atomic="true" class="position-relative">
+      <div id="toastContainer" class="toast-container"></div>
+    </div>
+
+    <div class="container-fluid mt-3">
+      <div class="row">
+        <div class="col-xxl-1 order-first"></div>
+
+        <div class="col-xxl-4 col-lg-5 order-lg-1 order-2">
+          <div class="card mb-2">
+            <div class="card-body" id="titleCard">
+              <label contenteditable="true" spellcheck="false" class="pull-left" id="raffleTitle" data-placeholder="Raffle mode"></label>
+              <small id="titleHint" class="text-body-secondary">Click to edit</small>
+            </div>
+          </div>
+
+          <div id="raffleOutput"></div>
+        </div>
+
+        <div class="col-xxl-2 col-lg-2 order-lg-2 order-1">
+          <div class="card">
+            <div class="card-body text-center" id="raffleButtons">
+              <a
+                role="button"
+                tabindex="0"
+                id="enableRaffle"
+                class="btn btn-success m-1"
+                data-bs-container="body"
+                data-bs-trigger="manual"
+                data-bs-placement="left"
+                data-bs-toggle="popover"
+                data-bs-title="Raffle not open"
+                data-bs-content="A viewer is trying join the raffle but it's closed"
+              >
+                <span id="enableRaffleText">Open Raffle</span><br /><small id="raffleCommandButton" class="notranslate">!join</small>
+              </a>
+              <br />
+              <a role="button" tabindex="0" id="drawRaffleWinner" class="btn btn-info m-1"><i class="material-icons notranslate">celebration</i> Draw A Winner</a>
+              <br />
+              <br />
+              <br />
+              <a role="button" tabindex="0" class="btn btn-outline-warning m-1" data-bs-toggle="modal" data-bs-target="#restartRaffleModal">
+                <i class="material-icons notranslate">refresh</i>Restart raffle
+              </a>
+              <br />
+              <button class="btn btn-secondary m-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#settingsOffcanvas" aria-controls="settingsOffcanvas">
+                <i class="material-icons notranslate">settings</i> Settings
+              </button>
+            </div>
+          </div>
+          <div id="extraTimerDiv" class="mt-3" style="display: none">
+            <div class="input-group">
+              <label class="input-group-text" for="extraTimerMins">Timer</label>
+              <input type="number" style="max-width: 5em" class="form-control" id="extraTimerMins" min="0" placeholder="0" aria-label="minutes" />
+              <button class="btn btn-outline-secondary" type="button" id="stopExtraTimer" style="display: none">Stop<i class="material-icons notranslate">timer_off</i></button>
+              <button class="btn btn-outline-secondary" type="button" id="pauseExtraTimer" style="display: none"><i class="material-icons notranslate">pause</i></button>
+              <button class="btn btn-outline-secondary" type="button" id="unpauseExtraTimer" style="display: none">
+                <i class="material-icons notranslate">play_arrow</i>
+              </button>
+              <button class="btn btn-outline-secondary" type="button" id="startExtraTimer">Start<i class="material-icons notranslate">timer</i></button>
+            </div>
+            <div class="card border-danger" id="extraCountdown" style="display: none; font-size: 3em">
+              <div class="card-body">
+                <div class="values"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xxl-4 col-lg-5 order-3">
+          <h2 class="text-center">
+            Type <span style="color: #00bc8c; cursor: pointer" id="raffleCommandText" class="notranslate">!join</span> in chat to join
+
+            <div class="role-badge" id="plebBadge">
+              <img src="/pics/pleb.png" alt="Non subscriber" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Non subscriber" style="height: 24px; width: 24px" />
+              <div class="role-allowed"></div>
+            </div>
+
+            <div class="role-badge" id="subBadge">
+              <img src="/pics/sub.png" alt="Subscriber" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Subscriber" style="height: 24px; width: 24px" />
+              <div class="role-allowed"></div>
+            </div>
+
+            <div class="role-badge" id="modBadge">
+              <img src="/pics/mod.png" alt="Moderator" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Moderator" style="height: 24px; width: 24px" />
+              <div class="role-allowed"></div>
+            </div>
+
+            <div class="role-badge" id="vipBadge">
+              <img src="/pics/vip.png" alt="VIP" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="VIP" style="height: 24px; width: 24px" />
+              <div class="role-allowed"></div>
+            </div>
+
+            <div class="role-badge" id="firstmsgBadge">
+              <img src="/pics/firstmsg.png" alt="First time chatter" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="First time chatter" style="height: 24px; width: 24px" />
+              <div class="role-allowed"></div>
+            </div>
+          </h2>
+          <h5 id="entrants" class="text-body-secondary">Entrants: 0</h5>
+          <div id="raffleUsersDiv">
+            <ul class="list-group" id="raffleUsers"></ul>
+          </div>
+        </div>
+
+        <div class="col-xxl-1 order-last"></div>
+      </div>
+    </div>
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="settingsOffcanvas" aria-labelledby="settingsOffcanvasLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="settingsOffcanvasLabel"><i class="material-icons notranslate">settings</i> Raffle Settings</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body">
+        <div class="card m-3" style="width: 30rem">
+          <div class="card-body">
+            <div class="row">
+              <div class="col">
+                <div class="form-group">
+                  <label for="raffleCommand" class="form-label">Raffle join command</label>
+                  <input type="text" class="form-control notranslate" id="raffleCommand" value="!join" placeholder="!join" aria-describedby="raffleCommandDesc" />
+                  <small id="raffleCommandDesc" class="text-body-secondary">The command to use to enter the raffle.</small>
+                </div>
+              </div>
+              <div class="col">
+                <div class="form-check form-switch mb-3">
+                  <input type="checkbox" class="form-check-input" id="removeWinner" aria-describedby="removeWinnerDesc" checked />
+                  <label class="form-check-label" for="removeWinner"><i class="material-icons notranslate">block</i> Remove winner from raffle</label>
+                  <small id="removeWinnerDesc" class="text-body-secondary">
+                    <br />Removes the winner from the raffle and prevents them from joining again. If this is off then a viewer can win multiple times
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card m-3" id="whoCanJoinCard" style="width: 35rem">
+          <div class="card-header">Who can join</div>
+          <div class="card-body">
+            <p id="whoCanJoin">Everyone will be able to join the raffle.<br />Entrants will get 1 ticket</p>
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">Allowed to join?</th>
+                  <th scope="col">Role</th>
+                  <th
+                    scope="col"
+                    data-bs-toggle="tooltip"
+                    data-bs-delay="200"
+                    data-bs-placement="top"
+                    data-bs-title="Everyone will get 1 ticket + this amount on bonus tickets. Bonus tickets stack for viewers that have more than 1 role"
+                  >
+                    Bonus Tickets
+                  </th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody class="table-group-divider">
+                <tr>
+                  <th scope="row">
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowPlebs" checked />
+                    </div>
+                  </th>
+                  <td>Non subscriber</td>
+                  <td>
+                    <input type="number" style="width: 80px" class="form-control" id="plebBonus" value="0" min="0" placeholder="0" />
+                  </td>
+                  <td></td>
+                </tr>
+                <tr style="display: none">
+                  <th scope="row">
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowFollowers" checked />
+                    </div>
+                  </th>
+                  <td>Follower</td>
+                  <td>
+                    <input type="number" style="width: 80px" class="form-control" id="followerBonus" value="0" min="0" placeholder="0" />
+                  </td>
+                  <td>
+                    <div class="input-group flex-nowrap">
+                      <label class="input-group-text" for="followAge">Must be following for at least</label>
+                      <input type="number" id="followAge" style="max-width: 5em" class="form-control" value="0" min="0" placeholder="0" aria-label="Text input for follow age" />
+                      <select style="max-width: 110px" class="form-select" id="followAgeUnit">
+                        <option value="min" selected>Minutes</option>
+                        <option value="hr">Hours</option>
+                        <option value="day">Days</option>
+                        <option value="week">Weeks</option>
+                      </select>
+                    </div>
+                  </td>
+                </tr>
+                <tr id="subsRow">
+                  <th scope="row">
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowSubs" checked />
+                    </div>
+                  </th>
+                  <td>Subscriber</td>
+                  <td>
+                    <input type="number" style="width: 80px" class="form-control" id="subBonus" value="0" min="0" placeholder="0" />
+                  </td>
+                  <td>
+                    <div class="input-group flex-nowrap" style="display: none">
+                      <label class="input-group-text" for="subAge">Must be subscribed for at least</label>
+                      <input type="number" id="subAge" style="max-width: 5em" class="form-control" value="0" min="0" placeholder="0" aria-label="Text input for sub age" />
+                      <label class="input-group-text" for="subAge">months</label>
+                    </div>
+                  </td>
+                </tr>
+                <tr id="tier1Row" style="display: none">
+                  <th scope="row">
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowTier1" checked />
+                    </div>
+                  </th>
+                  <td>Tier 1 Subscriber</td>
+                  <td>
+                    <input type="number" style="width: 80px" class="form-control" id="tier1Bonus" value="0" min="0" placeholder="0" />
+                  </td>
+                  <td>
+                    <div class="input-group flex-nowrap" style="display: none">
+                      <label class="input-group-text" for="tier1SubAge">Must be subscribed for at least</label>
+                      <input type="number" id="tier1SubAge" style="max-width: 5em" class="form-control" value="0" min="0" placeholder="0" aria-label="Text input for tier 2 sub age" />
+                      <label class="input-group-text" for="tier1SubAge">months</label>
+                    </div>
+                  </td>
+                </tr>
+                <tr id="tier2Row" style="display: none">
+                  <th scope="row">
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowTier2" checked />
+                    </div>
+                  </th>
+                  <td>Tier 2 Subscriber</td>
+                  <td>
+                    <input type="number" style="width: 80px" class="form-control" id="tier2Bonus" value="0" min="0" placeholder="0" />
+                  </td>
+                  <td>
+                    <div class="input-group flex-nowrap" style="display: none">
+                      <label class="input-group-text" for="tier2SubAge">Must be subscribed for at least</label>
+                      <input type="number" id="tier2SubAge" style="max-width: 5em" class="form-control" value="0" min="0" placeholder="0" aria-label="Text input for tier 2 sub age" />
+                      <label class="input-group-text" for="tier2SubAge">months</label>
+                    </div>
+                  </td>
+                </tr>
+                <tr id="tier3Row" style="display: none">
+                  <th scope="row">
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowTier3" checked />
+                    </div>
+                  </th>
+                  <td>Tier 3 Subscriber</td>
+                  <td>
+                    <input type="number" style="width: 80px" class="form-control" id="tier3Bonus" value="0" min="0" placeholder="0" />
+                  </td>
+                  <td>
+                    <div class="input-group flex-nowrap" style="display: none">
+                      <label class="input-group-text" for="tier3SubAge">Must be subscribed for at least</label>
+                      <input type="number" id="tier3SubAge" style="max-width: 5em" class="form-control" value="0" min="0" placeholder="0" aria-label="Text input for sub luck" />
+                      <label class="input-group-text" for="tier3SubAge">months</label>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowMods" checked />
+                    </div>
+                  </th>
+                  <td>Mod</td>
+                  <td>
+                    <input type="number" style="width: 80px" class="form-control" id="modBonus" value="0" min="0" placeholder="0" />
+                  </td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <th scope="row">
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowVips" checked />
+                    </div>
+                  </th>
+                  <td>VIP</td>
+                  <td>
+                    <input type="number" style="width: 80px" class="form-control" id="vipBonus" value="0" min="0" placeholder="0" />
+                  </td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <th scope="row">
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowFirstTimeChatters" checked />
+                    </div>
+                  </th>
+                  <td>First time chatter</td>
+                  <td>
+                    <input type="number" style="width: 80px" class="form-control" id="firstTimeChatterBonus" value="0" min="0" placeholder="0" />
+                  </td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="btn-group mb-3" role="group" aria-label="Check all/Uncheck all">
+              <button type="button" id="selectAll" class="btn btn-sm btn-success">Select all</button>
+              <button type="button" id="unselectAll" class="btn btn-sm btn-danger">Unselect all</button>
+            </div>
+            <div class="form-check form-switch mb-3">
+              <input type="checkbox" class="form-check-input" id="splitTiers" aria-describedby="splitTiersDesc" />
+              <label class="form-check-label" for="splitTiers"><i class="material-icons notranslate">call_split</i>Split Tier 1/2/3 subscribers into separate roles</label>
+              <br />
+              <small id="splitTiersDesc" class="text-body-secondary">
+                Adds separate roles for each tier so that you can give each role a different amount of bonus tickets or only allow some of them to join
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <div class="card m-3" style="width: 25rem">
+          <div class="card-header">Bot settings</div>
+          <div class="card-body">
+            <div class="form-check form-switch mb-3">
+              <input type="checkbox" class="form-check-input" id="announceWinner" aria-describedby="announceWinnerDesc" disabled />
+              <label class="form-check-label" for="announceWinner"><i class="material-icons notranslate">smart_toy</i> Announce winner in chat</label><br />
+              <small id="announceWinnerDesc" class="text-body-secondary"> Posts a message in chat to notify the winner </small><br />
+              <small class="text-warning no-twitch-warn">You need to sign in using Twitch to use this feature</small>
+            </div>
+            <div class="form-check form-switch mb-3">
+              <input type="checkbox" class="form-check-input" id="confirmJoin" aria-describedby="confirmJoinDesc" disabled />
+              <label class="form-check-label" for="confirmJoin"><i class="material-icons notranslate">smart_toy</i> Confirm joining in chat</label><br />
+              <small id="confirmJoinDesc" class="text-body-secondary">
+                Notifies each viewer that joins the raffle in chat to confirm that they joined.<br />
+                Make sure to mod the bot (@chatvote) so that it does not get timed out by other bots for spamming :)</small
+              ><br />
+              <small class="text-warning no-twitch-warn">You need to sign in using Twitch to use this feature</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="card m-3" style="width: 35rem">
+          <div class="card-header">Animation</div>
+          <div class="card-body">
+            <div class="form-check form-switch mb-3">
+              <input type="checkbox" class="form-check-input" id="animateDrawing" aria-describedby="animateDrawingDesc" checked />
+              <label class="form-check-label" for="animateDrawing"><i class="material-icons notranslate">star</i> Animate raffle drawing</label><br />
+              <small id="animateDrawingDesc" class="text-body-secondary">
+                Plays a CS:GO style case unboxing animation when drawing the winner using placeholder
+                <img src="/pics/donk.png" alt="donk" style="height: 22px; width: 22px" /> avatars that use the chatters' chat color
+              </small>
+            </div>
+            <div class="form-check form-switch ms-5">
+              <input type="checkbox" class="form-check-input" id="useTwitchPFP" aria-describedby="useTwitchPFPDesc" disabled />
+              <label class="form-check-label" for="useTwitchPFP"><i class="material-icons notranslate">account_circle</i> Use Twitch profile pictures</label>
+              <small id="useTwitchPFPDesc" class="text-body-secondary"><br />Replaces the placeholder avatars with the viewers' Twitch avatars </small><br />
+              <small class="text-danger">Use with caution; Some viewers might have avatars that break Twitch's TOS.</small> <br />
+              <small class="text-warning no-twitch-warn">You need to sign in using Twitch to use this feature</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="card m-3" style="width: 38rem">
+          <div class="card-header">Timers</div>
+          <div class="card-body">
+            <div class="input-group" id="rerollDiv">
+              <div class="input-group-text">
+                <input class="form-check-input mt-0" id="autoRerollEnabled" type="checkbox" value="" aria-label="Checkbox for following text input for automatic redraw" />
+              </div>
+              <span class="input-group-text">Redraw if winner does not respond within</span>
+              <input
+                disabled
+                type="number"
+                id="rerollTimerValueMinutes"
+                style="max-width: 5em"
+                class="form-control"
+                value="0"
+                min="0"
+                placeholder="0"
+                aria-label="Text input with checkbox for reroll timer"
+              />
+              <span class="input-group-text">minutes</span>
+            </div>
+            <small class="text-body-secondary">Will automatically draw another winner if the current winner does not type anything in chat.</small>
+
+            <div class="form-check form-switch mt-3">
+              <input type="checkbox" class="form-check-input" id="extraTimerEnabled" aria-describedby="extratimerswitchdesc" />
+              <label class="form-check-label" for="extraTimerEnabled"><i class="material-icons notranslate">timer</i> Extra countdown timer</label>
+              <small id="extratimerswitchdesc" class="text-body-secondary"><br />A separate timer that you control manually.</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="card m-3" style="width: 40rem">
+          <div class="card-body">
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" id="linkPreviewThumbnailsEnabled" />
+              <label class="form-check-label" for="linkPreviewThumbnailsEnabled"> <i class="material-icons notranslate">preview</i>Show thumbnails in link preview </label>
+              <br /><small class="text-body-secondary"><b class="text-danger">Use with caution; viewers might link images that break Twitch's TOS</b></small>
+            </div>
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" id="refreshWarningEnabled" />
+              <label class="form-check-label" for="refreshWarningEnabled"><i class="material-icons notranslate">notification_important</i>Enable close/refresh warning</label>
+              <br /><small class="text-body-secondary">Shows a warning before leaving/refreshing the site so that you don't accidentally lose your raffle results.</small>
+            </div>
+            <div class="input-group mb-0">
+              <span class="input-group-text blueborder">Refresh 3rd party emotes</span>
+              <button class="btn btn-outline-info" type="button" id="getEmotes"><i class="material-icons notranslate">refresh</i></button>
+            </div>
+            <div class="text-body-secondary mb-3">
+              Loaded emotes (global/channel): BTTV: <span id="bttvGlobalEmotes">0</span>/<span id="bttvChannelEmotes">0</span> | FFZ: <span id="ffzGlobalEmotes">0</span>/<span
+                id="ffzChannelEmotes"
+                >0</span
+              >
+              | 7TV: <span id="seventvGlobalEmotes">0</span>/<span id="seventvChannelEmotes">0</span>
+            </div>
+
+            <div class="input-group mb-0">
+              <span class="input-group-text redborder"><i class="material-icons notranslate">restore</i>Restore default settings</span>
+              <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#resetSettingsModal">
+                <i class="material-icons notranslate">delete_forever</i>Reset settings
+              </button>
+            </div>
+            <small class="text-body-secondary">Resets all settings and reloads the page</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/tmi.min.js"></script>
+    <script src="/js/purify.min.js"></script>
+    <script src="/js/easytimer.min.js"></script>
+    <script src="/js/validator.min.js"></script>
+    <script src="/js/linkify.min.js"></script>
+    <script src="/js/linkify-element.min.js"></script>
+    <script src="/js/linkify-plugin-mention.min.js"></script>
+    <script src="/js/howler.core.min.js"></script>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/functions.min.js"></script>
+    <script src="/raffles/raffles.min.js"></script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H43YN7FSSP"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-H43YN7FSSP");
+    </script>
+  </body>
+</html>

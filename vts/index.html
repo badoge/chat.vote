@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: https://ogp.me/ns#" data-bs-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <title>chat.vote VTS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta
+      name="description"
+      content="chat.vote/vts is a VTube Studio plugin that allows your Twitch viewers to trigger hotkeys using chat commands/channel points/subs/gifts/bits. Basic YouTube support is available also."
+    />
+    <meta name="keywords" content="chatvote, chat.vote, VTubeStudio, twitch, youtube" />
+    <meta property="og:title" content="chat.vote VTS" />
+    <meta property="og:site_name" content="chat.vote VTS" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://chat.vote/vts/" />
+    <meta property="og:image" content="https://chat.vote/pics/ogimage.png" />
+    <meta property="og:locale" content="en_US" />
+    <meta
+      property="og:description"
+      content="chat.vote/vts is a VTube Studio plugin that allows your Twitch viewers to trigger hotkeys using chat commands/channel points/subs/gifts/bits. Basic YouTube support is available also."
+    />
+
+    <link rel="apple-touch-icon" sizes="152x152" href="/pics/icon/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/pics/icon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/pics/icon/favicon-16x16.png" />
+    <link rel="manifest" href="/pics/icon/site.webmanifest" />
+    <link rel="mask-icon" href="/pics/icon/safari-pinned-tab.svg" color="#ffd100" />
+    <link rel="shortcut icon" href="/pics/icon/favicon.ico" />
+    <meta name="msapplication-TileColor" content="#2b5797" />
+    <meta name="msapplication-config" content="/pics/icon/browserconfig.xml" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/icons.css" />
+    <link rel="stylesheet" href="/css/common.min.css" />
+    <link rel="stylesheet" href="/vts/vts.min.css" />
+  </head>
+
+  <body>
+    <noscript>
+      <div class="alert alert-danger" role="alert">WARNING! JavaScript is disabled. This site will not work properly without it.</div>
+    </noscript>
+
+    <div class="modal" id="connectVTSModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">VTS connection</h5>
+          </div>
+          <div class="modal-body">
+            <p>1. enable "Start API" in vts settings</p>
+            <p>2. <button type="button" id="connectVTS" class="btn btn-success">Connect</button></p>
+            <p>3. allow connection in vts</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="cancelVTSlogin">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="resetModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Are you sure?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>All settings/commands/rewards/alerts will be reset</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="resetSettings()">Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="addCommandModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add Command</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <label for="commandName" class="form-label">Command</label>
+            <input type="text" class="form-control" id="commandName" placeholder="!command" />
+            <small class="text-body-secondary">The command that viewers will type in chat to trigger the hotkey that you select below</small><br />
+            <label for="commandCooldown" class="form-label">Command cooldown (seconds)</label>
+            <input type="number" min="0" max="3600" value="0" class="form-control" id="commandCooldown" />
+            <small class="text-body-secondary">How long viewers have to wait before using the same command again</small>
+            <div class="hotkeyList"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-success" id="addCommandSubmit">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="addExistingRewardModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add existing Reward</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <h3>Select an existing reward:</h3>
+            <div id="existingRewardsList"></div>
+            <br />
+            <div class="hotkeyList"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-success" id="addRewardSubmit">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="createNewRewardModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Create New Reward</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="newRewardName" class="form-label">Reward Name</label>
+              <input type="text" class="form-control" id="newRewardName" placeholder="Reward Name" maxlength="45" />
+            </div>
+            <div class="mb-3">
+              <label for="newRewardDesc" class="form-label">Description <small class="text-body-secondary">(optional)</small></label>
+              <textarea class="form-control" id="newRewardDesc" rows="4" placeholder="Reward Description" value="Powered by chat.vote/vts :)" maxlength="200"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="newRewardCost" class="form-label">Reward Cost</label>
+              <input type="number" min="1" class="form-control" id="newRewardCost" placeholder="Enter amount" />
+            </div>
+            <div class="mb-3">
+              <label for="newRewardColor" class="form-label">Background Color</label>
+              <input type="color" value="#22b14c" class="form-control" id="newRewardColor" />
+            </div>
+
+            <div class="container-fluid">
+              <h4>Cooldown & Limits</h4>
+              <div class="row">
+                <div class="col-5">Redemption Cooldown Time</div>
+                <div class="col-7">
+                  <div class="input-group">
+                    <input id="newRewardCooldown" type="number" min="1" class="form-control" style="font-size: 13px" placeholder="Enter number" />
+                    <select class="form-select" style="max-width: 110px" id="newRewardCooldownUnit">
+                      <option selected value="minutes">Minutes</option>
+                      <option value="hours">Hours</option>
+                      <option value="days">Days</option>
+                    </select>
+                  </div>
+                  <small class="text-body-secondary">Time between redemptions, up to 7 days</small>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-5">Limit Redemptions Per Stream</div>
+                <div class="col-7">
+                  <input type="number" min="1" placeholder="Enter amount" class="form-control" id="newRewardLimit" />
+                  <small class="text-body-secondary">Max total redemptions for viewers</small>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-5">Limit Redemptions Per User Per Stream</div>
+                <div class="col-7">
+                  <input type="number" min="1" placeholder="Enter amount" class="form-control" id="newRewardUserLimit" />
+                  <small class="text-body-secondary">Max individual redemptions per viewer per stream</small>
+                </div>
+              </div>
+            </div>
+            <div class="hotkeyList"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-success" id="createRewardSubmit">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="editCommandModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Command</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="modal7body">
+            <label for="commandNameEdit" class="form-label">Command</label>
+            <input type="text" class="form-control" id="commandNameEdit" placeholder="!command" />
+            <small class="text-body-secondary">The command that viewers will type in chat to trigger the hotkey that you select below</small><br />
+            <label for="commandCooldownEdit" class="form-label">Command cooldown (seconds)</label>
+            <input type="number" min="0" max="3600" value="0" class="form-control" id="commandCooldownEdit" />
+            <small class="text-body-secondary">How long viewers have to wait before using the same command again</small>
+            <div class="hotkeyList"></div>
+          </div>
+          <div class="modal-footer justify-content-between" id="modal7footer"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="editRewardModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Reward</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="modal8body">
+            Edit reward details on Twitch:<br />
+            <button class="btn btn-twitch" id="openRewardsPage"><span class="twitch-icon"></span> Edit reward on Twitch</button>
+            <br /><br />
+            <div class="hotkeyList"></div>
+          </div>
+          <div class="modal-footer justify-content-between" id="modal8footer"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="confirmDeletionModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Are you sure?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="modal9body"></div>
+          <div class="modal-footer" id="modal9footer"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="loginExpiredModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Login expired</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row justify-content-center">
+              Renew login:<br />
+              <button type="button" data-bs-dismiss="modal" onclick="login()" class="btn btn-twitch"><span class="twitch-icon"></span>Sign in with Twitch</button>
+              <br /><small class="text-body-secondary">Logins expire after 2 months.<br />Or after you change your password.</small>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-danger"
+              data-bs-toggle="tooltip"
+              data-bs-delay="200"
+              data-bs-placement="top"
+              data-bs-title="Will reset everything so you can login again."
+              data-bs-dismiss="modal"
+              onclick="resetSettings()"
+            >
+              Reset
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="addSubAlertModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add subscription alert</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <div class="input-group">
+                <span class="input-group-text">Trigger when someone subs for</span>
+                <input type="number" min="1" value="1" id="subAlertMonths" aria-label="number of months subbed" class="form-control" />
+                <span class="input-group-text">months or more</span>
+              </div>
+              <small class="text-body-secondary">Only the highest matching alert will trigger</small>
+            </div>
+            <div class="hotkeyList"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-success" id="addSubAlertSubmit">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="editSubAlertModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit subscription alert</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <div class="input-group">
+                <span class="input-group-text">Trigger when someone subs for</span>
+                <input type="number" min="1" value="1" id="subAlertMonthsEdit" aria-label="number of months subbed" class="form-control" />
+                <span class="input-group-text">months or more</span>
+              </div>
+              <small class="text-body-secondary">Only the highest matching alert will trigger</small>
+            </div>
+            <div class="hotkeyList"></div>
+          </div>
+          <div class="modal-footer justify-content-between" id="modal12footer"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="addGiftedSubAlertModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add gifted sub alert</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <div class="input-group">
+                <span class="input-group-text">Trigger when someone gifts</span>
+                <input type="number" min="1" max="100" value="1" id="giftedSubsNumber" aria-label="number of gifts" class="form-control" />
+                <span class="input-group-text">or more subs</span>
+              </div>
+              <small class="text-body-secondary">Only the highest matching alert will trigger</small>
+            </div>
+            <div class="hotkeyList"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-success" id="addGiftedSubAlertSubmit">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="editGiftedSubAlertModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit gifted sub alert</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <div class="input-group">
+                <span class="input-group-text">Trigger when someone gifts</span>
+                <input type="number" min="1" max="100" value="1" id="giftedSubsNumberEdit" aria-label="number of gifts" class="form-control" />
+                <span class="input-group-text">or more subs</span>
+              </div>
+              <small class="text-body-secondary">Only the highest matching alert will trigger</small>
+            </div>
+            <div class="hotkeyList"></div>
+          </div>
+          <div class="modal-footer justify-content-between" id="modal14footer"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="addBitsAlertModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add bits alert</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <div class="input-group">
+                <span class="input-group-text">Trigger when someone cheers</span>
+                <input type="number" min="1" max="100000" value="1" id="bitsNumber" aria-label="number of bits" class="form-control" />
+                <span class="input-group-text">or more bits</span>
+              </div>
+              <small class="text-body-secondary">Only the highest matching alert will trigger</small>
+            </div>
+            <div class="hotkeyList"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-success" id="addBitsAlertSubmit">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="editBitsAlertModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit bits alert</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <div class="input-group">
+                <span class="input-group-text">Trigger when someone cheers</span>
+                <input type="number" min="1" max="100000" value="1" id="bitsNumberEdit" aria-label="number of bits" class="form-control" />
+                <span class="input-group-text">or more bits</span>
+              </div>
+              <small class="text-body-secondary">Only the highest matching alert will trigger</small>
+            </div>
+            <div class="hotkeyList"></div>
+          </div>
+          <div class="modal-footer justify-content-between" id="modal16footer"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="addRewardModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add new channel points reward</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <button class="btn btn-info mainbuttons" data-bs-dismiss="modal" id="createReward">
+              <svg type="color-fill-current" width="25px" height="25px" version="1.1" viewBox="0 0 20 20" x="0px" y="0px">
+                <g>
+                  <path d="M10 6a4 4 0 014 4h-2a2 2 0 00-2-2V6z"></path>
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-2 0a6 6 0 11-12 0 6 6 0 0112 0z" clip-rule="evenodd"></path>
+                </g>
+              </svg>
+              Create New Reward
+            </button>
+            <button class="btn btn-info mainbuttons" data-bs-dismiss="modal" id="addReward">
+              <svg type="color-fill-current" width="25px" height="25px" version="1.1" viewBox="0 0 20 20" x="0px" y="0px">
+                <g>
+                  <path d="M10 6a4 4 0 014 4h-2a2 2 0 00-2-2V6z"></path>
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-2 0a6 6 0 11-12 0 6 6 0 0112 0z" clip-rule="evenodd"></path>
+                </g>
+              </svg>
+              Add Existing Reward
+            </button>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="youtubeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="youtubeModalTitle"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="youtubeModalBody"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="importModalLabel">Are you sure?</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">Importing a backup will overwrite your current commands/rewards/alerts</div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="importBackup">Import</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand notranslate site-link" href="/vts/" target="_self" rel="noopener noreferrer"
+          ><img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" /> chat.vote/vts</a
+        >
+        <div class="collapse navbar-collapse">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a
+                class="nav-link site-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="Polls that you vote on by typing in Twitch chat"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/"
+              >
+                <img style="height: 1.2em; filter: invert(0.25)" id="twitchLogo" alt="twitch" src="/pics/twitch.png" /> Twitch chat polls
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link site-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="Straw polls with shareable links"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/poll/"
+              >
+                <i class="material-icons notranslate">how_to_vote</i>Polls
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link site-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="Mini games with chat interaction"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/games/"
+              >
+                <i class="material-icons notranslate">videogame_asset</i> Games
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link site-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="Twitch chat raffles"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/raffles/"
+              >
+                <i class="material-icons notranslate">local_activity</i> Raffles
+              </a>
+            </li>
+            <li class="nav-item" id="vtsLink">
+              <a
+                class="nav-link site-link active"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="A VTS plugin that allows your viewers to control your model"
+                aria-current="page"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/vts/"
+              >
+                <span class="vts-icon"></span>VTube Studio Plugin
+              </a>
+            </li>
+          </ul>
+          <div class="mx-auto d-inline-flex">
+            <div id="streamStatus" style="margin-top: 5px">
+              <h4><span class="badge bg-danger">Chat not connected :(</span></h4>
+            </div>
+            <div id="VTSstatus" style="margin-top: 5px">
+              <h4><span class="badge bg-danger">VTS not connected :(</span></h4>
+            </div>
+          </div>
+        </div>
+        <div id="topright1" class="navbar-nav">
+          <a
+            role="button"
+            id="connectvtsbtn"
+            onclick="loginVTS()"
+            class="btn btn-vts"
+            tabindex="0"
+            data-bs-container="body"
+            data-bs-custom-class="custom-popover"
+            data-bs-placement="bottom"
+            data-bs-trigger="manual"
+            data-bs-toggle="popover"
+            data-bs-title="VTS not connected"
+            data-bs-content="You need connect VTube Studio before adding commands/rewards/alerts"
+            ><span class="vts-btn-icon"></span>Connect VTube Studio</a
+          >
+        </div>
+
+        <div id="topright2" class="navbar-nav">
+          <a
+            role="button"
+            id="loginButton"
+            onclick="login()"
+            class="btn btn-twitch"
+            tabindex="0"
+            data-bs-container="body"
+            data-bs-custom-class="custom-popover"
+            data-bs-placement="bottom"
+            data-bs-trigger="manual"
+            data-bs-toggle="popover"
+            data-bs-title="Not signed in"
+            data-bs-content="You need sign in first before connecting to VTS or adding commands/rewards/alerts"
+            ><span class="twitch-icon"></span>Sign in with Twitch</a
+          >
+        </div>
+
+        <div id="topright3" class="navbar-nav">
+          <a onclick="YTlogin()" role="button" id="YTloginButton" class="btn btn-youtube" tabindex="0"><span class="youtube-icon"></span>Sign in with YouTube</a>
+        </div>
+
+        <div class="navbar-nav">
+          <div id="theme-label-container">
+            <label id="theme-label">
+              <input id="darkTheme" type="checkbox" checked />
+              <div class="planet"></div>
+              <div class="theme-elements">
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+                <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="250" cy="250" r="200" />
+                </svg>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row" id="mainrow">
+        <div class="col-lg-4 maincol">
+          <div class="card infocard">
+            <div class="card-body">
+              <button class="btn btn-info mainbuttons" id="addCommand"><i class="material-icons notranslate">chat</i> Create New Chat Command</button>
+
+              <button class="btn btn-info mainbuttons" id="createChannelPointsButton" data-bs-toggle="modal" data-bs-target="#addRewardModal">
+                <svg type="color-fill-current" width="25px" height="25px" version="1.1" viewBox="0 0 20 20" x="0px" y="0px">
+                  <g>
+                    <path d="M10 6a4 4 0 014 4h-2a2 2 0 00-2-2V6z"></path>
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-2 0a6 6 0 11-12 0 6 6 0 0112 0z" clip-rule="evenodd"></path>
+                  </g>
+                </svg>
+                Create Channel points Reward
+              </button>
+
+              <button class="btn btn-info mainbuttons" id="addSubAlert">
+                <svg type="color-fill-current" width="25px" height="25px" version="1.1" viewBox="0 0 20 20" x="0px" y="0px">
+                  <g>
+                    <path
+                      fill-rule="evenodd"
+                      d="M11.456 8.255L10 5.125l-1.456 3.13-3.49.485 2.552 2.516-.616 3.485L10 13.064l3.01 1.677-.616-3.485 2.553-2.516-3.491-.485zM7.19 6.424l-4.2.583c-.932.13-1.318 1.209-.664 1.853l3.128 3.083-.755 4.272c-.163.92.876 1.603 1.722 1.132L10 15.354l3.579 1.993c.846.47 1.885-.212 1.722-1.132l-.755-4.272 3.128-3.083c.654-.644.268-1.723-.664-1.853l-4.2-.583-1.754-3.77c-.406-.872-1.706-.872-2.112 0L7.19 6.424z"
+                      clip-rule="evenodd"
+                    ></path>
+                  </g>
+                </svg>
+                Create New Subscription Alert
+              </button>
+
+              <button class="btn btn-info mainbuttons" id="addGiftedSubAlert">
+                <svg type="color-fill-current" width="25px" height="25px" version="1.1" viewBox="0 0 20 20" x="0px" y="0px">
+                  <g>
+                    <path
+                      fill-rule="evenodd"
+                      d="M16 6h2v6h-1v6H3v-6H2V6h2V4.793c0-2.507 3.03-3.762 4.803-1.99.131.131.249.275.352.429L10 4.5l.845-1.268a2.81 2.81 0 01.352-.429C12.969 1.031 16 2.286 16 4.793V6zM6 4.793V6h2.596L7.49 4.341A.814.814 0 006 4.793zm8 0V6h-2.596l1.106-1.659a.814.814 0 011.49.451zM16 8v2h-5V8h5zm-1 8v-4h-4v4h4zM9 8v2H4V8h5zm0 4H5v4h4v-4z"
+                      clip-rule="evenodd"
+                    ></path>
+                  </g>
+                </svg>
+                Create New Gifted Sub Alert
+              </button>
+
+              <button class="btn btn-info mainbuttons" id="addBitsAlert">
+                <svg type="color-fill-current" width="25px" height="25px" version="1.1" viewBox="0 0 20 20" x="0px" y="0px">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M3 12l7-10 7 10-7 6-7-6zm2.678-.338L10 5.487l4.322 6.173-.85.728L10 11l-3.473 1.39-.849-.729z"></path>
+                </svg>
+                Create New Bits Alert
+              </button>
+              <div class="accordion" id="settingsAccordion">
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="settingsAccordionHeader">
+                    <button
+                      class="accordion-button collapsed"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#settingsCollapse"
+                      aria-expanded="false"
+                      aria-controls="settingsCollapse"
+                    >
+                      <i class="material-icons notranslate">settings</i>Settings
+                    </button>
+                  </h2>
+                  <div id="settingsCollapse" class="accordion-collapse collapse" aria-labelledby="settingsAccordionHeader" data-bs-parent="#settingsAccordion">
+                    <div class="accordion-body">
+                      <ul class="nav nav-tabs" id="settingstabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                          <a class="nav-link active" id="basicTab" data-bs-toggle="tab" href="#basic" role="tab" aria-controls="basic" aria-selected="true">Settings</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                          <a class="nav-link" id="contactTab" data-bs-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">About/Contact</a>
+                        </li>
+                      </ul>
+                      <div class="tab-content">
+                        <div class="tab-pane fade show active" id="basic" role="tabpanel" aria-labelledby="basicTab">
+                          <div class="row">
+                            <div class="col">
+                              <div class="card border settingscard">
+                                <div class="card-body">
+                                  <label for="commandCooldownGlobal" class="form-label">Global chat command cooldown (seconds)</label>
+                                  <input type="number" min="0" max="3600" value="0" class="form-control" id="commandCooldownGlobal" />
+                                  <small class="text-body-secondary">How long viewers have to wait before using another chat command</small>
+                                  <div class="form-check form-switch mt-3">
+                                    <input class="form-check-input" type="checkbox" id="hideDefault" checked />
+                                    <label class="form-check-label" for="hideDefault"><i class="material-icons notranslate">visibility_off</i> Hide default models</label><br />
+                                    <small class="text-body-secondary">Hides the pre-installed models that come with VTS and only shows your models</small>
+                                  </div>
+                                  <hr />
+                                  <button type="button" id="exportBackup" class="btn btn-primary mt-3"><i class="material-icons notranslate">file_download</i> Export backup</button><br />
+                                  <small class="text-body-secondary"> Makes a backup of all your commands/rewards/alerts</small>
+
+                                  <div class="input-group mt-3">
+                                    <input type="file" accept=".json" class="form-control" id="backupInput" aria-describedby="importBackup" aria-label="Upload" />
+                                    <button class="btn btn-outline-success" type="button" data-bs-toggle="modal" data-bs-target="#importModal">
+                                      <i class="material-icons notranslate">file_upload</i> Import backup
+                                    </button>
+                                  </div>
+                                  <small class="text-body-secondary"> Restores your commands/rewards/alerts from a backup</small>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contactTab">
+                          <div class="row">
+                            <div class="col-xl-6">
+                              <div class="card border settingscard">
+                                <div class="card-body">
+                                  <h5>Contact info:</h5>
+                                  <p>
+                                    Site by <a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/badoge">badoge</a> :) <br />
+                                    If you find any issues or if you have suggestions or questions, you can contact me: <br />
+                                    <a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/popout/badoge/chat?popout=">in this chat</a><br />
+                                    or on <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/eF54kvd">discord</a><br />
+                                    or by <a href="mailto:vts@chat.vote">email</a>
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="col-xl-6">
+                              <div class="card border settingscard">
+                                <div class="card-body">
+                                  <h5>About:</h5>
+                                  <h6>This site uses:</h6>
+                                  <ul>
+                                    <li><a target="_blank" rel="noopener noreferrer" href="https://getbootstrap.com/">Bootstrap</a></li>
+                                    <li><a target="_blank" rel="noopener noreferrer" href="https://tmijs.com/">tmi.js</a> to read twitch chat</li>
+                                    <li><a target="_blank" rel="noopener noreferrer" href="https://github.com/Hawkbat/VTubeStudioJS">VTubeStudioJS</a> to connect to VTS</li>
+                                    <li><a target="_blank" rel="noopener noreferrer" href="https://fonts.google.com/icons">Material Icons</a> icons</li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="col-xl-6">
+                              <div class="card border settingscard">
+                                <div class="card-body">
+                                  <h5>Other stuff by me :)</h5>
+                                  <p>
+                                    <a target="_blank" rel="noopener noreferrer" href="https://chat.vote/">chat.vote</a><br />
+                                    <small>Polls that you vote on by typing in Twitch chat.</small><br />
+                                    <a target="_blank" rel="noopener noreferrer" href="https://chat.vote/poll/">chat.vote/poll</a><br />
+                                    <small>Like normal chat.vote but you vote by visiting the site instead of typing in chat.</small><br />
+                                    <a target="_blank" rel="noopener noreferrer" href="https://chat.vote/games/">chat.vote/games</a><br />
+                                    <small>Mini games with chat interaction.</small><br />
+                                    <a target="_blank" rel="noopener noreferrer" href="https://okayeg.com">OkayegBOT</a><br />
+                                    <small>Fun/utility Twitch chat bot.</small><br />
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card infocard">
+            <div class="card-body">
+              <h6>What is this?</h6>
+              <ul>
+                <li>
+                  This is a VTube Studio plugin that allows your Twitch viewers to trigger hotkeys using chat commands/channel points/subs/gifts/bits. Basic YouTube support is available also
+                </li>
+              </ul>
+              <h3>How to use:</h3>
+              <ul>
+                <li>Sign in with Twitch/YouTube top right</li>
+                <li>Enable "Start API (allow plugins)" in VTS settings</li>
+                <li>Click on "Connect VTube Studio" top right -> "Connect"</li>
+                <li>You should get a prompt in VTS to allow the site to connect to VTS</li>
+                <li>Click on Create New Chat Command/Reward to make commands/rewards that trigger a VTS hotkey</li>
+                <li>:)</li>
+              </ul>
+
+              <h6>Notes:</h6>
+              <ul>
+                <li>The site needs to be open during your stream so that it can listen to commands/rewards and execute them.</li>
+              </ul>
+              More info and hotkey examples can be found on the
+              <a target="_blank" rel="noopener noreferrer" href="/vts/help"><i class="material-icons notranslate">help_outline</i> help page</a>.
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 maincol">
+          <div id="commandsRewardsDiv" style="display: block">
+            <h2>Chat commands:</h2>
+            <ul class="list-group" id="commandsList"></ul>
+            <h2 style="margin-top: 50px" id="rewardsListHeader">Channel points rewards:</h2>
+            <ul class="list-group" id="rewardsList"></ul>
+            <h2 style="margin-top: 50px" id="subsListHeader">Subscription alerts:</h2>
+            <ul class="list-group" id="subsList"></ul>
+            <h2 style="margin-top: 50px" id="giftsListHeader">Gifted Sub alerts:</h2>
+            <ul class="list-group" id="giftsList"></ul>
+            <h2 style="margin-top: 50px" id="bitsListHeader">Bits alerts:</h2>
+            <ul class="list-group" id="bitsList"></ul>
+          </div>
+        </div>
+
+        <div class="col-lg-4 maincol">
+          <h2>Logs:</h2>
+          <ul class="list-group" id="logs">
+            nothing here :)
+          </ul>
+        </div>
+      </div>
+      <div aria-live="polite" aria-atomic="true" class="position-relative">
+        <div id="toastContainer" class="toast-container"></div>
+      </div>
+    </div>
+
+    <script src="/js/tmi.min.js"></script>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="/vts/bundle.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="/js/functions.min.js"></script>
+    <script src="/vts/vts.min.js"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H43YN7FSSP"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-H43YN7FSSP");
+    </script>
+  </body>
+</html>

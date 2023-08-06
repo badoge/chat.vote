@@ -1,0 +1,422 @@
+body {
+  margin-bottom: 300px;
+}
+
+.table {
+  word-break: break-all;
+}
+
+.removebtn {
+  width: 90%;
+  margin: 0px;
+}
+
+#options > tbody > tr > td:nth-child(5) {
+  text-align: center;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#options > thead > tr > th.sorting_disabled {
+  text-align: center;
+}
+
+.totalVotesDiv {
+  height: 40px;
+  box-sizing: border-box;
+  display: inline-block;
+  border-width: 1px;
+  border: 1px solid var(--bs-secondary-color);
+  border-radius: 6px;
+  padding: 6px 12px 12px 6px;
+  vertical-align: middle;
+  color: var(--bs-secondary-color);
+}
+
+#enterPollOptionCardBody {
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.card-header,
+#hideQuestion:hover,
+.cursorPointer {
+  cursor: pointer;
+}
+
+#questionLabel:hover {
+  cursor: text;
+}
+
+#bulkadd {
+  margin-top: 5px;
+}
+
+.arrows {
+  font-size: 2rem;
+}
+
+#optionList {
+  resize: both;
+  white-space: nowrap;
+  overflow: auto;
+  margin-bottom: 10px;
+}
+
+#chatiframe {
+  height: 90vh;
+  width: 100%;
+}
+
+#questionLabel {
+  text-shadow: none;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+#questionLabel:focus {
+  color: #969696;
+  cursor: text;
+}
+
+[data-placeholder]:empty:before {
+  content: attr(data-placeholder);
+}
+
+.undertwitchbtn {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border: 0;
+  border-top: 1px solid rgba(150, 147, 147, 0.3);
+}
+
+.defaultbtn {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: 10px;
+}
+
+#enableSuggestionsDropdown {
+  margin-right: 10px;
+}
+
+#removeContainer {
+  max-width: 400px;
+  float: left;
+}
+
+#linkpreview {
+  padding: 10px;
+  display: none;
+  position: fixed;
+  pointer-events: none;
+  z-index: 1;
+  max-width: 400px;
+}
+
+.previewThumbnail {
+  max-width: 100%;
+}
+
+#pauseTimer,
+#confettiLevel,
+#rerollDiv > span:nth-child(4) {
+  border-radius: 0 6px 6px 0;
+}
+
+#settingsCollapse > div > div {
+  height: 40vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.values {
+  margin: -10px;
+}
+
+#toastContainer {
+  z-index: 1056;
+  position: fixed;
+  top: 1%;
+  width: 15vw;
+}
+
+@media screen and (max-width: 1400px) {
+  .toast {
+    display: none;
+  }
+}
+
+#settingsAccordionHeader,
+#settingsAccordionHeader > button {
+  height: 82px;
+}
+
+#randomOptionWinner,
+#timeOverWinner {
+  word-wrap: break-word;
+}
+
+th {
+  white-space: nowrap;
+}
+
+#pollOptionLabel {
+  font-size: 200%;
+  margin: 0;
+}
+
+#countdown > .card-body {
+  padding: 0px;
+}
+
+#options {
+  margin-bottom: 0px !important;
+}
+
+#tableAndChartDiv {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  white-space: normal;
+}
+
+#enableVoting,
+#enableVotingDropdown {
+  height: 62px;
+}
+#enableVotingText {
+  font-size: 1.5rem;
+  line-height: 1.5rem;
+}
+
+#tableAndChartDiv > .card-body {
+  padding: 5px;
+}
+
+#mainButtonsCard {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.settingscard {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.resizable {
+  display: inline-block;
+  resize: both;
+  overflow: hidden;
+  line-height: 0;
+  height: 100%;
+  max-height: 50vh;
+}
+
+.resizable img {
+  height: 100%;
+  max-height: 50vh;
+}
+
+.restart > button,
+.restart > label {
+  border-color: #9e0f60;
+  background-color: #b91372;
+  border-radius: 6px;
+}
+
+.restart > select {
+  border-color: #9e0f60;
+  cursor: pointer;
+}
+
+#removeAndRestart:hover {
+  background-color: #960e5b;
+  border-color: #9e0f60;
+}
+
+.timer > button,
+.timer > label {
+  border-color: #b8431f;
+  background-color: #d34e24;
+  border-radius: 6px;
+}
+
+.timer > input {
+  border-color: #b8431f;
+  cursor: pointer;
+}
+
+#timerControls {
+  margin-top: 5px;
+  margin-right: 5px;
+}
+
+#stopTimer:hover,
+#pauseTimer:hover,
+#unpauseTimer:hover,
+#timerValueMinutes > button {
+  background-color: #a73a19;
+  border-color: #b8431f;
+}
+
+.custom-popover {
+  --bs-popover-border-color: var(--bs-warning);
+  --bs-popover-header-bg: var(--bs-warning);
+  --bs-popover-header-color: var(--bs-white);
+}
+
+.accordion-button,
+.accordion-button i {
+  padding: 5px;
+  font-size: 2rem;
+}
+
+.redborder {
+  border-color: #e74c3c;
+}
+
+.blueborder {
+  border-color: #3498db;
+}
+
+.wide-tooltip > div.tooltip-inner {
+  max-width: 1200px;
+}
+
+.tooltip.show {
+  opacity: 1;
+}
+
+.deletebtn {
+  color: #e74c3c;
+}
+
+.deletebtn:hover {
+  color: #c44133;
+  cursor: pointer;
+}
+
+#hideQuestion {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin-top: -7px;
+  margin-right: -5px;
+}
+
+#questionCard {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+}
+
+#chartDiv {
+  position: relative;
+  height: 80vh;
+  width: 100%;
+}
+
+#yesnoDiv {
+  position: relative;
+  height: 40vh;
+  width: 100%;
+}
+
+#yeaPic,
+#nayPic {
+  max-height: 300px;
+  min-height: 50px;
+  transition: height 0.2s ease;
+}
+
+#quickActions > div {
+  height: 100%;
+}
+
+#restartPoll,
+#deleteAll,
+#hideScore,
+#pickRandom {
+  height: 41.5px;
+}
+
+#options_length,
+#options_filter {
+  display: none;
+}
+
+/* yea nay coinflip start */
+
+#coin {
+  position: relative;
+  margin: 0 auto;
+  width: 150px;
+  height: 150px;
+  cursor: pointer;
+}
+#coin div {
+  width: 100%;
+  height: 100%;
+}
+
+#coin {
+  transition: -webkit-transform 1s ease-in;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+#coin div {
+  position: absolute;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.side-a {
+  z-index: 100;
+}
+.side-b {
+  z-index: 100;
+  -webkit-transform: rotateY(-180deg);
+  transform: rotateY(-180deg);
+}
+
+#coin.heads {
+  -webkit-animation: flipHeads 3s ease-out forwards;
+  -moz-animation: flipHeads 3s ease-out forwards;
+  -o-animation: flipHeads 3s ease-out forwards;
+  animation: flipHeads 3s ease-out forwards;
+}
+#coin.tails {
+  -webkit-animation: flipTails 3s ease-out forwards;
+  -moz-animation: flipTails 3s ease-out forwards;
+  -o-animation: flipTails 3s ease-out forwards;
+  animation: flipTails 3s ease-out forwards;
+}
+
+@keyframes flipHeads {
+  from {
+    -webkit-transform: rotateY(0);
+    -moz-transform: rotateY(0);
+    transform: rotateY(0);
+  }
+  to {
+    -webkit-transform: rotateY(1800deg);
+    -moz-transform: rotateY(1800deg);
+    transform: rotateY(1800deg);
+  }
+}
+@keyframes flipTails {
+  from {
+    -webkit-transform: rotateY(0);
+    -moz-transform: rotateY(0);
+    transform: rotateY(0);
+  }
+  to {
+    -webkit-transform: rotateY(1980deg);
+    -moz-transform: rotateY(1980deg);
+    transform: rotateY(1980deg);
+  }
+}
+
+/* yea nay coinflip end */

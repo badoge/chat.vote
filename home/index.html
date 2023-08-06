@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: https://ogp.me/ns#" data-bs-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <title>chat.vote Homepage</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Learn about all the features of chat.vote" />
+    <meta name="keywords" content="chatvote, chat.vote" />
+    <meta property="og:title" content="chat.vote Homepage" />
+    <meta property="og:site_name" content="chat.vote Homepage" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://chat.vote/home/" />
+    <meta property="og:image" content="https://chat.vote/pics/ogimage.png" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:description" content="Learn about all the features of chat.vote" />
+
+    <link rel="apple-touch-icon" sizes="152x152" href="/pics/icon/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/pics/icon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/pics/icon/favicon-16x16.png" />
+    <link rel="manifest" href="/pics/icon/site.webmanifest" />
+    <link rel="mask-icon" href="/pics/icon/safari-pinned-tab.svg" color="#ffd100" />
+    <link rel="shortcut icon" href="/pics/icon/favicon.ico" />
+    <meta name="msapplication-TileColor" content="#2b5797" />
+    <meta name="msapplication-config" content="/pics/icon/browserconfig.xml" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/icons.css" />
+    <link rel="stylesheet" href="/css/common.min.css" />
+    <link rel="stylesheet" href="/home/home.min.css" />
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand notranslate" href="#"><img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" /> chat.vote Homepage</a>
+        <div class="collapse navbar-collapse">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="Polls that you vote on by typing in Twitch chat"
+                target="_blank"
+                href="/"
+              >
+                <img style="height: 1.2em; filter: invert(0.25)" id="twitchLogo" alt="twitch" src="/pics/twitch.png" /> Twitch chat polls
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Straw polls with shareable links" target="_blank" href="/poll/">
+                <i class="material-icons notranslate">how_to_vote</i>Polls
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Mini games with chat interaction" target="_blank" href="/games/">
+                <i class="material-icons notranslate">videogame_asset</i> Games
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Twitch chat raffles" target="_blank" href="/raffles/">
+                <i class="material-icons notranslate">local_activity</i> Raffles
+              </a>
+            </li>
+            <li class="nav-item" id="vtsLink">
+              <a
+                class="nav-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="A VTS plugin that allows your viewers to control your model"
+                target="_blank"
+                href="/vts/"
+              >
+                <span class="vts-icon"></span>VTube Studio Plugin
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row mt-3">
+        <div class="col-2"></div>
+        <div class="col-8">
+          <div class="card mb-3">
+            <div class="card-body">
+              <div class="card mb-3">
+                <div class="row g-0">
+                  <div class="col-md-4">
+                    <a target="_blank" rel="noopener noreferrer" href="https://chat.vote/vts/"><img src="/pics/vts.png" class="img-fluid rounded-start" alt="chat.vote/vts" /></a>
+                  </div>
+                  <div class="col-md-8">
+                    <div class="card-body">
+                      <h3 class="card-title"><a target="_blank" rel="noopener noreferrer" href="https://chat.vote/vts/">chat.vote/vts</a></h3>
+                      <p>A <a target="_blank" rel="noopener noreferrer" href="https://denchisoft.com/">VTube Studio</a> plugin that allows your viewers to control your model.</p>
+                      <p>It allows you to set up chat commands that trigger a VTube Studio hotkey.</p>
+                      <p>Platform specific details:</p>
+                      <nav>
+                        <div class="nav nav-tabs" id="nav-tab2" role="tablist">
+                          <button
+                            class="nav-link active"
+                            id="nav-yt-tab2"
+                            data-bs-toggle="tab"
+                            data-bs-target="#nav-yt2"
+                            type="button"
+                            role="tab"
+                            aria-controls="nav-yt2"
+                            aria-selected="true"
+                          >
+                            YouTube
+                          </button>
+                          <button
+                            class="nav-link"
+                            id="nav-twitch-tab2"
+                            data-bs-toggle="tab"
+                            data-bs-target="#nav-twitch2"
+                            type="button"
+                            role="tab"
+                            aria-controls="nav-twitch2"
+                            aria-selected="false"
+                          >
+                            Twitch
+                          </button>
+                        </div>
+                      </nav>
+                      <div class="tab-content">
+                        <div class="tab-pane fade show active" id="nav-yt2" role="tabpanel" aria-labelledby="nav-yt-tab2" tabindex="0">
+                          <p>
+                            After you login with your Google account the site will find your YouTube channel and connect to your live stream chat and start listening for viewer commands. If
+                            you have more than 1 active/upcoming stream then you will prompted to select which live chat to connect to.
+                          </p>
+                          <p>All your data will be stored locally on your browser only.</p>
+                          <br />
+                          <p>
+                            chat.vote's use and transfer to any other app of information received from Google APIs will adhere to the
+                            <a
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              href="https://developers.google.com/terms/api-services-user-data-policy#additional_requirements_for_specific_api_scopes"
+                              >Google API Services User Data Policy</a
+                            >, including the Limited Use requirements.
+                          </p>
+                          <p>Privacy policy: <a target="_blank" rel="noopener noreferrer" href="https://chat.vote/pp">chat.vote/pp</a></p>
+                        </div>
+                        <div class="tab-pane fade" id="nav-twitch2" role="tabpanel" aria-labelledby="nav-twitch-tab2" tabindex="0">
+                          <p>Twitch users can setup additional triggers for channel points rewards, subscription, sub gifting, and cheering.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card mb-3">
+            <div class="card-body">
+              <div class="card mb-3">
+                <div class="row g-0">
+                  <div class="col-md-4">
+                    <a target="_blank" rel="noopener noreferrer" href="https://chat.vote"><img src="/pics/chatvote.png" class="img-fluid rounded-start" alt="chat.vote" /></a>
+                  </div>
+                  <div class="col-md-8">
+                    <div class="card-body">
+                      <h3 class="card-title"><a target="_blank" rel="noopener noreferrer" href="https://chat.vote">chat.vote</a></h3>
+                      <p>chat.vote allows you to make polls that you vote on by typing in chat, it can also be used to collect suggestions from viewers or for making raffles.</p>
+                      <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                          <button class="nav-link active" id="nav-yt-tab" data-bs-toggle="tab" data-bs-target="#nav-yt" type="button" role="tab" aria-controls="nav-yt" aria-selected="true">
+                            YouTube
+                          </button>
+                          <button
+                            class="nav-link"
+                            id="nav-twitch-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#nav-twitch"
+                            type="button"
+                            role="tab"
+                            aria-controls="nav-twitch"
+                            aria-selected="false"
+                          >
+                            Twitch
+                          </button>
+                        </div>
+                      </nav>
+                      <div class="tab-content">
+                        <div class="tab-pane fade show active" id="nav-yt" role="tabpanel" aria-labelledby="nav-yt-tab" tabindex="0">Coming soon :)</div>
+                        <div class="tab-pane fade" id="nav-twitch" role="tabpanel" aria-labelledby="nav-twitch-tab" tabindex="0">:)</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-2"></div>
+      </div>
+    </div>
+
+    <script src="/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      window.onload = function () {
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        const tooltipList = [...tooltipTriggerList].map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
+      };
+    </script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H43YN7FSSP"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-H43YN7FSSP");
+    </script>
+  </body>
+</html>
