@@ -29,6 +29,7 @@ let elements = {
   pollTitle: document.getElementById("pollTitle"),
   optionsDiv: document.getElementById("optionsDiv"),
   toastContainer: document.getElementById("toastContainer"),
+  darkTheme: document.getElementById("darkTheme"),
 
   //settings
   multipleAnswersAllowed: document.getElementById("multipleAnswersAllowed"),
@@ -42,6 +43,8 @@ let elements = {
   detect_high: document.getElementById("detect_high"),
   bulkOptions: document.getElementById("bulkOptions"),
 };
+
+let darkTheme = true;
 
 let POLL = {
   multipleAnswersAllowed: false,
@@ -119,6 +122,8 @@ function load_localStorage() {
 } //load_localStorage
 
 function refreshData() {
+  darkTheme = elements.darkTheme.checked ?? true;
+
   POLL.multipleAnswersAllowed = elements.multipleAnswersAllowed.checked;
   POLL.pollTimerValue = parseFloat(elements.pollTimerValue.value);
   POLL.pollTimerUnit = elements.pollTimerUnit.value;
@@ -129,6 +134,7 @@ function refreshData() {
 function saveSettings() {
   refreshData();
   localStorage.setItem("POLL", JSON.stringify(POLL));
+  localStorage.setItem("darkTheme", darkTheme);
 } //saveSettings
 
 function ignoreModal() {
@@ -480,10 +486,10 @@ async function createPoll() {
     let polllevel = "";
     switch (result.data.level) {
       case 0:
-        polllevel = "Duplicate detection level: low";
+        polllevel = "<li>Duplicate detection level: low</li>";
         break;
       case 1:
-        polllevel = "Duplicate detection level: high";
+        polllevel = "<li>Duplicate detection level: high</li>";
         break;
     }
     let endtime = "No time limit";
@@ -497,7 +503,7 @@ async function createPoll() {
           <li>${pollmode}</li>
           <li>${result.data.multianswer ? "Multiple answers allowed" : "Multiple answers not allowed"}</li>
           <li>${endtime}</li>
-          <li>${polllevel}</li>
+          ${polllevel}
         </ul>
         </li>
       </ul>`;
@@ -624,6 +630,11 @@ function deleteImage(event) {
   }
 } //deleteImage
 
+function switchTheme(checkbox) {
+  document.documentElement.setAttribute("data-bs-theme", checkbox ? "dark" : "light");
+  document.getElementById("twitchLogo").style.filter = `invert(${checkbox ? 0.25 : 0.65})`;
+} //switchTheme
+
 window.onload = function () {
   //redirect old poll links to new site
   let url = new URL(window.location.href);
@@ -632,6 +643,10 @@ window.onload = function () {
     window.location.href = `https://poll.chat.vote/${pollID}`;
     return;
   }
+
+  darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
+  elements.darkTheme.checked = darkTheme ?? true;
+  switchTheme(elements.darkTheme.checked);
 
   load_localStorage();
   refreshData();
@@ -655,6 +670,11 @@ window.onload = function () {
       pollOptions[0].select();
     }
   });
+
+  elements.darkTheme.onchange = function () {
+    switchTheme(this.checked);
+    saveSettings();
+  };
 
   elements.results_anyone.onchange = function () {
     if (this.checked) {
