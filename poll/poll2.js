@@ -10,6 +10,7 @@ let token;
 let cooldown = false;
 let sorted = false;
 let unsortedData = {};
+let darkTheme = true;
 
 const spinner = `<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`;
 
@@ -25,6 +26,7 @@ let elements = {
   vote: document.getElementById("vote"),
   unblur: document.getElementById("unblur"),
   mainrow: document.getElementById("mainrow"),
+  darkTheme: document.getElementById("darkTheme"),
 };
 
 const ckey = "6LdzxrwdAAAAADyHX2t8ZS4U5QxTNLVWNrGOeNp0";
@@ -566,7 +568,16 @@ function backToPoll() {
   window.location.href = currentUrl;
 } //backToPoll
 
+function switchTheme(checkbox) {
+  document.documentElement.setAttribute("data-bs-theme", checkbox ? "dark" : "light");
+  document.getElementById("twitchLogo").style.filter = `invert(${checkbox ? 0.25 : 0.65})`;
+} //switchTheme
+
 window.onload = function () {
+  darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
+  elements.darkTheme.checked = darkTheme ?? true;
+  switchTheme(elements.darkTheme.checked);
+
   modal1 = new bootstrap.Modal(elements.modal1);
   modal2 = new bootstrap.Modal(elements.modal2);
   reportModal = new bootstrap.Modal(elements.reportModal);
@@ -589,4 +600,10 @@ window.onload = function () {
     refresh();
   }
   linkifyElementID("mainrow", true);
+
+  elements.darkTheme.onchange = function () {
+    switchTheme(this.checked);
+    darkTheme = elements.darkTheme.checked ?? true;
+    localStorage.setItem("darkTheme", darkTheme);
+  };
 }; //onload
