@@ -223,7 +223,7 @@ async function vote() {
     elements.mainrow.innerHTML = `
     <div class="col-xl-2"></div>
     <div class="col-xl-8">
-      <div class="card">
+      <div class="card bg-dark-subtle">
         <div class="card-body">
           <div id="countdowndiv"></div>
           ${result.data.title == "Untitled poll" ? "" : "<h1 class='display-5'>" + validator.escape(result.data.title) + "</h1>"}
@@ -347,7 +347,7 @@ async function refresh() {
     elements.mainrow.innerHTML = `
     <div class="col-xl-2"></div>
     <div class="col-xl-8">
-      <div class="card">
+      <div class="card bg-dark-subtle">
         <div class="card-body">
           <div id="countdowndiv"></div>
           ${result.data.title == "Untitled poll" ? "" : "<h1 class='display-5'>" + validator.escape(result.data.title) + "</h1>"}
