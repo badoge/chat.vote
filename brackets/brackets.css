@@ -110,3 +110,8 @@ body {
 #hideScore {
   height: 38px;
 }
+
+.option-image {
+  max-height: 50vh;
+  max-width: 100%;
+}
