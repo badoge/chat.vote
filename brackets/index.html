@@ -9,7 +9,7 @@
     <meta property="og:title" content="chat.vote Brackets" />
     <meta property="og:site_name" content="chat.vote Brackets" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://chat.vote/poll/" />
+    <meta property="og:url" content="https://chat.vote/brackets/" />
     <meta property="og:image" content="https://chat.vote/pics/ogimage.png" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:description" content="Brackets" />
@@ -114,31 +114,135 @@
       </div>
     </div>
 
-    <div class="modal fade" id="importModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="generateModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Import bracket</h5>
+            <h5 class="modal-title">Generate bracket</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <div class="input-group mb-3">
-              <label class="input-group-text" for="importBracketType">Bracket type</label>
-              <select class="form-select" id="importBracketType">
+              <label class="input-group-text" for="generateBracketType">Bracket type</label>
+              <select class="form-select generate-value" id="generateBracketType">
                 <option value="" selected>Choose...</option>
-                <option value="chatvote">chat.vote bracket</option>
+                <option value="spotifyartist">Spotify artist - not working yet :)</option>
+                <option value="spotifyplaylist">Spotify playlist - not working yet :)</option>
+                <option value="clips">Twitch clips - not working yet :)</option>
+                <option value="emotes">Twitch emotes - not working yet :)</option>
                 <option value="uwufufu">UwUFUFU bracket</option>
+                <option value="ytchannel">YouTube channel - not working yet :)</option>
+                <option value="ytplaylist">YouTube playlist - not working yet :)</option>
               </select>
             </div>
-            <div class="input-group mb-3">
-              <span class="input-group-text" id="importBracketLabel">Bracket code</span>
-              <input type="text" class="form-control" id="importBracketValue" placeholder="XXXX" aria-label="bracket code or URL" aria-describedby="importBracketLabel" />
+
+            <div id="spotifyartistSettings" class="generate-type" style="display: none">
+              <p>Generate a bracket using the top songs from an artist</p>
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="spotifyArtistLinkLabel">Spotify artist link</span>
+                <input
+                  type="text"
+                  class="form-control generate-value"
+                  id="spotifyArtistLink"
+                  placeholder="https://open.spotify.com/artist/XXXXXXXXXXXXXXXXXXXXXX"
+                  aria-label="Spotify artist link"
+                  aria-describedby="spotifyArtistLinkLabel"
+                />
+              </div>
+              <button type="button" class="btn btn-info float-end" onclick="previewSpotifyArtist()"><i class="material-icons notranslate">preview</i> Preview</button>
+              <div id="spotifyArtistPreview"></div>
             </div>
-            <button type="button" class="btn btn-info float-end" onclick="previewImport()"><i class="material-icons notranslate">preview</i> Preview</button>
-            <div id="importPreview"></div>
+
+            <div id="spotifyplaylistSettings" class="generate-type" style="display: none">
+              <p>Generate a bracket from a Spotify playlist</p>
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="spotifyPlaylistLinkLabel">Spotify playlist link</span>
+                <input
+                  type="text"
+                  class="form-control generate-value"
+                  id="spotifyPlaylistLink"
+                  placeholder="https://open.spotify.com/playlist/XXXXXXXXXXXXXXXXXXXXXX"
+                  aria-label="Spotify Playlist link"
+                  aria-describedby="spotifyPlaylistLinkLabel"
+                />
+              </div>
+              <button type="button" class="btn btn-info float-end" onclick="previewSpotifyPlaylist()"><i class="material-icons notranslate">preview</i> Preview</button>
+              <div id="spotifyPlaylistPreview"></div>
+            </div>
+
+            <div id="clipsSettings" class="generate-type" style="display: none">
+              <p>Generate a bracket using the top clips from a Twitch channel</p>
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="clipsChannelLabel">twitch.tv/</span>
+                <input type="text" class="form-control generate-value" id="clipsChannel" placeholder="username" aria-label="Twitch username" aria-describedby="clipsChannelLabel" />
+              </div>
+              <button type="button" class="btn btn-info float-end" onclick="previewClips()"><i class="material-icons notranslate">preview</i> Preview</button>
+              <div id="clipsPreview"></div>
+            </div>
+
+            <div id="emotesSettings" class="generate-type" style="display: none">
+              <p>Generate a bracket with a Twitch channel's emotes</p>
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="emotesChannelLabel">twitch.tv/</span>
+                <input type="text" class="form-control generate-value" id="emotesChannel" placeholder="username" aria-label="Twitch username" aria-describedby="emotesChannelLabel" />
+              </div>
+              <button type="button" class="btn btn-info float-end" onclick="previewEmotes()"><i class="material-icons notranslate">preview</i> Preview</button>
+              <div id="emotesPreview"></div>
+            </div>
+
+            <div id="uwufufuSettings" class="generate-type" style="display: none">
+              <p>Generate a bracket from an UwUFUFU quiz</p>
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="uwufufuLinkLabel">UwUFUFU link</span>
+                <input
+                  type="text"
+                  class="form-control generate-value"
+                  id="uwufufuLink"
+                  placeholder="https://uwufufu.com/quiz/worldcup/XXXXXXXXXXXXXXXXXXXXXXXX"
+                  aria-label="uwufufu URL"
+                  aria-describedby="uwufufuLinkLabel"
+                />
+              </div>
+              <button type="button" class="btn btn-info float-end" onclick="previewUwufufu()"><i class="material-icons notranslate">preview</i> Preview</button>
+              <div id="uwufufuPreview"></div>
+            </div>
+
+            <div id="ytchannelSettings" class="generate-type" style="display: none">
+              <p>Generate a bracket using the most viewed videos from a YouTube channel</p>
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="ytchannelLinkLabel">YouTube channel link</span>
+                <input
+                  type="text"
+                  class="form-control generate-value"
+                  id="ytchannelLink"
+                  placeholder="https://www.youtube.com/@handle"
+                  aria-label="YouTube channel URL"
+                  aria-describedby="ytchannelLinkLabel"
+                />
+              </div>
+              <button type="button" class="btn btn-info float-end" onclick="previewYTChannel()"><i class="material-icons notranslate">preview</i> Preview</button>
+              <div id="ytchannelPreview"></div>
+            </div>
+
+            <div id="ytplaylistSettings" class="generate-type" style="display: none">
+              <p>Generate a bracket from a YouTube playlist</p>
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="ytplaylistLinkLabel">YouTube playlist link</span>
+                <input
+                  type="text"
+                  class="form-control generate-value"
+                  id="ytplaylistLink"
+                  placeholder="https://www.youtube.com/playlist?list=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+                  aria-label="YouTube playlist URL"
+                  aria-describedby="ytplaylistLinkLabel"
+                />
+              </div>
+              <button type="button" class="btn btn-info float-end" onclick="previewYTPlaylist()"><i class="material-icons notranslate">preview</i> Preview</button>
+              <div id="ytplaylistPreview"></div>
+            </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-success" onclick="importBracket()"><i class="material-icons notranslate">cloud_download</i> Import</button>
+            <button type="button" class="btn btn-success" onclick="generateBracket()"><i class="material-icons notranslate">auto_awesome</i> Generate</button>
           </div>
         </div>
       </div>
@@ -491,8 +595,8 @@
         <div class="col-md-1"></div>
         <div class="col-md-5">
           <button type="button" class="btn btn-success btn-lg" id="createBracket"><i class="material-icons notranslate">add_circle_outline</i> Create new bracket</button>
-          <button type="button" class="btn btn-info btn-lg" id="importBracket" data-bs-toggle="modal" data-bs-target="#importModal">
-            <i class="material-icons notranslate">cloud_download</i> Import bracket
+          <button type="button" class="btn btn-info btn-lg" id="importBracket" data-bs-toggle="modal" data-bs-target="#generateModal">
+            <i class="material-icons notranslate">auto_awesome</i> Generate bracket
           </button>
           <button type="button" class="btn btn-primary btn-lg" id="browseBracket" onclick="loadApproved()"><i class="material-icons notranslate">search</i> Browse brackets</button>
           <h1 class="display-3">My brackets</h1>

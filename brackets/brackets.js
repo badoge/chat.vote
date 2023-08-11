@@ -15,11 +15,18 @@ let elements = {
   previewModal: document.getElementById("previewModal"),
   previewModalBody: document.getElementById("previewModalBody"),
 
-  importModal: document.getElementById("importModal"),
-  importBracketType: document.getElementById("importBracketType"),
-  importBracketLabel: document.getElementById("importBracketLabel"),
-  importBracketValue: document.getElementById("importBracketValue"),
-  importPreview: document.getElementById("importPreview"),
+  generateModal: document.getElementById("generateModal"),
+  generateBracketType: document.getElementById("generateBracketType"),
+  spotifyartistSettings: document.getElementById("spotifyartistSettings"),
+  spotifyplaylistSettings: document.getElementById("spotifyplaylistSettings"),
+  clipsSettings: document.getElementById("clipsSettings"),
+  emotesSettings: document.getElementById("emotesSettings"),
+  uwufufuSettings: document.getElementById("uwufufuSettings"),
+  ytchannelSettings: document.getElementById("ytchannelSettings"),
+  ytplaylistSettings: document.getElementById("ytplaylistSettings"),
+
+  uwufufuLink: document.getElementById("uwufufuLink"),
+  uwufufuPreview: document.getElementById("uwufufuPreview"),
 
   browseModal: document.getElementById("browseModal"),
   browseModalBody: document.getElementById("browseModalBody"),
@@ -104,7 +111,7 @@ let darkTheme = true;
 
 let client;
 let loginButton;
-let loginExpiredModal, deleteBracketModal, quitBracketModal, previewModal, importModal, browseModal, startModal;
+let loginExpiredModal, deleteBracketModal, quitBracketModal, previewModal, generateModal, browseModal, startModal;
 let votePopover;
 let currentBracket = {};
 let voters = [];
@@ -1094,9 +1101,9 @@ function shuffleArray(array) {
 } //shuffleArray
 
 let previewedBracket = [];
-async function previewImport() {
-  let type = elements.importBracketType.value?.replace(/\s+/g, "")?.toLowerCase() || null;
-  let value = elements.importBracketValue.value?.replace(/\s+/g, "")?.toLowerCase() || null;
+async function previewUwufufu() {
+  let type = elements.generateBracketType.value?.replace(/\s+/g, "")?.toLowerCase() || null;
+  let value = elements.uwufufuLink.value?.replace(/\s+/g, "")?.toLowerCase() || null;
 
   if (!type) {
     showToast("No bracket type selected", "warning", 3000);
@@ -1121,7 +1128,7 @@ async function previewImport() {
         showToast("Could not find the provided bracket", "warning", 3000);
         return;
       }
-      elements.importPreview.innerHTML = spinner;
+      elements.uwufufuPreview.innerHTML = spinner;
       let requestOptions = {
         method: "GET",
         headers: {
@@ -1157,18 +1164,18 @@ async function previewImport() {
         }
       }
       html += `</ul>`;
-      elements.importPreview.innerHTML = html;
+      elements.uwufufuPreview.innerHTML = html;
     } catch (error) {
       console.log(error);
       showToast("Could not find the provided bracket", "warning", 3000);
       return;
     }
   }
-} //previewImport
+} //previewUwufufu
 
-async function importBracket() {
-  let type = elements.importBracketType.value?.replace(/\s+/g, "")?.toLowerCase() || null;
-  let value = elements.importBracketValue.value?.replace(/\s+/g, "")?.toLowerCase() || null;
+async function generateBracket() {
+  let type = elements.generateBracketType.value?.replace(/\s+/g, "")?.toLowerCase() || null;
+  let value = elements.uwufufuLink.value?.replace(/\s+/g, "")?.toLowerCase() || null;
 
   if (!type) {
     showToast("No bracket type selected", "warning", 3000);
@@ -1185,7 +1192,7 @@ async function importBracket() {
   }
   createBracket(true);
   elements.bracketTitle.value = "Imported bracket";
-  elements.bracketDescription.value = `Imported from ${elements.importBracketValue.value}`;
+  elements.bracketDescription.value = `Imported from ${elements.uwufufuLink.value}`;
   for (let index = 0; index < previewedBracket.length; index++) {
     if (previewedBracket[index].isVideo && !previewedBracket[index].videoUrl) {
       continue;
@@ -1200,8 +1207,8 @@ async function importBracket() {
     );
   }
   saveBracket();
-  importModal.hide();
-} //importBracket
+  generateModal.hide();
+} //generateBracket
 
 async function importApproved(id) {
   let bracket = approvedBrackets.find((e) => e.id === id);
@@ -1213,7 +1220,7 @@ async function importApproved(id) {
   }
   saveBracket();
   browseModal.hide();
-} //importBracket
+} //importApproved
 
 async function publishBracket(id, e) {
   e.innerHTML = `<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Loading...</span></div>`;
@@ -1381,7 +1388,7 @@ window.onload = async function () {
   deleteBracketModal = new bootstrap.Modal(elements.deleteBracketModal);
   quitBracketModal = new bootstrap.Modal(elements.quitBracketModal);
   previewModal = new bootstrap.Modal(elements.previewModal);
-  importModal = new bootstrap.Modal(elements.importModal);
+  generateModal = new bootstrap.Modal(elements.generateModal);
   browseModal = new bootstrap.Modal(elements.browseModal);
   startModal = new bootstrap.Modal(elements.startModal);
 
@@ -1389,11 +1396,16 @@ window.onload = async function () {
     elements.previewModalBody.innerHTML = "";
   });
 
-  elements.importModal.addEventListener("hidden.bs.modal", (event) => {
-    elements.importPreview.innerHTML = "";
+  elements.generateModal.addEventListener("hidden.bs.modal", (event) => {
+    elements.uwufufuPreview.innerHTML = "";
     previewedBracket = [];
-    elements.importBracketValue.value = "";
-    elements.importBracketType.value = "";
+
+    for (let element of document.getElementsByClassName("generate-type")) {
+      element.style.display = "none";
+    }
+    for (let element of document.getElementsByClassName("generate-value")) {
+      element.value = "";
+    }
   });
 
   elements.channelName.addEventListener("keydown", (event) => {
@@ -1407,15 +1419,11 @@ window.onload = async function () {
     saveSettings();
   };
 
-  elements.importBracketType.onchange = function () {
-    if (this.value == "chatvote") {
-      elements.importBracketLabel.innerHTML = "Bracket code";
-      elements.importBracketValue.placeholder = "XXXX";
+  elements.generateBracketType.onchange = function () {
+    for (let element of document.getElementsByClassName("generate-type")) {
+      element.style.display = "none";
     }
-    if (this.value == "uwufufu") {
-      elements.importBracketLabel.innerHTML = "UwUFUFU link";
-      elements.importBracketValue.placeholder = "https://uwufufu.com/quiz/worldcup/XXXXXXXXXXXXXXXXXXXXXXXX";
-    }
+    elements[`${this.value}Settings`].style.display = "";
   };
 
   elements.hideScore.addEventListener("click", function () {
@@ -1446,7 +1454,7 @@ window.onload = async function () {
   });
 
   elements.importBracket.addEventListener("click", function () {
-    elements.importPreview.innerHTML = "";
+    elements.uwufufuPreview.innerHTML = "";
     previewedBracket = [];
   });
 
