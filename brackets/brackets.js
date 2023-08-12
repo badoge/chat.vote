@@ -25,8 +25,20 @@ let elements = {
   ytchannelSettings: document.getElementById("ytchannelSettings"),
   ytplaylistSettings: document.getElementById("ytplaylistSettings"),
 
+  spotifyArtistLink: document.getElementById("spotifyArtistLink"),
+  spotifyArtistPreview: document.getElementById("spotifyArtistPreview"),
+  spotifyPlaylistLink: document.getElementById("spotifyPlaylistLink"),
+  spotifyPlaylistPreview: document.getElementById("spotifyPlaylistPreview"),
+  clipsChannel: document.getElementById("clipsChannel"),
+  clipsPreview: document.getElementById("clipsPreview"),
+  emotesChannel: document.getElementById("emotesChannel"),
+  emotesPreview: document.getElementById("emotesPreview"),
   uwufufuLink: document.getElementById("uwufufuLink"),
   uwufufuPreview: document.getElementById("uwufufuPreview"),
+  ytchannelLink: document.getElementById("ytchannelLink"),
+  ytchannelPreview: document.getElementById("ytchannelPreview"),
+  ytplaylistLink: document.getElementById("ytplaylistLink"),
+  ytplaylistPreview: document.getElementById("ytplaylistPreview"),
 
   browseModal: document.getElementById("browseModal"),
   browseModalBody: document.getElementById("browseModalBody"),
@@ -1102,76 +1114,93 @@ function shuffleArray(array) {
 
 let previewedBracket = [];
 async function previewUwufufu() {
-  let type = elements.generateBracketType.value?.replace(/\s+/g, "")?.toLowerCase() || null;
-  let value = elements.uwufufuLink.value?.replace(/\s+/g, "")?.toLowerCase() || null;
+  let link = elements.uwufufuLink.value?.replace(/\s+/g, "")?.toLowerCase() || null;
 
-  if (!type) {
-    showToast("No bracket type selected", "warning", 3000);
-    return;
-  }
-  if (!value) {
+  if (!link) {
     showToast("No bracket provided", "warning", 3000);
     return;
   }
-
-  if (type == "chatvote") {
-    if (value.length !== 4) {
-      showToast("Invalid bracket code", "warning", 3000);
-      return;
-    }
-  }
-
-  if (type == "uwufufu") {
-    try {
-      let id = value.match(/\/quiz\/worldcup\/(.+?)(\/rank)?(\?.*)?$/)[1];
-      if (id.length !== 24) {
-        showToast("Could not find the provided bracket", "warning", 3000);
-        return;
-      }
-      elements.uwufufuPreview.innerHTML = spinner;
-      let requestOptions = {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        redirect: "follow",
-      };
-      let response = await fetch(`https://brackets.pepega.workers.dev/import?id=${id}`, requestOptions);
-      let result = await response.json();
-      console.log(result);
-      previewedBracket = result.list;
-      let html = `<ul class="list-group">`;
-      for (let index = 0; index < result?.list.length; index++) {
-        if (result.list[index]?.isVideo) {
-          if (!result.list[index].videoUrl) {
-            continue;
-          }
-          html += `
-          <li class="list-group-item">
-          <a target="_blank" rel="noopener noreferrer" href="${result.list[index].videoUrl}">${result.list[index].name || "Untitled option"}</a>
-          </li>`;
-        } else {
-          if (!result.list[index].resourceUrl) {
-            continue;
-          }
-          html += `
-          <li class="list-group-item">
-          <a target="_blank" rel="noopener noreferrer" href="https://proxy.pepega.workers.dev/?url=${encodeURI(result.list[index].resourceUrl)}">${
-            result.list[index].name || "Untitled option"
-          }</a>
-          </li>`;
-        }
-      }
-      html += `</ul>`;
-      elements.uwufufuPreview.innerHTML = html;
-    } catch (error) {
-      console.log(error);
+  let videos = 0;
+  let images = 0;
+  try {
+    let id = link.match(/\/quiz\/worldcup\/(.+?)(\/rank)?(\?.*)?$/)[1];
+    if (id.length !== 24) {
       showToast("Could not find the provided bracket", "warning", 3000);
       return;
     }
+    elements.uwufufuPreview.innerHTML = spinner;
+    let requestOptions = {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      redirect: "follow",
+    };
+    let response = await fetch(`https://brackets.pepega.workers.dev/uwufufu?id=${id}`, requestOptions);
+    let result = await response.json();
+    console.log(result);
+    previewedBracket = result.list;
+    let html = `<ul class="list-group">`;
+    for (let index = 0; index < result?.list.length; index++) {
+      if (result.list[index]?.isVideo) {
+        if (!result.list[index].videoUrl) {
+          continue;
+        }
+        html += `
+        <li class="list-group-item">
+        <a target="_blank" rel="noopener noreferrer" href="${result.list[index].videoUrl}">${result.list[index].name || "Untitled option"}</a>
+        </li>`;
+        videos++;
+      } else {
+        if (!result.list[index].resourceUrl) {
+          continue;
+        }
+        html += `
+        <li class="list-group-item">
+        <a target="_blank" rel="noopener noreferrer" href="https://proxy.pepega.workers.dev/?url=${encodeURI(result.list[index].resourceUrl)}">
+        ${result.list[index].name || "Untitled option"}
+        </a>
+        </li>`;
+        images++;
+      }
+    }
+    html += `</ul>`;
+    elements.uwufufuPreview.innerHTML = `<p>${videos > 0 ? `${videos} videos` : ""} ${images > 0 ? `${images} images` : ""}</p>${html}`;
+  } catch (error) {
+    console.log(error);
+    showToast("Could not find the provided bracket", "warning", 3000);
+    return;
   }
 } //previewUwufufu
+
+async function previewEmotes() {
+  let channel = elements.emotesChannel.value?.replace(/\s+/g, "")?.toLowerCase() || null;
+  if (!channel) {
+    showToast("No channel provided", "warning", 3000);
+    return;
+  }
+  try {
+    elements.emotesPreview.innerHTML = spinner;
+
+    let emotes = await getChannelTwitchEmotes(channel, true);
+    console.log(emotes);
+    //previewedBracket = result.list;
+    let html = `<ul class="list-group">`;
+    for (let index = 0; index < emotes.length; index++) {
+      html += `
+      <li class="list-group-item">
+      <a target="_blank" rel="noopener noreferrer" href="${emotes[index].url}">${emotes[index].name}</a>
+      </li>`;
+    }
+    html += `</ul>`;
+    elements.emotesPreview.innerHTML = `<p>${emotes.length == 0 ? "Channel has no emotes" : `${emotes.length} ${emotes.length == 1 ? "emote" : "emotes"}`} </p>${html}`;
+  } catch (error) {
+    console.log(error);
+    showToast("Could not load emotes for the provided channel", "warning", 3000);
+    return;
+  }
+} //previewEmotes
 
 async function generateBracket() {
   let type = elements.generateBracketType.value?.replace(/\s+/g, "")?.toLowerCase() || null;

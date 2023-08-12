@@ -49,7 +49,7 @@ body {
   color: var(--bs-secondary-color);
 }
 
-#uwufufuPreview {
+.generate-preview {
   max-height: 30vh;
   overflow: auto;
 }
