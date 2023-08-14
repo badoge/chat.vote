@@ -1171,6 +1171,7 @@ async function previewSpotifyPlaylist() {
     }
     previewedBracketTitle = result[0].name || "Untitled playlist";
     previewedBracketDescription = `${result[0].description || "No description"} - Generated from ${elements.spotifyPlaylistLink.value}`;
+    previewedBracket = [];
     let html = `<ul class="list-group">`;
     for (let index = 0; index < tracks.length; index++) {
       previewedBracket.push({
@@ -1221,6 +1222,7 @@ async function previewClips() {
 
     previewedBracketTitle = `Top ${channel} clips`;
     previewedBracketDescription = `Bracket with 100 ${channel} clips`;
+    previewedBracket = [];
     let html = `<ul class="list-group">`;
     for (let index = 0; index < clips.length; index++) {
       previewedBracket.push({
@@ -1255,6 +1257,7 @@ async function previewEmotes() {
     let emotes = await getChannelTwitchEmotes(channel, true);
     previewedBracketTitle = `Best ${channel} emote`;
     previewedBracketDescription = `Bracket with ${emotes.length} ${channel} emotes`;
+    previewedBracket = [];
     let html = `<ul class="list-group">`;
     for (let index = 0; index < emotes.length; index++) {
       previewedBracket.push({
@@ -1302,9 +1305,9 @@ async function previewUwufufu() {
     };
     let response = await fetch(`https://brackets.pepega.workers.dev/uwufufu?id=${id}`, requestOptions);
     let result = await response.json();
-    previewedBracketTitle = `Generated UwUFUFU bracket`;
+    previewedBracketTitle = result.title || `Generated UwUFUFU bracket`;
     previewedBracketDescription = `Generated from ${link}`;
-
+    previewedBracket = [];
     for (let index = 0; index < result.list.length; index++) {
       if (result.list[index].isVideo && !result.list[index].videoUrl) {
         continue;
@@ -1366,6 +1369,7 @@ async function previewYTChannel() {
     console.log(videos);
     previewedBracketTitle = `Top ${channel} videos`;
     previewedBracketDescription = `Bracket with the top 50 ${channel} videos`;
+    previewedBracket = [];
     let html = `<ul class="list-group">`;
     for (let index = 0; index < videos.length; index++) {
       previewedBracket.push({
@@ -1407,6 +1411,7 @@ async function previewYTPlaylist() {
     console.log(videos);
     previewedBracketTitle = `Generated YouTube playlist bracket`;
     previewedBracketDescription = `Generated from YouTube playlist ${link}`;
+    previewedBracket = [];
     let html = `<ul class="list-group">`;
     for (let index = 0; index < videos.length; index++) {
       previewedBracket.push({
