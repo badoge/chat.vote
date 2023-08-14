@@ -17,7 +17,6 @@ let elements = {
 
   generateModal: document.getElementById("generateModal"),
   generateBracketType: document.getElementById("generateBracketType"),
-  spotifyartistSettings: document.getElementById("spotifyartistSettings"),
   spotifyplaylistSettings: document.getElementById("spotifyplaylistSettings"),
   clipsSettings: document.getElementById("clipsSettings"),
   emotesSettings: document.getElementById("emotesSettings"),
@@ -25,8 +24,6 @@ let elements = {
   ytchannelSettings: document.getElementById("ytchannelSettings"),
   ytplaylistSettings: document.getElementById("ytplaylistSettings"),
 
-  spotifyArtistLink: document.getElementById("spotifyArtistLink"),
-  spotifyArtistPreview: document.getElementById("spotifyArtistPreview"),
   spotifyPlaylistLink: document.getElementById("spotifyPlaylistLink"),
   spotifyPlaylistPreview: document.getElementById("spotifyPlaylistPreview"),
   clipsChannel: document.getElementById("clipsChannel"),
@@ -116,8 +113,10 @@ const icons = {
   image: `<i class="material-icons notranslate">image</i>`,
   youtube: `<i class="material-icons notranslate">play_arrow</i>`,
   twitch: `<i class="material-icons notranslate">movie_creation</i>`,
+  spotify: `<i class="material-icons notranslate">audiotrack</i>`,
 };
 const spinner = `<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`;
+const spotifyURLRegex = /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:(album|track|playlist)\/|\?uri=spotify:track:)((\w|-){22})/;
 
 let darkTheme = true;
 
@@ -482,6 +481,7 @@ function addOption(name = "", type = "", value = "") {
             <option value="image" ${optionType == "image" ? "selected" : ""}>Image</option>
             <option value="youtube" ${optionType == "youtube" ? "selected" : ""}>YouTube video</option>
             <option value="twitch" ${optionType == "twitch" ? "selected" : ""}>Twitch clip</option>
+            <option value="spotify" ${optionType == "spotify" ? "selected" : ""}>Spotify song</option>
           </select>
           <button class="btn btn-outline-secondary" onclick="previewOption(${optionNumber})" type="button">Preview</button>
         </div>
@@ -499,10 +499,11 @@ function addOption(name = "", type = "", value = "") {
 function deleteOption(id) {
   id = parseInt(id, 10);
   let bracketID = parseInt(elements.bracketTitle.dataset.bracketId, 10);
-
   let bracketIndex = BRACKETS.brackets.findIndex((e) => e.id === bracketID);
   BRACKETS.brackets[bracketIndex].options.splice(id - 1, 1);
+
   editBracket(bracketID);
+  saveBracket();
 } //deleteOption
 
 function previewOption(id) {
@@ -520,7 +521,7 @@ function previewOption(id) {
     <div class="card-body">${option?.value || `<span class="text-body-secondary">Empty option</span>`}</div>
     </div>`;
     previewModal.show();
-  }
+  } //text
 
   if (type.value == "image") {
     let image = option?.value.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g) || null;
@@ -535,7 +536,7 @@ function previewOption(id) {
     </div>
     </div>`;
     previewModal.show();
-  }
+  } //image
 
   if (type.value == "youtube") {
     let regex = /(youtu.*be.*)\/(watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$))/gm;
@@ -558,7 +559,7 @@ function previewOption(id) {
     </div>
     </div>`;
     previewModal.show();
-  }
+  } //youtube
 
   if (type.value == "twitch") {
     try {
@@ -590,7 +591,30 @@ function previewOption(id) {
       showToast("Invalid Twitch clip URL", "warning", 3000);
       return;
     }
-  }
+  } //twitch
+
+  if (type.value == "spotify") {
+    try {
+      let id = option?.value.match(spotifyURLRegex);
+      if (!id[2] || id[1] !== "track") {
+        showToast("Invalid Spotify track URL", "warning", 3000);
+        return;
+      }
+      elements.previewModalBody.innerHTML = `
+      <div class="card">
+      <div class="card-body">
+      <iframe 
+      style="border-radius:12px" src="https://open.spotify.com/embed/track/${id[2]}${darkTheme ? "?theme=0" : ""}" 
+      width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture">
+      </iframe>
+      </div>
+      </div>`;
+      previewModal.show();
+    } catch (error) {
+      showToast("Invalid Spotify track URL", "warning", 3000);
+      return;
+    }
+  } //spotify
 } //previewOption
 
 function createBracket(imported = false) {
@@ -899,7 +923,7 @@ function showOption(position, option) {
 
   if (option.type == "text") {
     elements[`${position}_value`].innerHTML = option.value || `<span class="text-body-secondary">Empty option</span>`;
-  }
+  } //text
 
   if (option.type == "image") {
     let image = option?.value.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g) || null;
@@ -908,7 +932,7 @@ function showOption(position, option) {
       return;
     }
     elements[`${position}_value`].innerHTML = `<img src="https://proxy.pepega.workers.dev/?url=${encodeURI(image)}" alt="${option.name}" title="${option.name}" class="option-image">`;
-  }
+  } //image
 
   if (option.type == "youtube") {
     let regex = /(youtu.*be.*)\/(watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$))/gm;
@@ -944,7 +968,7 @@ function showOption(position, option) {
         },
       });
     }
-  }
+  } //youtube
 
   if (option.type == "twitch") {
     try {
@@ -969,7 +993,25 @@ function showOption(position, option) {
       elements[`${position}_value`].innerHTML = `Invalid Twitch clip URL`;
       return;
     }
-  }
+  } //twitch
+
+  if (option.type == "spotify") {
+    try {
+      let id = option?.value.match(spotifyURLRegex);
+      if (!id[2] || id[1] !== "track") {
+        elements[`${position}_value`].innerHTML = `Invalid Spotify track URL`;
+        return;
+      }
+      elements[`${position}_value`].innerHTML = `
+      <iframe 
+      style="border-radius:12px" src="https://open.spotify.com/embed/track/${id[2]}${darkTheme ? "?theme=0" : ""}" 
+      width="100%" height="352" frameBorder="0" allowfullscreen="" allow="${position == "left" ? "autoplay;" : ""} clipboard-write; encrypted-media; picture-in-picture">
+      </iframe>`;
+    } catch (error) {
+      elements[`${position}_value`].innerHTML = `Invalid Spotify track URL`;
+      return;
+    }
+  } //spotify
 } //showOption
 
 function updateScores() {
@@ -1037,17 +1079,7 @@ function editBracket(id) {
   elements.bracketEditorHeader.innerHTML = `ID${id}`;
 
   for (let index = 0; index < bracket.options.length; index++) {
-    addOption();
-  }
-
-  let optionNames = document.querySelectorAll(".option-name");
-  let optionTypes = document.querySelectorAll(".option-type");
-  let optionValues = document.querySelectorAll(".option-value");
-
-  for (let index = 0; index < optionNames.length; index++) {
-    optionNames[index].value = bracket.options[index].name;
-    optionTypes[index].value = bracket.options[index].type;
-    optionValues[index].value = bracket.options[index].value;
+    addOption(bracket.options[index].name, bracket.options[index].type, bracket.options[index].value);
   }
 } //editBracket
 
@@ -1113,6 +1145,137 @@ function shuffleArray(array) {
 } //shuffleArray
 
 let previewedBracket = [];
+let previewedBracketTitle = "";
+let previewedBracketDescription = "";
+async function previewSpotifyPlaylist() {
+  let playlist = elements.spotifyPlaylistLink.value?.replace(/\s+/g, "").match(spotifyURLRegex);
+  if (!playlist[2]) {
+    showToast("Invalid playlist URL provided", "warning", 3000);
+    return;
+  }
+  try {
+    elements.spotifyPlaylistPreview.innerHTML = spinner;
+    let requestOptions = {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      redirect: "follow",
+    };
+    let response = await fetch(`https://brackets.pepega.workers.dev/spotifyplaylist?id=${playlist[2]}`, requestOptions);
+    let result = await response.json();
+    let tracks = [...result[0].tracks.items];
+    for (let index = 1; index < result.length; index++) {
+      tracks.push(...result[index].items);
+    }
+    previewedBracketTitle = result[0].name || "Untitled playlist";
+    previewedBracketDescription = `${result[0].description || "No description"} - Generated from ${elements.spotifyPlaylistLink.value}`;
+    let html = `<ul class="list-group">`;
+    for (let index = 0; index < tracks.length; index++) {
+      previewedBracket.push({
+        name: `${tracks[index].track.name} - ${tracks[index].track.artists.map((a) => a.name).join(", ")}`,
+        type: "spotify",
+        value: tracks[index].track.external_urls.spotify,
+      });
+      html += `
+      <li class="list-group-item">
+      <a target="_blank" rel="noopener noreferrer" href="${tracks[index].track.preview_url}">${tracks[index].track.name} - ${tracks[index].track.artists.map((a) => a.name).join(", ")}</a>
+      </li>`;
+    }
+    html += `</ul>`;
+    elements.spotifyPlaylistPreview.innerHTML = `<p>${result[0].name || "Untitled playlist"} - ${result[0].description || "No description"} - ${
+      tracks.length == 0 ? "Playlist has no tracks" : `${tracks.length} ${tracks.length == 1 ? "track" : "tracks"}`
+    } </p>${html}`;
+  } catch (error) {
+    console.log(error);
+    showToast("Could not load playlist", "warning", 3000);
+    return;
+  }
+} //previewSpotifyPlaylist
+
+async function previewClips() {
+  let channel = elements.clipsChannel.value?.replace(/\s+/g, "");
+  if (!channel) {
+    showToast("No channel provided", "warning", 3000);
+    return;
+  }
+  let id = await getUserID(channel);
+  try {
+    elements.clipsPreview.innerHTML = spinner;
+    let requestOptions = {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      redirect: "follow",
+    };
+    let response = await fetch(`https://helper.pepega.workers.dev/twitch/clips?broadcaster_id=${id}`, requestOptions);
+    let result = await response.json();
+    let clips = result.data;
+    if (clips == 0) {
+      showToast("Could not load clips", "warning", 3000);
+      return;
+    }
+
+    previewedBracketTitle = `Top ${channel} clips`;
+    previewedBracketDescription = `Bracket with 100 ${channel} clips`;
+    let html = `<ul class="list-group">`;
+    for (let index = 0; index < clips.length; index++) {
+      previewedBracket.push({
+        name: clips[index].title,
+        type: "twitch",
+        value: clips[index].url,
+      });
+      html += `
+      <li class="list-group-item">
+      <a target="_blank" rel="noopener noreferrer" href="${clips[index].url}">
+      ${clips[index].title} - ${clips[index].view_count.toLocaleString()} ${clips[index].view_count == 1 ? "view" : "views"}
+      </a>
+      </li>`;
+    }
+    html += `</ul>`;
+    elements.clipsPreview.innerHTML = `<p>${clips.length} ${clips.length == 1 ? "clip" : "clips"} </p>${html}`;
+  } catch (error) {
+    console.log(error);
+    showToast("Could not load clips", "warning", 3000);
+    return;
+  }
+} //previewClips
+
+async function previewEmotes() {
+  let channel = elements.emotesChannel.value?.replace(/\s+/g, "")?.toLowerCase() || null;
+  if (!channel) {
+    showToast("No channel provided", "warning", 3000);
+    return;
+  }
+  try {
+    elements.emotesPreview.innerHTML = spinner;
+    let emotes = await getChannelTwitchEmotes(channel, true);
+    previewedBracketTitle = `Best ${channel} emote`;
+    previewedBracketDescription = `Bracket with ${emotes.length} ${channel} emotes`;
+    let html = `<ul class="list-group">`;
+    for (let index = 0; index < emotes.length; index++) {
+      previewedBracket.push({
+        name: emotes[index].name,
+        type: "image",
+        value: emotes[index].url,
+      });
+      html += `
+      <li class="list-group-item">
+      <a target="_blank" rel="noopener noreferrer" href="${emotes[index].url}">${emotes[index].name}</a>
+      </li>`;
+    }
+    html += `</ul>`;
+    elements.emotesPreview.innerHTML = `<p>${emotes.length == 0 ? "Channel has no emotes" : `${emotes.length} ${emotes.length == 1 ? "emote" : "emotes"}`} </p>${html}`;
+  } catch (error) {
+    console.log(error);
+    showToast("Could not load emotes for the provided channel", "warning", 3000);
+    return;
+  }
+} //previewEmotes
+
 async function previewUwufufu() {
   let link = elements.uwufufuLink.value?.replace(/\s+/g, "")?.toLowerCase() || null;
 
@@ -1139,27 +1302,36 @@ async function previewUwufufu() {
     };
     let response = await fetch(`https://brackets.pepega.workers.dev/uwufufu?id=${id}`, requestOptions);
     let result = await response.json();
-    console.log(result);
-    previewedBracket = result.list;
+    previewedBracketTitle = `Generated UwUFUFU bracket`;
+    previewedBracketDescription = `Generated from ${link}`;
+
+    for (let index = 0; index < result.list.length; index++) {
+      if (result.list[index].isVideo && !result.list[index].videoUrl) {
+        continue;
+      }
+      if (!result.list[index].isVideo && !result.list[index].resourceUrl) {
+        continue;
+      }
+      previewedBracket.push({
+        name: result.list[index].name,
+        type: result.list[index].isVideo ? "youtube" : "image",
+        value: result.list[index].isVideo ? result.list[index].videoUrl : result.list[index].resourceUrl,
+      });
+    }
+
     let html = `<ul class="list-group">`;
-    for (let index = 0; index < result?.list.length; index++) {
-      if (result.list[index]?.isVideo) {
-        if (!result.list[index].videoUrl) {
-          continue;
-        }
+    for (let index = 0; index < previewedBracket.length; index++) {
+      if (previewedBracket[index].type == "youtube") {
         html += `
         <li class="list-group-item">
-        <a target="_blank" rel="noopener noreferrer" href="${result.list[index].videoUrl}">${result.list[index].name || "Untitled option"}</a>
+        <a target="_blank" rel="noopener noreferrer" href="${previewedBracket[index].value}">${previewedBracket[index].name || "Untitled option"}</a>
         </li>`;
         videos++;
       } else {
-        if (!result.list[index].resourceUrl) {
-          continue;
-        }
         html += `
         <li class="list-group-item">
-        <a target="_blank" rel="noopener noreferrer" href="https://proxy.pepega.workers.dev/?url=${encodeURI(result.list[index].resourceUrl)}">
-        ${result.list[index].name || "Untitled option"}
+        <a target="_blank" rel="noopener noreferrer" href="https://proxy.pepega.workers.dev/?url=${encodeURI(previewedBracket[index].value)}">
+        ${previewedBracket[index].name || "Untitled option"}
         </a>
         </li>`;
         images++;
@@ -1174,44 +1346,95 @@ async function previewUwufufu() {
   }
 } //previewUwufufu
 
-async function previewEmotes() {
-  let channel = elements.emotesChannel.value?.replace(/\s+/g, "")?.toLowerCase() || null;
+async function previewYTChannel() {
+  let channel = elements.ytchannelLink.value?.replace(/\s+/g, "");
   if (!channel) {
     showToast("No channel provided", "warning", 3000);
     return;
   }
-  try {
-    elements.emotesPreview.innerHTML = spinner;
 
-    let emotes = await getChannelTwitchEmotes(channel, true);
-    console.log(emotes);
-    //previewedBracket = result.list;
+  let id = await getYTChannelID(channel);
+  if (!id?.items[0]?.id?.channelId) {
+    showToast("Could not find channel", "warning", 3000);
+    return;
+  }
+  id = id.items[0].id.channelId;
+  try {
+    elements.ytchannelPreview.innerHTML = spinner;
+    let videos = await getYTChannelVideos(id);
+    videos = videos.flatMap((e) => e.items);
+    console.log(videos);
+    previewedBracketTitle = `Top ${channel} videos`;
+    previewedBracketDescription = `Bracket with the top 50 ${channel} videos`;
     let html = `<ul class="list-group">`;
-    for (let index = 0; index < emotes.length; index++) {
+    for (let index = 0; index < videos.length; index++) {
+      previewedBracket.push({
+        name: videos[index].snippet.title,
+        type: "youtube",
+        value: `https://www.youtube.com/watch?v=${videos[index].id.videoId}`,
+      });
       html += `
       <li class="list-group-item">
-      <a target="_blank" rel="noopener noreferrer" href="${emotes[index].url}">${emotes[index].name}</a>
+      <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/watch?v=${videos[index].id.videoId}">
+      ${videos[index].snippet.title}
+      </a>
       </li>`;
     }
     html += `</ul>`;
-    elements.emotesPreview.innerHTML = `<p>${emotes.length == 0 ? "Channel has no emotes" : `${emotes.length} ${emotes.length == 1 ? "emote" : "emotes"}`} </p>${html}`;
+    elements.ytchannelPreview.innerHTML = `<p>${videos.length} ${videos.length == 1 ? "video" : "videos"} </p>${html}`;
   } catch (error) {
     console.log(error);
-    showToast("Could not load emotes for the provided channel", "warning", 3000);
+    showToast("Could not channel videos", "warning", 3000);
     return;
   }
-} //previewEmotes
+} //previewYTChannel
+
+async function previewYTPlaylist() {
+  let link = elements.ytplaylistLink.value?.replace(/\s+/g, "");
+  if (!link) {
+    showToast("No playlist link provided", "warning", 3000);
+    return;
+  }
+  let id = link.match(/^.*(youtu.be\/|list=)([^#\&\?]*).*/);
+  if (!id[2] || id[2].length !== 34) {
+    showToast("Invalid playlist link provided", "warning", 3000);
+    return;
+  }
+  try {
+    elements.ytplaylistPreview.innerHTML = spinner;
+    let videos = await getYTPlaylist(id[2]);
+    videos = videos.flatMap((e) => e.items);
+    console.log(videos);
+    previewedBracketTitle = `Generated YouTube playlist bracket`;
+    previewedBracketDescription = `Generated from YouTube playlist ${link}`;
+    let html = `<ul class="list-group">`;
+    for (let index = 0; index < videos.length; index++) {
+      previewedBracket.push({
+        name: videos[index].snippet.title,
+        type: "youtube",
+        value: `https://www.youtube.com/watch?v=${videos[index].snippet.resourceId.videoId}`,
+      });
+      html += `
+      <li class="list-group-item">
+      <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/watch?v=${videos[index].snippet.resourceId.videoId}">
+      ${videos[index].snippet.title}
+      </a>
+      </li>`;
+    }
+    html += `</ul>`;
+    elements.ytplaylistPreview.innerHTML = `<p>${videos.length} ${videos.length == 1 ? "video" : "videos"} </p>${html}`;
+  } catch (error) {
+    console.log(error);
+    showToast("Could not load playlist", "warning", 3000);
+    return;
+  }
+} //previewYTPlaylist
 
 async function generateBracket() {
   let type = elements.generateBracketType.value?.replace(/\s+/g, "")?.toLowerCase() || null;
-  let value = elements.uwufufuLink.value?.replace(/\s+/g, "")?.toLowerCase() || null;
 
   if (!type) {
     showToast("No bracket type selected", "warning", 3000);
-    return;
-  }
-  if (!value) {
-    showToast("No bracket provided", "warning", 3000);
     return;
   }
 
@@ -1220,21 +1443,12 @@ async function generateBracket() {
     return;
   }
   createBracket(true);
-  elements.bracketTitle.value = "Imported bracket";
-  elements.bracketDescription.value = `Imported from ${elements.uwufufuLink.value}`;
+  elements.bracketTitle.value = previewedBracketTitle;
+  elements.bracketDescription.value = previewedBracketDescription;
   for (let index = 0; index < previewedBracket.length; index++) {
-    if (previewedBracket[index].isVideo && !previewedBracket[index].videoUrl) {
-      continue;
-    }
-    if (!previewedBracket[index].isVideo && !previewedBracket[index].resourceUrl) {
-      continue;
-    }
-    addOption(
-      previewedBracket[index].name,
-      previewedBracket[index].isVideo ? "youtube" : "image",
-      previewedBracket[index].isVideo ? previewedBracket[index].videoUrl : previewedBracket[index].resourceUrl
-    );
+    addOption(previewedBracket[index].name, previewedBracket[index].type, previewedBracket[index].value);
   }
+
   saveBracket();
   generateModal.hide();
 } //generateBracket
@@ -1376,6 +1590,82 @@ function hideScore() {
   }
 } //hideScore
 
+async function getYTPlaylist(id) {
+  let parts = [];
+  parts.push(await getYTPlaylistPart(id));
+  while (parts[parts.length - 1].nextPageToken) {
+    parts.push(await getYTPlaylistPart(id, parts[parts.length - 1].nextPageToken));
+  }
+  return parts;
+} //getYTPlaylist
+
+async function getYTChannelVideos(id, length = 1) {
+  let parts = [];
+  parts.push(await getYTChannelVideosPart(id));
+  for (let index = 1; index < length; index++) {
+    console.log("asd");
+    parts.push(await getYTChannelVideosPart(id, parts[parts.length - 1].nextPageToken));
+  }
+
+  return parts;
+} //getYTChannelVideos
+
+const API_KEY_YT = "AIzaSyAMCaIslOwxlmotLsNN4NB2ia949h4GLP0";
+async function getYTPlaylistPart(id, nextPageToken = null) {
+  let requestOptions = {
+    method: "GET",
+    redirect: "follow",
+  };
+  try {
+    let response = await fetch(
+      `https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&key=${API_KEY_YT}&playlistId=${encodeURIComponent(id)}${
+        nextPageToken ? `&pageToken=${nextPageToken}` : ""
+      }`,
+      requestOptions
+    );
+    let result = await response.json();
+    return result;
+  } catch (error) {
+    console.log("getYTPlaylist error", error);
+    return false;
+  }
+} //getYTPlaylist
+
+async function getYTChannelVideosPart(id, nextPageToken = null) {
+  let requestOptions = {
+    method: "GET",
+    redirect: "follow",
+  };
+  try {
+    let response = await fetch(
+      `https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&order=viewcount&key=${API_KEY_YT}&channelId=${encodeURIComponent(id)}${
+        nextPageToken ? `&pageToken=${nextPageToken}` : ""
+      }`,
+      requestOptions
+    );
+    let result = await response.json();
+    return result;
+  } catch (error) {
+    console.log("getYTPlaylist error", error);
+    return false;
+  }
+} //getYTChannelVideosPart
+
+async function getYTChannelID(handle) {
+  let requestOptions = {
+    method: "GET",
+    redirect: "follow",
+  };
+  try {
+    let response = await fetch(`https://youtube.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(handle)}&type=channel&maxResults=1&key=${API_KEY_YT}`, requestOptions);
+    let result = await response.json();
+    return result;
+  } catch (error) {
+    console.log("getYTChannelID error", error);
+    return false;
+  }
+} //getYTChannelID
+
 window.onload = async function () {
   darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
   elements.darkTheme.checked = darkTheme ?? true;
@@ -1426,14 +1716,17 @@ window.onload = async function () {
   });
 
   elements.generateModal.addEventListener("hidden.bs.modal", (event) => {
-    elements.uwufufuPreview.innerHTML = "";
     previewedBracket = [];
-
+    previewedBracketDescription = "";
+    previewedBracketTitle = "";
     for (let element of document.getElementsByClassName("generate-type")) {
       element.style.display = "none";
     }
     for (let element of document.getElementsByClassName("generate-value")) {
       element.value = "";
+    }
+    for (let element of document.getElementsByClassName("generate-preview")) {
+      element.innerHTML = "";
     }
   });
 
@@ -1483,14 +1776,26 @@ window.onload = async function () {
   });
 
   elements.importBracket.addEventListener("click", function () {
-    elements.uwufufuPreview.innerHTML = "";
     previewedBracket = [];
+    previewedBracketDescription = "";
+    previewedBracketTitle = "";
+    for (let element of document.getElementsByClassName("generate-type")) {
+      element.style.display = "none";
+    }
+    for (let element of document.getElementsByClassName("generate-value")) {
+      element.value = "";
+    }
+    for (let element of document.getElementsByClassName("generate-preview")) {
+      element.innerHTML = "";
+    }
+    generateModal.show();
   });
 
   elements.browseBracket.addEventListener("click", function () {});
 
   elements.addOption.addEventListener("click", function () {
     addOption();
+    saveBracket();
   });
 
   elements.deleteBracketButton.addEventListener("click", function () {
@@ -1536,4 +1841,8 @@ function onYouTubeIframeAPIReady() {
       }
     } catch (error) {}
   });
-}
+} //onYouTubeIframeAPIReady
+
+window.onSpotifyIframeApiReady = (IFrameAPI) => {
+  console.log("onSpotifyIframeApiReady");
+};

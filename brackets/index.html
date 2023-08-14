@@ -126,34 +126,17 @@
               <label class="input-group-text" for="generateBracketType">Bracket type</label>
               <select class="form-select generate-value" id="generateBracketType">
                 <option value="" selected>Choose...</option>
-                <option value="spotifyartist">Spotify artist - not working yet :)</option>
-                <option value="spotifyplaylist">Spotify playlist - not working yet :)</option>
-                <option value="clips">Twitch clips - not working yet :)</option>
-                <option value="emotes">Twitch emotes - not working yet :)</option>
+                <option value="spotifyplaylist">Spotify playlist</option>
+                <option value="clips">Twitch clips</option>
+                <option value="emotes">Twitch emotes</option>
                 <option value="uwufufu">UwUFUFU bracket</option>
-                <option value="ytchannel">YouTube channel - not working yet :)</option>
-                <option value="ytplaylist">YouTube playlist - not working yet :)</option>
+                <option value="ytchannel">YouTube channel</option>
+                <option value="ytplaylist">YouTube playlist</option>
               </select>
             </div>
 
-            <div id="spotifyartistSettings" class="generate-type" style="display: none">
-              <p>Generate a bracket using the top songs from an artist</p>
-              <div class="input-group mb-3">
-                <span class="input-group-text" id="spotifyArtistLinkLabel">Spotify artist link</span>
-                <input
-                  type="text"
-                  class="form-control generate-value"
-                  id="spotifyArtistLink"
-                  placeholder="https://open.spotify.com/artist/XXXXXXXXXXXXXXXXXXXXXX"
-                  aria-label="Spotify artist link"
-                  aria-describedby="spotifyArtistLinkLabel"
-                />
-              </div>
-              <button type="button" class="btn btn-info float-end" onclick="previewSpotifyArtist()"><i class="material-icons notranslate">preview</i> Preview</button>
-              <div id="spotifyArtistPreview" class="generate-preview"></div>
-            </div>
-
             <div id="spotifyplaylistSettings" class="generate-type" style="display: none">
+              <div class="alert alert-danger" role="alert">Spotify embeds don't have a volume slider; make sure to lower your volume before starting</div>
               <p>Generate a bracket from a Spotify playlist</p>
               <div class="input-group mb-3">
                 <span class="input-group-text" id="spotifyPlaylistLinkLabel">Spotify playlist link</span>
@@ -171,7 +154,7 @@
             </div>
 
             <div id="clipsSettings" class="generate-type" style="display: none">
-              <p>Generate a bracket using the top clips from a Twitch channel</p>
+              <p>Generate a bracket using the top 100 clips from a Twitch channel</p>
               <div class="input-group mb-3">
                 <span class="input-group-text" id="clipsChannelLabel">twitch.tv/</span>
                 <input type="text" class="form-control generate-value" id="clipsChannel" placeholder="username" aria-label="Twitch username" aria-describedby="clipsChannelLabel" />
@@ -208,17 +191,10 @@
             </div>
 
             <div id="ytchannelSettings" class="generate-type" style="display: none">
-              <p>Generate a bracket using the most viewed videos from a YouTube channel</p>
+              <p>Generate a bracket using the 50 most viewed videos from a YouTube channel</p>
               <div class="input-group mb-3">
-                <span class="input-group-text" id="ytchannelLinkLabel">YouTube channel link</span>
-                <input
-                  type="text"
-                  class="form-control generate-value"
-                  id="ytchannelLink"
-                  placeholder="https://www.youtube.com/@handle"
-                  aria-label="YouTube channel URL"
-                  aria-describedby="ytchannelLinkLabel"
-                />
+                <span class="input-group-text" id="ytchannelLinkLabel">YouTube handle</span>
+                <input type="text" class="form-control generate-value" id="ytchannelLink" placeholder="@username" aria-label="YouTube channel URL" aria-describedby="ytchannelLinkLabel" />
               </div>
               <button type="button" class="btn btn-info float-end" onclick="previewYTChannel()"><i class="material-icons notranslate">preview</i> Preview</button>
               <div id="ytchannelPreview" class="generate-preview"></div>
@@ -595,9 +571,7 @@
         <div class="col-md-1"></div>
         <div class="col-md-5">
           <button type="button" class="btn btn-success btn-lg" id="createBracket"><i class="material-icons notranslate">add_circle_outline</i> Create new bracket</button>
-          <button type="button" class="btn btn-info btn-lg" id="importBracket" data-bs-toggle="modal" data-bs-target="#generateModal">
-            <i class="material-icons notranslate">auto_awesome</i> Generate bracket
-          </button>
+          <button type="button" class="btn btn-info btn-lg" id="importBracket"><i class="material-icons notranslate">auto_awesome</i> Generate bracket</button>
           <button type="button" class="btn btn-primary btn-lg" id="browseBracket" onclick="loadApproved()"><i class="material-icons notranslate">search</i> Browse brackets</button>
           <h1 class="display-3">My brackets</h1>
           <div id="myBrackets">
@@ -622,9 +596,9 @@
                 <small class="text-body-secondary">Bracket description</small>
               </div>
 
-              <div id="optionContainer" class="mb-3"></div>
+              <button type="button" class="btn btn-secondary btn-sm mb-3" id="addOption"><i class="material-icons notranslate">add</i>Add option</button>
 
-              <button type="button" class="btn btn-secondary btn-sm" id="addOption"><i class="material-icons notranslate">add</i>Add option</button>
+              <div id="optionContainer" class="mb-3"></div>
             </div>
           </div>
         </div>
@@ -640,6 +614,7 @@
     <script src="/js/linkify-element.min.js"></script>
     <script src="/js/linkify-plugin-mention.min.js"></script>
     <script src="/js/anime.min.js"></script>
+    <script src="https://open.spotify.com/embed-podcast/iframe-api/v1" async></script>
     <script src="/js/functions.min.js"></script>
     <script src="/brackets/brackets.js"></script>
     <!-- Google tag (gtag.js) -->

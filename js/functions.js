@@ -177,7 +177,10 @@ async function getChannelTwitchEmotes(channel, largeEmotes = false) {
     if (channelTwitch.data.id) {
       if (channelTwitch.data.emotes.length > 0) {
         for (let i = 0, j = channelTwitch.data.emotes.length; i < j; i++) {
-          emotes.push({ name: channelTwitch.data.emotes[i].name, url: channelTwitch.data.emotes[i].images[largeEmotes ? "url_4x" : "url_1 x"] });
+          emotes.push({
+            name: channelTwitch.data.emotes[i].name,
+            url: `https://static-cdn.jtvnw.net/emoticons/v2/${channelTwitch.data.emotes[i].id}/default/dark/${largeEmotes ? "3.0" : "1.0"} `,
+          });
         }
         return emotes;
       } //twitch
