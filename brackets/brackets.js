@@ -1407,9 +1407,9 @@ async function previewYTPlaylist() {
   try {
     elements.ytplaylistPreview.innerHTML = spinner;
     let videos = await getYTPlaylist(id[2]);
+    let info = await getYTPlaylistInfo(id[2]);
     videos = videos.flatMap((e) => e.items);
-    console.log(videos);
-    previewedBracketTitle = `Generated YouTube playlist bracket`;
+    previewedBracketTitle = info?.items[0]?.snippet?.title || "YouTube playlist generated bracket";
     previewedBracketDescription = `Generated from YouTube playlist ${link}`;
     previewedBracket = [];
     let html = `<ul class="list-group">`;
@@ -1631,10 +1631,25 @@ async function getYTPlaylistPart(id, nextPageToken = null) {
     let result = await response.json();
     return result;
   } catch (error) {
-    console.log("getYTPlaylist error", error);
+    console.log("getYTPlaylistPart error", error);
     return false;
   }
-} //getYTPlaylist
+} //getYTPlaylistPart
+
+async function getYTPlaylistInfo(id) {
+  let requestOptions = {
+    method: "GET",
+    redirect: "follow",
+  };
+  try {
+    let response = await fetch(`https://youtube.googleapis.com/youtube/v3/playlists?part=snippet&maxResults=50&key=${API_KEY_YT}&id=${encodeURIComponent(id)}`, requestOptions);
+    let result = await response.json();
+    return result;
+  } catch (error) {
+    console.log("getYTPlaylistInfo error", error);
+    return false;
+  }
+} //getYTPlaylistInfo
 
 async function getYTChannelVideosPart(id, nextPageToken = null) {
   let requestOptions = {
@@ -1651,7 +1666,7 @@ async function getYTChannelVideosPart(id, nextPageToken = null) {
     let result = await response.json();
     return result;
   } catch (error) {
-    console.log("getYTPlaylist error", error);
+    console.log("getYTChannelVideosPart error", error);
     return false;
   }
 } //getYTChannelVideosPart
