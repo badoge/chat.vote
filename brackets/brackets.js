@@ -70,7 +70,7 @@ let elements = {
   toastContainer: document.getElementById("toastContainer"),
   main: document.getElementById("main"),
   brackets_editor: document.getElementById("brackets_editor"),
-
+  pickWinner: document.getElementById("pickWinner"),
   hideScore: document.getElementById("hideScore"),
   hideScoreIcon: document.getElementById("hideScoreIcon"),
 
@@ -713,6 +713,7 @@ function startBracket() {
   elements.main.style.display = "";
   elements.title.innerHTML = bracket.title;
   elements.endTitle.innerHTML = `<h1 class="display-6">Winner of ${bracket.title}</h1>`;
+  elements.pickWinner.innerHTML = `<i class="material-icons notranslate">navigate_next</i>Next match`;
 
   console.log(currentBracket);
 
@@ -757,6 +758,11 @@ function nextMatch() {
   if (Object.keys(currentBracket).length == currentRound) {
     showWinner(currentBracket[`round${currentRound}`]);
     return;
+  }
+
+  //change next match button text for final match
+  if (Object.keys(currentBracket).length - 1 == currentRound) {
+    elements.pickWinner.innerHTML = `<i class="material-icons notranslate">emoji_events</i>Show winner`;
   }
 
   let left = currentBracket[`round${currentRound}`][currentOption++];
@@ -808,6 +814,10 @@ function nextMatch() {
   elements.right_command.innerHTML = currentCommand.right;
 
   if (!elements.disableAnimations.checked) {
+    anime({
+      targets: `#centerTitle`,
+      translateY: ["-100%", 0],
+    });
     anime({
       targets: `#left_title`,
       translateX: ["-100%", 0],
@@ -878,6 +888,13 @@ function promoteOption(option, position = null) {
   currentBracket[`round${currentRound + 1}`][index] = option;
 
   if (position && !elements.disableAnimations.checked) {
+    //title
+    anime({
+      targets: `#centerTitle`,
+      translateY: `2000px`,
+      duration: 1000,
+    });
+
     //loser
     anime({
       targets: `#${position == "right" ? "left" : "right"}_title`,
@@ -1368,10 +1385,14 @@ async function previewYTChannel() {
     videos = videos.flatMap((e) => e.items);
     console.log(videos);
     previewedBracketTitle = `Top ${channel} videos`;
-    previewedBracketDescription = `Bracket with the top 50 ${channel} videos`;
+    let numberOfVideos = 0;
     previewedBracket = [];
     let html = `<ul class="list-group">`;
     for (let index = 0; index < videos.length; index++) {
+      if (videos[index].snippet?.liveBroadcastContent == "upcoming" || videos[index].snippet?.id?.kind == "youtube#channel") {
+        continue;
+      }
+      numberOfVideos++;
       previewedBracket.push({
         name: videos[index].snippet.title,
         type: "youtube",
@@ -1384,8 +1405,9 @@ async function previewYTChannel() {
       </a>
       </li>`;
     }
+    previewedBracketDescription = `Bracket with the top ${numberOfVideos} ${channel} videos`;
     html += `</ul>`;
-    elements.ytchannelPreview.innerHTML = `<p>${videos.length} ${videos.length == 1 ? "video" : "videos"} </p>${html}`;
+    elements.ytchannelPreview.innerHTML = `<p>${numberOfVideos} ${numberOfVideos == 1 ? "video" : "videos"} </p>${html}`;
   } catch (error) {
     console.log(error);
     showToast("Could not channel videos", "warning", 3000);
@@ -1658,9 +1680,9 @@ async function getYTChannelVideosPart(id, nextPageToken = null) {
   };
   try {
     let response = await fetch(
-      `https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&order=viewcount&key=${API_KEY_YT}&channelId=${encodeURIComponent(id)}${
-        nextPageToken ? `&pageToken=${nextPageToken}` : ""
-      }`,
+      `https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&order=viewCount&safeSearch=none&type=video&videoEmbeddable=true&key=${API_KEY_YT}&channelId=${encodeURIComponent(
+        id
+      )}${nextPageToken ? `&pageToken=${nextPageToken}` : ""}`,
       requestOptions
     );
     let result = await response.json();
