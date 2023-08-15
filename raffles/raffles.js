@@ -492,7 +492,16 @@ function connect() {
       }
 
       //make user object with 1 ticket
-      let user = { username: context.username, displayname: context["display-name"], tickets: 1, color: context.color, badges: context.badges, msg: msg };
+      let user = {
+        username: context.username,
+        displayname: context["display-name"],
+        tickets: 1,
+        color: context.color,
+        badges: context.badges,
+        emotes: context.emotes,
+        time: context["tmi-sent-ts"],
+        msg: msg,
+      };
 
       ////add bonus tickets
       //check if sub tiers are split
@@ -668,6 +677,12 @@ async function drawRaffleWinner() {
     }
     currentRaffleWinner = user_tickets[Math.floor(Math.random() * user_tickets.length)];
     raffleWinners.push(currentRaffleWinner);
+    let winner = raffle_users.find((e) => e.username == currentRaffleWinner);
+    raffleWinnerChat(
+      { username: winner.username, "display-name": winner.displayname, color: winner.color, badges: winner.badges, emotes: winner.emotes, time: winner.time },
+      winner.msg,
+      true
+    );
     let p = document.createElement("p");
     p.classList.add("h2");
     p.innerHTML = `Winner #${raffleWinners.length}: <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USER.channel}/viewercard/${currentRaffleWinner}?popout=","_blank","width=340,height=800")>${currentRaffleWinner}</a>`;
@@ -768,6 +783,12 @@ const detectWinner = function () {
     app.spinStarted = false;
     raffleWinners.push(winnerSlot.username);
     currentRaffleWinner = winnerSlot.username;
+    let winner = raffle_users.find((e) => e.username == currentRaffleWinner);
+    raffleWinnerChat(
+      { username: winner.username, "display-name": winner.displayname, color: winner.color, badges: winner.badges, emotes: winner.emotes, time: winner.time },
+      winner.msg,
+      true
+    );
     let p = document.createElement("p");
     p.classList.add("h2");
     p.innerHTML = `Winner #${raffleWinners.length}: <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USER.channel}/viewercard/${winnerSlot.username}?popout=","_blank","width=340,height=800")>${winnerSlot.username}</a>`;
@@ -987,7 +1008,15 @@ async function addBadges(badges, username) {
   }
 } //addBadges
 
-async function raffleWinnerChat(context, msg) {
+function relativeTime(timestamp) {
+  const rtf = new Intl.RelativeTimeFormat("en", {
+    numeric: "auto",
+  });
+  const diff = Math.round((parseInt(timestamp, 10) - new Date().getTime()) / 60000);
+
+  return rtf.format(diff, "minute");
+}
+async function raffleWinnerChat(context, msg, joinMessage = false) {
   let msg_s = validator.escape(msg);
   if (context.emotes) {
     let emotes = [];
@@ -1010,7 +1039,9 @@ async function raffleWinnerChat(context, msg) {
   let color = !context.color ? "#FFFFFF" : context.color;
   let badges = await addBadges(context.badges, context.username);
   let p = document.createElement("p");
-  p.innerHTML = `${badges}<span style="color:${color};"> ${name}:</span> ${msg_s}`;
+  p.innerHTML = `${joinMessage ? relativeTime(context.time) : ""} ${badges}<span ${joinMessage ? `class="text-body-secondary"` : `style="color:${color};"`}> ${name}:</span> ${
+    joinMessage ? `<span class="text-body-secondary"> ${msg_s}</span>` : msg_s
+  }`;
   elements.raffleOutput.append(p);
   linkifyElementID("raffleOutput", RAFFLES.linkPreviewThumbnailsEnabled);
 } //raffleWinnerChat
