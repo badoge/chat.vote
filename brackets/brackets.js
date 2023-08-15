@@ -18,6 +18,7 @@ let elements = {
   generateModal: document.getElementById("generateModal"),
   generateBracketType: document.getElementById("generateBracketType"),
   spotifyplaylistSettings: document.getElementById("spotifyplaylistSettings"),
+  //tiermakerSettings: document.getElementById("tiermakerSettings"),
   clipsSettings: document.getElementById("clipsSettings"),
   emotesSettings: document.getElementById("emotesSettings"),
   uwufufuSettings: document.getElementById("uwufufuSettings"),
@@ -26,6 +27,8 @@ let elements = {
 
   spotifyPlaylistLink: document.getElementById("spotifyPlaylistLink"),
   spotifyPlaylistPreview: document.getElementById("spotifyPlaylistPreview"),
+  //tiermakerLink: document.getElementById("tiermakerLink"),
+  //tiermakerPreview: document.getElementById("tiermakerPreview"),
   clipsChannel: document.getElementById("clipsChannel"),
   clipsPreview: document.getElementById("clipsPreview"),
   emotesChannel: document.getElementById("emotesChannel"),
@@ -45,6 +48,7 @@ let elements = {
   changeCommand: document.getElementById("changeCommand"),
   keepVotingEnabled: document.getElementById("keepVotingEnabled"),
   disableAnimations: document.getElementById("disableAnimations"),
+  spotifyWarning: document.getElementById("spotifyWarning"),
 
   //navbar
   vtsLink: document.getElementById("vtsLink"),
@@ -663,8 +667,19 @@ function saveBracket() {
 let startID;
 function showStartModal(id) {
   startID = id;
+  let bracketid = parseInt(startID, 10);
+  let bracket = BRACKETS.brackets.find((x) => x.id === bracketid);
+  if (bracket.options.length < 2) {
+    showToast("Bracket must have 2 options at least", "warning", 3000);
+    return;
+  }
+  if (bracket.options.flatMap((e) => e.type).includes("spotify")) {
+    elements.spotifyWarning.style.display = "";
+  } else {
+    elements.spotifyWarning.style.display = "none";
+  }
   startModal.show();
-}
+} //showStartModal
 
 function startBracket() {
   let id = parseInt(startID, 10);
@@ -1212,6 +1227,58 @@ async function previewSpotifyPlaylist() {
   }
 } //previewSpotifyPlaylist
 
+// async function previewTiermaker() {
+//   let link = elements.tiermakerLink.value?.replace(/\s+/g, "")?.toLowerCase() || null;
+//   let id = link.match(/\/([^\/?]+)(?:\?.*)?$/)[1];
+//   if (!id) {
+//     showToast("Could not find the provided tier list", "warning", 3000);
+//     return;
+//   }
+//   let images = 0;
+//   try {
+//     elements.tiermakerPreview.innerHTML = spinner;
+//     let requestOptions = {
+//       method: "GET",
+//       headers: {
+//         Accept: "application/json",
+//         "Content-Type": "application/json",
+//       },
+//       redirect: "follow",
+//     };
+//     let response = await fetch(`https://brackets.pepega.workers.dev/tiermaker?id=${id}`, requestOptions);
+//     let result = await response.json();
+//     previewedBracketTitle = `Generated TierMaker bracket`;
+//     previewedBracketDescription = `Generated from ${link}`;
+//     previewedBracket = [];
+//     let list = JSON.parse(result);
+
+//     let html = `<ul class="list-group">`;
+//     for (let index = 1; index < list.length; index++) {
+//       let name = list[index].replace(".png", "").replace("100x100jpg", "");
+//       let link = `https://tiermaker.com/images/chart/chart/${id}/${list[index]}`;
+//       previewedBracket.push({
+//         name: name,
+//         type: "image",
+//         value: link,
+//       });
+
+//       html += `
+//         <li class="list-group-item">
+//         <a target="_blank" rel="noopener noreferrer" href="https://proxy.pepega.workers.dev/?url=${encodeURI(link)}">
+//         ${name || "Untitled option"}
+//         </a>
+//         </li>`;
+//       images++;
+//     }
+//     html += `</ul>`;
+//     elements.tiermakerPreview.innerHTML = `<p>${list.length - 1} images</p>${html}`;
+//   } catch (error) {
+//     console.log(error);
+//     showToast("Could not find the provided tier list", "warning", 3000);
+//     return;
+//   }
+// } //previewTiermaker
+
 async function previewClips() {
   let channel = elements.clipsChannel.value?.replace(/\s+/g, "");
   if (!channel) {
@@ -1300,7 +1367,7 @@ async function previewUwufufu() {
   let link = elements.uwufufuLink.value?.replace(/\s+/g, "")?.toLowerCase() || null;
 
   if (!link) {
-    showToast("No bracket provided", "warning", 3000);
+    showToast("No link provided", "warning", 3000);
     return;
   }
   let videos = 0;
@@ -1496,6 +1563,11 @@ async function publishBracket(id, e) {
   e.innerHTML = `<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Loading...</span></div>`;
   id = parseInt(id, 10);
   let bracket = BRACKETS.brackets.find((x) => x.id === id);
+  if (bracket.options.length < 2) {
+    showToast("Bracket must have 2 options at least", "warning", 3000);
+    e.innerHTML = `<i class="material-icons notranslate">cloud_upload</i>`;
+    return;
+  }
   let body = JSON.stringify({
     userid: USER.userID,
     username: USER.channel,

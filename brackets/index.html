@@ -127,16 +127,16 @@
               <select class="form-select generate-value" id="generateBracketType">
                 <option value="" selected>Choose...</option>
                 <option value="spotifyplaylist">Spotify playlist</option>
+                <!-- <option value="tiermaker">TierMaker.com tier list</option> -->
                 <option value="clips">Twitch clips</option>
                 <option value="emotes">Twitch emotes</option>
-                <option value="uwufufu">UwUFUFU bracket</option>
+                <option value="uwufufu">UwUFUFU.com bracket</option>
                 <option value="ytchannel">YouTube channel</option>
                 <option value="ytplaylist">YouTube playlist</option>
               </select>
             </div>
 
             <div id="spotifyplaylistSettings" class="generate-type" style="display: none">
-              <div class="alert alert-danger" role="alert">Spotify embeds don't have a volume slider; make sure to lower your volume before starting</div>
               <p>Generate a bracket from a Spotify playlist</p>
               <div class="input-group mb-3">
                 <span class="input-group-text" id="spotifyPlaylistLinkLabel">Spotify playlist link</span>
@@ -152,6 +152,23 @@
               <button type="button" class="btn btn-info float-end" onclick="previewSpotifyPlaylist()"><i class="material-icons notranslate">preview</i> Preview</button>
               <div id="spotifyPlaylistPreview" class="generate-preview"></div>
             </div>
+
+            <!-- <div id="tiermakerSettings" class="generate-type" style="display: none">
+              <p>Generate a bracket from a TierMaker.com tier list</p>
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="tiermakerLinkLabel">TierMaker.com link</span>
+                <input
+                  type="text"
+                  class="form-control generate-value"
+                  id="tiermakerLink"
+                  placeholder="https://tiermaker.com/create/example-tierlist-XXXXX"
+                  aria-label="TierMaker.com link"
+                  aria-describedby="tiermakerLinkLabel"
+                />
+              </div>
+              <button type="button" class="btn btn-info float-end" onclick="previewTiermaker()"><i class="material-icons notranslate">preview</i> Preview</button>
+              <div id="tiermakerPreview" class="generate-preview"></div>
+            </div> -->
 
             <div id="clipsSettings" class="generate-type" style="display: none">
               <p>Generate a bracket using the top 100 clips from a Twitch channel</p>
@@ -176,7 +193,7 @@
             <div id="uwufufuSettings" class="generate-type" style="display: none">
               <p>Generate a bracket from an UwUFUFU quiz</p>
               <div class="input-group mb-3">
-                <span class="input-group-text" id="uwufufuLinkLabel">UwUFUFU link</span>
+                <span class="input-group-text" id="uwufufuLinkLabel">UwUFUFU.com link</span>
                 <input
                   type="text"
                   class="form-control generate-value"
@@ -279,6 +296,10 @@
             <div class="form-check form-switch mt-3">
               <input class="form-check-input" type="checkbox" role="switch" id="disableAnimations" />
               <label class="form-check-label" for="disableAnimations">Disable transition animation</label>
+            </div>
+
+            <div id="spotifyWarning" style="display: none" class="alert alert-danger mt-5" role="alert">
+              Spotify embeds don't have a volume slider; make sure to lower your volume before starting
             </div>
           </div>
           <div class="modal-footer">
