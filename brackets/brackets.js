@@ -1206,6 +1206,9 @@ async function previewSpotifyPlaylist() {
     previewedBracket = [];
     let html = `<ul class="list-group">`;
     for (let index = 0; index < tracks.length; index++) {
+      if (!tracks[index].track.is_playable) {
+        continue;
+      }
       previewedBracket.push({
         name: `${tracks[index].track.name} - ${tracks[index].track.artists.map((a) => a.name).join(", ")}`,
         type: "spotify",
@@ -1218,7 +1221,7 @@ async function previewSpotifyPlaylist() {
     }
     html += `</ul>`;
     elements.spotifyPlaylistPreview.innerHTML = `<p>${result[0].name || "Untitled playlist"} - ${result[0].description || "No description"} - ${
-      tracks.length == 0 ? "Playlist has no tracks" : `${tracks.length} ${tracks.length == 1 ? "track" : "tracks"}`
+      previewedBracket.length == 0 ? "Playlist has no tracks" : `${previewedBracket.length} ${previewedBracket.length == 1 ? "track" : "tracks"}`
     } </p>${html}`;
   } catch (error) {
     console.log(error);
