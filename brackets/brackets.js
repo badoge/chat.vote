@@ -18,7 +18,7 @@ let elements = {
   generateModal: document.getElementById("generateModal"),
   generateBracketType: document.getElementById("generateBracketType"),
   spotifyplaylistSettings: document.getElementById("spotifyplaylistSettings"),
-  //tiermakerSettings: document.getElementById("tiermakerSettings"),
+  tiermakerSettings: document.getElementById("tiermakerSettings"),
   clipsSettings: document.getElementById("clipsSettings"),
   emotesSettings: document.getElementById("emotesSettings"),
   uwufufuSettings: document.getElementById("uwufufuSettings"),
@@ -27,8 +27,8 @@ let elements = {
 
   spotifyPlaylistLink: document.getElementById("spotifyPlaylistLink"),
   spotifyPlaylistPreview: document.getElementById("spotifyPlaylistPreview"),
-  //tiermakerLink: document.getElementById("tiermakerLink"),
-  //tiermakerPreview: document.getElementById("tiermakerPreview"),
+  tiermakerLink: document.getElementById("tiermakerLink"),
+  tiermakerPreview: document.getElementById("tiermakerPreview"),
   clipsChannel: document.getElementById("clipsChannel"),
   clipsPreview: document.getElementById("clipsPreview"),
   emotesChannel: document.getElementById("emotesChannel"),
@@ -1230,57 +1230,80 @@ async function previewSpotifyPlaylist() {
   }
 } //previewSpotifyPlaylist
 
-// async function previewTiermaker() {
-//   let link = elements.tiermakerLink.value?.replace(/\s+/g, "")?.toLowerCase() || null;
-//   let id = link.match(/\/([^\/?]+)(?:\?.*)?$/)[1];
-//   if (!id) {
-//     showToast("Could not find the provided tier list", "warning", 3000);
-//     return;
-//   }
-//   let images = 0;
-//   try {
-//     elements.tiermakerPreview.innerHTML = spinner;
-//     let requestOptions = {
-//       method: "GET",
-//       headers: {
-//         Accept: "application/json",
-//         "Content-Type": "application/json",
-//       },
-//       redirect: "follow",
-//     };
-//     let response = await fetch(`https://brackets.pepega.workers.dev/tiermaker?id=${id}`, requestOptions);
-//     let result = await response.json();
-//     previewedBracketTitle = `Generated TierMaker bracket`;
-//     previewedBracketDescription = `Generated from ${link}`;
-//     previewedBracket = [];
-//     let list = JSON.parse(result);
+async function previewTiermaker() {
+  let link = elements.tiermakerLink.value?.replace(/\s+/g, "")?.toLowerCase() || null;
+  let id = link.match(/\/([^\/?]+)(?:\?.*)?$/)[1];
+  let number = id.slice(id.lastIndexOf("-") + 1);
 
-//     let html = `<ul class="list-group">`;
-//     for (let index = 1; index < list.length; index++) {
-//       let name = list[index].replace(".png", "").replace("100x100jpg", "");
-//       let link = `https://tiermaker.com/images/chart/chart/${id}/${list[index]}`;
-//       previewedBracket.push({
-//         name: name,
-//         type: "image",
-//         value: link,
-//       });
+  if (!id) {
+    showToast("Could not find the provided tier list", "warning", 3000);
+    return;
+  }
+  let images = 0;
+  try {
+    elements.tiermakerPreview.innerHTML = spinner;
+    let requestOptions = {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      redirect: "follow",
+    };
+    let response = await fetch(`https://brackets.pepega.workers.dev/tiermaker?id=${id}`, requestOptions);
+    let result = await response.json();
+    previewedBracketTitle = `Generated TierMaker bracket`;
+    previewedBracketDescription = `Generated from ${link}`;
+    previewedBracket = [];
+    let list = JSON.parse(result);
 
-//       html += `
-//         <li class="list-group-item">
-//         <a target="_blank" rel="noopener noreferrer" href="https://proxy.pepega.workers.dev/?url=${encodeURI(link)}">
-//         ${name || "Untitled option"}
-//         </a>
-//         </li>`;
-//       images++;
-//     }
-//     html += `</ul>`;
-//     elements.tiermakerPreview.innerHTML = `<p>${list.length - 1} images</p>${html}`;
-//   } catch (error) {
-//     console.log(error);
-//     showToast("Could not find the provided tier list", "warning", 3000);
-//     return;
-//   }
-// } //previewTiermaker
+    let format = await testImage(`https://tiermaker.com/images/chart/chart/${id}/${list[1]}`, 1);
+    if (!format) {
+      format = await testImage(`https://tiermaker.com/images/template_images/2022/${number}/${id}/${list[1]}`, 2);
+      if (!format) {
+        showToast("Could not load tier list :(", "warning", 3000);
+        return;
+      }
+    }
+
+    let html = `<ul class="list-group">`;
+    for (let index = 1; index < list.length; index++) {
+      let name = list[index].replace("png", "").replace("jpg", "").replace(".", "").replace("-", " ");
+      let link = format == 1 ? `https://tiermaker.com/images/chart/chart/${id}/${list[index]}` : `https://tiermaker.com/images/template_images/2022/${number}/${id}/${list[index]}`;
+      previewedBracket.push({
+        name: name,
+        type: "image",
+        value: link,
+      });
+
+      html += `
+        <li class="list-group-item">
+        <a target="_blank" rel="noopener noreferrer" href="https://proxy.pepega.workers.dev/?url=${encodeURI(link)}">
+        ${name || "Untitled option"}
+        </a>
+        </li>`;
+      images++;
+    }
+    html += `</ul>`;
+    elements.tiermakerPreview.innerHTML = `<p>${list.length - 1} images</p> <p class="text-warning">Make sure the images load by testing one of the links below</p>${html}`;
+  } catch (error) {
+    console.log(error);
+    showToast("Could not find the provided tier list", "warning", 3000);
+    return;
+  }
+} //previewTiermaker
+
+async function testImage(url, format) {
+  try {
+    const res = await fetch(`https://helper.pepega.workers.dev/cors/?${url}`);
+    const buff = await res.blob();
+    if (buff.type.startsWith("image/")) {
+      return format;
+    }
+  } catch (error) {
+    return 0;
+  }
+} //testImage
 
 async function previewClips() {
   let channel = elements.clipsChannel.value?.replace(/\s+/g, "");
