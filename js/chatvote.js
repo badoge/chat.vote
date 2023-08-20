@@ -1210,7 +1210,7 @@ function download() {
     showToast("Export Data does not support Yea/Nay mode for now :(", "danger", 2000);
     return;
   }
-  if (!checkLogin() || checkEmpty()) {
+  if (!checkLogin() || !checkEmpty()) {
     return;
   }
   let title = elements.questionLabel.innerHTML;
