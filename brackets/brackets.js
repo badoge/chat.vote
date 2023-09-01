@@ -11,6 +11,8 @@ let elements = {
   deleteBracketModalBody: document.getElementById("deleteBracketModalBody"),
   deleteBracketButton: document.getElementById("deleteBracketButton"),
   quitBracketModal: document.getElementById("quitBracketModal"),
+  tierlistEditorModal: document.getElementById("tierlistEditorModal"),
+  tierlistEditor: document.getElementById("tierlistEditor"),
 
   previewModal: document.getElementById("previewModal"),
   previewModalBody: document.getElementById("previewModalBody"),
@@ -44,6 +46,7 @@ let elements = {
   browseModalBody: document.getElementById("browseModalBody"),
 
   startModal: document.getElementById("startModal"),
+  formatSelect: document.getElementById("formatSelect"),
   optionLimit: document.getElementById("optionLimit"),
   changeCommand: document.getElementById("changeCommand"),
   keepVotingEnabled: document.getElementById("keepVotingEnabled"),
@@ -70,9 +73,9 @@ let elements = {
   optionContainer: document.getElementById("optionContainer"),
   addOption: document.getElementById("addOption"),
 
-  //main
+  //bracket
   toastContainer: document.getElementById("toastContainer"),
-  main: document.getElementById("main"),
+  bracket: document.getElementById("bracket"),
   brackets_editor: document.getElementById("brackets_editor"),
   pickWinner: document.getElementById("pickWinner"),
   hideScore: document.getElementById("hideScore"),
@@ -104,12 +107,28 @@ let elements = {
 
   controls: document.getElementById("controls"),
   enableVoting: document.getElementById("enableVoting"),
+  enableVotingTierlist: document.getElementById("enableVotingTierlist"),
 
   end: document.getElementById("end"),
   endTitle: document.getElementById("endTitle"),
   winner_name: document.getElementById("winner_name"),
   winner_value: document.getElementById("winner_value"),
   endControls: document.getElementById("endControls"),
+
+  //tierlist
+  tierlist: document.getElementById("tierlist"),
+  tierlistContainer: document.getElementById("tierlistContainer"),
+  upcoming: document.getElementById("upcoming"),
+  upcoming_images: document.getElementById("upcoming_images"),
+  tierlistItem: document.getElementById("tierlistItem"),
+  tierlistItemDrag: document.getElementById("tierlistItemDrag"),
+  tierlistLabels: document.getElementById("tierlistLabels"),
+  tierlistScores: document.getElementById("tierlistScores"),
+  currentTierlistItemName: document.getElementById("currentTierlistItemName"),
+  currentTierlistItem: document.getElementById("currentTierlistItem"),
+  pickWinnerTierlist: document.getElementById("pickWinnerTierlist"),
+  hideScoreTierlist: document.getElementById("hideScoreTierlist"),
+  hideScoreTierlistIcon: document.getElementById("hideScoreTierlistIcon"),
 };
 
 const icons = {
@@ -126,9 +145,11 @@ let darkTheme = true;
 
 let client;
 let loginButton;
-let loginExpiredModal, deleteBracketModal, quitBracketModal, previewModal, generateModal, browseModal, startModal;
-let votePopover;
+let loginExpiredModal, deleteBracketModal, quitBracketModal, tierlistEditorModal, previewModal, generateModal, browseModal, startModal;
+let votePopover, votePopoverTierlist;
 let currentBracket = {};
+let currentTierlist = {};
+let currentFormat = "single";
 let voters = [];
 let voting_enabled = false;
 let currentTime = 0;
@@ -390,13 +411,24 @@ function connect() {
     let command = input[0].toLowerCase();
 
     if (!voting_enabled) {
-      if ((command == "1" || command == "a" || command == "2" || command == "b") && (Date.now() - currentTime) / 1000 > 10) {
-        currentTime = Date.now();
-        votePopover.show();
-        setTimeout(function () {
-          votePopover.hide();
-        }, 2000);
-      } //if chatter is trying to vote while voting is disabled show popover
+      if (currentFormat == "single") {
+        if ((command == "1" || command == "a" || command == "2" || command == "b") && (Date.now() - currentTime) / 1000 > 10) {
+          currentTime = Date.now();
+          votePopover.show();
+          setTimeout(function () {
+            votePopover.hide();
+          }, 2000);
+        } //if chatter is trying to vote for bracket while voting is disabled show popover
+      }
+      if (currentFormat == "tierlist") {
+        if (currentTierlistCommands.includes(command)) {
+          currentTime = Date.now();
+          votePopoverTierlist.show();
+          setTimeout(function () {
+            votePopoverTierlist.hide();
+          }, 2000);
+        } //if chatter is trying to vote for tierlist while voting is disabled show popover
+      }
       return;
     } //voting disabled
 
@@ -404,22 +436,35 @@ function connect() {
       return;
     } //chatter already voted
 
-    if (command == currentCommand.left) {
-      vote_results.left++;
-      voters.push(context["user-id"]);
-      updateScores();
-      return;
-    } //chatter voted for left option
+    if (currentFormat == "single") {
+      if (command == currentCommand.left) {
+        vote_results.left++;
+        voters.push(context["user-id"]);
+        updateScores();
+        return;
+      } //chatter voted for left option
 
-    if (command == currentCommand.right) {
-      vote_results.right++;
+      if (command == currentCommand.right) {
+        vote_results.right++;
+        voters.push(context["user-id"]);
+        updateScores();
+        return;
+      } //chatter voted for right option
+    }
+
+    if (currentFormat == "tierlist" && currentTierlistCommands.includes(command)) {
+      let pos = currentTierlistData.findIndex((e) => e.command === command);
+      if (pos == -1) {
+        return;
+      }
+      currentTierlistData[pos].score += 1;
       voters.push(context["user-id"]);
       updateScores();
       return;
-    } //chatter voted for right option
+    }
   }); //message
 
-  client.on("timeout", (channel, username, reason, duration, userstate) => {}); //timeout
+  //client.on("timeout", (channel, username, reason, duration, userstate) => {}); //timeout
 
   client.on("connected", async (address, port) => {
     console.log(`Connected to ${address}:${port}`);
@@ -487,13 +532,13 @@ function addOption(name = "", type = "", value = "") {
             <option value="twitch" ${optionType == "twitch" ? "selected" : ""}>Twitch clip</option>
             <option value="spotify" ${optionType == "spotify" ? "selected" : ""}>Spotify song</option>
           </select>
-          <button class="btn btn-outline-secondary" onclick="previewOption(${optionNumber})" type="button">Preview</button>
         </div>
 
         <div class="input-group mb-3">
           <span class="input-group-text option-value-label">Value</span>
           <input type="text" class="form-control option-value" data-option-id="${optionNumber}" onchange="saveBracket()" value="${value}" placeholder="Option Value" aria-label="Option Value" />
-        </div>
+          <button class="btn btn-outline-secondary" onclick="previewOption(${optionNumber})" type="button">Preview</button>
+          </div>
 
       </div>
     </div>`
@@ -621,7 +666,7 @@ function previewOption(id) {
   } //spotify
 } //previewOption
 
-function createBracket(imported = false) {
+function createBracket(generated = false, type = "single") {
   let maxID = 0;
   if (BRACKETS?.brackets?.length !== 0) {
     maxID = BRACKETS.brackets.reduce((prev, current) => (prev.id > current.id ? prev : current)).id;
@@ -631,7 +676,8 @@ function createBracket(imported = false) {
     title: "",
     description: "",
     options: [],
-    imported: imported,
+    generated: generated,
+    defaultFormat: type == "tiermaker" ? "tierlist" : "single",
     time: Date.now(),
   });
 
@@ -669,6 +715,11 @@ function showStartModal(id) {
   startID = id;
   let bracketid = parseInt(startID, 10);
   let bracket = BRACKETS.brackets.find((x) => x.id === bracketid);
+  if (bracket?.defaultFormat == "tierlist") {
+    elements.formatSelect.value = "tierlist";
+  } else {
+    elements.formatSelect.value = "single";
+  }
   if (bracket.options.length < 2) {
     showToast("Bracket must have 2 options at least", "warning", 3000);
     return;
@@ -688,14 +739,37 @@ function startBracket() {
     showToast("Bracket must have 2 options at least", "warning", 3000);
     return;
   }
-
+  let format = elements.formatSelect.value || "single";
   let limit = parseInt(elements.optionLimit.value, 10) || 0;
   if (limit > 0) {
     while (bracket.options.length > limit) {
       bracket.options.splice(Math.floor(Math.random() * bracket.options.length), 1);
     }
   }
+  switch (format) {
+    case "single":
+      currentFormat = "single";
+      startSingleElimination(bracket);
+      break;
+    case "tierlist":
+      let types = bracket.options.flatMap((e) => e.type);
+      for (let index = 0; index < types.length; index++) {
+        if (types[index] !== "image") {
+          showToast("Only images are supported in tier lists for now :)", "warning", 3000);
+          return;
+        }
+      }
+      currentFormat = "tierlist";
+      startTierlist(bracket);
+      break;
+    default:
+      showToast("Unknown format", "warning", 3000);
+      return;
+  }
+  changeSiteLinkTarget("_blank");
+} //startBracket
 
+function startSingleElimination(bracket) {
   let numberOfRounds = Math.ceil(Math.log2(bracket.options.length));
   let numberOfOptions = bracket.options.length;
 
@@ -725,7 +799,7 @@ function startBracket() {
   }
 
   elements.brackets_editor.style.display = "none";
-  elements.main.style.display = "";
+  elements.bracket.style.display = "";
   elements.title.innerHTML = bracket.title;
   elements.endTitle.innerHTML = `<h1 class="display-6">Winner of ${bracket.title}</h1>`;
   elements.pickWinner.innerHTML = `<i class="material-icons notranslate">navigate_next</i>Next match`;
@@ -737,8 +811,40 @@ function startBracket() {
   currentScores = { left: 0, right: 0 };
   currentCommand = { left: "a", right: "b" };
   nextMatch();
-  changeSiteLinkTarget("_blank");
-} //startBracket
+} //startSingleElimination
+
+function startTierlist(bracket) {
+  console.log(bracket);
+  elements.tierlistContainer.innerHTML = "";
+  elements.upcoming_images.innerHTML = "";
+  for (let index = 0; index < bracket.options.length; index++) {
+    elements.upcoming_images.insertAdjacentHTML(
+      "beforeend",
+      `<img class="border rounded tierlist-item me-1" alt="${bracket.options[index].name}" title="${bracket.options[index].name}" loading="lazy" src="https://proxy.pepega.workers.dev/?url=${bracket.options[index].value}" />`
+    );
+  }
+  addTier("S", "s", "#de0b0b");
+  addTier("A", "a", "#d9740f");
+  addTier("B", "b", "#dea216");
+  addTier("C", "c", "#f7e51b");
+  addTier("D", "d", "#64f71b");
+  addTier("F", "f", "#08cc12");
+  addTier("¯\\_(ツ)_/¯", "idk", "#0fd9cb");
+
+  let labels = "";
+  for (let i = 0, j = currentTierlistData.length; i < j; i++) {
+    labels += `<kbd>${currentTierlistData[i].command.toUpperCase()}</kbd> <br />`;
+  }
+  elements.tierlistLabels.innerHTML = `<div class="col text-end p-1">${labels}</div>`;
+  updateScores();
+
+  elements.brackets_editor.style.display = "none";
+  elements.tierlist.style.display = "";
+  currentTierlist = {};
+  currentTierlist = structuredClone(bracket);
+  currentTierlistCommands = currentTierlistData.map((e) => e.command);
+  nextTierlistItem();
+} //startTierlist
 
 let currentRound = 1;
 let currentOption = 0;
@@ -860,6 +966,27 @@ function nextMatch() {
   }
 } //nextMatch
 
+let currentItem = 1;
+let currentTierlistData = [
+  { name: "s", command: "s", score: 0 },
+  { name: "a", command: "a", score: 0 },
+  { name: "b", command: "b", score: 0 },
+  { name: "c", command: "c", score: 0 },
+  { name: "d", command: "d", score: 0 },
+  { name: "f", command: "f", score: 0 },
+  { name: "idk", command: "idk", score: 0 },
+];
+let currentTierlistCommands = [];
+function nextTierlistItem() {
+  let item = currentTierlist.options.shift();
+  elements.currentTierlistItem.src = item.value;
+  elements.currentTierlistItem.alt = item.name || "Untitled item";
+  elements.currentTierlistItem.title = item.name || "Untitled item";
+  elements.currentTierlistItemName.innerHTML = item.name || "Untitled item";
+  elements.upcoming_images.firstElementChild.remove();
+  resetScores();
+} //nextTierlistItem
+
 function streamerVote(position) {
   vote_results[position]++;
   voters.push(USER.userID);
@@ -889,14 +1016,30 @@ function pickWinner(winner = null) {
   promoteOption(winner, position);
 } //pickWinner
 
+function pickWinnerTierlist() {
+  currentTierlistData.sort((a, b) => b.score - a.score);
+  if (currentTierlistData[0].score == currentTierlistData[1].score) {
+    showToast("Top 2 tiers are tied, unable to place item", "warning", 4000);
+    return;
+  }
+  placeTierlistItem(currentTierlistData[0]);
+} //pickWinnerTierlist
+
 function restartMatch() {
-  vote_results = { left: 0, right: 0 };
-  voters = [];
-  updateScores();
+  resetScores();
   for (let element of document.getElementsByClassName("streamer-vote")) {
     element.style.display = "";
   }
 } //restartMatch
+
+function resetScores() {
+  voters = [];
+  vote_results = { left: 0, right: 0 };
+  for (let index = 0; index < currentTierlistData.length; index++) {
+    currentTierlistData[index].score = 0;
+  }
+  updateScores();
+} //resetScores
 
 function promoteOption(option, position = null) {
   let index = currentBracket[`round${currentRound + 1}`].findIndex((e) => e === undefined);
@@ -948,6 +1091,12 @@ function promoteOption(option, position = null) {
     nextMatch();
   }
 } //promoteOption
+
+function placeTierlistItem(tier) {
+  let card = document.querySelector(`[data-tier="${tier.command}"]`);
+  card.innerHTML += `<img class="border rounded tierlist-item" alt="${elements.currentTierlistItemName.innerHTML}" title="${elements.currentTierlistItemName.innerHTML}" src=${elements.currentTierlistItem.src}>`;
+  nextTierlistItem();
+} //placeTierlistItem
 
 let left_player, right_player;
 function showOption(position, option) {
@@ -1047,12 +1196,36 @@ function showOption(position, option) {
 } //showOption
 
 function updateScores() {
-  if (!scoreHidden) {
-    elements.left_score.innerHTML = `${vote_results.left.toLocaleString()} ${vote_results.left == 1 ? "vote" : "votes"}`;
-    elements.right_score.innerHTML = `${vote_results.right.toLocaleString()} ${vote_results.right == 1 ? "vote" : "votes"}`;
-  } else {
-    elements.left_score.innerHTML = `<span class="text-body-secondary">Score hidden</span>`;
-    elements.right_score.innerHTML = `<span class="text-body-secondary">Score hidden</span>`;
+  if (currentFormat == "single") {
+    if (!scoreHidden) {
+      elements.left_score.innerHTML = `${vote_results.left.toLocaleString()} ${vote_results.left == 1 ? "vote" : "votes"} 
+      (${Math.round((vote_results.left / (vote_results.left + vote_results.right)) * 100) || 0}%)`;
+      elements.right_score.innerHTML = `${vote_results.right.toLocaleString()} ${vote_results.right == 1 ? "vote" : "votes"} 
+      (${Math.round((vote_results.right / (vote_results.left + vote_results.right)) * 100) || 0}%)`;
+    } else {
+      elements.left_score.innerHTML = `<span class="text-body-secondary">Score hidden</span>`;
+      elements.right_score.innerHTML = `<span class="text-body-secondary">Score hidden</span>`;
+    }
+  }
+
+  if (currentFormat == "tierlist") {
+    if (!scoreHidden) {
+      let scores = "";
+      let total = 0;
+      for (let i = 0, j = currentTierlistData.length; i < j; i++) {
+        total += currentTierlistData[i].score;
+      }
+      for (let i = 0, j = currentTierlistData.length; i < j; i++) {
+        scores += `${currentTierlistData[i].score} (${Math.round((currentTierlistData[i].score / total) * 100) || 0}%)<br />`;
+      }
+      elements.tierlistScores.innerHTML = `<div class="col text-start p-1">${scores}</div>`;
+    } else {
+      let scores = "";
+      for (let i = 0, j = currentTierlistData.length; i < j; i++) {
+        scores += `🙈<br />`;
+      }
+      elements.tierlistScores.innerHTML = `<div class="col text-start p-1">${scores}</div>`;
+    }
   }
 } //updateScores
 
@@ -1060,7 +1233,7 @@ function showWinner(winner) {
   showOption("winner", winner[0]);
   elements.left_value.innerHTML = "";
   elements.right_value.innerHTML = "";
-  elements.main.style.display = "none";
+  elements.bracket.style.display = "none";
   elements.end.style.display = "";
 } //showWinner
 
@@ -1076,6 +1249,9 @@ function enableVoteButton() {
   elements.enableVoting.classList.remove("btn-success");
   elements.enableVoting.classList.add("btn-danger");
   elements.enableVoting.innerText = "Stop Voting";
+  elements.enableVotingTierlist.classList.remove("btn-success");
+  elements.enableVotingTierlist.classList.add("btn-danger");
+  elements.enableVotingTierlist.innerText = "Stop Voting";
   voting_enabled = true;
 } //enableVoteButton
 
@@ -1083,12 +1259,16 @@ function disableVoteButton() {
   elements.enableVoting.classList.remove("btn-danger");
   elements.enableVoting.classList.add("btn-success");
   elements.enableVoting.innerText = "Start Voting";
+  elements.enableVotingTierlist.classList.remove("btn-danger");
+  elements.enableVotingTierlist.classList.add("btn-success");
+  elements.enableVotingTierlist.innerText = "Start Voting";
   voting_enabled = false;
 } //disableVoteButton
 
 function quitBracket() {
-  elements.main.style.display = "none";
+  elements.bracket.style.display = "none";
   elements.end.style.display = "none";
+  elements.tierlist.style.display = "none";
   elements.brackets_editor.style.display = "";
   elements.left_value.innerHTML = "";
   elements.right_value.innerHTML = "";
@@ -1140,7 +1320,7 @@ function loadBrackets() {
          data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Start bracket" onclick="showStartModal(${BRACKETS.brackets[index].id})">
           <i class="material-icons notranslate">play_arrow</i>
         </button>
-        <button type="button" class="btn btn-secondary" ${BRACKETS.brackets[index]?.imported ? `style="display: none"` : ""}
+        <button type="button" class="btn btn-secondary" ${BRACKETS.brackets[index]?.generated ? `style="display: none"` : ""}
         data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Publish bracket" onclick="publishBracket(${BRACKETS.brackets[index].id},this)">
          <i class="material-icons notranslate">cloud_upload</i>
        </button>
@@ -1268,7 +1448,7 @@ async function previewTiermaker() {
 
     let html = `<ul class="list-group">`;
     for (let index = 1; index < list.length; index++) {
-      let name = list[index].replace("png", "").replace("jpg", "").replace(".", "").replace("-", " ");
+      let name = list[index].replace("png", "").replace("jpg", "").replace(".", "").replaceAll("-", " ");
       let link = format == 1 ? `https://tiermaker.com/images/chart/chart/${id}/${list[index]}` : `https://tiermaker.com/images/template_images/2022/${number}/${id}/${list[index]}`;
       previewedBracket.push({
         name: name,
@@ -1552,7 +1732,6 @@ async function previewYTPlaylist() {
 
 async function generateBracket() {
   let type = elements.generateBracketType.value?.replace(/\s+/g, "")?.toLowerCase() || null;
-
   if (!type) {
     showToast("No bracket type selected", "warning", 3000);
     return;
@@ -1562,7 +1741,7 @@ async function generateBracket() {
     showToast("You must preview the bracket first", "warning", 3000);
     return;
   }
-  createBracket(true);
+  createBracket(true, type);
   elements.bracketTitle.value = previewedBracketTitle;
   elements.bracketDescription.value = previewedBracketDescription;
   for (let index = 0; index < previewedBracket.length; index++) {
@@ -1693,27 +1872,80 @@ let scoreHidden = false;
 function hideScore() {
   scoreHidden = !scoreHidden;
   elements.hideScoreIcon.innerHTML = scoreHidden ? "visibility_off" : "visibility";
+  elements.hideScoreTierlistIcon.innerHTML = scoreHidden ? "visibility_off" : "visibility";
 
   if (scoreHidden) {
     updateScores();
   } else {
-    let scores = {
-      left: 0,
-      right: 0,
-    };
-    anime({
-      targets: scores,
-      left: vote_results.left,
-      right: vote_results.right,
-      round: 1,
-      easing: "easeInOutExpo",
-      update: function () {
-        elements.left_score.innerHTML = `${scores.left.toLocaleString()} ${scores.left == 1 ? "vote" : "votes"}`;
-        elements.right_score.innerHTML = `${scores.right.toLocaleString()} ${scores.right == 1 ? "vote" : "votes"}`;
-      },
-    });
+    if (currentFormat == "single") {
+      let scores = {
+        left: 0,
+        right: 0,
+      };
+      anime({
+        targets: scores,
+        left: vote_results.left,
+        right: vote_results.right,
+        round: 1,
+        easing: "easeInOutExpo",
+        update: function () {
+          elements.left_score.innerHTML = `${scores.left.toLocaleString()} ${scores.left == 1 ? "vote" : "votes"}`;
+          elements.right_score.innerHTML = `${scores.right.toLocaleString()} ${scores.right == 1 ? "vote" : "votes"}`;
+        },
+      });
+    }
+    if (currentFormat == "tierlist") {
+      updateScores();
+    }
   }
 } //hideScore
+
+function loadTierlistEditor() {
+  let labels = document.querySelectorAll(".tierlist-label");
+  let html = "";
+  for (let index = 0; index < labels.length; index++) {
+    html += `<div class="input-group mb-3">
+    <span class="input-group-text">Tier name:</span>
+    <input type="text" class="form-control tier-name" placeholder="name" aria-label="Tier name" value="${labels[index].textContent}" onchange="updateTierlist()" />
+    <span class="input-group-text">Voting command:</span>
+    <input type="text" class="form-control tier-command" placeholder="command" aria-label="Voting command" value="${labels[index].textContent}" onchange="updateTierlist()" />
+    <span class="input-group-text">Color:</span>
+    <input type="color" class="form-control tier-color" value="${rgba2hex(labels[index].style.backgroundColor)}" aria-label="Tier color" onchange="updateTierlist()" />
+    <button class="btn btn-outline-secondary" type="button" id="button-addon2"><i class="material-icons notranslate" style="cursor: pointer">delete_forever</i></button>
+    </div>`;
+  }
+
+  elements.tierlistEditor.innerHTML = html;
+} //loadTierlistEditor
+
+function addTier(name, command, color) {
+  let labels = document.querySelectorAll(".tierlist-label");
+  if (name == "name") {
+    name = `Tier#${labels.length + 1}`;
+    command = `Tier#${labels.length + 1}`;
+  }
+  elements.tierlistContainer.insertAdjacentHTML(
+    "beforeend",
+    `<div class="card mb-1 tierlist-tier">
+    <div class="row g-0">
+    <div class="col-auto rounded-start tierlist-label" contenteditable="true" spellcheck="false" style="background-color: ${color}">${name}</div>
+    <div class="col">
+    <div class="card-body p-1" data-tier="${command}"></div>
+    </div>
+    </div>
+    </div>`
+  );
+  loadTierlistEditor();
+} //addTier
+
+function updateTierlist() {} //updateTierlist
+
+const rgba2hex = (rgba) =>
+  `#${rgba
+    .match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)$/)
+    .slice(1)
+    .map((n, i) => (i === 3 ? Math.round(parseFloat(n) * 255) : parseFloat(n)).toString(16).padStart(2, "0").replace("NaN", ""))
+    .join("")}`;
 
 async function getYTPlaylist(id) {
   let parts = [];
@@ -1806,6 +2038,44 @@ async function getYTChannelID(handle) {
   }
 } //getYTChannelID
 
+function dragElement() {
+  let pos1 = 0,
+    pos2 = 0,
+    pos3 = 0,
+    pos4 = 0;
+  elements.tierlistItemDrag.onmousedown = dragMouseDown;
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elements.tierlistItem.style.top = elements.tierlistItem.offsetTop - pos2 + "px";
+    elements.tierlistItem.style.left = elements.tierlistItem.offsetLeft - pos1 + "px";
+  }
+
+  function closeDragElement() {
+    // stop moving when mouse button is released:
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+} //dragElement
+
 window.onload = async function () {
   darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
   elements.darkTheme.checked = darkTheme ?? true;
@@ -1842,17 +2112,23 @@ window.onload = async function () {
   });
 
   votePopover = new bootstrap.Popover(elements.enableVoting);
+  votePopoverTierlist = new bootstrap.Popover(elements.enableVotingTierlist);
 
   loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
   deleteBracketModal = new bootstrap.Modal(elements.deleteBracketModal);
   quitBracketModal = new bootstrap.Modal(elements.quitBracketModal);
+  tierlistEditorModal = new bootstrap.Modal(elements.tierlistEditorModal);
   previewModal = new bootstrap.Modal(elements.previewModal);
   generateModal = new bootstrap.Modal(elements.generateModal);
   browseModal = new bootstrap.Modal(elements.browseModal);
   startModal = new bootstrap.Modal(elements.startModal);
 
-  elements.previewModal.addEventListener("hidden.bs.modal", (event) => {
-    elements.previewModalBody.innerHTML = "";
+  elements.tierlistEditorModal.addEventListener("show.bs.modal", (event) => {
+    loadTierlistEditor();
+  });
+
+  elements.quitBracketModal.addEventListener("hidden.bs.modal", (event) => {
+    // do something...
   });
 
   elements.generateModal.addEventListener("hidden.bs.modal", (event) => {
@@ -1890,6 +2166,11 @@ window.onload = async function () {
 
   elements.hideScore.addEventListener("click", function () {
     const tooltip = bootstrap.Tooltip.getInstance("#hideScore");
+    tooltip.setContent({ ".tooltip-inner": scoreHidden ? "Hide score" : "Show score" });
+    hideScore();
+  });
+  elements.hideScoreTierlist.addEventListener("click", function () {
+    const tooltip = bootstrap.Tooltip.getInstance("#hideScoreTierlist");
     tooltip.setContent({ ".tooltip-inner": scoreHidden ? "Hide score" : "Show score" });
     hideScore();
   });
@@ -1962,6 +2243,7 @@ window.onload = async function () {
   tag.src = "https://www.youtube.com/iframe_api";
   let firstScriptTag = document.getElementsByTagName("script")[0];
   firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  dragElement();
 }; //onload
 
 function onYouTubeIframeAPIReady() {
