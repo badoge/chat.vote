@@ -1093,8 +1093,20 @@ function promoteOption(option, position = null) {
 } //promoteOption
 
 function placeTierlistItem(tier) {
+  let id = `item${Date.now()}`;
   let card = document.querySelector(`[data-tier="${tier.command}"]`);
-  card.innerHTML += `<img class="border rounded tierlist-item" alt="${elements.currentTierlistItemName.innerHTML}" title="${elements.currentTierlistItemName.innerHTML}" src=${elements.currentTierlistItem.src}>`;
+  card.innerHTML += `<img id="${id}" class="border rounded tierlist-item me-1" alt="${elements.currentTierlistItemName.innerHTML}" title="${elements.currentTierlistItemName.innerHTML}" src=${elements.currentTierlistItem.src}>`;
+  let start = elements.currentTierlistItem.getBoundingClientRect();
+  let destination = document.getElementById(id).getBoundingClientRect();
+  if (!elements.disableAnimations.checked) {
+    anime({
+      targets: `#${id}`,
+      translateY: [start.top - destination.top, 0],
+      translateX: [start.left - destination.left, 0],
+      height: ["20vh", "10vh"],
+    });
+  }
+
   nextTierlistItem();
 } //placeTierlistItem
 
