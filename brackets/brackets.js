@@ -1017,12 +1017,12 @@ function pickWinner(winner = null) {
 } //pickWinner
 
 function pickWinnerTierlist() {
-  currentTierlistData.sort((a, b) => b.score - a.score);
-  if (currentTierlistData[0].score == currentTierlistData[1].score) {
+  let sorted = [...currentTierlistData].sort((a, b) => b.score - a.score);
+  if (sorted[0].score == sorted[1].score) {
     showToast("Top 2 tiers are tied, unable to place item", "warning", 4000);
     return;
   }
-  placeTierlistItem(currentTierlistData[0]);
+  placeTierlistItem(sorted[0]);
 } //pickWinnerTierlist
 
 function restartMatch() {
