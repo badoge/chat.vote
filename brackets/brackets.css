@@ -155,9 +155,16 @@ body {
   width: 100%;
 }
 
-#upcoming_images {
+#upcoming_thumbnails {
   overflow: auto;
   white-space: nowrap;
+}
+
+#upcoming_thumbnails > div {
+  display: inline;
+  overflow-wrap: break-word;
+  max-width: 200px;
+  word-break: break-all;
 }
 
 .tierlist-item {
@@ -169,15 +176,20 @@ body {
 }
 
 #tierlistItem {
+  font-size: 1.7rem;
   position: absolute;
   background-color: var(--bs-dark-bg-subtle);
-  max-height: 75vh;
+  max-height: 80vh;
   overflow: auto;
-  width: 300px;
+  max-width: 40vw;
   z-index: 1000;
 }
 
 #currentTierlistItem {
-  height: 20vh;
-  max-width: 20vh;
+  max-height: 50vh;
+  max-width: 40vw;
+}
+
+.tierlist-image {
+  min-height: 200px;
 }

@@ -119,7 +119,7 @@ let elements = {
   tierlist: document.getElementById("tierlist"),
   tierlistContainer: document.getElementById("tierlistContainer"),
   upcoming: document.getElementById("upcoming"),
-  upcoming_images: document.getElementById("upcoming_images"),
+  upcoming_thumbnails: document.getElementById("upcoming_thumbnails"),
   tierlistItem: document.getElementById("tierlistItem"),
   tierlistItemDrag: document.getElementById("tierlistItemDrag"),
   tierlistLabels: document.getElementById("tierlistLabels"),
@@ -499,7 +499,7 @@ function switchTheme(checkbox) {
   }
 } //switchTheme
 
-function addOption(name = "", type = "", value = "") {
+function addOption(name = "", type = "", value = "", thumbnail = "") {
   let optionNumber = ++document.querySelectorAll(".option-name").length;
   let optionType = "text";
   if (optionNumber > 1) {
@@ -538,8 +538,12 @@ function addOption(name = "", type = "", value = "") {
           <span class="input-group-text option-value-label">Value</span>
           <input type="text" class="form-control option-value" data-option-id="${optionNumber}" onchange="saveBracket()" value="${value}" placeholder="Option Value" aria-label="Option Value" />
           <button class="btn btn-outline-secondary" onclick="previewOption(${optionNumber})" type="button">Preview</button>
-          </div>
+        </div>
 
+        <div class="input-group mb-3">
+          <span class="input-group-text">Tier list thumbnail</span>
+          <input type="text" class="form-control option-thumbnail" data-option-id="${optionNumber}" onchange="saveBracket()" value="${thumbnail}" placeholder="Tier list thumbnail" aria-label="Tier list thumbnail" />
+        </div>
       </div>
     </div>`
   );
@@ -560,10 +564,12 @@ function previewOption(id) {
   let optionNames = document.querySelectorAll(".option-name");
   let optionTypes = document.querySelectorAll(".option-type");
   let optionValues = document.querySelectorAll(".option-value");
+  let optionThumbnails = document.querySelectorAll(".option-thumbnail");
+
   let name = Array.from(optionNames).find((e) => e.dataset.optionId == id);
   let type = Array.from(optionTypes).find((e) => e.dataset.optionId == id);
   let option = Array.from(optionValues).find((e) => e.dataset.optionId == id);
-
+  let thumbnail = Array.from(optionThumbnails).find((e) => e.dataset.optionId == id);
   if (type.value == "text") {
     elements.previewModalBody.innerHTML = `
     <div class="card">
@@ -695,6 +701,7 @@ function saveBracket() {
   let optionNames = document.querySelectorAll(".option-name");
   let optionTypes = document.querySelectorAll(".option-type");
   let optionValues = document.querySelectorAll(".option-value");
+  let optionThumbnails = document.querySelectorAll(".option-thumbnail");
 
   bracket.options = [];
 
@@ -703,6 +710,7 @@ function saveBracket() {
       name: optionNames[index].value,
       type: optionTypes[index].value,
       value: optionValues[index].value,
+      thumbnail: optionThumbnails[index].value,
     });
   }
 
@@ -752,13 +760,6 @@ function startBracket() {
       startSingleElimination(bracket);
       break;
     case "tierlist":
-      let types = bracket.options.flatMap((e) => e.type);
-      for (let index = 0; index < types.length; index++) {
-        if (types[index] !== "image") {
-          showToast("Only images are supported in tier lists for now :)", "warning", 3000);
-          return;
-        }
-      }
       currentFormat = "tierlist";
       startTierlist(bracket);
       break;
@@ -816,11 +817,18 @@ function startSingleElimination(bracket) {
 function startTierlist(bracket) {
   console.log(bracket);
   elements.tierlistContainer.innerHTML = "";
-  elements.upcoming_images.innerHTML = "";
+  elements.upcoming_thumbnails.innerHTML = "";
+  shuffleArray(bracket.options);
   for (let index = 0; index < bracket.options.length; index++) {
-    elements.upcoming_images.insertAdjacentHTML(
+    if (bracket.options[index].type == "text") {
+      elements.upcoming_thumbnails.insertAdjacentHTML("beforeend", `<div class="border rounded tierlist-item me-1">${bracket.options[index].value}</div>`);
+      continue;
+    }
+    let link = bracket.options[index].thumbnail ? `https://proxy.pepega.workers.dev/?url=${encodeURI(bracket.options[index].thumbnail)}` : "/pics/nothumbnail.png";
+
+    elements.upcoming_thumbnails.insertAdjacentHTML(
       "beforeend",
-      `<img class="border rounded tierlist-item me-1" alt="${bracket.options[index].name}" title="${bracket.options[index].name}" loading="lazy" src="https://proxy.pepega.workers.dev/?url=${bracket.options[index].value}" />`
+      `<img class="border rounded tierlist-item me-1" alt="${bracket.options[index].name}" title="${bracket.options[index].name}" loading="lazy" src="${link}" />`
     );
   }
   addTier("S", "s", "#de0b0b");
@@ -977,13 +985,98 @@ let currentTierlistData = [
   { name: "idk", command: "idk", score: 0 },
 ];
 let currentTierlistCommands = [];
+let tierlist_player;
+let currentTierlistItem;
 function nextTierlistItem() {
   let item = currentTierlist.options.shift();
-  elements.currentTierlistItem.src = item.value;
-  elements.currentTierlistItem.alt = item.name || "Untitled item";
-  elements.currentTierlistItem.title = item.name || "Untitled item";
+  currentTierlistItem = item;
+  elements.upcoming_thumbnails.firstElementChild.remove();
+
   elements.currentTierlistItemName.innerHTML = item.name || "Untitled item";
-  elements.upcoming_images.firstElementChild.remove();
+
+  if (item.type == "text") {
+    elements.currentTierlistItem.innerHTML = item.value || `<span class="text-body-secondary">Empty option</span>`;
+  } //text
+
+  if (item.type == "image") {
+    let image = item?.value.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g) || null;
+    if (!image) {
+      elements.currentTierlistItem.innerHTML = `Invalid image URL`;
+      return;
+    }
+    elements.currentTierlistItem.innerHTML = `<img src="https://proxy.pepega.workers.dev/?url=${encodeURI(image)}" alt="${item.name}" title="${item.name}" class="tierlist-image">`;
+  } //image
+
+  if (item.type == "youtube") {
+    let regex = /(youtu.*be.*)\/(watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$))/gm;
+    let videoID = regex.exec(item?.value) || null;
+    if (!videoID) {
+      elements.currentTierlistItem.innerHTML = "Invalid YouTube URL";
+      return;
+    }
+    videoID = videoID[3];
+    elements.currentTierlistItem.innerHTML = `
+    <iframe 
+    id="tierlist_youtube" 
+    type="text/html" 
+    width="100%" height="360" 
+    src="https://www.youtube.com/embed/${videoID}?enablejsapi=1&origin=https://chat.vote" 
+    frameborder="0">
+    </iframe>`;
+
+    tierlist_player = new YT.Player("tierlist_youtube", {
+      events: {
+        onReady: (event) => {
+          event.target.playVideo();
+        },
+        onStateChange: (event) => {},
+      },
+    });
+  } //youtube
+
+  if (item.type == "twitch") {
+    try {
+      let clipURL = new URL(item?.value);
+      let clipID =
+        clipURL.hostname === "clips.twitch.tv"
+          ? /^\/(\w+(?:\/[A-Z]\w+)?(?:[\-\w]*))(?:\/|$)/.exec(clipURL.pathname)
+          : /^\/\w+\/clip\/(\w+(?:\/[A-Z]\w+)?(?:[\-\w]*))(?:\/|$)/.exec(clipURL.pathname);
+      if (!clipID[1]) {
+        elements.currentTierlistItem.innerHTML = `Invalid Twitch clip URL`;
+        return;
+      }
+      elements.currentTierlistItem.innerHTML = `
+      <iframe 
+      src="https://clips.twitch.tv/embed?clip=${clipID[1]}&parent=127.0.0.1&autoplay=true" 
+      height="360" 
+      width="100%" 
+      preload="auto" 
+      >
+      </iframe>`;
+    } catch (error) {
+      elements.currentTierlistItem.innerHTML = `Invalid Twitch clip URL`;
+      return;
+    }
+  } //twitch
+
+  if (item.type == "spotify") {
+    try {
+      let id = item?.value.match(spotifyURLRegex);
+      if (!id[2] || id[1] !== "track") {
+        elements.currentTierlistItem.innerHTML = `Invalid Spotify track URL`;
+        return;
+      }
+      elements.currentTierlistItem.innerHTML = `
+      <iframe 
+      style="border-radius:12px" src="https://open.spotify.com/embed/track/${id[2]}${darkTheme ? "?theme=0" : ""}" 
+      width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture">
+      </iframe>`;
+    } catch (error) {
+      elements.currentTierlistItem.innerHTML = `Invalid Spotify track URL`;
+      return;
+    }
+  } //spotify
+
   resetScores();
 } //nextTierlistItem
 
@@ -1094,8 +1187,9 @@ function promoteOption(option, position = null) {
 
 function placeTierlistItem(tier) {
   let id = `item${Date.now()}`;
+  let link = currentTierlistItem.thumbnail ? `https://proxy.pepega.workers.dev/?url=${encodeURI(currentTierlistItem.thumbnail)}` : "/pics/nothumbnail.png";
   let card = document.querySelector(`[data-tier="${tier.command}"]`);
-  card.innerHTML += `<img id="${id}" class="border rounded tierlist-item me-1" alt="${elements.currentTierlistItemName.innerHTML}" title="${elements.currentTierlistItemName.innerHTML}" src=${elements.currentTierlistItem.src}>`;
+  card.innerHTML += `<img id="${id}" class="border rounded tierlist-item me-1" alt="${elements.currentTierlistItemName.innerHTML}" title="${elements.currentTierlistItemName.innerHTML}" src="${link}">`;
   let start = elements.currentTierlistItem.getBoundingClientRect();
   let destination = document.getElementById(id).getBoundingClientRect();
   if (!elements.disableAnimations.checked) {
@@ -1285,7 +1379,9 @@ function quitBracket() {
   elements.left_value.innerHTML = "";
   elements.right_value.innerHTML = "";
   elements.winner_value.innerHTML = "";
+  elements.currentTierlistItem.innerHTML = "";
   quitBracketModal.hide();
+  disableVoteButton();
   changeSiteLinkTarget("_self");
 } //quitBracket
 
@@ -1303,7 +1399,7 @@ function editBracket(id) {
   elements.bracketEditorHeader.innerHTML = `ID${id}`;
 
   for (let index = 0; index < bracket.options.length; index++) {
-    addOption(bracket.options[index].name, bracket.options[index].type, bracket.options[index].value);
+    addOption(bracket.options[index].name, bracket.options[index].type, bracket.options[index].value, bracket.options[index].thumbnail);
   }
 } //editBracket
 
@@ -1397,6 +1493,7 @@ async function previewSpotifyPlaylist() {
     previewedBracketDescription = `${result[0].description || "No description"} - Generated from ${elements.spotifyPlaylistLink.value}`;
     previewedBracket = [];
     let html = `<ul class="list-group">`;
+    console.log(tracks);
     for (let index = 0; index < tracks.length; index++) {
       if (!tracks[index].track.is_playable) {
         continue;
@@ -1405,6 +1502,7 @@ async function previewSpotifyPlaylist() {
         name: `${tracks[index].track.name} - ${tracks[index].track.artists.map((a) => a.name).join(", ")}`,
         type: "spotify",
         value: tracks[index].track.external_urls.spotify,
+        thumbnail: tracks[index].track.album.images[0].url,
       });
       html += `
       <li class="list-group-item">
@@ -1466,6 +1564,7 @@ async function previewTiermaker() {
         name: name,
         type: "image",
         value: link,
+        thumbnail: link,
       });
 
       html += `
@@ -1484,18 +1583,6 @@ async function previewTiermaker() {
     return;
   }
 } //previewTiermaker
-
-async function testImage(url, format) {
-  try {
-    const res = await fetch(`https://helper.pepega.workers.dev/cors/?${url}`);
-    const buff = await res.blob();
-    if (buff.type.startsWith("image/")) {
-      return format;
-    }
-  } catch (error) {
-    return 0;
-  }
-} //testImage
 
 async function previewClips() {
   let channel = elements.clipsChannel.value?.replace(/\s+/g, "");
@@ -1531,6 +1618,7 @@ async function previewClips() {
         name: clips[index].title,
         type: "twitch",
         value: clips[index].url,
+        thumbnail: clips[index].thumbnail_url,
       });
       html += `
       <li class="list-group-item">
@@ -1561,11 +1649,13 @@ async function previewEmotes() {
     previewedBracketDescription = `Bracket with ${emotes.length} ${channel} emotes`;
     previewedBracket = [];
     let html = `<ul class="list-group">`;
+    console.log(emotes);
     for (let index = 0; index < emotes.length; index++) {
       previewedBracket.push({
         name: emotes[index].name,
         type: "image",
         value: emotes[index].url,
+        thumbnail: emotes[index].url,
       });
       html += `
       <li class="list-group-item">
@@ -1668,11 +1758,11 @@ async function previewYTChannel() {
     elements.ytchannelPreview.innerHTML = spinner;
     let videos = await getYTChannelVideos(id);
     videos = videos.flatMap((e) => e.items);
-    console.log(videos);
     previewedBracketTitle = `Top ${channel} videos`;
     let numberOfVideos = 0;
     previewedBracket = [];
     let html = `<ul class="list-group">`;
+    console.log(videos);
     for (let index = 0; index < videos.length; index++) {
       if (videos[index].snippet?.liveBroadcastContent == "upcoming" || videos[index].snippet?.id?.kind == "youtube#channel") {
         continue;
@@ -1682,6 +1772,7 @@ async function previewYTChannel() {
         name: videos[index].snippet.title,
         type: "youtube",
         value: `https://www.youtube.com/watch?v=${videos[index].id.videoId}`,
+        thumbnail: videos[index].snippet.thumbnails.high.url,
       });
       html += `
       <li class="list-group-item">
@@ -1720,11 +1811,13 @@ async function previewYTPlaylist() {
     previewedBracketDescription = `Generated from YouTube playlist ${link}`;
     previewedBracket = [];
     let html = `<ul class="list-group">`;
+    console.log(videos);
     for (let index = 0; index < videos.length; index++) {
       previewedBracket.push({
         name: videos[index].snippet.title,
         type: "youtube",
         value: `https://www.youtube.com/watch?v=${videos[index].snippet.resourceId.videoId}`,
+        thumbnail: videos[index].snippet.thumbnails.high.url,
       });
       html += `
       <li class="list-group-item">
@@ -1757,7 +1850,7 @@ async function generateBracket() {
   elements.bracketTitle.value = previewedBracketTitle;
   elements.bracketDescription.value = previewedBracketDescription;
   for (let index = 0; index < previewedBracket.length; index++) {
-    addOption(previewedBracket[index].name, previewedBracket[index].type, previewedBracket[index].value);
+    addOption(previewedBracket[index].name, previewedBracket[index].type, previewedBracket[index].value, previewedBracket[index].thumbnail);
   }
 
   saveBracket();
@@ -1770,7 +1863,7 @@ async function importApproved(id) {
   elements.bracketTitle.value = bracket.bracket.title;
   elements.bracketDescription.value = `${bracket.bracket.description} - Bracket by @${bracket.username} - bracket ID: ${bracket.id}`;
   for (let index = 0; index < bracket.bracket.options.length; index++) {
-    addOption(bracket.bracket.options[index].name, bracket.bracket.options[index].type, bracket.bracket.options[index].value);
+    addOption(bracket.bracket.options[index].name, bracket.bracket.options[index].type, bracket.bracket.options[index].value, bracket.bracket.options[index].thumbnail);
   }
   saveBracket();
   browseModal.hide();
@@ -2087,6 +2180,18 @@ function dragElement() {
     document.onmousemove = null;
   }
 } //dragElement
+
+async function testImage(url, format) {
+  try {
+    const res = await fetch(`https://helper.pepega.workers.dev/cors/?${url}`);
+    const buff = await res.blob();
+    if (buff.type.startsWith("image/")) {
+      return format;
+    }
+  } catch (error) {
+    return 0;
+  }
+} //testImage
 
 window.onload = async function () {
   darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";

@@ -179,7 +179,7 @@ async function getChannelTwitchEmotes(channel, largeEmotes = false) {
         for (let i = 0, j = channelTwitch.data.emotes.length; i < j; i++) {
           emotes.push({
             name: channelTwitch.data.emotes[i].name,
-            url: `https://static-cdn.jtvnw.net/emoticons/v2/${channelTwitch.data.emotes[i].id}/default/dark/${largeEmotes ? "3.0" : "1.0"} `,
+            url: `https://static-cdn.jtvnw.net/emoticons/v2/${channelTwitch.data.emotes[i].id}/default/dark/${largeEmotes ? "3.0" : "1.0"}`,
           });
         }
         return emotes;
