@@ -1047,7 +1047,7 @@ function nextTierlistItem() {
       }
       elements.currentTierlistItem.innerHTML = `
       <iframe 
-      src="https://clips.twitch.tv/embed?clip=${clipID[1]}&parent=127.0.0.1&autoplay=true" 
+      src="https://clips.twitch.tv/embed?clip=${clipID[1]}&parent=chat.vote&autoplay=true" 
       height="360" 
       width="100%" 
       preload="auto" 
