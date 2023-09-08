@@ -48,7 +48,11 @@ let elements = {
   startModal: document.getElementById("startModal"),
   formatSelect: document.getElementById("formatSelect"),
   optionLimit: document.getElementById("optionLimit"),
+  bracketSettings: document.getElementById("bracketSettings"),
+  tierlistSettings: document.getElementById("tierlistSettings"),
   changeCommand: document.getElementById("changeCommand"),
+  highestTier: document.getElementById("highestTier"),
+  averageTier: document.getElementById("averageTier"),
   keepVotingEnabled: document.getElementById("keepVotingEnabled"),
   disableAnimations: document.getElementById("disableAnimations"),
   spotifyWarning: document.getElementById("spotifyWarning"),
@@ -122,8 +126,21 @@ let elements = {
   upcoming_thumbnails: document.getElementById("upcoming_thumbnails"),
   tierlistItem: document.getElementById("tierlistItem"),
   tierlistItemDrag: document.getElementById("tierlistItemDrag"),
-  tierlistLabels: document.getElementById("tierlistLabels"),
-  tierlistScores: document.getElementById("tierlistScores"),
+  tierlistLabel0: document.getElementById("tierlistLabel0"),
+  tierlistLabel1: document.getElementById("tierlistLabel1"),
+  tierlistLabel2: document.getElementById("tierlistLabel2"),
+  tierlistLabel3: document.getElementById("tierlistLabel3"),
+  tierlistLabel4: document.getElementById("tierlistLabel4"),
+  tierlistLabel5: document.getElementById("tierlistLabel5"),
+  tierlistLabel6: document.getElementById("tierlistLabel6"),
+  tierlistScore0: document.getElementById("tierlistScore0"),
+  tierlistScore1: document.getElementById("tierlistScore1"),
+  tierlistScore2: document.getElementById("tierlistScore2"),
+  tierlistScore3: document.getElementById("tierlistScore3"),
+  tierlistScore4: document.getElementById("tierlistScore4"),
+  tierlistScore5: document.getElementById("tierlistScore5"),
+  tierlistScore6: document.getElementById("tierlistScore6"),
+
   currentTierlistItemName: document.getElementById("currentTierlistItemName"),
   currentTierlistItem: document.getElementById("currentTierlistItem"),
   pickWinnerTierlist: document.getElementById("pickWinnerTierlist"),
@@ -725,8 +742,12 @@ function showStartModal(id) {
   let bracket = BRACKETS.brackets.find((x) => x.id === bracketid);
   if (bracket?.defaultFormat == "tierlist") {
     elements.formatSelect.value = "tierlist";
+    elements.bracketSettings.style.display = "none";
+    elements.tierlistSettings.style.display = "";
   } else {
     elements.formatSelect.value = "single";
+    elements.bracketSettings.style.display = "";
+    elements.tierlistSettings.style.display = "none";
   }
   if (bracket.options.length < 2) {
     showToast("Bracket must have 2 options at least", "warning", 3000);
@@ -839,11 +860,6 @@ function startTierlist(bracket) {
   addTier("F", "f", "#08cc12");
   addTier("¯\\_(ツ)_/¯", "idk", "#0fd9cb");
 
-  let labels = "";
-  for (let i = 0, j = currentTierlistData.length; i < j; i++) {
-    labels += `<kbd>${currentTierlistData[i].command.toUpperCase()}</kbd> <br />`;
-  }
-  elements.tierlistLabels.innerHTML = `<div class="col text-end p-1">${labels}</div>`;
   updateScores();
 
   elements.brackets_editor.style.display = "none";
@@ -976,12 +992,12 @@ function nextMatch() {
 
 let currentItem = 1;
 let currentTierlistData = [
-  { name: "s", command: "s", score: 0 },
-  { name: "a", command: "a", score: 0 },
-  { name: "b", command: "b", score: 0 },
-  { name: "c", command: "c", score: 0 },
-  { name: "d", command: "d", score: 0 },
-  { name: "f", command: "f", score: 0 },
+  { name: "s", command: "s", score: 0, weight: 5 },
+  { name: "a", command: "a", score: 0, weight: 4 },
+  { name: "b", command: "b", score: 0, weight: 3 },
+  { name: "c", command: "c", score: 0, weight: 2 },
+  { name: "d", command: "d", score: 0, weight: 1 },
+  { name: "f", command: "f", score: 0, weight: 0 },
   { name: "idk", command: "idk", score: 0 },
 ];
 let currentTierlistCommands = [];
@@ -1110,12 +1126,22 @@ function pickWinner(winner = null) {
 } //pickWinner
 
 function pickWinnerTierlist() {
-  let sorted = [...currentTierlistData].sort((a, b) => b.score - a.score);
-  if (sorted[0].score == sorted[1].score) {
-    showToast("Top 2 tiers are tied, unable to place item", "warning", 4000);
-    return;
+  if (elements.averageTier.checked) {
+    for (let index = 0; index < 7; index++) {
+      if (elements[`tierlistScore${index}`].innerHTML.includes("⭐")) {
+        placeTierlistItem(currentTierlistData[index]);
+        return;
+      }
+    }
+    showToast("Could not pick winner", "warning", 4000);
+  } else {
+    let sorted = [...currentTierlistData].sort((a, b) => b.score - a.score);
+    if (sorted[0].score == sorted[1].score) {
+      showToast("Top 2 tiers are tied, unable to place item", "warning", 4000);
+      return;
+    }
+    placeTierlistItem(sorted[0]);
   }
-  placeTierlistItem(sorted[0]);
 } //pickWinnerTierlist
 
 function restartMatch() {
@@ -1316,21 +1342,39 @@ function updateScores() {
 
   if (currentFormat == "tierlist") {
     if (!scoreHidden) {
-      let scores = "";
       let total = 0;
-      for (let i = 0, j = currentTierlistData.length; i < j; i++) {
+      let max = 0;
+      for (let i = 0; i < 7; i++) {
         total += currentTierlistData[i].score;
+        if (currentTierlistData[i].score > currentTierlistData[max].score) {
+          max = i;
+        }
       }
-      for (let i = 0, j = currentTierlistData.length; i < j; i++) {
-        scores += `${currentTierlistData[i].score} (${Math.round((currentTierlistData[i].score / total) * 100) || 0}%)<br />`;
+      if (elements.averageTier.checked) {
+        let weights = 0;
+        //first 6 scores only because idk score has no weight
+        for (let i = 0; i < 6; i++) {
+          weights += currentTierlistData[i].score * currentTierlistData[i].weight;
+        }
+        let winner = Math.round(weights / (total - currentTierlistData[6].score));
+        for (let i = 0; i < 7; i++) {
+          elements[`tierlistScore${i}`].innerHTML = `${currentTierlistData[i].score} (${Math.round((currentTierlistData[i].score / total) * 100) || 0}%) ${
+            currentTierlistData[i].weight == winner ? "⭐" : ""
+          }<br />`;
+        }
+        //mark idk as winner if all other scores are 0
+        if (isNaN(winner) && total) {
+          elements[`tierlistScore6`].innerHTML = `${currentTierlistData[6].score} (${Math.round((currentTierlistData[6].score / total) * 100) || 0}%) ⭐<br />`;
+        }
+      } else {
+        for (let i = 0; i < 7; i++) {
+          elements[`tierlistScore${i}`].innerHTML = `${currentTierlistData[i].score} (${Math.round((currentTierlistData[i].score / total) * 100) || 0}%) ${i == max ? "⭐" : ""}<br />`;
+        }
       }
-      elements.tierlistScores.innerHTML = `<div class="col text-start p-1">${scores}</div>`;
     } else {
-      let scores = "";
-      for (let i = 0, j = currentTierlistData.length; i < j; i++) {
-        scores += `🙈<br />`;
+      for (let i = 0; i < 7; i++) {
+        elements[`tierlistScore${i}`].innerHTML = `🙈<br />`;
       }
-      elements.tierlistScores.innerHTML = `<div class="col text-start p-1">${scores}</div>`;
     }
   }
 } //updateScores
@@ -2279,6 +2323,16 @@ window.onload = async function () {
       element.style.display = "none";
     }
     elements[`${this.value}Settings`].style.display = "";
+  };
+
+  elements.formatSelect.onchange = function () {
+    if (this.value == "tierlist") {
+      elements.bracketSettings.style.display = "none";
+      elements.tierlistSettings.style.display = "";
+    } else {
+      elements.bracketSettings.style.display = "";
+      elements.tierlistSettings.style.display = "none";
+    }
   };
 
   elements.hideScore.addEventListener("click", function () {

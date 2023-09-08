@@ -309,18 +309,36 @@
               </select>
               <label class="input-group-text" for="optionLimit">options</label>
             </div>
-            <small class="text-body-secondary mb-3">Will skip random options to reduce the bracket length</small>
+            <small class="text-body-secondary mb-3">Will skip random options to reduce the bracket/tier list length</small>
+
+            <div id="bracketSettings">
+              <div class="form-check form-switch mt-3">
+                <input class="form-check-input" type="checkbox" role="switch" id="changeCommand" />
+                <label class="form-check-label" for="changeCommand">Alternate voting command</label><br />
+                <small class="text-body-secondary"> Switches the voting command from 1/2 to a/b every other round to get around the Twitch 30s same message cooldown </small>
+              </div>
+            </div>
+
+            <div class="mt-3" id="tierlistSettings" style="display: none">
+              <label>Scoring</label><br />
+              <div class="btn-group" role="group" aria-label="Mode">
+                <input type="radio" class="btn-check" name="tierlistScoringSelect" value="highest" id="highestTier" autocomplete="off" checked />
+                <label class="btn btn-outline-primary" for="highestTier">Highest tier</label>
+                <input type="radio" class="btn-check" name="tierlistScoringSelect" value="average" id="averageTier" autocomplete="off" />
+                <label class="btn btn-outline-info" for="averageTier">Average tier</label>
+              </div>
+              <br />
+              <small class="text-body-secondary">
+                If Highest tier is selected then the item will be placed in the tier with the most votes. If Average tier is selected and the item has 50 S votes and 10 F votes then it will
+                be placed in A tier
+              </small>
+            </div>
 
             <div class="form-check form-switch mt-3">
-              <input class="form-check-input" type="checkbox" role="switch" id="changeCommand" />
-              <label class="form-check-label" for="changeCommand">Alternate voting command</label><br />
-              <small class="text-body-secondary"> Switches the voting command from 1/2 to a/b every other round to get around the Twitch 30s same message cooldown </small>
-            </div>
-            <div class="form-check form-switch mt-3">
               <input class="form-check-input" type="checkbox" role="switch" id="keepVotingEnabled" />
-              <label class="form-check-label" for="keepVotingEnabled">Keep voting enabled after match ends</label><br />
+              <label class="form-check-label" for="keepVotingEnabled">Keep voting enabled after round ends</label><br />
               <small class="text-body-secondary">
-                If this is off then voting will be automatically disabled after a match ends so viewers don't accidentally vote too soon if they have a long stream delay
+                If this is off then voting will be automatically disabled after a round ends so viewers don't accidentally vote too soon if they have a long stream delay
               </small>
             </div>
 
@@ -638,8 +656,28 @@
           <div class="col-1"></div>
           <div class="col-5 p-0">
             <div class="row">
-              <div class="col-6 text-end p-0" id="tierlistLabels"></div>
-              <div class="col-6 text-start p-0" id="tierlistScores"></div>
+              <div class="col-6 text-end p-0">
+                <div class="col text-end p-1">
+                  <kbd id="tierlistLabel0">S</kbd> <br />
+                  <kbd id="tierlistLabel1">A</kbd> <br />
+                  <kbd id="tierlistLabel2">B</kbd> <br />
+                  <kbd id="tierlistLabel3">C</kbd> <br />
+                  <kbd id="tierlistLabel4">D</kbd> <br />
+                  <kbd id="tierlistLabel5">F</kbd> <br />
+                  <kbd id="tierlistLabel6">IDK</kbd> <br />
+                </div>
+              </div>
+              <div class="col-6 text-start p-0">
+                <div class="col text-start p-1">
+                  <span id="tierlistScore0">0 (0%) <br /></span>
+                  <span id="tierlistScore1">0 (0%) <br /></span>
+                  <span id="tierlistScore2">0 (0%) <br /></span>
+                  <span id="tierlistScore3">0 (0%) <br /></span>
+                  <span id="tierlistScore4">0 (0%) <br /></span>
+                  <span id="tierlistScore5">0 (0%) <br /></span>
+                  <span id="tierlistScore6">0 (0%) <br /></span>
+                </div>
+              </div>
             </div>
           </div>
           <div class="col-5 text-center p-0">
