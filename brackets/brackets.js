@@ -1244,7 +1244,7 @@ function showOption(position, option) {
       elements[`${position}_value`].innerHTML = `Invalid image URL`;
       return;
     }
-    elements[`${position}_value`].innerHTML = `<img src="https://proxy.pepega.workers.dev/?url=${encodeURI(image)}" alt="${option.name}" title="${option.name}" class="option-image">`;
+    elements[`${position}_value`].innerHTML = `<img src="https://proxy.pepega.workers.dev/?url=${encodeURI(option.value)}" alt="${option.name}" title="${option.name}" class="option-image">`;
   } //image
 
   if (option.type == "youtube") {
