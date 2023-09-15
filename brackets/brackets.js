@@ -864,6 +864,8 @@ function startTierlist(bracket) {
 
   elements.brackets_editor.style.display = "none";
   elements.tierlist.style.display = "";
+  elements.tierlistItem.style.display = "";
+  elements.upcoming.style.display = "";
   currentTierlist = {};
   currentTierlist = structuredClone(bracket);
   currentTierlistCommands = currentTierlistData.map((e) => e.command);
@@ -930,10 +932,7 @@ function nextMatch() {
     element.style.display = "";
   }
 
-  vote_results = { left: 0, right: 0 };
-  voters = [];
-  updateScores();
-
+  resetScores();
   if (!elements.keepVotingEnabled.checked) {
     disableVoteButton();
   }
@@ -1005,6 +1004,10 @@ let tierlist_player;
 let currentTierlistItem;
 function nextTierlistItem() {
   let item = currentTierlist.options.shift();
+  if (!item) {
+    endTierlist();
+    return;
+  }
   currentTierlistItem = item;
   elements.upcoming_thumbnails.firstElementChild.remove();
 
@@ -1094,7 +1097,15 @@ function nextTierlistItem() {
   } //spotify
 
   resetScores();
+  if (!elements.keepVotingEnabled.checked) {
+    disableVoteButton();
+  }
 } //nextTierlistItem
+
+function endTierlist() {
+  elements.tierlistItem.style.display = "none";
+  elements.upcoming.style.display = "none";
+} //endTierlist
 
 function streamerVote(position) {
   vote_results[position]++;
