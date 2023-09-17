@@ -604,7 +604,7 @@ function previewOption(id) {
     elements.previewModalBody.innerHTML = `
     <div class="card">
     <div class="card-body">
-    <img src="https://proxy.pepega.workers.dev/?url=${encodeURI(image)}" alt="${name.value}" title="${name.value}" class="option-image">
+    <img src="https://proxy.pepega.workers.dev/?url=${encodeURI(option.value)}" alt="${name.value}" title="${name.value}" class="option-image">
     </div>
     </div>`;
     previewModal.show();
@@ -1023,7 +1023,7 @@ function nextTierlistItem() {
       elements.currentTierlistItem.innerHTML = `Invalid image URL`;
       return;
     }
-    elements.currentTierlistItem.innerHTML = `<img src="https://proxy.pepega.workers.dev/?url=${encodeURI(image)}" alt="${item.name}" title="${item.name}" class="tierlist-image">`;
+    elements.currentTierlistItem.innerHTML = `<img src="https://proxy.pepega.workers.dev/?url=${encodeURI(item.value)}" alt="${item.name}" title="${item.name}" class="tierlist-image">`;
   } //image
 
   if (item.type == "youtube") {
@@ -1475,9 +1475,15 @@ function loadBrackets() {
   let html = ``;
 
   for (let index = BRACKETS.brackets.length - 1; index >= 0; index--) {
+    let warning = BRACKETS.brackets[index].options.some((e) => !e.value)
+      ? `<i class="material-icons notranslate text-danger" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Some of the options have no value">warning</i>`
+      : "";
+    warning += BRACKETS.brackets[index].options.some((e) => !e.thumbnail)
+      ? `<i class="material-icons notranslate text-warning" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Some of the options have no thumbnail">warning</i>`
+      : "";
     html += `<div class="card mb-3">
     <div class="card-header">
-      ${BRACKETS.brackets[index].title || "Untitled bracket"}
+      ${BRACKETS.brackets[index].title || "Untitled bracket"} ${warning}
       <div class="btn-group btn-group-sm float-end" role="group" aria-label="bracket controls">
         <button type="button" class="btn btn-success"
          data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Start bracket" onclick="showStartModal(${BRACKETS.brackets[index].id})">
@@ -1766,6 +1772,7 @@ async function previewUwufufu() {
         name: result.list[index].name,
         type: result.list[index].isVideo ? "youtube" : "image",
         value: result.list[index].isVideo ? result.list[index].videoUrl : result.list[index].resourceUrl,
+        thumbnail: result.list[index].thumbnailUrl,
       });
     }
 
