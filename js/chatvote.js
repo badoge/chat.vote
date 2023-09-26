@@ -1746,6 +1746,7 @@ window.onload = function () {
     retrieve: true,
     paging: false,
     scrollCollapse: true,
+    ordering: false,
     searching: false,
     info: false,
     columns: [
