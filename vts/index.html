@@ -480,9 +480,20 @@
 
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid">
-        <a class="navbar-brand notranslate site-link" href="/vts/" target="_self" rel="noopener noreferrer"
-          ><img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" /> chat.vote/vts</a
+        <a
+          class="navbar-brand notranslate site-link"
+          href="/home/"
+          target="_self"
+          rel="noopener noreferrer"
+          data-bs-toggle="tooltip"
+          data-bs-delay="200"
+          data-bs-placement="bottom"
+          data-bs-title="Home page"
         >
+          <img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" />
+        </a>
+        <a class="navbar-brand notranslate site-link" href="/vts/" target="_self" rel="noopener noreferrer"> chat.vote/vts</a>
+
         <div class="collapse navbar-collapse">
           <ul class="navbar-nav">
             <li class="nav-item">
@@ -539,6 +550,20 @@
                 href="/raffles/"
               >
                 <i class="material-icons notranslate">local_activity</i> Raffles
+              </a>
+            </li>
+            <li class="nav-item" style="display: none">
+              <a
+                class="nav-link site-link"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-placement="bottom"
+                data-bs-title="Brackets and tier lists with chat interaction"
+                target="_self"
+                rel="noopener noreferrer"
+                href="/brackets/"
+              >
+                <i class="material-icons notranslate">emoji_events</i> Brackets
               </a>
             </li>
             <li class="nav-item" id="vtsLink">

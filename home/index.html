@@ -33,35 +33,36 @@
   <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid">
-        <a class="navbar-brand notranslate" href="#"><img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" /> chat.vote Homepage</a>
+        <a class="navbar-brand notranslate" href="/home/" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Home page">
+          <img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" />
+        </a>
+        <a class="navbar-brand notranslate" href="/home/"> chat.vote Homepage</a>
+
         <div class="collapse navbar-collapse">
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a
-                class="nav-link"
-                data-bs-toggle="tooltip"
-                data-bs-delay="200"
-                data-bs-placement="bottom"
-                data-bs-title="Polls that you vote on by typing in Twitch chat"
-                target="_blank"
-                href="/"
-              >
+              <a class="nav-link" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Polls that you vote on by typing in Twitch chat" href="/">
                 <img style="height: 1.2em; filter: invert(0.25)" id="twitchLogo" alt="twitch" src="/pics/twitch.png" /> Twitch chat polls
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Straw polls with shareable links" target="_blank" href="/poll/">
+              <a class="nav-link" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Straw polls with shareable links" href="/poll/">
                 <i class="material-icons notranslate">how_to_vote</i>Polls
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Mini games with chat interaction" target="_blank" href="/games/">
+              <a class="nav-link" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Mini games with chat interaction" href="/games/">
                 <i class="material-icons notranslate">videogame_asset</i> Games
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Twitch chat raffles" target="_blank" href="/raffles/">
+              <a class="nav-link" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Twitch chat raffles" href="/raffles/">
                 <i class="material-icons notranslate">local_activity</i> Raffles
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Brackets and tier lists with chat interaction" href="/brackets/">
+                <i class="material-icons notranslate">emoji_events</i> Brackets
               </a>
             </li>
             <li class="nav-item" id="vtsLink">
@@ -71,7 +72,6 @@
                 data-bs-delay="200"
                 data-bs-placement="bottom"
                 data-bs-title="A VTS plugin that allows your viewers to control your model"
-                target="_blank"
                 href="/vts/"
               >
                 <span class="vts-icon"></span>VTube Studio Plugin
