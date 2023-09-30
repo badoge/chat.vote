@@ -128,10 +128,13 @@
   overflow: hidden;
   line-height: 0;
   vertical-align: middle;
+  position: relative;
+  z-index: 2;
 }
 
 .resizable img {
   height: 100%;
+  max-height: 200px;
 }
 
 .accordion-button,
