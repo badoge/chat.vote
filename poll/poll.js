@@ -1,24 +1,20 @@
 /*jshint esversion: 11 */
 
-let modal1, modal2, modal3, modal4, modal5;
+let deleteAllModal, pollModal, captchaModal;
 let mode = 0;
 let level = 1;
 let multipleAnswersAllowed;
-let donkdonk;
-let ignored = false;
 let token;
 let copyTooltip;
 let numberOfOptions = 2;
 
 let elements = {
   //modals
-  modal1: document.getElementById("modal1"),
-  modal2: document.getElementById("modal2"),
-  modal3: document.getElementById("modal3"),
-  modal4: document.getElementById("modal4"),
-  modal5: document.getElementById("modal5"),
+  deleteAllModal: document.getElementById("deleteAllModal"),
+  pollModal: document.getElementById("pollModal"),
+  captchaModal: document.getElementById("captchaModal"),
 
-  //modal2
+  //pollModal
   errorDiv: document.getElementById("errorDiv"),
   pollLinkDiv: document.getElementById("pollLinkDiv"),
   pollTitleDiv: document.getElementById("pollTitleDiv"),
@@ -55,21 +51,6 @@ let POLL = {
 };
 
 const ckey = "6LdzxrwdAAAAADyHX2t8ZS4U5QxTNLVWNrGOeNp0";
-const donk = import("/js/donk.min.js").then((donk) => donk.load());
-
-donk.then((fp) => fp.get()).then((result) => (donkdonk = result.visitorId));
-
-function checkdonk() {
-  if (!donkdonk && mode == 3) {
-    if (!ignored) {
-      modal3.show();
-      return false;
-    }
-    return true;
-  } else {
-    return true;
-  }
-} //checkdonk
 
 function load_localStorage() {
   if (!localStorage.getItem("POLL")) {
@@ -137,19 +118,15 @@ function saveSettings() {
   localStorage.setItem("darkTheme", darkTheme);
 } //saveSettings
 
-function ignoreModal() {
-  ignored = true;
-} //ignoreModal
-
-function showModal1() {
-  modal1.show();
-} //showModal1
+function showDeleteAllModal() {
+  deleteAllModal.show();
+} //showDeleteAllModal
 
 function reset() {
   numberOfOptions = 2;
-  resetModal2();
+  resetPollModal();
   elements.optionsDiv.innerHTML = `
-  <div class="card bg-dark-subtle border-dark-subtle option-card" data-option-id="1">
+  <div class="card bg-body-tertiary option-card" data-option-id="1">
   <div class="card-body">
     <div class="input-group">
       <input type="text" class="form-control poll-option" onkeydown="handleInput(event)" data-option-id="1" placeholder="Enter poll option" aria-label="Poll option" />
@@ -163,7 +140,7 @@ function reset() {
     </div>
   </div>
 </div>
-<div class="card bg-dark-subtle border-dark-subtle option-card" data-option-id="2">
+<div class="card bg-body-tertiary option-card" data-option-id="2">
   <div class="card-body">
     <div class="input-group">
       <input type="text" class="form-control poll-option" onkeydown="handleInput(event)" data-option-id="2" placeholder="Enter poll option" aria-label="Poll option" />
@@ -195,18 +172,17 @@ function checkEmpty() {
   }
 } //checkEmpty
 
-function removeDuplicates() {
+function removeDuplicates(removeEmpty = false) {
   let pollOptions = [...document.querySelectorAll(".poll-option")];
   let buttons = [...document.querySelectorAll(".remove-input")];
   let options = [];
   for (let index = 0; index < pollOptions.length; index++) {
-    if (options.includes(pollOptions[index].value)) {
+    if (options.includes(pollOptions[index].value) || (removeEmpty && !pollOptions[index].value.replace(/\s+/g, ""))) {
       buttons[index].click();
     } else {
       options.push(pollOptions[index].value);
     }
   }
-  createPoll();
 } //removeDuplicates
 
 function updateTimer(element) {
@@ -229,15 +205,16 @@ function copyLink(link) {
 } //copyLink
 
 async function addOptionBulk() {
-  resetModal2();
-  if (!checkEmpty()) {
-    showToast("Poll already has some options, remove them before adding in bulk", "warning", 3000);
-    return;
-  }
+  resetPollModal();
   let og = elements.bulkOptions.value.split(/\r?\n/);
+  let options = [];
+  for (let index = 0; index < og.length; index++) {
+    if (!options.includes(og[index]) && og[index].replace(/\s+/g, "")) {
+      options.push(og[index].trim());
+    }
+  }
   elements.bulkOptions.value = "";
-  let options = og.filter(Boolean);
-  for (let i = 0, j = options.length - 2; i < j; i++) {
+  for (let i = 0, j = options.length; i < j; i++) {
     addInput();
   }
 
@@ -246,10 +223,11 @@ async function addOptionBulk() {
   let removeImageButtons = [...document.querySelectorAll(".remove-image")];
 
   for (let i = 0, j = pollOptions.length; i < j; i++) {
-    let text = options[i];
-    if (!text) {
+    let text = options[0];
+    if (!text || pollOptions[i].value) {
       continue;
     }
+    options.shift();
     pollOptions[i].value = text;
     if (text.startsWith("http")) {
       let requestOptions = {
@@ -271,23 +249,24 @@ async function addOptionBulk() {
       }
     }
   } //for
+  removeDuplicates(true);
 } //addOptionBulk
 
-function resetModal2() {
+function resetPollModal() {
   elements.errorDiv.innerHTML = "";
   elements.pollLinkDiv.innerHTML = `<p class="placeholder-glow">
   <span class="placeholder placeholder-lg col-12 bg-warning"></span>
-</p>`;
+  </p>`;
   elements.pollTitleDiv.innerHTML = `<p class="placeholder-glow">
   <span class="placeholder col-12"></span>
-</p>`;
+  </p>`;
   elements.pollOptionsDiv.innerHTML = `<p class="placeholder-glow">
   <span class="placeholder col-12"></span>
-</p>`;
+  </p>`;
   elements.pollSettingsDiv.innerHTML = `<p class="placeholder-glow">
   <span class="placeholder col-12"></span>
-</p>`;
-} //resetModal2
+  </p>`;
+} //resetPollModal
 
 function checkSize() {
   let title = !elements.pollTitle.value ? "Untitled poll" : elements.pollTitle.value;
@@ -320,7 +299,6 @@ function checkSize() {
     mode: 1,
     endtime: 1678513462683,
     multianswer: false,
-    creatorid: "352ed00d4cdc0c3b39b791ecee4efe56",
     creatorip: "123.456.789.123",
   };
   const size = new TextEncoder().encode(JSON.stringify(poll)).length;
@@ -329,18 +307,13 @@ function checkSize() {
 } //checkSize
 
 async function createPoll() {
-  if (!checkdonk()) {
-    return;
-  }
-
   if (checkEmpty()) {
     showToast("No poll options added", "warning", 3000);
     return;
   }
 
   if (!noDuplicates()) {
-    modal5.show();
-    return;
+    removeDuplicates();
   }
 
   if (checkSize()) {
@@ -386,13 +359,13 @@ async function createPoll() {
     return;
   }
 
-  resetModal2();
-  modal2.show();
+  resetPollModal();
+  pollModal.show();
 
   try {
     token = await grecaptcha.execute(ckey, { action: "submit" });
     if (!token) {
-      modal4.show();
+      captchaModal.show();
       return;
     }
     let requestOptions = {
@@ -402,7 +375,6 @@ async function createPoll() {
       "Content-Type": "application/json",
       body: JSON.stringify({
         captchatoken: token,
-        userid: donkdonk,
         title: title,
         options: pollOptionsArray,
         images: imagesArray,
@@ -585,7 +557,7 @@ function selectNextInput(optionId) {
 function addInput(move = true) {
   elements.optionsDiv.insertAdjacentHTML(
     "beforeend",
-    `<div class="card bg-dark-subtle border-dark-subtle option-card" data-option-id="${++numberOfOptions}">
+    `<div class="card bg-body-tertiary option-card" data-option-id="${++numberOfOptions}">
     <div class="card-body">
       <div class="input-group">
         <input type="text" class="form-control poll-option" onkeydown="handleInput(event)" data-option-id="${numberOfOptions}" placeholder="Enter poll option" aria-label="Poll option" />
@@ -651,11 +623,9 @@ window.onload = function () {
   load_localStorage();
   refreshData();
 
-  modal1 = new bootstrap.Modal(elements.modal1);
-  modal2 = new bootstrap.Modal(elements.modal2);
-  modal3 = new bootstrap.Modal(elements.modal3);
-  modal4 = new bootstrap.Modal(elements.modal4);
-  modal5 = new bootstrap.Modal(elements.modal5);
+  deleteAllModal = new bootstrap.Modal(elements.deleteAllModal);
+  pollModal = new bootstrap.Modal(elements.pollModal);
+  captchaModal = new bootstrap.Modal(elements.captchaModal);
 
   enableTooltips();
   enablePopovers();

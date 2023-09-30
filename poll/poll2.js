@@ -1,11 +1,9 @@
 /*jshint esversion: 8 */
 
-let donkdonk;
 let myChart;
 let barChart = true;
 let pieChart = false;
-let ignored = false;
-let modal1, modal2, reportModal;
+let captchaModal, reportModal;
 let token;
 let cooldown = false;
 let sorted = false;
@@ -15,8 +13,7 @@ let darkTheme = true;
 const spinner = `<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`;
 
 let elements = {
-  modal1: document.getElementById("modal1"),
-  modal2: document.getElementById("modal2"),
+  captchaModal: document.getElementById("captchaModal"),
   reportModal: document.getElementById("reportModal"),
   reason: document.getElementById("reason"),
   reportDetails: document.getElementById("reportDetails"),
@@ -30,25 +27,6 @@ let elements = {
 };
 
 const ckey = "6LdzxrwdAAAAADyHX2t8ZS4U5QxTNLVWNrGOeNp0";
-const donk = import("https://chat.vote/js/donk.min.js").then((donk) => donk.load());
-
-donk.then((fp) => fp.get()).then((result) => (donkdonk = result.visitorId));
-
-function checkDonk() {
-  if (!donkdonk) {
-    if (!ignored) {
-      modal1.show();
-      return false;
-    }
-    return true;
-  } else {
-    return true;
-  }
-} //checkDonk
-
-function ignoreModal() {
-  ignored = true;
-} //ignoreModal
 
 function showCountdown(endtime) {
   document.getElementById("countdowndiv").innerHTML = `
@@ -95,11 +73,6 @@ function unblur() {
 } //unblur
 
 async function report(id) {
-  if (!checkDonk()) {
-    reportModal.hide();
-    return;
-  }
-
   let reason = parseInt(elements.reason.value, 10);
   if (!reason) {
     showToast("You need to select a reason", "warning", 2000);
@@ -114,7 +87,7 @@ async function report(id) {
     token = await grecaptcha.execute(ckey, { action: "submit" });
     if (!token) {
       reportModal.hide();
-      modal2.show();
+      captchaModal.show();
       elements.report.disabled = false;
       elements.report.innerHTML = "Submit report";
       return;
@@ -152,7 +125,7 @@ async function report(id) {
     elements.report.innerHTML = "Submit report";
     if (!token) {
       reportModal.hide();
-      modal2.show();
+      captchaModal.show();
       return;
     }
     console.log(error);
@@ -160,10 +133,6 @@ async function report(id) {
 } //report
 
 async function vote() {
-  if (!checkDonk()) {
-    return;
-  }
-
   let vote = [];
   let options = document.querySelectorAll(".polloption");
   let type = options[0].type;
@@ -191,7 +160,7 @@ async function vote() {
   try {
     token = await grecaptcha.execute(ckey, { action: "submit" });
     if (!token) {
-      modal2.show();
+      captchaModal.show();
       return;
     }
     let requestOptions = {
@@ -202,7 +171,6 @@ async function vote() {
       body: JSON.stringify({
         id: pollID,
         vote: vote,
-        userid: donkdonk,
         captchatoken: token,
       }),
     };
@@ -294,7 +262,7 @@ async function vote() {
     showToast(result.message, "primary", 5000);
   } catch (error) {
     if (!token) {
-      modal2.show();
+      captchaModal.show();
       return;
     }
     console.log(error);
@@ -304,10 +272,6 @@ async function vote() {
 } //vote
 
 async function refresh() {
-  if (!checkDonk()) {
-    return;
-  }
-
   if (cooldown) {
     return;
   }
@@ -322,7 +286,7 @@ async function refresh() {
     let pollID = path[0];
     token = await grecaptcha.execute(ckey, { action: "submit" });
     if (!token) {
-      modal2.show();
+      captchaModal.show();
       return;
     }
     let requestOptions = {
@@ -331,7 +295,7 @@ async function refresh() {
       redirect: "follow",
       "Content-Type": "application/json",
     };
-    let url = `id=${encodeURI(pollID)}&userid=${donkdonk}&captchatoken=${token}`;
+    let url = `id=${encodeURI(pollID)}&captchatoken=${token}`;
     let response = await fetch(`https://polls.pepega.workers.dev/results/?${url}`, requestOptions);
     //let response = await fetch(`http://127.0.0.1:8787/results/?${url}`, requestOptions);
 
@@ -418,7 +382,7 @@ async function refresh() {
     showToast(result.message, "primary", 5000);
   } catch (error) {
     if (!token) {
-      modal2.show();
+      captchaModal.show();
       return;
     }
     console.log(error);
@@ -578,8 +542,7 @@ window.onload = function () {
   elements.darkTheme.checked = darkTheme ?? true;
   switchTheme(elements.darkTheme.checked);
 
-  modal1 = new bootstrap.Modal(elements.modal1);
-  modal2 = new bootstrap.Modal(elements.modal2);
+  captchaModal = new bootstrap.Modal(elements.captchaModal);
   reportModal = new bootstrap.Modal(elements.reportModal);
 
   enableTooltips();

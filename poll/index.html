@@ -35,7 +35,7 @@
       <div class="alert alert-danger" role="alert">WARNING! JavaScript is disabled. This site will not work properly without it.</div>
     </noscript>
 
-    <div class="modal" id="modal1" tabindex="-1" aria-hidden="true">
+    <div class="modal" id="deleteAllModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
@@ -53,14 +53,14 @@
       </div>
     </div>
 
-    <div class="modal" data-bs-backdrop="static" id="modal2" tabindex="-1" aria-hidden="true">
+    <div class="modal" data-bs-backdrop="static" id="pollModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Poll info</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body" id="modal2body">
+          <div class="modal-body">
             <div class="text-danger" id="errorDiv"></div>
             <h4>Poll link:</h4>
             <div id="pollLinkDiv">
@@ -95,33 +95,14 @@
       </div>
     </div>
 
-    <div class="modal" data-bs-backdrop="static" id="modal3" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Could not get user ID</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body" id="modal3body">
-            Could not get your user ID, maybe you are using some extension that is blocking the script?<br />
-            The server uses device fingerprints to identify users, and it might not be able to verify that you made this poll without it.<br />
-            Try disabling any extension that might blocking it and refresh :)<br />
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-warning" onclick="ignoreModal()" data-bs-dismiss="modal">Ignore</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal" id="modal4" tabindex="-1" aria-hidden="true">
+    <div class="modal" id="captchaModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Failed to run reCAPTCHA</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body" id="modal4body">
+          <div class="modal-body">
             It seems that you are blocking reCAPTCHA, the server won't accept any request that is not verified by reCAPTCHA.<br />
             Try disabling any extension that might be blocking it and refresh :)<br />
           </div>
@@ -130,19 +111,19 @@
       </div>
     </div>
 
-    <div class="modal" id="modal5" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
+    <div class="modal fade" id="bulkModal" tabindex="-1" aria-labelledby="bulkModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Duplicates detected</h5>
+            <h1 class="modal-title fs-5" id="bulkModalLabel">Add poll options in bulk</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <p>Some of the options you entered were duplicate</p>
+            <textarea class="form-control" placeholder="1 option per line" id="bulkOptions" style="white-space: pre-wrap" rows="9"></textarea>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-warning" data-bs-dismiss="modal" onclick="removeDuplicates()">Remove duplicate options</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-success" onclick="addOptionBulk()" data-bs-dismiss="modal"><i class="material-icons notranslate">add</i>Add</button>
           </div>
         </div>
       </div>
@@ -292,10 +273,10 @@
 
     <div class="container-fluid">
       <div class="row" id="mainrow">
-        <div class="col-xl-2"></div>
+        <div class="col-xl-3"></div>
 
-        <div class="col-xl-6" id="main">
-          <div class="card bg-dark-subtle border-dark-subtle" id="titleCard">
+        <div class="col-xl-6">
+          <div class="card bg-body-tertiary" id="titleCard">
             <div class="card-body">
               <div class="input-group input-group-lg">
                 <input type="text" id="pollTitle" class="form-control" placeholder="Poll title" aria-label="Poll title" />
@@ -304,7 +285,7 @@
           </div>
 
           <div id="optionsDiv">
-            <div class="card bg-dark-subtle border-dark-subtle option-card" data-option-id="1">
+            <div class="card bg-body-tertiary option-card" data-option-id="1">
               <div class="card-body">
                 <div class="input-group">
                   <input type="text" class="form-control poll-option" onkeydown="handleInput(event)" data-option-id="1" placeholder="Enter poll option" aria-label="Poll option" />
@@ -318,7 +299,7 @@
                 </div>
               </div>
             </div>
-            <div class="card bg-dark-subtle border-dark-subtle option-card" data-option-id="2">
+            <div class="card bg-body-tertiary option-card" data-option-id="2">
               <div class="card-body">
                 <div class="input-group">
                   <input type="text" class="form-control poll-option" onkeydown="handleInput(event)" data-option-id="2" placeholder="Enter poll option" aria-label="Poll option" />
@@ -335,16 +316,79 @@
           </div>
 
           <div id="underOptions">
-            <button id="createpollbtn" class="btn btn-success btn-lg" type="button" onclick="createPoll()"><i class="material-icons notranslate">create</i>Create Poll</button>
+            <div class="btn-group dropdown-center">
+              <button type="button" id="createpollbtn" class="btn btn-success btn-lg" onclick="createPoll()"><i class="material-icons notranslate">create</i>Create Poll</button>
+              <button type="button" class="btn btn-success btn-lg dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                <i class="material-icons notranslate">settings</i><span class="visually-hidden">Poll settings</span>
+              </button>
+              <form class="container-fluid dropdown-menu p-4 bg-body-tertiary" style="width: 50vw">
+                <div class="row">
+                  <div class="col">
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" id="multipleAnswersAllowed" />
+                      <label class="form-check-label" for="multipleAnswersAllowed"><i class="material-icons notranslate">plus_one</i>Allow multiple answers</label>
+                      <br /><small class="form-text text-body-secondary">Lets users vote for more than 1 option from the poll.</small>
+                    </div>
+                    <hr />
+                    <h4>Poll timer</h4>
+                    <div class="mb-3">
+                      <div class="input-group flex-nowrap timer">
+                        <input type="number" aria-label="poll timer value" id="pollTimerValue" placeholder="0" min="0" class="form-control" />
+                        <select class="form-select timer" id="pollTimerUnit">
+                          <option selected value="m">Minutes</option>
+                          <option value="h">Hours</option>
+                          <option value="d">Days</option>
+                        </select>
+                      </div>
+                      <small class="form-text text-body-secondary">Poll will close after the timer runs out.</small>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <h4>Results visibility</h4>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="resultsVisibility" value="0" id="results_anyone" checked />
+                      <label class="form-check-label" for="results_anyone"><i class="material-icons notranslate">visibility</i>Visible to anyone</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="resultsVisibility" value="1" id="results_voters" />
+                      <label class="form-check-label" for="results_voters"><i class="material-icons notranslate">how_to_vote</i>Visible after voting</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="resultsVisibility" value="2" id="results_timer" disabled />
+                      <label class="form-check-label" for="results_timer"><i class="material-icons notranslate">timer</i>Reveal after timer runs out</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="resultsVisibility" value="3" id="results_creator" />
+                      <label class="form-check-label" for="results_creator"><i class="material-icons notranslate">person</i>Visible to me only</label>
+                    </div>
+                    <hr />
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bulkModal">Add multiple options</button>
+                  </div>
+                  <div class="col">
+                    <h4>Duplicate detection level</h4>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="duplicateDetectionLevel" value="0" id="detect_low" />
+                      <label class="form-check-label" for="detect_low"><i class="material-icons notranslate">remove_moderator</i>Low</label>
+                      <br /><small class="form-text text-body-secondary">Low protection against duplicate votes, only very obvious bots will be blocked.</small>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="duplicateDetectionLevel" value="1" id="detect_high" checked />
+                      <label class="form-check-label" for="detect_high"><i class="material-icons notranslate">security</i>High</label>
+                      <br /><small class="form-text text-body-secondary">Users on the same network might not be able to vote.</small>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
 
-            <button type="button" class="btn add-btn bg-dark-subtle border-dark-subtle" onclick="addInput()"><i class="material-icons notranslate">add</i></button>
+            <button type="button" class="btn add-btn bg-body-tertiary" onclick="addInput()"><i class="material-icons notranslate">add</i></button>
 
             <div class="float-end">
               <div class="btn-group" role="group" aria-label="Delete all or restart buttons">
                 <button
                   type="button"
                   class="btn btn-outline-danger"
-                  onclick="showModal1()"
+                  onclick="showDeleteAllModal()"
                   data-bs-toggle="tooltip"
                   data-bs-delay="200"
                   data-bs-placement="top"
@@ -357,162 +401,7 @@
           </div>
         </div>
 
-        <div class="col-xl-3">
-          <div class="container-fluid" id="settings">
-            <div class="accordion" id="accordion1">
-              <div class="accordion-item">
-                <h2 class="accordion-header" id="headingOne">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                    <i class="material-icons notranslate">settings</i>Settings
-                  </button>
-                </h2>
-
-                <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordion1">
-                  <div class="accordion-body">
-                    <ul class="nav nav-tabs" id="myTab" role="tablist">
-                      <li class="nav-item" role="presentation">
-                        <a class="nav-link active" id="basic-tab" data-bs-toggle="tab" href="#basic" role="tab" aria-controls="basic" aria-selected="true">Settings</a>
-                      </li>
-                      <li class="nav-item" role="presentation">
-                        <a class="nav-link" id="contact-tab" data-bs-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">About/Contact</a>
-                      </li>
-                    </ul>
-
-                    <div class="tab-content" id="myTabContent">
-                      <div class="tab-pane fade show active" id="basic" role="tabpanel" aria-labelledby="basic-tab">
-                        <div class="row">
-                          <div class="col">
-                            <div class="card border settingscard">
-                              <div class="card-body" id="basicsettings">
-                                <small class="text-info">Hint: Add an image link at the start of a poll option and press enter to embed it</small>
-                                <hr />
-                                <div class="form-check form-switch">
-                                  <input class="form-check-input" type="checkbox" id="multipleAnswersAllowed" />
-                                  <label class="form-check-label" for="multipleAnswersAllowed"><i class="material-icons notranslate">plus_one</i>Allow multiple answers</label>
-                                  <br /><small class="form-text text-body-secondary">Lets users vote for more than 1 option from the poll.</small>
-                                </div>
-                                <br />
-                                <h4>Poll timer</h4>
-                                <div class="mb-3">
-                                  <div class="input-group flex-nowrap timer">
-                                    <input type="number" aria-label="poll timer value" id="pollTimerValue" placeholder="0" min="0" class="form-control" />
-                                    <select class="form-select timer" id="pollTimerUnit">
-                                      <option selected value="m">Minutes</option>
-                                      <option value="h">Hours</option>
-                                      <option value="d">Days</option>
-                                    </select>
-                                  </div>
-
-                                  <small class="form-text text-body-secondary">Poll will close after the timer runs out.</small>
-                                </div>
-                                <br />
-                                <h4>Results visibility</h4>
-                                <div class="form-check">
-                                  <input class="form-check-input" type="radio" name="resultsVisibility" value="0" id="results_anyone" checked />
-                                  <label class="form-check-label" for="results_anyone"><i class="material-icons notranslate">visibility</i>Visible to anyone</label>
-                                </div>
-                                <div class="form-check">
-                                  <input class="form-check-input" type="radio" name="resultsVisibility" value="1" id="results_voters" />
-                                  <label class="form-check-label" for="results_voters"><i class="material-icons notranslate">how_to_vote</i>Visible after voting</label>
-                                </div>
-                                <div class="form-check">
-                                  <input class="form-check-input" type="radio" name="resultsVisibility" value="2" id="results_timer" disabled />
-                                  <label class="form-check-label" for="results_timer"><i class="material-icons notranslate">timer</i>Reveal after timer runs out</label>
-                                </div>
-                                <div class="form-check">
-                                  <input class="form-check-input" type="radio" name="resultsVisibility" value="3" id="results_creator" />
-                                  <label class="form-check-label" for="results_creator"><i class="material-icons notranslate">person</i>Visible to me only</label>
-                                </div>
-                                <br />
-                                <h4 style="display: none">Duplicate detection level</h4>
-                                <small style="display: none" class="text-warning">not ready yet :)</small>
-                                <div class="form-check" style="display: none">
-                                  <input class="form-check-input" type="radio" name="duplicateDetectionLevel" value="0" id="detect_low" disabled />
-                                  <label class="form-check-label" for="results_anyone"><i class="material-icons notranslate">remove_moderator</i>Low</label>
-                                  <br /><small class="form-text text-body-secondary">Low protection against duplicate votes, only very obvious bots will be blocked.</small>
-                                </div>
-
-                                <div class="form-check" style="display: none">
-                                  <input class="form-check-input" type="radio" name="duplicateDetectionLevel" value="1" id="detect_high" checked disabled />
-                                  <label class="form-check-label" for="results_timer"><i class="material-icons notranslate">security</i>High</label>
-                                  <br /><small class="form-text text-body-secondary">Users on the same network might not be able to vote.</small>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div class="card border settingscard">
-                              <div class="card-body">
-                                <label for="bulkOptions">Add poll options in bulk</label>
-                                <textarea class="form-control" placeholder="1 option per line" id="bulkOptions" style="white-space: pre-wrap" rows="7"></textarea>
-                                <button type="button" onclick="addOptionBulk()" data-bs-toggle="collapse" data-bs-target="#collapseOne" class="btn btn-primary mt-2">
-                                  <i class="material-icons notranslate">add</i>Add
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
-                        <div class="row">
-                          <div class="col">
-                            <div class="card border settingscard">
-                              <div class="card-body">
-                                <h5>Contact info:</h5>
-                                <p>
-                                  Site by <a href="https://www.twitch.tv/badoge">badoge</a> :) <br />
-                                  If you find any issues or if you have suggestions or questions, you can contact me:<br />
-                                  <a href="https://www.twitch.tv/popout/badoge/chat?popout=">in this chat</a> <br />
-                                  or on <a href="https://discord.gg/eF54kvd">discord</a> <br />
-                                  or by <a href="mailto:poll@chat.vote">email</a>
-                                </p>
-                              </div>
-                            </div>
-                            <div class="card border settingscard">
-                              <div class="card-body">
-                                <h5>Other stuff by me :)</h5>
-                                <p>
-                                  <a target="_blank" rel="noopener noreferrer" href="https://chat.vote/">chat.vote</a><br />
-                                  <small>Polls that you vote on by typing in Twitch chat.</small><br />
-                                  <a target="_blank" rel="noopener noreferrer" href="https://chat.vote/games/">chat.vote/games</a><br />
-                                  <small>Mini games with chat interaction.</small><br />
-                                  <a target="_blank" rel="noopener noreferrer" href="https://chat.vote/vts/">chat.vote/vts</a><br />
-                                  <small>A site that lets viewers control your VTube Studio model using chat commands or channel points.</small><br />
-                                  <a target="_blank" rel="noopener noreferrer" href="https://okayeg.com">OkayegBOT</a><br />
-                                  <small>Fun/utility Twitch chat bot.</small><br />
-                                  <a target="_blank" rel="noopener noreferrer" href="https://zero.chat.vote">0weebs</a><br />
-                                  <small>Twitch moderation bot that bans weebs.</small><br />
-                                </p>
-                              </div>
-                            </div>
-                            <div class="card border settingscard">
-                              <div class="card-body">
-                                <h5>About:</h5>
-                                <h6>This site uses:</h6>
-                                <ul>
-                                  <li><a target="_blank" rel="noopener noreferrer" href="https://workers.cloudflare.com/">Cloudflare Workers + Durable Objects</a></li>
-                                  <li><a target="_blank" rel="noopener noreferrer" href="https://getbootstrap.com/">Bootstrap</a></li>
-                                  <li><a target="_blank" rel="noopener noreferrer" href="https://www.chartjs.org/">Chart.js</a> to display the results graph</li>
-                                  <li><a target="_blank" rel="noopener noreferrer" href="https://github.com/albert-gonzalez/easytimer.js">EasyTimer.js</a> for the countdown timer</li>
-                                  <li><a target="_blank" rel="noopener noreferrer" href="https://github.com/validatorjs/validator.js">validator.js</a> sanitizer</li>
-                                  <li><a target="_blank" rel="noopener noreferrer" href="https://github.com/cure53/DOMPurify">DOMPurify</a> sanitizer</li>
-                                  <li><a target="_blank" rel="noopener noreferrer" href="https://github.com/fingerprintjs/fingerprintjs/">FingerprintJS</a> to identify users</li>
-                                  <li><a target="_blank" rel="noopener noreferrer" href="https://developers.google.com/recaptcha/docs/v3">reCAPTCHA</a> to protect against bots</li>
-                                  <li><a target="_blank" rel="noopener noreferrer" href="https://fonts.google.com/icons">Material Icons</a> icons</li>
-                                </ul>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-xl-1"></div>
+        <div class="col-xl-3"></div>
       </div>
       <div aria-live="polite" aria-atomic="true" class="position-relative">
         <div id="toastContainer" class="toast-container"></div>
