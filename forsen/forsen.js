@@ -44,6 +44,7 @@ let currentTime = 0;
 let modal8, modal9;
 let channelBadges = { subscriber: [], bits: [] };
 let globalBadges = {};
+let customBadges = [];
 let winner = "";
 let winners = [];
 let raffleCollapse;
@@ -109,7 +110,16 @@ function connect() {
         return;
       }
       if (!raffle_users.some((e) => e.username === context.username) && !winners.includes(context.username)) {
-        let user = { username: context.username, displayname: context["display-name"], tickets: 1, color: context.color, firstmsg: context["first-msg"], badges: context.badges, msg: msg };
+        let user = {
+          id: context["user-id"],
+          username: context.username,
+          displayname: context["display-name"],
+          tickets: 1,
+          color: context.color,
+          firstmsg: context["first-msg"],
+          badges: context.badges,
+          msg: msg,
+        };
         addUserToRaffle(user);
       }
       return;
@@ -163,7 +173,7 @@ async function addUserToRaffle(user) {
   raffle_users.push(user);
   let name = user.username == user.displayname.toLowerCase() ? `${user.displayname}` : `${user.displayname} (${user.username})`;
   let color = !user.color ? "#FFFFFF" : user.color;
-  let badges = await addBadges(user.badges, user.username, user.msg, user.firstmsg);
+  let badges = addBadges(user.badges, user.id, user.firstmsg);
   let deletebtn = `<i class="material-icons notranslate deletebtn float-end" onclick="removeFromRaffle('${user.username}')">highlight_off</i>`;
   elements.raffleUsers.innerHTML =
     `<li id="${user.username}_raffle" class="list-group-item">
@@ -405,22 +415,27 @@ const fpsBenchmark = function () {
   }, 1000);
 };
 
-async function addBadges(badges, username, message, firstmsg) {
+function addBadges(badges, userid, firstmsg) {
   try {
     let badgesHTML = "";
     if (firstmsg) {
       badgesHTML += `<i class="material-icons notranslate" style="color:#f18805;" title="First-time chatter">warning_amber</i>`;
     }
+    for (let index = 0; index < customBadges.length; index++) {
+      if (customBadges[index].users.includes(userid) && customBadges[index].sites.includes("chat.vote")) {
+        badgesHTML += `<img src="${customBadges[index].url}" class="chat-badge" title="${customBadges[index].name}"/>`;
+      }
+    }
     for (const badge in badges) {
       if (badge == "subscriber" && badges.subscriber && channelBadges.subscriber.length > 0) {
         let badge = channelBadges.subscriber.find((obj) => obj.id === badges.subscriber);
-        badgesHTML += `<img src="${badge.url}" style="height:1.3em;" title="Subscriber"/>`;
+        badgesHTML += `<img src="${badge.url}" class="chat-badge" title="Subscriber"/>`;
       } else if (badge == "bits" && channelBadges.bits.length > 0) {
         let badge = channelBadges.bits.find((obj) => obj.id === badges.bits);
-        badgesHTML += `<img src="${badge.url}" style="height:1.3em;" title="Bits"/>`;
+        badgesHTML += `<img src="${badge.url}" class="chat-badge" title="Bits"/>`;
       } else if (Object.keys(globalBadges).length > 0) {
         let version = globalBadges[badge].find((obj) => obj.id === badges[badge]);
-        badgesHTML += `<img src="${version.image_url_4x}" style="height:1.3em;" title="${badge}"/>`;
+        badgesHTML += `<img src="${version.image_url_4x}" class="chat-badge" title="${badge}"/>`;
       }
     }
     return badgesHTML;
@@ -430,7 +445,7 @@ async function addBadges(badges, username, message, firstmsg) {
   }
 } //addBadges
 
-async function raffleWinnerChat(context, msg) {
+function raffleWinnerChat(context, msg) {
   let msg_s = validator.escape(msg);
   if (context.emotes) {
     let emotes = [];
@@ -451,7 +466,7 @@ async function raffleWinnerChat(context, msg) {
   msg_s = replaceEmotes(msg_s, thirdPartyEmotes);
   let name = context.username == context["display-name"].toLowerCase() ? `${context["display-name"]}` : `${context["display-name"]} (${context.username})`;
   let color = !context.color ? "#FFFFFF" : context.color;
-  let badges = await addBadges(context.badges, context.username, msg_s, context.firstmsg);
+  let badges = addBadges(context.badges, context["user-id"], context.firstmsg);
   let p = document.createElement("p");
   p.innerHTML = `${badges}<span style="color:${color};"> ${name}:</span> ${msg_s}`;
   elements.raffleOutput.append(p);
@@ -481,17 +496,17 @@ window.onload = async function () {
   fpsBenchmark();
   globalBadges = await getGlobalBadges();
   channelBadges = await getChannelBadges(USERNAME);
-
+  customBadges = await getCustomBadges();
   modal8 = new bootstrap.Modal(elements.modal8);
   modal9 = new bootstrap.Modal(elements.modal9);
 
   enableTooltips();
 
   tickSound = new Howl({
-    src: ["/sounds/tick.mp3"],
+    src: ["/raffles/tick.mp3"],
   });
   revealSound = new Howl({
-    src: ["/sounds/reveal.mp3"],
+    src: ["/raffles/reveal.mp3"],
   });
 
   elements.restartRaffle.addEventListener("click", function () {

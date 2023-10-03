@@ -122,6 +122,7 @@ let loginButton;
 let resetSettingsModal, loginExpiredModal, restartRaffleModal, fancyRaffleModal;
 let channelBadges = { subscriber: [], bits: [] };
 let globalBadges = {};
+let customBadges = [];
 let currentRaffleWinner = "";
 let raffleWinners = [];
 let settingsOffcanvas;
@@ -493,6 +494,7 @@ function connect() {
 
       //make user object with 1 ticket
       let user = {
+        id: context["user-id"],
         username: context.username,
         displayname: context["display-name"],
         tickets: 1,
@@ -646,11 +648,11 @@ async function loadPFP() {
   </div>`;
 } //loadPFP
 
-async function addUserToRaffle(user) {
+function addUserToRaffle(user) {
   raffle_users.push(user);
   let name = user.username == user.displayname.toLowerCase() ? `${user.displayname}` : `${user.displayname} (${user.username})`;
   let color = !user.color ? "#FFFFFF" : user.color;
-  let badges = await addBadges(user.badges, user.username);
+  let badges = addBadges(user.badges, user.id, user.username);
   let deletebtn = `<i class="material-icons notranslate deletebtn float-end" onclick="removeFromRaffle('${user.username}')">highlight_off</i>`;
   elements.raffleUsers.innerHTML =
     `<li id="${user.username}_raffle" class="list-group-item">
@@ -679,7 +681,7 @@ async function drawRaffleWinner() {
     raffleWinners.push(currentRaffleWinner);
     let winner = raffle_users.find((e) => e.username == currentRaffleWinner);
     raffleWinnerChat(
-      { username: winner.username, "display-name": winner.displayname, color: winner.color, badges: winner.badges, emotes: winner.emotes, time: winner.time },
+      { "user-id": winner.id, username: winner.username, "display-name": winner.displayname, color: winner.color, badges: winner.badges, emotes: winner.emotes, time: winner.time },
       winner.msg,
       true
     );
@@ -983,22 +985,27 @@ async function getPFP(users) {
   });
 } //getPFP
 
-async function addBadges(badges, username) {
+function addBadges(badges, userid, username) {
   try {
     let badgesHTML = "";
     if (firstTimeChatters.includes(username)) {
       badgesHTML += `<i class="material-icons notranslate" style="color:#f18805;" title="First-time chatter">warning_amber</i>`;
     }
+    for (let index = 0; index < customBadges.length; index++) {
+      if (customBadges[index].users.includes(userid) && customBadges[index].sites.includes("chat.vote")) {
+        badgesHTML += `<img src="${customBadges[index].url}" class="chat-badge" title="${customBadges[index].name}"/>`;
+      }
+    }
     for (const badge in badges) {
       if (badge == "subscriber" && badges.subscriber && channelBadges.subscriber.length > 0) {
         let badge = channelBadges.subscriber.find((obj) => obj.id === badges.subscriber);
-        badgesHTML += `<img src="${badge.url}" style="height:1.3em;" title="Subscriber"/>`;
+        badgesHTML += `<img src="${badge.url}" class="chat-badge" title="Subscriber"/>`;
       } else if (badge == "bits" && channelBadges.bits.length > 0) {
         let badge = channelBadges.bits.find((obj) => obj.id === badges.bits);
-        badgesHTML += `<img src="${badge.url}" style="height:1.3em;" title="Bits"/>`;
+        badgesHTML += `<img src="${badge.url}" class="chat-badge" title="Bits"/>`;
       } else if (Object.keys(globalBadges).length > 0) {
         let version = globalBadges[badge].find((obj) => obj.id === badges[badge]);
-        badgesHTML += `<img src="${version.image_url_4x}" style="height:1.3em;" title="${badge}"/>`;
+        badgesHTML += `<img src="${version.image_url_4x}" class="chat-badge" title="${badge}"/>`;
       }
     }
     return badgesHTML;
@@ -1013,10 +1020,10 @@ function relativeTime(timestamp) {
     numeric: "auto",
   });
   const diff = Math.round((parseInt(timestamp, 10) - new Date().getTime()) / 60000);
-
   return rtf.format(diff, "minute");
-}
-async function raffleWinnerChat(context, msg, joinMessage = false) {
+} //relativeTime
+
+function raffleWinnerChat(context, msg, joinMessage = false) {
   let msg_s = validator.escape(msg);
   if (context.emotes) {
     let emotes = [];
@@ -1037,7 +1044,7 @@ async function raffleWinnerChat(context, msg, joinMessage = false) {
   msg_s = replaceEmotes(msg_s, thirdPartyEmotes);
   let name = context.username == context["display-name"].toLowerCase() ? `${context["display-name"]}` : `${context["display-name"]} (${context.username})`;
   let color = !context.color ? "#FFFFFF" : context.color;
-  let badges = await addBadges(context.badges, context.username);
+  let badges = addBadges(context.badges, context["user-id"], context.username);
   let p = document.createElement("p");
   p.innerHTML = `${joinMessage ? relativeTime(context.time) : ""} ${badges}<span ${joinMessage ? `class="text-body-secondary"` : `style="color:${color};"`}> ${name}:</span> ${
     joinMessage ? `<span class="text-body-secondary"> ${msg_s}</span>` : msg_s
@@ -1192,6 +1199,7 @@ async function enableRaffleButton() {
   if (!checkLogin()) {
     return;
   }
+
   if (
     !RAFFLES.allowPlebs &&
     !RAFFLES.allowSubs &&
@@ -1215,13 +1223,16 @@ async function enableRaffleButton() {
     }, 1000);
     return;
   }
+  elements.raffleCommandButton.innerHTML = spinner;
+
   if (Object.keys(globalBadges).length == 0) {
-    elements.raffleCommandButton.innerHTML = spinner;
     globalBadges = await getGlobalBadges();
   }
   if (channelBadges.subscriber.length == 0) {
-    elements.raffleCommandButton.innerHTML = spinner;
     channelBadges = await getChannelBadges(USER.channel);
+  }
+  if (customBadges.length == 0) {
+    customBadges = await getCustomBadges();
   }
   fpsBenchmark();
   raffle_open = true;

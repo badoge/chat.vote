@@ -390,7 +390,7 @@ async function removeAndRestart() {
   vote_results = [];
   for (let k = 0; k < optionsToKeep; k++) {
     pushVoteResults(vote_results_copy[k].id, vote_results_copy[k].option, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
-    await pushTable(vote_results_copy[k].id, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
+    pushTable(vote_results_copy[k].id, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
   }
   loadChart();
   updateChart();
@@ -413,7 +413,7 @@ async function restartPoll() {
   vote_results = [];
   for (let k = 0; k < length; k++) {
     pushVoteResults(vote_results_copy[k].id, vote_results_copy[k].option, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
-    await pushTable(vote_results_copy[k].id, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
+    pushTable(vote_results_copy[k].id, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
   }
   if (timer && timer.isRunning()) {
     timer.reset();
@@ -458,7 +458,7 @@ async function removeWinner() {
   vote_results = [];
   for (let k = 0; k < oldlength - 1; k++) {
     pushVoteResults(vote_results_copy[k].id, vote_results_copy[k].option, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
-    await pushTable(vote_results_copy[k].id, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
+    pushTable(vote_results_copy[k].id, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
   }
   loadChart();
   updateChart();
@@ -766,7 +766,7 @@ function connect() {
         }
       }
       oid++;
-      await pushTable(oid, suggestion_emotes, context.username, 0, context);
+      pushTable(oid, suggestion_emotes, context.username, 0, context);
       pushVoteResults(oid, suggestion_unchanged, suggestion_emotes, context.username, 0, context);
       updateChart();
       return;
@@ -964,7 +964,7 @@ async function getEmotes() {
   }, 3000);
 } //getEmotes
 
-async function addBadges(badges, userid, firstmsg) {
+function addBadges(badges, userid, firstmsg) {
   try {
     let badgesHTML = "";
     if (firstmsg) {
@@ -1091,7 +1091,7 @@ async function addOption() {
   let extraoption_clean = extraoption.toLowerCase().replace(/\W/g, "");
   if (!vote_results.some((e) => e.option_clean === extraoption_clean) && extraoption_clean) {
     oid++;
-    await pushTable(oid, replaceEmotes(extraoption, thirdPartyEmotes), USER.channel, 0, null);
+    pushTable(oid, replaceEmotes(extraoption, thirdPartyEmotes), USER.channel, 0, null);
     pushVoteResults(oid, extraoption.replace(/<div.*?<\/div>/, "↖ Switch to Table view to see image :)"), replaceEmotes(extraoption, thirdPartyEmotes), USER.channel, 0, null);
     updateChart();
     elements.pollOption.value = "";
@@ -1136,7 +1136,7 @@ async function addOptionBulk() {
 
     if (!vote_results.some((e) => e.option_clean === option_clean) && option_clean) {
       oid++;
-      await pushTable(oid, replaceEmotes(f2[i], thirdPartyEmotes), USER.channel, 0, null);
+      pushTable(oid, replaceEmotes(f2[i], thirdPartyEmotes), USER.channel, 0, null);
       pushVoteResults(oid, f2[i], replaceEmotes(f2[i], thirdPartyEmotes), USER.channel, 0, null);
       updateChart();
     } else {
@@ -1145,7 +1145,7 @@ async function addOptionBulk() {
   }
 } //addOptionBulk
 
-async function pushTable(id, suggestion, by, score, context) {
+function pushTable(id, suggestion, by, score, context) {
   let command = id;
   if (CHATVOTE.votingMode == "text") {
     suggestion = suggestion.replace(/[^a-zA-Z0-9]+/g, "-");
@@ -1155,7 +1155,7 @@ async function pushTable(id, suggestion, by, score, context) {
   let color = "#FFFFFF";
   let username = by;
   if (context) {
-    badgesHTML = await addBadges(context.badges, context["user-id"], context["first-msg"]);
+    badgesHTML = addBadges(context.badges, context["user-id"], context["first-msg"]);
     color = context.color || "#FFFFFF";
     username = context["display-name"].toLowerCase() == by.toLowerCase() ? context["display-name"] : `${context["display-name"]} (${by})`;
   }

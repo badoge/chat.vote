@@ -86,7 +86,10 @@ async function getGlobalTwitchEmotes(largeEmotes = false) {
       if (filter.includes(globalTwitch.data[i].name)) {
         continue;
       }
-      emotes.push({ name: globalTwitch.data[i].name, url: globalTwitch.data[i].images[largeEmotes ? "url_4x" : "url_1x"] });
+      emotes.push({
+        name: globalTwitch.data[i].name,
+        url: `https://static-cdn.jtvnw.net/emoticons/v2/${globalTwitch.data[i].id}/default/dark/${largeEmotes ? "3.0" : "1.0"}`,
+      });
     }
     return emotes;
   } catch (error) {

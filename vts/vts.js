@@ -165,7 +165,8 @@ let apiClient;
 let loginButton;
 let cooldowns = { global: 0 };
 let channelBadges = { subscriber: [], bits: [] };
-let globalBadges = [];
+let globalBadges = {};
+let customBadges = [];
 let connectVTSModal,
   resetModal,
   addCommandModal,
@@ -1883,6 +1884,7 @@ function connectTwitch() {
       triggerHotkey(VTS.commands[command]);
       log({
         action: `Used command: "${command}"`,
+        id: context["user-id"],
         username: context.username,
         displayname: context["display-name"],
         firstmsg: context["first-msg"],
@@ -1910,6 +1912,7 @@ function connectTwitch() {
       triggerHotkey(VTS.subs[max]);
       log({
         action: userstate["system-msg"],
+        id: userstate["user-id"],
         username: userstate.login,
         displayname: userstate["display-name"],
         firstmsg: false,
@@ -1936,6 +1939,7 @@ function connectTwitch() {
       triggerHotkey(VTS.subs[max]);
       log({
         action: userstate["system-msg"],
+        id: userstate["user-id"],
         username: userstate.login,
         displayname: userstate["display-name"],
         firstmsg: false,
@@ -1962,6 +1966,7 @@ function connectTwitch() {
       triggerHotkey(VTS.gifts[max]);
       log({
         action: userstate["system-msg"],
+        id: userstate["user-id"],
         username: userstate.login,
         displayname: userstate["display-name"],
         firstmsg: false,
@@ -1988,6 +1993,7 @@ function connectTwitch() {
       triggerHotkey(VTS.gifts[max]);
       log({
         action: userstate["system-msg"],
+        id: userstate["user-id"],
         username: userstate.login,
         displayname: userstate["display-name"],
         firstmsg: false,
@@ -2027,6 +2033,7 @@ function connectTwitch() {
       triggerHotkey(VTS.bits[max]);
       log({
         action: `Cheered ${userstate.bits} ${userstate.bits == 1 ? "bit" : "bits"}`,
+        id: userstate["user-id"],
         username: userstate.username,
         displayname: userstate["display-name"],
         firstmsg: userstate["first-msg"],
@@ -2136,7 +2143,7 @@ async function log(user) {
   let color = !user.color ? "#FFFFFF" : user.color;
   let badges = "";
   if (user.badges && Object.keys(user.badges).length > 0) {
-    badges = await addBadges(user.badges, user.username, user.firstmsg);
+    badges = await addBadges(user.badges, user.id, user.firstmsg);
   }
   if (elements.logs.innerHTML.trim() == "nothing here :)") {
     elements.logs.innerHTML = "";
@@ -2155,28 +2162,36 @@ async function logYT(user) {
     elements.logs.innerHTML;
 } //log
 
-async function addBadges(badges, username, firstmsg) {
+async function addBadges(badges, userid, firstmsg) {
   if (globalBadges.length == 0) {
     globalBadges = await getGlobalBadges();
   }
   if (channelBadges.subscriber.length == 0) {
     channelBadges = await getChannelBadges(VTS.channel);
   }
+  if (customBadges.length == 0) {
+    customBadges = await getCustomBadges();
+  }
   let badgesHTML = "";
   if (firstmsg) {
-    badgesHTML += `<i class="material-icons notranslate" style="color:#f18805;" title="This was ${username}'s first ever message in chat">warning_amber</i>`;
+    badgesHTML += `<i class="material-icons notranslate" style="color:#f18805;" title="First-time chatter">warning_amber</i>`;
+  }
+  for (let index = 0; index < customBadges.length; index++) {
+    if (customBadges[index].users.includes(userid) && customBadges[index].sites.includes("chat.vote")) {
+      badgesHTML += `<img src="${customBadges[index].url}" class="chat-badge" title="${customBadges[index].name}"/>`;
+    }
   }
   try {
     for (const badge in badges) {
       if (badge == "subscriber" && badges.subscriber && channelBadges.subscriber.length > 0) {
         let badge = channelBadges.subscriber.find((obj) => obj.id === badges.subscriber);
-        badgesHTML += `<img src="${badge.url}" style="height:1.3em;" title="Subscriber"/>`;
+        badgesHTML += `<img src="${badge.url}" class="chat-badge" title="Subscriber"/>`;
       } else if (badge == "bits" && channelBadges.bits.length > 0) {
         let badge = channelBadges.bits.find((obj) => obj.id === badges.bits);
-        badgesHTML += `<img src="${badge.url}" style="height:1.3em;" title="Bits"/>`;
+        badgesHTML += `<img src="${badge.url}" class="chat-badge" title="Bits"/>`;
       } else {
         let version = globalBadges[badge].find((obj) => obj.id === badges[badge]);
-        badgesHTML += `<img src="${version.image_url_4x}" style="height:1.3em;" title="${badge}"/>`;
+        badgesHTML += `<img src="${version.image_url_4x}" class="chat-badge" title="${badge}"/>`;
       }
     }
   } catch (error) {
@@ -2398,6 +2413,7 @@ function PubSubconnect() {
       if (data.data.redemption.reward.image) {
         rewardImage = `<img src="${data.data.redemption.reward.image.url_1x}" alt="reward image" style="height:1.2em;">`;
       }
+      let redeemerId = data.data.redemption.user.id;
       let redeemerLogin = data.data.redemption.user.login;
       let redeemerDisplayName = data.data.redemption.user.display_name;
       let userInput = "";
@@ -2413,6 +2429,7 @@ function PubSubconnect() {
           action: `Redeemed ${rewardtitle} ${rewardImage} ${userInput ? "| Message: " + userInput + '"' : ""} | ${data.data.redemption.reward.cost.toLocaleString()} ${
             data.data.redemption.reward.cost == 1 ? "point" : "points"
           }`,
+          id: redeemerId,
           username: redeemerLogin,
           displayname: redeemerDisplayName,
           firstmsg: null,
