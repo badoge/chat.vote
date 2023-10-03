@@ -2168,7 +2168,7 @@ async function addBadges(badges, userid, firstmsg) {
       globalBadges = await getGlobalBadges();
     }
     if (channelBadges.subscriber.length == 0) {
-      channelBadges = await getChannelBadges(USER.channel);
+      channelBadges = await getChannelBadges(VTS.channel);
     }
     if (customBadges.length == 0) {
       customBadges = await getCustomBadges();
