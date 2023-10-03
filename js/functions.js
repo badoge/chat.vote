@@ -476,6 +476,22 @@ async function getGlobalBadges() {
   });
 } //getGlobalBadges
 
+async function getCustomBadges() {
+  return new Promise(async function (resolve, reject) {
+    try {
+      let response = await fetch(`https://badges.pepega.workers.dev`, GETrequestOptions);
+      let result = await response.json();
+      if (!result || result.length == 0) {
+        resolve([]);
+      }
+      resolve(result);
+    } catch (error) {
+      console.log("getCustomBadges error", error);
+      resolve([]);
+    }
+  });
+} //getCustomBadges
+
 function replaceEmotes(input, thirdPartyEmotes) {
   input = input.split(" ");
   if (thirdPartyEmotes.length != 0) {

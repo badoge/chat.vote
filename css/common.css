@@ -25,6 +25,12 @@ i {
   vertical-align: middle;
 }
 
+.chat-badge {
+  height: 1.3rem;
+  margin-right: 0.2rem;
+  vertical-align: middle;
+}
+
 input:disabled,
 select:disabled {
   cursor: not-allowed;

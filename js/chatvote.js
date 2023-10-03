@@ -159,6 +159,7 @@ let enableVotingDropdown, enableSuggestionsDropdown;
 let tableTab, chartTab, yesnoTab;
 let channelBadges = { subscriber: [], bits: [] };
 let globalBadges = {};
+let customBadges = [];
 let thirdPartyEmotes = [];
 
 let darkTheme = true;
@@ -963,22 +964,27 @@ async function getEmotes() {
   }, 3000);
 } //getEmotes
 
-async function addBadges(badges, username, message, firstmsg) {
+async function addBadges(badges, userid, firstmsg) {
   try {
     let badgesHTML = "";
     if (firstmsg) {
       badgesHTML += `<i class="material-icons notranslate" style="color:#f18805;" title="First-time chatter">warning_amber</i>`;
     }
+    for (let index = 0; index < customBadges.length; index++) {
+      if (customBadges[index].users.includes(userid) && customBadges[index].sites.includes("chat.vote")) {
+        badgesHTML += `<img src="${customBadges[index].url}" class="chat-badge" title="${customBadges[index].name}"/>`;
+      }
+    }
     for (const badge in badges) {
       if (badge == "subscriber" && badges.subscriber && channelBadges.subscriber.length > 0) {
         let badge = channelBadges.subscriber.find((obj) => obj.id === badges.subscriber);
-        badgesHTML += `<img src="${badge.url}" style="height:1.3em;" title="Subscriber"/>`;
+        badgesHTML += `<img src="${badge.url}" class="chat-badge" title="Subscriber"/>`;
       } else if (badge == "bits" && channelBadges.bits.length > 0) {
         let badge = channelBadges.bits.find((obj) => obj.id === badges.bits);
-        badgesHTML += `<img src="${badge.url}" style="height:1.3em;" title="Bits"/>`;
+        badgesHTML += `<img src="${badge.url}" class="chat-badge" title="Bits"/>`;
       } else if (Object.keys(globalBadges).length > 0) {
         let version = globalBadges[badge].find((obj) => obj.id === badges[badge]);
-        badgesHTML += `<img src="${version.image_url_4x}" style="height:1.3em;" title="${badge}"/>`;
+        badgesHTML += `<img src="${version.image_url_4x}" class="chat-badge" title="${badge}"/>`;
       }
     }
     return badgesHTML;
@@ -1149,7 +1155,7 @@ async function pushTable(id, suggestion, by, score, context) {
   let color = "#FFFFFF";
   let username = by;
   if (context) {
-    badgesHTML = await addBadges(context.badges, by, suggestion, context["first-msg"]);
+    badgesHTML = await addBadges(context.badges, context["user-id"], context["first-msg"]);
     color = context.color || "#FFFFFF";
     username = context["display-name"].toLowerCase() == by.toLowerCase() ? context["display-name"] : `${context["display-name"]} (${by})`;
   }
@@ -1666,13 +1672,16 @@ async function enableSuggestButton() {
   if (!checkLogin()) {
     return;
   }
+  elements.suggestionsCommand.innerHTML = spinner;
+
   if (Object.keys(globalBadges).length == 0) {
-    elements.suggestionsCommand.innerHTML = spinner;
     globalBadges = await getGlobalBadges();
   }
   if (channelBadges.subscriber.length == 0) {
-    elements.suggestionsCommand.innerHTML = spinner;
     channelBadges = await getChannelBadges(USER.channel);
+  }
+  if (customBadges.length == 0) {
+    customBadges = await getCustomBadges();
   }
   suggestions_enabled = true;
   elements.enableSuggestions.classList.remove("btn-success");
