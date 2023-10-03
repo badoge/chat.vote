@@ -2163,25 +2163,25 @@ async function logYT(user) {
 } //log
 
 async function addBadges(badges, userid, firstmsg) {
-  if (globalBadges.length == 0) {
-    globalBadges = await getGlobalBadges();
-  }
-  if (channelBadges.subscriber.length == 0) {
-    channelBadges = await getChannelBadges(VTS.channel);
-  }
-  if (customBadges.length == 0) {
-    customBadges = await getCustomBadges();
-  }
-  let badgesHTML = "";
-  if (firstmsg) {
-    badgesHTML += `<i class="material-icons notranslate" style="color:#f18805;" title="First-time chatter">warning_amber</i>`;
-  }
-  for (let index = 0; index < customBadges.length; index++) {
-    if (customBadges[index].users.includes(userid) && customBadges[index].sites.includes("chat.vote")) {
-      badgesHTML += `<img src="${customBadges[index].url}" class="chat-badge" title="${customBadges[index].name}"/>`;
-    }
-  }
   try {
+    if (Object.keys(globalBadges).length == 0) {
+      globalBadges = await getGlobalBadges();
+    }
+    if (channelBadges.subscriber.length == 0) {
+      channelBadges = await getChannelBadges(USER.channel);
+    }
+    if (customBadges.length == 0) {
+      customBadges = await getCustomBadges();
+    }
+    let badgesHTML = "";
+    if (firstmsg) {
+      badgesHTML += `<i class="material-icons notranslate" style="color:#f18805;" title="First-time chatter">warning_amber</i>`;
+    }
+    for (let index = 0; index < customBadges.length; index++) {
+      if (customBadges[index].users.includes(userid) && customBadges[index].sites.includes("chat.vote")) {
+        badgesHTML += `<img src="${customBadges[index].url}" class="chat-badge" title="${customBadges[index].name}"/>`;
+      }
+    }
     for (const badge in badges) {
       if (badge == "subscriber" && badges.subscriber && channelBadges.subscriber.length > 0) {
         let badge = channelBadges.subscriber.find((obj) => obj.id === badges.subscriber);
@@ -2189,16 +2189,16 @@ async function addBadges(badges, userid, firstmsg) {
       } else if (badge == "bits" && channelBadges.bits.length > 0) {
         let badge = channelBadges.bits.find((obj) => obj.id === badges.bits);
         badgesHTML += `<img src="${badge.url}" class="chat-badge" title="Bits"/>`;
-      } else {
+      } else if (Object.keys(globalBadges).length > 0) {
         let version = globalBadges[badge].find((obj) => obj.id === badges[badge]);
         badgesHTML += `<img src="${version.image_url_4x}" class="chat-badge" title="${badge}"/>`;
       }
     }
+    return badgesHTML;
   } catch (error) {
     console.log(error);
+    return "";
   }
-
-  return badgesHTML;
 } //addBadges
 
 function load_localStorage() {
