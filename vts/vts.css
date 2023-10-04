@@ -57,6 +57,11 @@
 
 #toastContainer > div > div {
   font-size: 1.5em;
+  word-break: break-all;
+}
+
+#port {
+  max-width: 100px;
 }
 
 .editbtn {

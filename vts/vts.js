@@ -78,6 +78,7 @@ let elements = {
   modal9body: document.getElementById("modal9body"),
   youtubeModalBody: document.getElementById("youtubeModalBody"),
   youtubeModalTitle: document.getElementById("youtubeModalTitle"),
+  port: document.getElementById("port"),
   connectVTS: document.getElementById("connectVTS"),
   cancelVTSlogin: document.getElementById("cancelVTSlogin"),
 
@@ -198,6 +199,7 @@ let VTS = {
   access_token: "",
   refresh_token: "",
   token: "",
+  port: 8001,
   platform: "",
   commandCooldownGlobal: 0,
   hideDefault: true,
@@ -1779,7 +1781,7 @@ function connectVTS() {
   if (!checkLogin()) {
     return;
   }
-
+  let port = parseInt(elements.port.value, 10) || 8001;
   elements.VTSstatus.innerHTML = `
   <h4><span class="badge bg-warning">
   VTS connecting... 
@@ -1792,6 +1794,7 @@ function connectVTS() {
       pluginName: "chat.vote/vts",
       pluginDeveloper: "badoge",
       pluginIcon: icon,
+      port: port,
     };
 
     apiClient = new vtubestudio.ApiClient(options);
@@ -2206,6 +2209,7 @@ function load_localStorage() {
     VTS = JSON.parse(localStorage.getItem("VTS"));
     elements.commandCooldownGlobal.value = VTS.commandCooldownGlobal ?? 0;
     elements.hideDefault.checked = VTS.hideDefault ?? true;
+    elements.port.value = VTS.port || 8001;
     if (VTS.platform == "youtube") {
       hideTwitchSettings();
     }
@@ -2239,6 +2243,7 @@ function refreshData() {
     VTS.commandCooldownGlobal = 0;
   }
   VTS.hideDefault = elements.hideDefault.checked;
+  VTS.port = parseInt(elements.port.value, 10) || 8001;
 } //refreshData
 
 function saveSettings() {
@@ -2284,6 +2289,7 @@ function resetSettings() {
       access_token: "",
       refresh_token: "",
       token: "",
+      port: 8001,
       platform: "",
       commandCooldownGlobal: 0,
       hideDefault: true,

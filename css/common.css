@@ -25,6 +25,14 @@ i {
   vertical-align: middle;
 }
 
+.wide-tooltip > div.tooltip-inner {
+  max-width: 1200px;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
 .chat-badge {
   height: 1.3rem;
   margin-right: 0.2rem;

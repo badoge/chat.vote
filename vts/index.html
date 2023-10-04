@@ -48,9 +48,50 @@
             <h5 class="modal-title">VTS connection</h5>
           </div>
           <div class="modal-body">
-            <p>1. enable "Start API" in vts settings</p>
-            <p>2. <button type="button" id="connectVTS" class="btn btn-success">Connect</button></p>
-            <p>3. allow connection in vts</p>
+            <p>
+              Enable "Start API (allow plugins)" in VTS settings then click the Connect button below
+              <i
+                class="material-icons notranslate cursor-pointer"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-custom-class="wide-tooltip"
+                data-bs-placement="auto"
+                data-bs-html="true"
+                data-bs-title='<img src="/vts/pics/start.png"/>'
+                >help</i
+              >
+            </p>
+            <p>
+              Make sure that the Port number is the same
+              <i
+                class="material-icons notranslate cursor-pointer"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-custom-class="wide-tooltip"
+                data-bs-placement="auto"
+                data-bs-html="true"
+                data-bs-title='<img src="/vts/pics/port.png"/>'
+                >help</i
+              >
+            </p>
+            <div class="input-group mb-3">
+              <span class="input-group-text">Port</span>
+              <input type="number" class="form-control" id="port" placeholder="8001" value="8001" onchange="saveSettings()" aria-label="VTS port number" aria-describedby="connectVTS" />
+              <button class="btn btn-outline-success" type="button" id="connectVTS">Connect</button>
+            </div>
+            <p>
+              Allow connection in VTS
+              <i
+                class="material-icons notranslate cursor-pointer"
+                data-bs-toggle="tooltip"
+                data-bs-delay="200"
+                data-bs-custom-class="wide-tooltip"
+                data-bs-placement="auto"
+                data-bs-html="true"
+                data-bs-title='<img src="/vts/pics/allow.png"/>'
+                >help</i
+              >
+            </p>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="cancelVTSlogin">Cancel</button>

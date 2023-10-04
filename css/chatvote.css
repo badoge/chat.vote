@@ -282,10 +282,6 @@ th {
   border-color: #3498db;
 }
 
-.wide-tooltip > div.tooltip-inner {
-  max-width: 1200px;
-}
-
 .tooltip.show {
   opacity: 1;
 }
