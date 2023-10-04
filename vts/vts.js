@@ -1474,7 +1474,7 @@ async function loadYTPFP() {
       result.items[0].snippet.thumbnails.default.url
     }" alt="profile pic" style="height:2em;"></button>
     <div class="btn-group" role="group">
-    <button id="btnGroupDropYTlogin" type="button"  class="btn btn-${darkTheme ? "dark" : "secondary"}" data-bs-toggle="dropdown" aria-expanded="false">
+    <button id="btnGroupDropYTlogin" type="button"  class="btn btn-${darkTheme ? "dark" : "secondary"} dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
     ${result.items[0].snippet.title}
     </button>
     <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="btnGroupDropYTlogin">
