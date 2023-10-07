@@ -680,18 +680,13 @@ async function drawRaffleWinner() {
     currentRaffleWinner = user_tickets[Math.floor(Math.random() * user_tickets.length)];
     raffleWinners.push(currentRaffleWinner);
     let winner = raffle_users.find((e) => e.username == currentRaffleWinner);
-    raffleWinnerChat(
-      { "user-id": winner.id, username: winner.username, "display-name": winner.displayname, color: winner.color, badges: winner.badges, emotes: winner.emotes, time: winner.time },
-      winner.msg,
-      true
-    );
+    if (RAFFLES.autoRerollEnabled) {
+      startRaffleTimer();
+    }
     let p = document.createElement("p");
     p.classList.add("h2");
     p.innerHTML = `Winner #${raffleWinners.length}: <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USER.channel}/viewercard/${currentRaffleWinner}?popout=","_blank","width=340,height=800")>${currentRaffleWinner}</a>`;
     elements.raffleOutput.append(p);
-    if (RAFFLES.autoRerollEnabled) {
-      startRaffleTimer();
-    }
     if (RAFFLES.announceWinner && USER.twitchLogin) {
       let chance = Math.ceil((raffle_users.find((users) => users.username === currentRaffleWinner).tickets / user_tickets.length) * 100);
       botSay(`PogChamp @${currentRaffleWinner} won the raffle with a ${chance}% chance to win :) 🎊`);
@@ -699,6 +694,11 @@ async function drawRaffleWinner() {
     if (RAFFLES.removeWinner) {
       removeFromRaffle(currentRaffleWinner);
     }
+    raffleWinnerChat(
+      { "user-id": winner.id, username: winner.username, "display-name": winner.displayname, color: winner.color, badges: winner.badges, emotes: winner.emotes, time: winner.time },
+      winner.msg,
+      true
+    );
   }
 } //drawRaffleWinner
 
@@ -786,18 +786,13 @@ const detectWinner = function () {
     raffleWinners.push(winnerSlot.username);
     currentRaffleWinner = winnerSlot.username;
     let winner = raffle_users.find((e) => e.username == currentRaffleWinner);
-    raffleWinnerChat(
-      { username: winner.username, "display-name": winner.displayname, color: winner.color, badges: winner.badges, emotes: winner.emotes, time: winner.time },
-      winner.msg,
-      true
-    );
+    if (RAFFLES.autoRerollEnabled) {
+      startRaffleTimer();
+    }
     let p = document.createElement("p");
     p.classList.add("h2");
     p.innerHTML = `Winner #${raffleWinners.length}: <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USER.channel}/viewercard/${winnerSlot.username}?popout=","_blank","width=340,height=800")>${winnerSlot.username}</a>`;
     elements.raffleOutput.append(p);
-    if (RAFFLES.autoRerollEnabled) {
-      startRaffleTimer();
-    }
     if (RAFFLES.announceWinner && USER.twitchLogin) {
       let chance = Math.ceil(
         (raffle_users.find((users) => users.username === currentRaffleWinner).tickets /
@@ -811,7 +806,11 @@ const detectWinner = function () {
     if (RAFFLES.removeWinner) {
       removeFromRaffle(winnerSlot.username);
     }
-
+    raffleWinnerChat(
+      { username: winner.username, "display-name": winner.displayname, color: winner.color, badges: winner.badges, emotes: winner.emotes, time: winner.time },
+      winner.msg,
+      true
+    );
     setTimeout(() => {
       fancyRaffleModal.hide();
       elements.fancyRaffleWinner.innerHTML = "";
