@@ -10,6 +10,9 @@ async function get7TVPFP(userID) {
   return new Promise(async function (resolve, reject) {
     try {
       let response = await fetch(`https://7tv.io/v3/users/twitch/${userID}`, GETrequestOptions);
+      if (response.status !== 200) {
+        resolve("/pics/donk.png");
+      }
       let result = await response.json();
       if (!result?.user?.avatar_url) {
         resolve("/pics/donk.png");
@@ -201,8 +204,11 @@ async function getChannelBTTVEmotes(userID, largeEmotes = false) {
   let emotes = [];
   try {
     let response1 = await fetch(`https://api.betterttv.net/3/cached/users/twitch/${userID}`, GETrequestOptions);
+    if (response1.status !== 200) {
+      return [];
+    }
     let channelBTTV = await response1.json();
-    if (response1.status == 200 && channelBTTV?.message != "user not found") {
+    if (channelBTTV?.message != "user not found") {
       for (let i = 0, j = channelBTTV.channelEmotes.length; i < j; i++) {
         emotes.push({ name: channelBTTV.channelEmotes[i].code, url: `https://cdn.betterttv.net/emote/${channelBTTV.channelEmotes[i].id}/${largeEmotes ? "3x" : "1x"}`, zerowidth: false });
       }
@@ -223,19 +229,20 @@ async function getChannelFFZEmotes(userID, largeEmotes = false) {
   let emotes = [];
   try {
     let response2 = await fetch(`https://api.frankerfacez.com/v1/room/id/${userID}`, GETrequestOptions);
-    let channelFFZ = await response2.json();
-    if (channelFFZ.status != 404) {
-      let setid = channelFFZ.room.set;
-      let sets = channelFFZ.sets[setid];
-      for (let i = 0, j = sets.emoticons.length; i < j; i++) {
-        let url = sets.emoticons[i].urls[largeEmotes ? "4" : "1"];
-        if (sets.emoticons[i].animated) {
-          url = sets.emoticons[i].animated[largeEmotes ? "4" : "1"];
-        }
-        emotes.push({ name: sets.emoticons[i].name, url: url, zerowidth: false });
-      }
-      return emotes;
+    if (response2.status !== 200) {
+      return [];
     }
+    let channelFFZ = await response2.json();
+    let setid = channelFFZ.room.set;
+    let sets = channelFFZ.sets[setid];
+    for (let i = 0, j = sets.emoticons.length; i < j; i++) {
+      let url = sets.emoticons[i].urls[largeEmotes ? "4" : "1"];
+      if (sets.emoticons[i].animated) {
+        url = sets.emoticons[i].animated[largeEmotes ? "4" : "1"];
+      }
+      emotes.push({ name: sets.emoticons[i].name, url: url, zerowidth: false });
+    }
+    return emotes;
   } catch (error) {
     console.log("getChannelFFZEmotes error", error);
     return [];
@@ -249,6 +256,9 @@ async function getChannel7TVEmotes(userID, largeEmotes = false) {
   let emotes = [];
   try {
     let response3 = await fetch(`https://7tv.io/v3/users/twitch/${userID}`, GETrequestOptions);
+    if (response3.status !== 200) {
+      return [];
+    }
     let channel7TV = await response3.json();
     for (let i = 0, j = channel7TV.emote_set.emotes.length; i < j; i++) {
       let files = channel7TV.emote_set.emotes[i].data.host.files.filter((e) => e.format == "AVIF");
