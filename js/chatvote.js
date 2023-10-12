@@ -975,6 +975,10 @@ function addBadges(badges, userid, firstmsg) {
         badgesHTML += `<img src="${customBadges[index].url}" class="chat-badge" title="${customBadges[index].name}"/>`;
       }
     }
+    if (badges == "streamer") {
+      badgesHTML += `<img src="https://static-cdn.jtvnw.net/badges/v1/5527c58c-fb7d-422d-b71b-f309dcb85cc1/3" class="chat-badge" title="Broadcaster"/>`;
+      return badgesHTML;
+    }
     for (const badge in badges) {
       if (badge == "subscriber" && badges.subscriber && channelBadges.subscriber.length > 0) {
         let badge = channelBadges.subscriber.find((obj) => obj.id === badges.subscriber);
@@ -1091,7 +1095,7 @@ async function addOption() {
   let extraoption_clean = extraoption.toLowerCase().replace(/\W/g, "");
   if (!vote_results.some((e) => e.option_clean === extraoption_clean) && extraoption_clean) {
     oid++;
-    pushTable(oid, replaceEmotes(extraoption, thirdPartyEmotes), USER.channel, 0, null);
+    pushTable(oid, replaceEmotes(extraoption, thirdPartyEmotes), USER.channel, 0, { badges: "streamer", "user-id": USER.userID, "first-msg": false, "display-name": USER.channel });
     pushVoteResults(oid, extraoption.replace(/<div.*?<\/div>/, "↖ Switch to Table view to see image :)"), replaceEmotes(extraoption, thirdPartyEmotes), USER.channel, 0, null);
     updateChart();
     elements.pollOption.value = "";
@@ -1136,7 +1140,7 @@ async function addOptionBulk() {
 
     if (!vote_results.some((e) => e.option_clean === option_clean) && option_clean) {
       oid++;
-      pushTable(oid, replaceEmotes(f2[i], thirdPartyEmotes), USER.channel, 0, null);
+      pushTable(oid, replaceEmotes(f2[i], thirdPartyEmotes), USER.channel, 0, { badges: "streamer", "user-id": USER.userID, "first-msg": false, "display-name": USER.channel });
       pushVoteResults(oid, f2[i], replaceEmotes(f2[i], thirdPartyEmotes), USER.channel, 0, null);
       updateChart();
     } else {
@@ -1176,7 +1180,7 @@ function pushTable(id, suggestion, by, score, context) {
 let startingHue = Math.random() * 360;
 function pushVoteResults(id, option, option_emotes, by, score, context) {
   let color = `hsla(${(startingHue += Math.random() * 60 + 20)}, 100%, 50%, 0.8)`;
-  let label = `${id} • "${option}"`;
+  let label = `${id} • "${validator.unescape(option)}"`;
   let option_clean = option.toLowerCase().replace(/\W/g, "");
   if (CHATVOTE.votingMode == "text") {
     option = option.replace(/[^a-zA-Z0-9]+/g, "-");
