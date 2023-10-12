@@ -346,6 +346,17 @@ async function getUserID(username) {
   }
 } //getUserID
 
+async function getStreamerColor(channelId) {
+  try {
+    let response = await fetch(`https://helper.pepega.workers.dev/twitch/chat/color?user_id=${channelId}`, GETrequestOptions);
+    let result = await response.json();
+    return result?.data[0]?.color || "#FFFFFF";
+  } catch (error) {
+    console.log("getStreamerColor error", error);
+    return "#FFFFFF";
+  }
+} //getStreamerColor
+
 async function sendUsername(site, channel, platform, stream = null) {
   let body = JSON.stringify({ site: site, channel: channel, platform: platform, stream: stream });
   let requestOptions = {

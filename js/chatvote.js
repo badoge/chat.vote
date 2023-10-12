@@ -173,6 +173,7 @@ let USER = {
   userID: "",
   platform: "",
 };
+let streamerColor = "";
 
 let CHATVOTE = {
   chartType: "bar",
@@ -1095,7 +1096,13 @@ async function addOption() {
   let extraoption_clean = extraoption.toLowerCase().replace(/\W/g, "");
   if (!vote_results.some((e) => e.option_clean === extraoption_clean) && extraoption_clean) {
     oid++;
-    pushTable(oid, replaceEmotes(extraoption, thirdPartyEmotes), USER.channel, 0, { badges: "streamer", "user-id": USER.userID, "first-msg": false, "display-name": USER.channel });
+    pushTable(oid, replaceEmotes(extraoption, thirdPartyEmotes), USER.channel, 0, {
+      badges: "streamer",
+      "user-id": USER.userID,
+      "first-msg": false,
+      "display-name": USER.channel,
+      color: streamerColor,
+    });
     pushVoteResults(oid, extraoption.replace(/<div.*?<\/div>/, "↖ Switch to Table view to see image :)"), replaceEmotes(extraoption, thirdPartyEmotes), USER.channel, 0, null);
     updateChart();
     elements.pollOption.value = "";
@@ -1140,7 +1147,13 @@ async function addOptionBulk() {
 
     if (!vote_results.some((e) => e.option_clean === option_clean) && option_clean) {
       oid++;
-      pushTable(oid, replaceEmotes(f2[i], thirdPartyEmotes), USER.channel, 0, { badges: "streamer", "user-id": USER.userID, "first-msg": false, "display-name": USER.channel });
+      pushTable(oid, replaceEmotes(f2[i], thirdPartyEmotes), USER.channel, 0, {
+        badges: "streamer",
+        "user-id": USER.userID,
+        "first-msg": false,
+        "display-name": USER.channel,
+        color: streamerColor,
+      });
       pushVoteResults(oid, f2[i], replaceEmotes(f2[i], thirdPartyEmotes), USER.channel, 0, null);
       updateChart();
     } else {
@@ -2053,6 +2066,14 @@ window.onload = function () {
   });
   elements.addOption.addEventListener("click", function () {
     addOption();
+  });
+  elements.pollOption.addEventListener("focus", async function () {
+    if (customBadges.length == 0) {
+      customBadges = await getCustomBadges();
+    }
+    if (!streamerColor && USER.userID) {
+      streamerColor = await getStreamerColor(USER.userID);
+    }
   });
   elements.deleteAll.addEventListener("click", function () {
     if (yesNoMode) {
