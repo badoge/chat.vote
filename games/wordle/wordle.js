@@ -10,7 +10,6 @@ let elements = {
   loginExpiredModal: document.getElementById("loginExpiredModal"),
   loginExpiredRenew: document.getElementById("loginExpiredRenew"),
   loginExpiredReset: document.getElementById("loginExpiredReset"),
-  howToPlayModal: document.getElementById("howToPlayModal"),
   aboutModal: document.getElementById("aboutModal"),
 
   //navbar
@@ -31,7 +30,7 @@ const spinner = `<div class="spinner-border" role="status"><span class="visually
 let loginButton;
 let darkTheme = true;
 
-let loginExpiredModal, howToPlayModal, aboutModal;
+let loginExpiredModal, aboutModal;
 
 let USER = {
   channel: "",
@@ -136,15 +135,15 @@ function connect() {
         }
         let word = input[0].toLowerCase();
         if (WORDLE.words.length == 0) {
-          await WORDLE.loadwords();
+          await loadwords();
         }
         if (WORDLE.verifywords) {
           if (WORDLE.words.includes(word)) {
-            WORDLE.addWord(word, context.username);
+            addWord(word, context.username);
             return;
           }
         } else {
-          WORDLE.addWord(word, context.username);
+          addWord(word, context.username);
           return;
         }
       }
@@ -326,10 +325,6 @@ function toggleGrid() {
   elements.gameDiv.style.display = elements.gameDiv.style.display == "" ? "none" : "";
 }
 
-function showHowToPlay() {
-  howToPlayModal.show();
-} //showHowToPlay
-
 window.onload = function () {
   darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
   elements.darkTheme.checked = darkTheme ?? true;
@@ -342,7 +337,6 @@ window.onload = function () {
   }
 
   loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
-  howToPlayModal = new bootstrap.Modal(elements.howToPlayModal);
   aboutModal = new bootstrap.Modal(elements.aboutModal);
 
   enableTooltips();
@@ -375,8 +369,8 @@ window.onload = function () {
     saveSettings();
   };
 
-  WORDLE.listeners();
-  WORDLE.shownw();
+  listeners();
+  shownw();
 }; //onload
 
 window.onbeforeunload = function () {
@@ -395,168 +389,172 @@ let WORDLE = {
   multiword: false,
   verifywords: true,
   words: [],
+}; //WORDLE
 
-  addWord: function (word, username) {
-    word = validator.escape(word).toLowerCase();
-    if (word.length != WORDLE.wordlength) {
-      return;
-    }
-    let index = WORDLE.wordList.findIndex((x) => x.word === word);
-    if (index == -1) {
-      WORDLE.wordList.push({ word: word, usernames: [username] });
-    } else {
-      WORDLE.wordList[index].usernames.push(username);
-    }
-    if (!WORDLE.multiword) {
-      voters.push(username);
-    }
-    document.getElementById("wordcount").innerHTML = `Submitted words: ${WORDLE.wordList.length}`;
-  },
-  startnw: function () {
-    if (WORDLE.wordList.length < 2) {
-      showToast(`Chat needs to submit at least 2 words before you can start.`, "warning", 6000);
-      return;
-    } else {
-      showToast(`A random word has been picked from chat's suggestions. Start guessing :)`, "success", 6000);
-    }
-    document.getElementById("nwoutput2").innerHTML = "";
-    WORDLE.shownw();
-    WORDLE.nwletter = 0;
-    WORDLE.nwrow = 0;
-    let random = WORDLE.wordList[Math.floor(Math.random() * WORDLE.wordList.length)];
-    WORDLE.nwword = random.word.split("");
-    WORDLE.nwusers = random.usernames.join(", ");
-    WORDLE.nwstarted = true;
-    WORDLE.wordList = WORDLE.wordList.filter((list) => list.word !== random.word);
-    document.getElementById("wordcount").innerHTML = `Submitted words: ${WORDLE.wordList.length}`;
-    document.getElementById("startnw").style.display = "none";
-    document.getElementById("resetnw").style.display = "block";
-  },
-  reset: function () {
-    document.getElementById("startnw").style.display = "block";
-    document.getElementById("resetnw").style.display = "none";
-    WORDLE.wordList = [];
-    document.getElementById("wordcount").innerHTML = `Submitted words: 0`;
-    document.getElementById("nwoutput").innerHTML = "";
-    document.getElementById("nwoutput2").innerHTML = "";
-    WORDLE.nwletter = 0;
-    WORDLE.nwrow = 0;
-    WORDLE.nwword = [];
-    WORDLE.nwusers = "";
-    WORDLE.words = [];
-    WORDLE.nwstarted = false;
-    WORDLE.shownw();
-  },
-  shownw: function () {
-    let count = 0;
-    let output = `<div class="container nwwrapper">`;
-    for (let index1 = 0; index1 < WORDLE.guesslimit; index1++) {
-      output += `<div class="row nwrows">`;
-      for (let index2 = 0; index2 < WORDLE.wordlength; index2++) {
-        output += `<div class="col nwsquare" id="nw${count}"></div>`;
-        count++;
-      }
-      output += `</div>`;
+function addWord(word, username) {
+  word = validator.escape(word).toLowerCase();
+  if (word.length != WORDLE.wordlength) {
+    return;
+  }
+  let index = WORDLE.wordList.findIndex((x) => x.word === word);
+  if (index == -1) {
+    WORDLE.wordList.push({ word: word, usernames: [username] });
+  } else {
+    WORDLE.wordList[index].usernames.push(username);
+  }
+  if (!WORDLE.multiword) {
+    voters.push(username);
+  }
+  document.getElementById("wordcount").innerHTML = `Submitted words: ${WORDLE.wordList.length}`;
+} //addWord
+
+function startnw() {
+  if (WORDLE.wordList.length < 2) {
+    showToast(`Chat needs to submit at least 2 words before you can start.`, "warning", 6000);
+    return;
+  } else {
+    showToast(`A random word has been picked from chat's suggestions. Start guessing :)`, "success", 6000);
+  }
+  document.getElementById("nwoutput2").innerHTML = "";
+  shownw();
+  WORDLE.nwletter = 0;
+  WORDLE.nwrow = 0;
+  let random = WORDLE.wordList[Math.floor(Math.random() * WORDLE.wordList.length)];
+  WORDLE.nwword = random.word.split("");
+  WORDLE.nwusers = random.usernames.join(", ");
+  WORDLE.nwstarted = true;
+  WORDLE.wordList = WORDLE.wordList.filter((list) => list.word !== random.word);
+  document.getElementById("wordcount").innerHTML = `Submitted words: ${WORDLE.wordList.length}`;
+  document.getElementById("startnw").style.display = "none";
+  document.getElementById("resetnw").style.display = "block";
+} //startnw
+
+function reset() {
+  document.getElementById("startnw").style.display = "block";
+  document.getElementById("resetnw").style.display = "none";
+  WORDLE.wordList = [];
+  document.getElementById("wordcount").innerHTML = `Submitted words: 0`;
+  document.getElementById("nwoutput").innerHTML = "";
+  document.getElementById("nwoutput2").innerHTML = "";
+  WORDLE.nwletter = 0;
+  WORDLE.nwrow = 0;
+  WORDLE.nwword = [];
+  WORDLE.nwusers = "";
+  WORDLE.words = [];
+  WORDLE.nwstarted = false;
+  shownw();
+} //reset
+
+function shownw() {
+  let count = 0;
+  let output = `<div class="container nwwrapper">`;
+  for (let index1 = 0; index1 < WORDLE.guesslimit; index1++) {
+    output += `<div class="row nwrows">`;
+    for (let index2 = 0; index2 < WORDLE.wordlength; index2++) {
+      output += `<div class="col nwsquare" id="nw${count}"></div>`;
+      count++;
     }
     output += `</div>`;
-    document.getElementById("nwoutput").innerHTML = output;
-  },
-  loadwords: async function () {
-    const response = await fetch(`/games/wordle/words/${WORDLE.wordlength}.json`);
-    const json = await response.json();
-    WORDLE.words = Object.keys(json);
-  },
-  listeners: function () {
-    document.getElementById("multiword").onchange = function () {
-      voters = [];
-      WORDLE.multiword = this.checked;
-    };
-    document.getElementById("verifywords").onchange = function () {
-      WORDLE.verifywords = this.checked;
-      if (WORDLE.verifywords) {
-        resetGame();
-      }
-    };
-    document.addEventListener("keydown", function (event) {
-      if (WORDLE.wordList.length < 1 || !WORDLE.nwstarted) {
-        return;
-      }
-      let correct = 0;
-      if (event.key == "Enter") {
-        let guess = [];
-        let tempnwword = [...WORDLE.nwword];
-        for (let index = 0; index < WORDLE.wordlength; index++) {
-          guess.push(document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`).innerHTML.toLowerCase());
-        }
-        if (guess.includes("")) {
-          return;
-        }
-        if (WORDLE.verifywords && !WORDLE.words.includes(guess.join(""))) {
-          showToast(`"${guess.join("")}" is not a word <img src="/pics/donk.png" alt="donk" style="height:24px; width:24px;">`, "danger", 3000);
-          return;
-        }
-        for (let index = 0; index < WORDLE.wordlength; index++) {
-          document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`).style.backgroundColor = "black";
-        }
-        for (let index = 0; index < WORDLE.wordlength; index++) {
-          if (guess[index] == WORDLE.nwword[index]) {
-            document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`).style.backgroundColor = "green";
-            let letterindex = tempnwword.indexOf(guess[index]);
-            if (letterindex > -1) {
-              tempnwword.splice(letterindex, 1);
-            }
-            correct++;
-            if (correct == WORDLE.wordlength) {
-              WORDLE.nwstarted = false;
-              document.getElementById("resetnw").style.display = "none";
-              document.getElementById("nwoutput2").innerHTML = `
-                            <h2>Word guessed correctly!</h2>
-                            <p>word submitted by: ${WORDLE.nwusers}</p>
-                            <button type="button" onclick="WORDLE.startnw()" class="btn btn-success">Pick another word</button>
-                            <button type="button" onclick="resetGame()" class="btn btn-warning">Reset</button>`;
-            }
-          }
-        }
-        for (let index = 0; index < WORDLE.wordlength; index++) {
-          if (tempnwword.includes(guess[index]) && document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`).style.backgroundColor != "green") {
-            document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`).style.backgroundColor = "orange";
-            let letterindex = tempnwword.indexOf(guess[index]);
-            if (letterindex > -1) {
-              tempnwword.splice(letterindex, 1);
-            }
-          }
-        }
+  }
+  output += `</div>`;
+  document.getElementById("nwoutput").innerHTML = output;
+} //shownw
 
-        WORDLE.nwrow++;
-        if (WORDLE.nwrow == WORDLE.guesslimit) {
-          document.getElementById("nwoutput2").innerHTML = `
-          <h2>No more guesses left</h2>
-          <h2>Word: ${WORDLE.nwword.join("")}</h2>
-          <p>word submitted by: ${WORDLE.nwusers}</p>
-          <button type="button" onclick="WORDLE.startnw()" class="btn btn-success">Pick another word</button>
-          <button type="button" onclick="resetGame()" class="btn btn-warning">Reset</button>`;
-          WORDLE.nwstarted = false;
-        }
+async function loadwords() {
+  const response = await fetch(`/games/wordle/words/${WORDLE.wordlength}.json`);
+  const json = await response.json();
+  WORDLE.words = Object.keys(json);
+} //loadwords
+
+function listeners() {
+  document.getElementById("multiword").onchange = function () {
+    voters = [];
+    WORDLE.multiword = this.checked;
+  };
+  document.getElementById("verifywords").onchange = function () {
+    WORDLE.verifywords = this.checked;
+    if (WORDLE.verifywords) {
+      resetGame();
+    }
+  };
+  document.addEventListener("keydown", function (event) {
+    if (WORDLE.wordList.length < 1 || !WORDLE.nwstarted) {
+      return;
+    }
+    let correct = 0;
+    if (event.key == "Enter") {
+      let guess = [];
+      let tempnwword = [...WORDLE.nwword];
+      for (let index = 0; index < WORDLE.wordlength; index++) {
+        guess.push(document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`).innerHTML.toLowerCase());
       }
-      if (event.key == "Backspace" && WORDLE.nwletter - WORDLE.nwrow * WORDLE.wordlength > 0) {
-        document.getElementById(`nw${WORDLE.nwletter - 1}`).innerHTML = "";
-        WORDLE.nwletter--;
-      }
-      if (event.key.length !== 1) {
+      if (guess.includes("")) {
         return;
       }
-      if (event.key.toLowerCase() >= "a" && event.key.toLowerCase() <= "z" && WORDLE.nwletter - WORDLE.nwrow * WORDLE.wordlength < WORDLE.wordlength) {
-        document.getElementById(`nw${WORDLE.nwletter}`).innerHTML = event.key.toUpperCase();
-        WORDLE.nwletter++;
+      if (WORDLE.verifywords && !WORDLE.words.includes(guess.join(""))) {
+        showToast(`"${guess.join("")}" is not a word <img src="/pics/donk.png" alt="donk" style="height:24px; width:24px;">`, "danger", 3000);
+        return;
       }
-    }); //wordle keypress
-  },
-}; //WORDLE
+      for (let index = 0; index < WORDLE.wordlength; index++) {
+        document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`).style.backgroundColor = "black";
+      }
+      for (let index = 0; index < WORDLE.wordlength; index++) {
+        if (guess[index] == WORDLE.nwword[index]) {
+          document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`).style.backgroundColor = "green";
+          let letterindex = tempnwword.indexOf(guess[index]);
+          if (letterindex > -1) {
+            tempnwword.splice(letterindex, 1);
+          }
+          correct++;
+          if (correct == WORDLE.wordlength) {
+            WORDLE.nwstarted = false;
+            document.getElementById("resetnw").style.display = "none";
+            document.getElementById("nwoutput2").innerHTML = `
+            <h2>Word guessed correctly!</h2>
+            <p>word submitted by: ${WORDLE.nwusers}</p>
+            <button type="button" onclick="startnw()" class="btn btn-success">Pick another word</button>
+            <button type="button" onclick="resetGame()" class="btn btn-warning">Reset</button>`;
+          }
+        }
+      }
+      for (let index = 0; index < WORDLE.wordlength; index++) {
+        if (tempnwword.includes(guess[index]) && document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`).style.backgroundColor != "green") {
+          document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`).style.backgroundColor = "orange";
+          let letterindex = tempnwword.indexOf(guess[index]);
+          if (letterindex > -1) {
+            tempnwword.splice(letterindex, 1);
+          }
+        }
+      }
+
+      WORDLE.nwrow++;
+      if (WORDLE.nwrow == WORDLE.guesslimit) {
+        document.getElementById("nwoutput2").innerHTML = `
+        <h2>No more guesses left</h2>
+        <h2>Word: ${WORDLE.nwword.join("")}</h2>
+        <p>word submitted by: ${WORDLE.nwusers}</p>
+        <button type="button" onclick="startnw()" class="btn btn-success">Pick another word</button>
+        <button type="button" onclick="resetGame()" class="btn btn-warning">Reset</button>`;
+        WORDLE.nwstarted = false;
+      }
+    }
+    if (event.key == "Backspace" && WORDLE.nwletter - WORDLE.nwrow * WORDLE.wordlength > 0) {
+      document.getElementById(`nw${WORDLE.nwletter - 1}`).innerHTML = "";
+      WORDLE.nwletter--;
+    }
+    if (event.key.length !== 1) {
+      return;
+    }
+    if (event.key.toLowerCase() >= "a" && event.key.toLowerCase() <= "z" && WORDLE.nwletter - WORDLE.nwrow * WORDLE.wordlength < WORDLE.wordlength) {
+      document.getElementById(`nw${WORDLE.nwletter}`).innerHTML = event.key.toUpperCase();
+      WORDLE.nwletter++;
+    }
+  }); //wordle keypress
+} //listeners
 
 function resetGame() {
   voters = [];
-
-  WORDLE.reset();
+  reset();
 } //resetGame
 
 function updateLabel(element) {
@@ -585,5 +583,5 @@ function updateLabel(element) {
   WORDLE.nwrow = 0;
   WORDLE.nwword = [];
   WORDLE.nwusers = "";
-  WORDLE.shownw();
+  shownw();
 } //updateLabel

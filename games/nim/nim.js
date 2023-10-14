@@ -11,7 +11,6 @@ let elements = {
   loginExpiredModal: document.getElementById("loginExpiredModal"),
   loginExpiredRenew: document.getElementById("loginExpiredRenew"),
   loginExpiredReset: document.getElementById("loginExpiredReset"),
-  howToPlayModal: document.getElementById("howToPlayModal"),
   aboutModal: document.getElementById("aboutModal"),
 
   //navbar
@@ -32,7 +31,7 @@ const spinner = `<div class="spinner-border" role="status"><span class="visually
 let loginButton;
 let darkTheme = true;
 
-let loginExpiredModal, howToPlayModal, aboutModal;
+let loginExpiredModal, aboutModal;
 
 let USER = {
   channel: "",
@@ -323,10 +322,6 @@ function toggleGrid() {
   elements.gameDiv.style.display = elements.gameDiv.style.display == "" ? "none" : "";
 }
 
-function showHowToPlay() {
-  howToPlayModal.show();
-} //showHowToPlay
-
 window.onload = function () {
   darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
   elements.darkTheme.checked = darkTheme ?? true;
@@ -339,7 +334,6 @@ window.onload = function () {
   }
 
   loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
-  howToPlayModal = new bootstrap.Modal(elements.howToPlayModal);
   aboutModal = new bootstrap.Modal(elements.aboutModal);
 
   enableTooltips();
@@ -374,7 +368,7 @@ window.onload = function () {
 
   initGraph();
 
-  NIM.listeners();
+  listeners();
   document.getElementById("nimoverlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
 }; //onload
 
@@ -495,168 +489,176 @@ let NIM = {
     firstMove: 0,
     turn: 0,
   },
-  whoGoes: () => {
-    // returns number of current player - player1 or player2
-    return NIM.game.firstMove == NIM.game.turn % 2 ? 1 : 2;
-  },
-  setInitialCount: (event) => {
-    NIM.game.initialCount = Math.max(12, Math.min(36, parseInt(event.target.value, 10)));
-    NIM.html.popCountNumber.innerText = NIM.game.initialCount;
-    NIM.game.count = NIM.game.initialCount;
-    NIM.game.condition = NIM.html.popCondition.value || "lose";
-    NIM.game.turn = 0;
-    NIM.html.fieldrows.forEach((row) => (row.innerHTML = ""));
-    NIM.game.firstMove = Math.round(Math.random()); // who goes first? player 1 or 2?
-    // fill field with fresh tasty popsicles:
-    let rowNm = 0; // add as many "div.field-row" as you want, script will fill them evenly
-    for (let i = 0; i < NIM.game.count; i++) {
-      let popsicle = document.createElement("div");
-      popsicle.classList.add("nim-popsicle");
-      popsicle.style.filter = `hue-rotate(${Math.random() * 360}deg)`; // a bit of flair
-      NIM.html.fieldrows[rowNm].appendChild(popsicle);
-      rowNm += 1;
-      if (rowNm >= NIM.html.fieldrows.length) rowNm = 0;
-    }
-  },
-  turn: () => {
-    NIM.game.turn += 1;
-    NIM.html.p1controls.forEach((c) => (c.disabled = NIM.whoGoes() == 2));
-    NIM.html.p2controls.forEach((c) => (c.disabled = NIM.whoGoes() == 1));
-    if (NIM.whoGoes() == 1) {
-      streamersTurn = true;
-      document.getElementById("nimchartCanvas").classList = "blur";
-      document.getElementById("nimoverlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
-    } else {
-      streamersTurn = false;
-      document.getElementById("nimchartCanvas").classList = "";
-      document.getElementById("nimoverlay").innerHTML = "";
-    }
-  },
-  makeMove: (event) => {
-    let eatCount = 0;
-    if (streamersTurn) {
-      eatCount = parseInt(event.target.dataset.intake, 10);
-    } else {
-      if (voters.length == 0) {
-        return;
-      }
-      eatCount = NIM.getChatMove();
-      voters = [];
-      NIM.results = [
-        { label: "1", data: 0, c1: "#f44336", c2: "#f53337" },
-        { label: "2", data: 0, c1: "#f4c236", c2: "#f5c237" },
-        { label: "3", data: 0, c1: "#a8f436", c2: "#a9e437" },
-      ];
-      updateGraph("nim");
-    }
-    NIM.game.count -= eatCount;
-    NIM.turn();
-    if (NIM.game.count < 1) {
-      // check game end condition
-      if (NIM.game.condition == "win") NIM.game.turn += 1; // hack: switch player # depending on turn #
-      NIM.html.winmessage.innerText = `${NIM.whoGoes() == 1 ? USER.channel : "Chat"} wins!`;
-      NIM.html.controls.forEach((c) => (c.style.visibility = "hidden"));
-      NIM.html.gamestate.style.visibility = "visible";
-      NIM.html.settings.style.display = "block";
-    }
-    // clear last-taken state from all the popsicles
-    NIM.html.fieldrows.forEach((row) => row.querySelectorAll("div.nim-popsicle.nim-last-taken").forEach((p) => p.classList.remove("nim-last-taken")));
-    // iterator: eating the popsicles one by one
-    const popsicles = NIM.html.fieldrows.map((row) => Array.from(row.querySelectorAll("div.nim-popsicle")));
-    // player1 eats leftmost popsicles, player2 eats rightmost ones
-    let maxX = Math.max(...popsicles.map((p) => p.length)),
-      maxY = popsicles.length,
-      x = NIM.whoGoes() == 2 ? 0 : maxX - 1,
-      y = NIM.whoGoes() == 2 ? 0 : maxY - 1,
-      dir = NIM.whoGoes() == 2 ? 1 : -1;
-    while (eatCount > 0) {
-      if (popsicles[y].length > x) {
-        if (!popsicles[y][x].classList.contains("nim-taken")) {
-          eatCount -= 1;
-          popsicles[y][x].classList.add("nim-taken", "nim-last-taken");
-        }
-      }
-      y += dir;
-      if (y < 0 || y >= maxY) {
-        y = NIM.whoGoes() == 2 ? 0 : maxY - 1;
-        x += dir;
-        if (x < 0 || x >= maxX) break;
-      }
-    }
-  },
-  getChatMove: () => {
-    let list = NIM.results;
-    list.sort(function (a, b) {
-      return a.data > b.data ? -1 : a.data == b.data ? 0 : 1;
-    });
-    return parseInt(list[0].label, 10);
-  },
-  startGame: () => {
-    NIM.game.count = NIM.game.initialCount;
-    NIM.game.condition = NIM.html.popCondition.value || "lose";
-    NIM.game.turn = 0;
-    NIM.html.fieldrows.forEach((row) => (row.innerHTML = ""));
-    NIM.game.firstMove = Math.round(Math.random()); // who goes first? player 1 or 2?
-    if (NIM.game.firstMove == 1) {
-      streamersTurn = true;
-      document.getElementById("nimchartCanvas").classList = "blur";
-      document.getElementById("nimoverlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
-    } else {
-      streamersTurn = false;
-      document.getElementById("nimchartCanvas").classList = "";
-      document.getElementById("nimoverlay").innerHTML = "";
-    }
+}; //NIM
 
-    // fill field with fresh tasty popsicles:
-    let rowNm = 0; // add as many "div.field-row" as you want, script will fill them evenly
-    for (let i = 0; i < NIM.game.count; i++) {
-      let popsicle = document.createElement("div");
-      popsicle.classList.add("nim-popsicle");
-      popsicle.style.filter = `hue-rotate(${Math.random() * 360}deg)`; // a bit of flair
-      NIM.html.fieldrows[rowNm].appendChild(popsicle);
-      rowNm += 1;
-      if (rowNm >= NIM.html.fieldrows.length) rowNm = 0;
+function whoGoes() {
+  // returns number of current player - player1 or player2
+  return NIM.game.firstMove == NIM.game.turn % 2 ? 1 : 2;
+} //whoGoes
+
+function setInitialCount(event) {
+  NIM.game.initialCount = Math.max(12, Math.min(36, parseInt(event.target.value, 10)));
+  NIM.html.popCountNumber.innerText = NIM.game.initialCount;
+  NIM.game.count = NIM.game.initialCount;
+  NIM.game.condition = NIM.html.popCondition.value || "lose";
+  NIM.game.turn = 0;
+  NIM.html.fieldrows.forEach((row) => (row.innerHTML = ""));
+  NIM.game.firstMove = Math.round(Math.random()); // who goes first? player 1 or 2?
+  // fill field with fresh tasty popsicles:
+  let rowNm = 0; // add as many "div.field-row" as you want, script will fill them evenly
+  for (let i = 0; i < NIM.game.count; i++) {
+    let popsicle = document.createElement("div");
+    popsicle.classList.add("nim-popsicle");
+    popsicle.style.filter = `hue-rotate(${Math.random() * 360}deg)`; // a bit of flair
+    NIM.html.fieldrows[rowNm].appendChild(popsicle);
+    rowNm += 1;
+    if (rowNm >= NIM.html.fieldrows.length) rowNm = 0;
+  }
+} //setInitialCount
+
+function turn() {
+  NIM.game.turn += 1;
+  NIM.html.p1controls.forEach((c) => (c.disabled = whoGoes() == 2));
+  NIM.html.p2controls.forEach((c) => (c.disabled = whoGoes() == 1));
+  if (whoGoes() == 1) {
+    streamersTurn = true;
+    document.getElementById("nimchartCanvas").classList = "blur";
+    document.getElementById("nimoverlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
+  } else {
+    streamersTurn = false;
+    document.getElementById("nimchartCanvas").classList = "";
+    document.getElementById("nimoverlay").innerHTML = "";
+  }
+} //turn
+
+function makeMove(event) {
+  let eatCount = 0;
+  if (streamersTurn) {
+    eatCount = parseInt(event.target.dataset.intake, 10);
+  } else {
+    if (voters.length == 0) {
+      return;
     }
-    // mandatory stuff
-    NIM.html.gamestate.style.visibility = "hidden";
-    NIM.html.controls.forEach((c) => (c.style.visibility = "visible"));
-    NIM.html.settings.style.display = "none";
-    NIM.turn();
-  },
-  reset: () => {
-    NIM.html.settings.style.display = "block";
+    eatCount = getChatMove();
+    voters = [];
     NIM.results = [
       { label: "1", data: 0, c1: "#f44336", c2: "#f53337" },
       { label: "2", data: 0, c1: "#f4c236", c2: "#f5c237" },
       { label: "3", data: 0, c1: "#a8f436", c2: "#a9e437" },
     ];
-    document.getElementById("nimoverlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
-    document.getElementById("nimchartCanvas").classList = "blur";
-    NIM.game.count = NIM.game.initialCount;
-    NIM.game.condition = NIM.html.popCondition.value || "lose";
-    NIM.game.turn = 0;
-    NIM.html.fieldrows.forEach((row) => (row.innerHTML = ""));
-
-    let rowNm = 0; // add as many "div.field-row" as you want, script will fill them evenly
-    for (let i = 0; i < NIM.game.count; i++) {
-      let popsicle = document.createElement("div");
-      popsicle.classList.add("nim-popsicle");
-      popsicle.style.filter = `hue-rotate(${Math.random() * 360}deg)`; // a bit of flair
-      NIM.html.fieldrows[rowNm].appendChild(popsicle);
-      rowNm += 1;
-      if (rowNm >= NIM.html.fieldrows.length) rowNm = 0;
+    updateGraph("nim");
+  }
+  NIM.game.count -= eatCount;
+  turn();
+  if (NIM.game.count < 1) {
+    // check game end condition
+    if (NIM.game.condition == "win") NIM.game.turn += 1; // hack: switch player # depending on turn #
+    NIM.html.winmessage.innerText = `${whoGoes() == 1 ? USER.channel : "Chat"} wins!`;
+    NIM.html.controls.forEach((c) => (c.style.visibility = "hidden"));
+    NIM.html.gamestate.style.visibility = "visible";
+    NIM.html.settings.style.display = "block";
+  }
+  // clear last-taken state from all the popsicles
+  NIM.html.fieldrows.forEach((row) => row.querySelectorAll("div.nim-popsicle.nim-last-taken").forEach((p) => p.classList.remove("nim-last-taken")));
+  // iterator: eating the popsicles one by one
+  const popsicles = NIM.html.fieldrows.map((row) => Array.from(row.querySelectorAll("div.nim-popsicle")));
+  // player1 eats leftmost popsicles, player2 eats rightmost ones
+  let maxX = Math.max(...popsicles.map((p) => p.length)),
+    maxY = popsicles.length,
+    x = whoGoes() == 2 ? 0 : maxX - 1,
+    y = whoGoes() == 2 ? 0 : maxY - 1,
+    dir = whoGoes() == 2 ? 1 : -1;
+  while (eatCount > 0) {
+    if (popsicles[y].length > x) {
+      if (!popsicles[y][x].classList.contains("nim-taken")) {
+        eatCount -= 1;
+        popsicles[y][x].classList.add("nim-taken", "nim-last-taken");
+      }
     }
-    // mandatory stuff
-    NIM.html.gamestate.style.visibility = "hidden";
-  },
-  listeners: function () {
-    // settings: set initial count (sliders)
-    NIM.html.popCountSlider.addEventListener("input", NIM.setInitialCount);
-    // start game button listeners
-    NIM.html.startGameBtn.addEventListener("click", NIM.startGame);
-    NIM.html.restartGameBtn.addEventListener("click", NIM.startGame);
-    // game control listeners
-    NIM.html.p1controls.forEach((c) => c.addEventListener("click", NIM.makeMove));
-    NIM.html.p2controls.forEach((c) => c.addEventListener("click", NIM.makeMove));
-  },
-}; //NIM
+    y += dir;
+    if (y < 0 || y >= maxY) {
+      y = whoGoes() == 2 ? 0 : maxY - 1;
+      x += dir;
+      if (x < 0 || x >= maxX) break;
+    }
+  }
+} //makeMove
+
+function getChatMove() {
+  let list = NIM.results;
+  list.sort(function (a, b) {
+    return a.data > b.data ? -1 : a.data == b.data ? 0 : 1;
+  });
+  return parseInt(list[0].label, 10);
+} //getChatMove
+
+function startGame() {
+  NIM.game.count = NIM.game.initialCount;
+  NIM.game.condition = NIM.html.popCondition.value || "lose";
+  NIM.game.turn = 0;
+  NIM.html.fieldrows.forEach((row) => (row.innerHTML = ""));
+  NIM.game.firstMove = Math.round(Math.random()); // who goes first? player 1 or 2?
+  if (NIM.game.firstMove == 1) {
+    streamersTurn = true;
+    document.getElementById("nimchartCanvas").classList = "blur";
+    document.getElementById("nimoverlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
+  } else {
+    streamersTurn = false;
+    document.getElementById("nimchartCanvas").classList = "";
+    document.getElementById("nimoverlay").innerHTML = "";
+  }
+
+  // fill field with fresh tasty popsicles:
+  let rowNm = 0; // add as many "div.field-row" as you want, script will fill them evenly
+  for (let i = 0; i < NIM.game.count; i++) {
+    let popsicle = document.createElement("div");
+    popsicle.classList.add("nim-popsicle");
+    popsicle.style.filter = `hue-rotate(${Math.random() * 360}deg)`; // a bit of flair
+    NIM.html.fieldrows[rowNm].appendChild(popsicle);
+    rowNm += 1;
+    if (rowNm >= NIM.html.fieldrows.length) rowNm = 0;
+  }
+  // mandatory stuff
+  NIM.html.gamestate.style.visibility = "hidden";
+  NIM.html.controls.forEach((c) => (c.style.visibility = "visible"));
+  NIM.html.settings.style.display = "none";
+  turn();
+} //startGame
+
+function reset() {
+  NIM.html.settings.style.display = "block";
+  NIM.results = [
+    { label: "1", data: 0, c1: "#f44336", c2: "#f53337" },
+    { label: "2", data: 0, c1: "#f4c236", c2: "#f5c237" },
+    { label: "3", data: 0, c1: "#a8f436", c2: "#a9e437" },
+  ];
+  document.getElementById("nimoverlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
+  document.getElementById("nimchartCanvas").classList = "blur";
+  NIM.game.count = NIM.game.initialCount;
+  NIM.game.condition = NIM.html.popCondition.value || "lose";
+  NIM.game.turn = 0;
+  NIM.html.fieldrows.forEach((row) => (row.innerHTML = ""));
+
+  let rowNm = 0; // add as many "div.field-row" as you want, script will fill them evenly
+  for (let i = 0; i < NIM.game.count; i++) {
+    let popsicle = document.createElement("div");
+    popsicle.classList.add("nim-popsicle");
+    popsicle.style.filter = `hue-rotate(${Math.random() * 360}deg)`; // a bit of flair
+    NIM.html.fieldrows[rowNm].appendChild(popsicle);
+    rowNm += 1;
+    if (rowNm >= NIM.html.fieldrows.length) rowNm = 0;
+  }
+  // mandatory stuff
+  NIM.html.gamestate.style.visibility = "hidden";
+} //reset
+
+function listeners() {
+  // settings: set initial count (sliders)
+  NIM.html.popCountSlider.addEventListener("input", setInitialCount);
+  // start game button listeners
+  NIM.html.startGameBtn.addEventListener("click", startGame);
+  NIM.html.restartGameBtn.addEventListener("click", startGame);
+  // game control listeners
+  NIM.html.p1controls.forEach((c) => c.addEventListener("click", makeMove));
+  NIM.html.p2controls.forEach((c) => c.addEventListener("click", makeMove));
+} //listeners

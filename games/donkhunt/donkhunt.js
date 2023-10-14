@@ -9,7 +9,6 @@ let elements = {
   loginExpiredModal: document.getElementById("loginExpiredModal"),
   loginExpiredRenew: document.getElementById("loginExpiredRenew"),
   loginExpiredReset: document.getElementById("loginExpiredReset"),
-  howToPlayModal: document.getElementById("howToPlayModal"),
   aboutModal: document.getElementById("aboutModal"),
 
   //navbar
@@ -30,7 +29,7 @@ const spinner = `<div class="spinner-border" role="status"><span class="visually
 let loginButton;
 let darkTheme = true;
 
-let loginExpiredModal, howToPlayModal, aboutModal;
+let loginExpiredModal, aboutModal;
 
 let USER = {
   channel: "",
@@ -306,10 +305,6 @@ function toggleGrid() {
   elements.gameDiv.style.display = elements.gameDiv.style.display == "" ? "none" : "";
 }
 
-function showHowToPlay() {
-  howToPlayModal.show();
-} //showHowToPlay
-
 window.onload = function () {
   darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
   elements.darkTheme.checked = darkTheme ?? true;
@@ -322,7 +317,6 @@ window.onload = function () {
   }
 
   loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
-  howToPlayModal = new bootstrap.Modal(elements.howToPlayModal);
   aboutModal = new bootstrap.Modal(elements.aboutModal);
 
   enableTooltips();

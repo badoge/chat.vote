@@ -454,7 +454,7 @@
             <div class="card">
               <div class="card-body p-1">
                 <button type="button" onclick="toggleGrid()" class="btn btn-primary"><i class="material-icons notranslate">arrow_back</i>Back</button>
-                <button type="button" onclick="showHowToPlay()" class="btn btn-info"><i class="material-icons notranslate">help_outline</i>How To Play</button>
+                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#howToPlayModal"><i class="material-icons notranslate">help_outline</i>How To Play</button>
                 <b id="gameName">Not wordle :)</b>
               </div>
             </div>
@@ -496,8 +496,8 @@
               </div>
             </div>
 
-            <button type="button" id="startnw" onclick="WORDLE.startnw()" class="btn btn-success">Start</button>
-            <button type="button" id="resetnw" onclick="WORDLE.reset()" class="btn btn-warning">Reset</button>
+            <button type="button" id="startnw" onclick="startnw()" class="btn btn-success">Start</button>
+            <button type="button" id="resetnw" onclick="reset()" class="btn btn-warning">Reset</button>
 
             <div id="nwoutput2"></div>
           </div>

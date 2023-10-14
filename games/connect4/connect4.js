@@ -13,7 +13,6 @@ let elements = {
   loginExpiredModal: document.getElementById("loginExpiredModal"),
   loginExpiredRenew: document.getElementById("loginExpiredRenew"),
   loginExpiredReset: document.getElementById("loginExpiredReset"),
-  howToPlayModal: document.getElementById("howToPlayModal"),
   aboutModal: document.getElementById("aboutModal"),
 
   //navbar
@@ -34,7 +33,7 @@ const spinner = `<div class="spinner-border" role="status"><span class="visually
 let loginButton;
 let darkTheme = true;
 
-let loginExpiredModal, howToPlayModal, aboutModal;
+let loginExpiredModal, aboutModal;
 
 let USER = {
   channel: "",
@@ -43,6 +42,20 @@ let USER = {
   userID: "",
   platform: "",
 };
+
+let CONNECT4 = {
+  ctx: document.getElementById("c4chartCanvas").getContext("2d"),
+  chart: null,
+  results: [
+    { label: "1", data: 0, c1: "#f44336", c2: "#f53337" },
+    { label: "2", data: 0, c1: "#f4c236", c2: "#f5c237" },
+    { label: "3", data: 0, c1: "#a8f436", c2: "#a9e437" },
+    { label: "4", data: 0, c1: "#36f443", c2: "#37e444" },
+    { label: "5", data: 0, c1: "#36f4c2", c2: "#37e4c3" },
+    { label: "6", data: 0, c1: "#36a8f4", c2: "#3798f5" },
+    { label: "7", data: 0, c1: "#4336f4", c2: "#4426f5" },
+  ],
+}; //CONNECT4
 
 function refreshData() {
   darkTheme = elements.darkTheme.checked ?? true;
@@ -327,10 +340,6 @@ function toggleGrid() {
   elements.gameDiv.style.display = elements.gameDiv.style.display == "" ? "none" : "";
 }
 
-function showHowToPlay() {
-  howToPlayModal.show();
-} //showHowToPlay
-
 window.onload = function () {
   darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
   elements.darkTheme.checked = darkTheme ?? true;
@@ -343,7 +352,6 @@ window.onload = function () {
   }
 
   loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
-  howToPlayModal = new bootstrap.Modal(elements.howToPlayModal);
   aboutModal = new bootstrap.Modal(elements.aboutModal);
 
   enableTooltips();
@@ -468,10 +476,22 @@ function updateGraph() {
   CONNECT4.chart.update();
 } //updateGraph
 
-let CONNECT4 = {
-  ctx: document.getElementById("c4chartCanvas").getContext("2d"),
-  chart: null,
-  results: [
+function start(ai_1_strength, ai_2_strength) {
+  $("#board").empty();
+  let game = new C4({
+    ai_1_strength: ai_1_strength,
+    ai_2_strength: ai_2_strength,
+    container: "#board",
+  });
+} //start
+
+function reset() {
+  document.getElementById("totalvotesc4").innerHTML = `Total votes: 0`;
+  start(0, 0);
+  document.getElementById("c4chartCanvas").classList = "blur";
+  document.getElementById("c4overlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
+  document.getElementById("c4output").innerHTML = "";
+  CONNECT4.results = [
     { label: "1", data: 0, c1: "#f44336", c2: "#f53337" },
     { label: "2", data: 0, c1: "#f4c236", c2: "#f5c237" },
     { label: "3", data: 0, c1: "#a8f436", c2: "#a9e437" },
@@ -479,61 +499,38 @@ let CONNECT4 = {
     { label: "5", data: 0, c1: "#36f4c2", c2: "#37e4c3" },
     { label: "6", data: 0, c1: "#36a8f4", c2: "#3798f5" },
     { label: "7", data: 0, c1: "#4336f4", c2: "#4426f5" },
-  ],
-  start: function (ai_1_strength, ai_2_strength) {
-    $("#board").empty();
-    let game = new C4({
-      ai_1_strength: ai_1_strength,
-      ai_2_strength: ai_2_strength,
-      container: "#board",
-    });
-  },
-  reset: function () {
-    document.getElementById("totalvotesc4").innerHTML = `Total votes: 0`;
-    CONNECT4.start(0, 0);
-    document.getElementById("c4chartCanvas").classList = "blur";
-    document.getElementById("c4overlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
-    document.getElementById("c4output").innerHTML = "";
-    CONNECT4.results = [
-      { label: "1", data: 0, c1: "#f44336", c2: "#f53337" },
-      { label: "2", data: 0, c1: "#f4c236", c2: "#f5c237" },
-      { label: "3", data: 0, c1: "#a8f436", c2: "#a9e437" },
-      { label: "4", data: 0, c1: "#36f443", c2: "#37e444" },
-      { label: "5", data: 0, c1: "#36f4c2", c2: "#37e4c3" },
-      { label: "6", data: 0, c1: "#36a8f4", c2: "#3798f5" },
-      { label: "7", data: 0, c1: "#4336f4", c2: "#4426f5" },
-    ];
-  },
-  playTurn: function () {
-    if (voters.length == 0) {
-      return;
-    }
-    streamersTurn = true;
-    let donk = document.getElementsByClassName("c4cols");
-    let c4cols = Array.prototype.slice.call(donk).map((x) => parseInt(x.innerHTML, 10));
-    document.getElementById("c4chartCanvas").classList = "blur";
-    document.getElementById("c4overlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
-    let list = CONNECT4.results;
-    list.sort(function (a, b) {
-      return a.data > b.data ? -1 : a.data == b.data ? 0 : 1;
-    });
-    for (let i = 0, j = c4cols.length; i < j; i++) {
-      donk[i].innerHTML = 0;
-    }
+  ];
+} //reset
 
-    _game.trigger("drop", { col_index: parseInt(list[0].label, 10) - 1 });
+function playTurn() {
+  if (voters.length == 0) {
+    return;
+  }
+  streamersTurn = true;
+  let donk = document.getElementsByClassName("c4cols");
+  let c4cols = Array.prototype.slice.call(donk).map((x) => parseInt(x.innerHTML, 10));
+  document.getElementById("c4chartCanvas").classList = "blur";
+  document.getElementById("c4overlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
+  let list = CONNECT4.results;
+  list.sort(function (a, b) {
+    return a.data > b.data ? -1 : a.data == b.data ? 0 : 1;
+  });
+  for (let i = 0, j = c4cols.length; i < j; i++) {
+    donk[i].innerHTML = 0;
+  }
 
-    voters = [];
+  _game.trigger("drop", { col_index: parseInt(list[0].label, 10) - 1 });
 
-    for (let index = 0; index < CONNECT4.results.length; index++) {
-      CONNECT4.results[index].data = 0;
-    }
-    CONNECT4.results.sort(function (a, b) {
-      return parseInt(a.label, 10) < parseInt(b.label, 10) ? -1 : parseInt(a.label, 10) == parseInt(b.label, 10) ? 0 : 1;
-    });
-    updateGraph("c4");
-  },
-}; //CONNECT4
+  voters = [];
+
+  for (let index = 0; index < CONNECT4.results.length; index++) {
+    CONNECT4.results[index].data = 0;
+  }
+  CONNECT4.results.sort(function (a, b) {
+    return parseInt(a.label, 10) < parseInt(b.label, 10) ? -1 : parseInt(a.label, 10) == parseInt(b.label, 10) ? 0 : 1;
+  });
+  updateGraph("c4");
+} //playTurn
 
 class C4 {
   constructor(_options) {
@@ -779,5 +776,5 @@ function resetGame() {
   voters = [];
   initGraph();
   streamersTurn = true;
-  CONNECT4.reset();
+  reset();
 } //resetGame

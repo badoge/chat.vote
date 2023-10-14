@@ -451,7 +451,7 @@
             <div class="card">
               <div class="card-body p-1">
                 <button type="button" onclick="toggleGrid()" class="btn btn-primary"><i class="material-icons notranslate">arrow_back</i>Back</button>
-                <button type="button" onclick="showHowToPlay()" class="btn btn-info"><i class="material-icons notranslate">help_outline</i>How To Play</button>
+                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#howToPlayModal"><i class="material-icons notranslate">help_outline</i>How To Play</button>
                 <b id="gameName">tic tac toe</b>
               </div>
             </div>
@@ -481,7 +481,7 @@
               </div>
             </div>
             <div class="col-xl-5 centertext">
-              <button type="button" onclick="TTT.playTurn()" class="btn btn-lg btn-success">Play chat's turn</button>
+              <button type="button" onclick="playTurn()" class="btn btn-lg btn-success">Play chat's turn</button>
               <div id="tttoutput"></div>
               <div id="tttchartdiv" class="chart-container">
                 <div id="tttoverlay"></div>

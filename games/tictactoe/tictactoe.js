@@ -11,7 +11,6 @@ let elements = {
   loginExpiredModal: document.getElementById("loginExpiredModal"),
   loginExpiredRenew: document.getElementById("loginExpiredRenew"),
   loginExpiredReset: document.getElementById("loginExpiredReset"),
-  howToPlayModal: document.getElementById("howToPlayModal"),
   aboutModal: document.getElementById("aboutModal"),
 
   //navbar
@@ -32,7 +31,7 @@ const spinner = `<div class="spinner-border" role="status"><span class="visually
 let loginButton;
 let darkTheme = true;
 
-let loginExpiredModal, howToPlayModal, aboutModal;
+let loginExpiredModal, aboutModal;
 
 let USER = {
   channel: "",
@@ -328,10 +327,6 @@ function toggleGrid() {
   elements.gameDiv.style.display = elements.gameDiv.style.display == "" ? "none" : "";
 }
 
-function showHowToPlay() {
-  howToPlayModal.show();
-} //showHowToPlay
-
 window.onload = function () {
   darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
   elements.darkTheme.checked = darkTheme ?? true;
@@ -344,7 +339,6 @@ window.onload = function () {
   }
 
   loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
-  howToPlayModal = new bootstrap.Modal(elements.howToPlayModal);
   aboutModal = new bootstrap.Modal(elements.aboutModal);
 
   enableTooltips();
@@ -378,7 +372,7 @@ window.onload = function () {
   };
 
   initGraph();
-  TTT.listeners();
+  listeners();
   document.getElementById("tttoverlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
 }; //onload
 
@@ -509,159 +503,165 @@ let TTT = {
     [0, 4, 8],
     [2, 4, 6],
   ],
-  updateGameBoard: function (index, value, el) {
-    TTT.gameBoard[index] = value;
-    el.html(value);
-    let donk = document.getElementsByClassName("choices");
-    for (let i = 0, j = donk.length; i < j; i++) {
-      donk[i].innerHTML = 0;
-      if (TTT.gameBoard[i]) {
-        $(donk[i]).parent().addClass("text-body-secondary");
-      }
-    }
-  },
-  reset: function () {
-    TTT.init();
-    document.getElementById("totalvotesttt").innerHTML = `Total votes: 0`;
-    document.getElementById("tttoutput").innerHTML = "";
-    document.getElementById("tttchartCanvas").classList = "blur";
-    document.getElementById("tttoverlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
-    TTT.results = [
-      { label: "1", data: 0, c1: "#f44336", c2: "#f53337" },
-      { label: "2", data: 0, c1: "#f4c236", c2: "#f5c237" },
-      { label: "3", data: 0, c1: "#a8f436", c2: "#a9e437" },
-      { label: "4", data: 0, c1: "#36f443", c2: "#37e444" },
-      { label: "5", data: 0, c1: "#36f4c2", c2: "#37e4c3" },
-      { label: "6", data: 0, c1: "#36a8f4", c2: "#3798f5" },
-      { label: "7", data: 0, c1: "#4336f4", c2: "#4426f5" },
-      { label: "8", data: 0, c1: "#a236d4", c2: "#a326d5" },
-      { label: "9", data: 0, c1: "#f336b8", c2: "#f426b9" },
-    ];
-  },
-  init: function () {
-    for (let i = 0, j = TTT.squares.length; i < j; i++) {
-      TTT.squares[i].innerHTML = `<span class="text-body-secondary">${i + 1}</span>`;
-    }
-    TTT.gameBoard = [null, null, null, null, null, null, null, null, null];
-    TTT.isComputerPlaying = false;
-    TTT.isGameOver = false;
-    TTT.numberOfPlayedSquares = 0;
-    document.getElementById("gameboard").classList = "pointer";
-  }, // end TTT.init()
-
-  checkWin: function (value) {
-    let winner = false;
-    for (let combo = 0, j = TTT.winningCombos.length; combo < j; combo++) {
-      let a = TTT.winningCombos[combo][0];
-      let b = TTT.winningCombos[combo][1];
-      let c = TTT.winningCombos[combo][2];
-      if (TTT.gameBoard[a] === TTT.gameBoard[b]) {
-        if (TTT.gameBoard[b] === TTT.gameBoard[c]) {
-          if (TTT.gameBoard[a]) {
-            TTT.endGame(value);
-            winner = true;
-          }
-        }
-      }
-    }
-    return winner;
-  },
-
-  endGame: function (value) {
-    if (value === "X") {
-      document.getElementById("tttoutput").innerHTML = `${USER.channel} wins<br> <button type="button" onclick="resetGame()" class="btn btn-primary">Play again</button>`;
-    } else if (value === "O") {
-      document.getElementById("tttoutput").innerHTML = `Chat wins<br> <button type="button" onclick="resetGame()" class="btn btn-primary">Play again</button>`;
-    } else {
-      document.getElementById("tttoutput").innerHTML = `Draw<br> <button type="button" onclick="resetGame()" class="btn btn-primary">Play again</button>`;
-    }
-    TTT.isGameOver = true;
-    //	let playAgain = confirm("Click Ok to play again...");
-    //	if(playAgain){
-    //		TTT.init();
-    //	}
-  },
-  getChatMove: function () {
-    let list = TTT.results;
-    list.sort(function (a, b) {
-      return a.data > b.data ? -1 : a.data == b.data ? 0 : 1;
-    });
-    return list[0];
-  },
-  playTurn: function () {
-    if (voters.length == 0) {
-      return;
-    }
-    streamersTurn = true;
-    document.getElementById("tttchartCanvas").classList = "blur";
-    document.getElementById("tttoverlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
-    voters = [];
-    let theSquareToPlay = TTT.getChatMove();
-    theSquareToPlay = theSquareToPlay.label;
-    TTT.results = TTT.results.filter(function (el) {
-      return el.label != theSquareToPlay;
-    });
-    TTT.results.forEach((element, index) => {
-      TTT.results[index].data = 0;
-    });
-    TTT.results.sort(function (a, b) {
-      return parseInt(a.label, 10) < parseInt(b.label, 10) ? -1 : parseInt(a.label, 10) == parseInt(b.label, 10) ? 0 : 1;
-    });
-    updateGraph("ttt");
-    let $theSelectedSquare = $(".square-0" + `${parseInt(theSquareToPlay, 10) - 1}`);
-    TTT.numberOfPlayedSquares++;
-    TTT.updateGameBoard(`${parseInt(theSquareToPlay, 10) - 1}`, "O", $theSelectedSquare);
-    TTT.checkWin("O");
-    TTT.isComputerPlaying = false;
-    document.getElementById("gameboard").classList = "cursorpointer";
-    document.getElementById("totalvotesttt").innerHTML = `Total votes: 0`;
-  },
-  listeners: function () {
-    TTT.squares.click(function () {
-      voters = [];
-      let squareIndexValue = parseInt($(this).data("index"), 10);
-      document.getElementById("gameboard").classList = "cursordefault";
-
-      function checkIfTurnIsReady() {
-        if (TTT.isGameOver) {
-          return false;
-        }
-        if (TTT.isComputerPlaying) {
-          return false;
-        }
-        if (!TTT.gameBoard[squareIndexValue]) {
-          return true;
-        }
-      }
-      let isTurnReady = checkIfTurnIsReady();
-      if (isTurnReady) {
-        streamersTurn = false;
-        document.getElementById("tttchartCanvas").classList = "";
-        document.getElementById("tttoverlay").innerHTML = "";
-        TTT.updateGameBoard(squareIndexValue, "X", $(this));
-        TTT.numberOfPlayedSquares++;
-        let winner = TTT.checkWin("X");
-        if (!winner && TTT.numberOfPlayedSquares < 9) {
-          // AI.playTurn();
-        } else if (TTT.numberOfPlayedSquares === 9) {
-          TTT.endGame("draw");
-        }
-        TTT.isComputerPlaying = true;
-        TTT.results = TTT.results.filter(function (el) {
-          return el.label != `${squareIndexValue + 1}`;
-        });
-        TTT.results.forEach((element, index) => {
-          TTT.results[index].data = 0;
-        });
-        updateGraph("ttt");
-      }
-    }); //TTT click
-  },
 }; //TTT
+
+function updateGameBoard(index, value, el) {
+  TTT.gameBoard[index] = value;
+  el.html(value);
+  let donk = document.getElementsByClassName("choices");
+  for (let i = 0, j = donk.length; i < j; i++) {
+    donk[i].innerHTML = 0;
+    if (TTT.gameBoard[i]) {
+      $(donk[i]).parent().addClass("text-body-secondary");
+    }
+  }
+} //updateGameBoard
+
+function reset() {
+  init();
+  document.getElementById("totalvotesttt").innerHTML = `Total votes: 0`;
+  document.getElementById("tttoutput").innerHTML = "";
+  document.getElementById("tttchartCanvas").classList = "blur";
+  document.getElementById("tttoverlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
+  TTT.results = [
+    { label: "1", data: 0, c1: "#f44336", c2: "#f53337" },
+    { label: "2", data: 0, c1: "#f4c236", c2: "#f5c237" },
+    { label: "3", data: 0, c1: "#a8f436", c2: "#a9e437" },
+    { label: "4", data: 0, c1: "#36f443", c2: "#37e444" },
+    { label: "5", data: 0, c1: "#36f4c2", c2: "#37e4c3" },
+    { label: "6", data: 0, c1: "#36a8f4", c2: "#3798f5" },
+    { label: "7", data: 0, c1: "#4336f4", c2: "#4426f5" },
+    { label: "8", data: 0, c1: "#a236d4", c2: "#a326d5" },
+    { label: "9", data: 0, c1: "#f336b8", c2: "#f426b9" },
+  ];
+} //reset
+
+function init() {
+  for (let i = 0, j = TTT.squares.length; i < j; i++) {
+    TTT.squares[i].innerHTML = `<span class="text-body-secondary">${i + 1}</span>`;
+  }
+  TTT.gameBoard = [null, null, null, null, null, null, null, null, null];
+  TTT.isComputerPlaying = false;
+  TTT.isGameOver = false;
+  TTT.numberOfPlayedSquares = 0;
+  document.getElementById("gameboard").classList = "pointer";
+} //init
+
+function checkWin(value) {
+  let winner = false;
+  for (let combo = 0, j = TTT.winningCombos.length; combo < j; combo++) {
+    let a = TTT.winningCombos[combo][0];
+    let b = TTT.winningCombos[combo][1];
+    let c = TTT.winningCombos[combo][2];
+    if (TTT.gameBoard[a] === TTT.gameBoard[b]) {
+      if (TTT.gameBoard[b] === TTT.gameBoard[c]) {
+        if (TTT.gameBoard[a]) {
+          endGame(value);
+          winner = true;
+        }
+      }
+    }
+  }
+  return winner;
+} //checkWin
+
+function endGame(value) {
+  if (value === "X") {
+    document.getElementById("tttoutput").innerHTML = `${USER.channel} wins<br> <button type="button" onclick="resetGame()" class="btn btn-primary">Play again</button>`;
+  } else if (value === "O") {
+    document.getElementById("tttoutput").innerHTML = `Chat wins<br> <button type="button" onclick="resetGame()" class="btn btn-primary">Play again</button>`;
+  } else {
+    document.getElementById("tttoutput").innerHTML = `Draw<br> <button type="button" onclick="resetGame()" class="btn btn-primary">Play again</button>`;
+  }
+  TTT.isGameOver = true;
+  //	let playAgain = confirm("Click Ok to play again...");
+  //	if(playAgain){
+  //		init();
+  //	}
+} //endGame
+
+function getChatMove() {
+  let list = TTT.results;
+  list.sort(function (a, b) {
+    return a.data > b.data ? -1 : a.data == b.data ? 0 : 1;
+  });
+  return list[0];
+} //getChatMove
+
+function playTurn() {
+  if (voters.length == 0) {
+    return;
+  }
+  streamersTurn = true;
+  document.getElementById("tttchartCanvas").classList = "blur";
+  document.getElementById("tttoverlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
+  voters = [];
+  let theSquareToPlay = getChatMove();
+  theSquareToPlay = theSquareToPlay.label;
+  TTT.results = TTT.results.filter(function (el) {
+    return el.label != theSquareToPlay;
+  });
+  TTT.results.forEach((element, index) => {
+    TTT.results[index].data = 0;
+  });
+  TTT.results.sort(function (a, b) {
+    return parseInt(a.label, 10) < parseInt(b.label, 10) ? -1 : parseInt(a.label, 10) == parseInt(b.label, 10) ? 0 : 1;
+  });
+  updateGraph("ttt");
+  let $theSelectedSquare = $(".square-0" + `${parseInt(theSquareToPlay, 10) - 1}`);
+  TTT.numberOfPlayedSquares++;
+  updateGameBoard(`${parseInt(theSquareToPlay, 10) - 1}`, "O", $theSelectedSquare);
+  checkWin("O");
+  TTT.isComputerPlaying = false;
+  document.getElementById("gameboard").classList = "cursorpointer";
+  document.getElementById("totalvotesttt").innerHTML = `Total votes: 0`;
+} //playTurn
+
+function listeners() {
+  TTT.squares.click(function () {
+    voters = [];
+    let squareIndexValue = parseInt($(this).data("index"), 10);
+    document.getElementById("gameboard").classList = "cursordefault";
+
+    function checkIfTurnIsReady() {
+      if (TTT.isGameOver) {
+        return false;
+      }
+      if (TTT.isComputerPlaying) {
+        return false;
+      }
+      if (!TTT.gameBoard[squareIndexValue]) {
+        return true;
+      }
+    }
+    let isTurnReady = checkIfTurnIsReady();
+    if (isTurnReady) {
+      streamersTurn = false;
+      document.getElementById("tttchartCanvas").classList = "";
+      document.getElementById("tttoverlay").innerHTML = "";
+      updateGameBoard(squareIndexValue, "X", $(this));
+      TTT.numberOfPlayedSquares++;
+      let winner = checkWin("X");
+      if (!winner && TTT.numberOfPlayedSquares < 9) {
+        // AI.playTurn();
+      } else if (TTT.numberOfPlayedSquares === 9) {
+        endGame("draw");
+      }
+      TTT.isComputerPlaying = true;
+      TTT.results = TTT.results.filter(function (el) {
+        return el.label != `${squareIndexValue + 1}`;
+      });
+      TTT.results.forEach((element, index) => {
+        TTT.results[index].data = 0;
+      });
+      updateGraph("ttt");
+    }
+  }); //TTT click
+} //listeners
 
 function resetGame() {
   voters = [];
   initGraph();
   streamersTurn = true;
-  TTT.reset();
+  reset();
 } //resetGame
