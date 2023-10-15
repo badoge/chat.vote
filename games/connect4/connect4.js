@@ -1,5 +1,4 @@
 /*jshint esversion: 11 */
-const CLIENT_ID = "qn0wimnszbqlwfnszdz3wwfz430eqr";
 
 let _game;
 let streamersTurn = true;
@@ -11,8 +10,6 @@ let elements = {
   gameDiv: document.getElementById("gameDiv"),
 
   loginExpiredModal: document.getElementById("loginExpiredModal"),
-  loginExpiredRenew: document.getElementById("loginExpiredRenew"),
-  loginExpiredReset: document.getElementById("loginExpiredReset"),
   aboutModal: document.getElementById("aboutModal"),
 
   //navbar
@@ -27,8 +24,6 @@ let elements = {
   //main
   toastContainer: document.getElementById("toastContainer"),
 };
-
-const spinner = `<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`;
 
 let loginButton;
 let darkTheme = true;
@@ -56,61 +51,6 @@ let CONNECT4 = {
     { label: "7", data: 0, c1: "#4336f4", c2: "#4426f5" },
   ],
 }; //CONNECT4
-
-function refreshData() {
-  darkTheme = elements.darkTheme.checked ?? true;
-
-  if (!USER.twitchLogin) {
-    USER.channel = elements.channelName.value.replace(/\s+/g, "").toLowerCase();
-    USER.platform = "twitch";
-  }
-} //refreshdata
-
-function saveSettings() {
-  refreshData();
-  localStorage.setItem("USER", JSON.stringify(USER));
-  localStorage.setItem("darkTheme", darkTheme);
-} //saveSettings
-
-function load_localStorage() {
-  if (!localStorage.getItem("USER")) {
-    console.log("localStorage user info not found");
-  } else {
-    USER = JSON.parse(localStorage.getItem("USER"));
-    elements.channelName.value = USER.channel;
-  }
-} //load_localStorage
-
-function resetSettings() {
-  localStorage.setItem(
-    "USER",
-    JSON.stringify({
-      channel: "",
-      twitchLogin: false,
-      access_token: "",
-      userID: "",
-      platform: "",
-    })
-  );
-
-  location.reload();
-  return false;
-} //resetSettings
-
-function login() {
-  elements.topRight.innerHTML = `<div class="btn-group" role="group" aria-label="log in button group">
-    <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></button>
-    <div class="btn-group" role="group">
-        <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-      </button>
-        <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="btnGroupDrop1">
-            <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
-        </ul>
-    </div>
-</div>`;
-  window.open("/prompt.html", "loginWindow", "toolbar=0,status=0,scrollbars=0,width=500px,height=800px");
-  return false;
-} //login
 
 function connect() {
   elements.status.innerHTML = `
@@ -189,157 +129,6 @@ function connect() {
   client.connect().catch(console.error);
 } //connect
 
-async function loadPFP() {
-  if (!USER.channel) {
-    elements.topRight.innerHTML = ` <div class="btn-group" role="group" aria-label="login options">
-    <a
-      role="button"
-      id="loginButton"
-      class="btn btn-twitch"
-      tabindex="0"
-      data-bs-container="body"
-      data-bs-custom-class="custom-popover"
-      data-bs-placement="bottom"
-      data-bs-trigger="manual"
-      data-bs-toggle="popover"
-      data-bs-title="Not signed in"
-      data-bs-content="You need sign in first before adding options or enabling voting/suggestions"
-      ><span class="twitch-icon"></span>Sign in with Twitch</a
-    >
-    <div class="btn-group" role="group">
-      <button
-        id="btnGroupDropLogin"
-        type="button"
-        class="btn btn-twitch dropdown-toggle"
-        data-bs-toggle="dropdown"
-        data-bs-auto-close="outside"
-        aria-label="other login option, connect manually"
-        aria-expanded="false"
-      ></button>
-      <div class="dropdown-menu dropdown-menu-end" aria-labelledby="btnGroupDropLogin">
-        <div class="p-3" style="width: 300px">
-          <label for="channelName" class="form-label">Connect to chat directly</label>
-          <div class="input-group mb-3">
-            <span class="input-group-text" id="directLoginChannel">twitch.tv/</span>
-            <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
-          </div>
-          <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
-          <button type="button" id="connectbtn" class="btn btn-primary float-end">Connect</button>
-        </div>
-      </div>
-    </div>
-  </div>`;
-    return;
-  }
-  let profilepicurl = await get7TVPFP(USER.userID);
-  if (profilepicurl == "/pics/donk.png" && USER.access_token) {
-    profilepicurl = await getTwitchPFP(USER.channel, USER.access_token);
-  }
-  elements.topRight.innerHTML = `
-  <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
-  <button type="button" id="btnGroupDrop2" class="btn btn-${darkTheme ? "dark" : "secondary"}"><img src="${profilepicurl}" alt="profile pic" style="height:2em;"></button>
-  <div class="btn-group" role="group">
-  <button id="btnGroupDrop1" type="button" class="btn btn-${darkTheme ? "dark" : "secondary"} dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-  ${USER.channel}
-  </button>
-  <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="btnGroupDrop1">
-  <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
-  </ul>
-  </div>
-  </div>`;
-} //loadPFP
-
-function checkLogin() {
-  if (!USER.channel) {
-    loginButton.show();
-    setTimeout(function () {
-      loginButton.hide();
-    }, 4000);
-    return false;
-  }
-  return true;
-} //checkLogin
-
-function logout() {
-  elements.topRight.innerHTML = ` <div class="btn-group" role="group" aria-label="login options">
-  <a
-    role="button"
-    id="loginButton"
-    class="btn btn-twitch"
-    tabindex="0"
-    data-bs-container="body"
-    data-bs-custom-class="custom-popover"
-    data-bs-placement="bottom"
-    data-bs-trigger="manual"
-    data-bs-toggle="popover"
-    data-bs-title="Not signed in"
-    data-bs-content="You need sign in first before adding options or enabling voting/suggestions"
-    ><span class="twitch-icon"></span>Sign in with Twitch</a
-  >
-  <div class="btn-group" role="group">
-    <button
-      id="btnGroupDropLogin"
-      type="button"
-      class="btn btn-twitch dropdown-toggle"
-      data-bs-toggle="dropdown"
-      data-bs-auto-close="outside"
-      aria-label="other login option, connect manually"
-      aria-expanded="false"
-    ></button>
-    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="btnGroupDropLogin">
-      <div class="p-3" style="width: 300px">
-        <label for="channelName" class="form-label">Connect to chat directly</label>
-        <div class="input-group mb-3">
-          <span class="input-group-text" id="directLoginChannel">twitch.tv/</span>
-          <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
-        </div>
-        <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
-        <button type="button" id="connectbtn" class="btn btn-primary float-end">Connect</button>
-      </div>
-    </div>
-  </div>
-</div>`;
-  resetSettings();
-} //logout
-
-function switchTheme(checkbox) {
-  document.documentElement.setAttribute("data-bs-theme", checkbox ? "dark" : "light");
-  document.getElementById("twitchLogo").style.filter = `invert(${checkbox ? 0.25 : 0.65})`;
-  if (document.getElementById("btnGroupDrop1") && document.getElementById("btnGroupDrop2")) {
-    document.getElementById("btnGroupDrop1").classList.remove(`${checkbox ? "btn-secondary" : "btn-dark"}`);
-    document.getElementById("btnGroupDrop1").classList.add(`${checkbox ? "btn-dark" : "btn-secondary"}`);
-    document.getElementById("btnGroupDrop2").classList.remove(`${checkbox ? "btn-secondary" : "btn-dark"}`);
-    document.getElementById("btnGroupDrop2").classList.add(`${checkbox ? "btn-dark" : "btn-secondary"}`);
-  }
-} //switchTheme
-
-async function loadAndConnect() {
-  load_localStorage();
-  refreshData();
-  const params = new Proxy(new URLSearchParams(window.location.search), {
-    get: (searchParams, prop) => searchParams.get(prop),
-  });
-  if (params.channel && !USER.channel && !USER.twitchLogin && !USER.access_token && !USER.userID) {
-    let input = params.channel.replace(/\s+/g, "").toLowerCase();
-    elements.channelName.value = input;
-    USER.channel = input;
-    window.history.replaceState({}, document.title, "/");
-  }
-  if (USER.twitchLogin && !(await checkToken(USER.access_token))) {
-    USER.channel = "";
-    loginExpiredModal.show();
-    return;
-  }
-  if (USER.channel) {
-    connect();
-  }
-} //loadAndConnect
-
-function toggleGrid() {
-  elements.grid.style.display = elements.grid.style.display == "none" ? "" : "none";
-  elements.gameDiv.style.display = elements.gameDiv.style.display == "" ? "none" : "";
-}
-
 window.onload = function () {
   darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
   elements.darkTheme.checked = darkTheme ?? true;
@@ -367,18 +156,6 @@ window.onload = function () {
     connect();
   });
 
-  elements.loginExpiredRenew.addEventListener("click", function () {
-    login();
-  });
-
-  elements.loginButton.addEventListener("click", function () {
-    login();
-  });
-
-  elements.loginExpiredReset.addEventListener("click", function () {
-    resetSettings();
-  });
-
   elements.darkTheme.onchange = function () {
     switchTheme(this.checked);
     saveSettings();
@@ -387,10 +164,6 @@ window.onload = function () {
   initGraph();
   document.getElementById("c4overlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
 }; //onload
-
-window.onbeforeunload = function () {
-  return null;
-}; //onbeforeunload
 
 function initGraph() {
   if (CONNECT4.chart) {

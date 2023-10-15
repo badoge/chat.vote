@@ -1,46 +1,14 @@
 /*jshint esversion: 11 */
-const CLIENT_ID = "qn0wimnszbqlwfnszdz3wwfz430eqr";
 
-let elements = {
-  //modals
-  grid: document.getElementById("grid"),
-  loginExpiredModal: document.getElementById("loginExpiredModal"),
-  loginExpiredRenew: document.getElementById("loginExpiredRenew"),
-  loginExpiredReset: document.getElementById("loginExpiredReset"),
-  aboutModal: document.getElementById("aboutModal"),
-
-  //navbar
-  vtsLink: document.getElementById("vtsLink"),
-  status: document.getElementById("status"),
-  topRight: document.getElementById("topRight"),
-  loginButton: document.getElementById("loginButton"),
-  channelName: document.getElementById("channelName"),
-  connectbtn: document.getElementById("connectbtn"),
-  darkTheme: document.getElementById("darkTheme"),
-};
-
-const spinner = `<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`;
-
-let loginButton;
-
-let loginExpiredModal, aboutModal;
-
-let darkTheme = true;
-
-let USER = {
-  channel: "",
-  twitchLogin: false,
-  access_token: "",
-  userID: "",
-  platform: "",
-};
-
-function refreshData() {
+async function refreshData() {
   darkTheme = elements.darkTheme.checked ?? true;
 
   if (!USER.twitchLogin) {
     USER.channel = elements.channelName.value.replace(/\s+/g, "").toLowerCase();
     USER.platform = "twitch";
+  }
+  if (!USER.userID && USER.channel) {
+    USER.userID = await getUserID(USER.channel);
   }
 } //refreshdata
 
@@ -81,7 +49,7 @@ function login() {
     <div class="btn-group" role="group">
         <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
       </button>
-        <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="btnGroupDropLogin">
+        <ul class="dropdown-menu dropdown-menu-lg-end" aria-label="Log out">
             <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
         </ul>
     </div>
@@ -90,69 +58,13 @@ function login() {
   return false;
 } //login
 
-function connect() {
-  elements.status.innerHTML = `
-  <h4>
-  <span class="badge bg-warning">Connecting... 
-  <div class="spinner-border" style="width:18px;height:18px;" role="status"><span class="visually-hidden">Loading...</span></div>
-  </span>
-  </h4>`;
-  elements.topRight.innerHTML = `
-  <div class="btn-group" role="group" aria-label="log in button group">
-  <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></button>
-  <div class="btn-group" role="group">
-  <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
-  <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="btnGroupDrop1">
-  <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
-  </ul>
-  </div>
-  </div>`;
-  refreshData();
-  let options = {
-    options: {
-      clientId: CLIENT_ID,
-      debug: false,
-    },
-    connection: {
-      secure: true,
-      reconnect: true,
-    },
-    channels: [USER.channel],
-  };
-  client = new tmi.client(options);
-
-  client.on("message", async (target, context, msg, self) => {}); //message
-
-  client.on("timeout", (channel, username, reason, duration, userstate) => {}); //timeout
-
-  client.on("connected", async (address, port) => {
-    console.log(`Connected to ${address}:${port}`);
-    elements.status.innerHTML = `<h4><span class="badge bg-success">Connected :)</span></h4>`;
-    saveSettings();
-    sendUsername(`chat.vote/games`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
-    if (await checkTags(USER.userID, USER.access_token)) {
-      elements.vtsLink.style.display = "";
-    }
-    loadPFP();
-  }); //connected
-
-  client.on("disconnected", (reason) => {
-    elements.status.innerHTML = `<h4><span class="badge bg-danger">Disconnected: ${reason}</span></h4>`;
-  }); //disconnected
-
-  client.on("notice", (channel, msgid, message) => {
-    elements.status.innerHTML = `<h4><span class="badge bg-danger">Disconnected: ${message}</span></h4>`;
-  }); //notice
-
-  client.connect().catch(console.error);
-} //connect
-
 async function loadPFP() {
   if (!USER.channel) {
     elements.topRight.innerHTML = ` <div class="btn-group" role="group" aria-label="login options">
     <a
       role="button"
       id="loginButton"
+      onclick="login()"
       class="btn btn-twitch"
       tabindex="0"
       data-bs-container="body"
@@ -182,7 +94,7 @@ async function loadPFP() {
             <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
           </div>
           <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
-          <button type="button" id="connectbtn" class="btn btn-primary float-end">Connect</button>
+          <button type="button" id="connectbtn" onclick="connect()" class="btn btn-primary float-end">Connect</button>
         </div>
       </div>
     </div>
@@ -223,6 +135,7 @@ function logout() {
   <a
     role="button"
     id="loginButton"
+    onclick="login()"
     class="btn btn-twitch"
     tabindex="0"
     data-bs-container="body"
@@ -252,7 +165,7 @@ function logout() {
           <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
         </div>
         <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
-        <button type="button" id="connectbtn" class="btn btn-primary float-end">Connect</button>
+        <button type="button" id="connectbtn" onclick="connect()" class="btn btn-primary float-end">Connect</button>
       </div>
     </div>
   </div>
@@ -293,51 +206,7 @@ async function loadAndConnect() {
   }
 } //loadAndConnect
 
-window.onload = function () {
-  darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
-  elements.darkTheme.checked = darkTheme ?? true;
-  switchTheme(elements.darkTheme.checked);
-
-  loadAndConnect();
-
-  if (!USER.channel) {
-    loginButton = new bootstrap.Popover(elements.loginButton);
-  }
-
-  loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
-  aboutModal = new bootstrap.Modal(elements.aboutModal);
-
-  enableTooltips();
-  enablePopovers();
-
-  elements.channelName.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      connect();
-    }
-  });
-
-  elements.connectbtn.addEventListener("click", function () {
-    connect();
-  });
-
-  elements.loginExpiredRenew.addEventListener("click", function () {
-    login();
-  });
-
-  elements.loginButton.addEventListener("click", function () {
-    login();
-  });
-
-  elements.loginExpiredReset.addEventListener("click", function () {
-    resetSettings();
-  });
-
-  elements.darkTheme.onchange = function () {
-    switchTheme(this.checked);
-    saveSettings();
-  };
-}; //onload
-
-window.onbeforeunload = function () {
-  return null;
-}; //onbeforeunload
+function toggleGrid() {
+  elements.grid.style.display = elements.grid.style.display == "none" ? "" : "none";
+  elements.gameDiv.style.display = elements.gameDiv.style.display == "" ? "none" : "";
+} //toggleGrid

@@ -61,7 +61,7 @@
           <div class="modal-body">
             <div class="row justify-content-center">
               Renew login:<br />
-              <button type="button" data-bs-dismiss="modal" id="loginExpiredRenew" class="btn btn-twitch"><span class="twitch-icon"></span>Sign in with Twitch</button>
+              <button type="button" data-bs-dismiss="modal" onclick="login()" class="btn btn-twitch"><span class="twitch-icon"></span>Sign in with Twitch</button>
               <br /><small class="text-body-secondary">Logins expire after 2 months.<br />Or after you change your password.</small>
             </div>
           </div>
@@ -74,7 +74,7 @@
               data-bs-placement="top"
               data-bs-title="Will reset everything so you can login again."
               data-bs-dismiss="modal"
-              id="loginExpiredReset"
+              onclick="resetSettings(true)"
             >
               Reset
             </button>

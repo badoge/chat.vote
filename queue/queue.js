@@ -7,7 +7,6 @@ function copyLink(link) {
 } //copyLink
 
 /*jshint esversion: 9 */
-const CLIENT_ID = "qn0wimnszbqlwfnszdz3wwfz430eqr";
 
 let elements = {
   //modals
@@ -34,8 +33,6 @@ let color = "";
 let currentTime = 0;
 let loginButton;
 let modal1, modal2, modal3, modal4, modal5, modal6, modal7, modal8, modal9, modal10;
-
-const spinner = `<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`;
 
 let QUEUE = {
   userID: "",

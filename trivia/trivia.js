@@ -1,7 +1,4 @@
 /*jshint esversion: 9 */
-const CLIENT_ID = "qn0wimnszbqlwfnszdz3wwfz430eqr";
-
-const spinner = `<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`;
 
 let channelBadges = { subscriber: [], bits: [] };
 let globalBadges = {};

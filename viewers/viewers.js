@@ -1,5 +1,3 @@
-const CLIENT_ID = "qn0wimnszbqlwfnszdz3wwfz430eqr";
-
 let modal1, modal2;
 let myChart;
 let viewCountArray = [];

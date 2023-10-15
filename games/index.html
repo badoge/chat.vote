@@ -45,7 +45,7 @@
           <div class="modal-body">
             <div class="row justify-content-center">
               Renew login:<br />
-              <button type="button" data-bs-dismiss="modal" id="loginExpiredRenew" class="btn btn-twitch"><span class="twitch-icon"></span>Sign in with Twitch</button>
+              <button type="button" data-bs-dismiss="modal" onclick="login()" class="btn btn-twitch"><span class="twitch-icon"></span>Sign in with Twitch</button>
               <br /><small class="text-body-secondary">Logins expire after 2 months.<br />Or after you change your password.</small>
             </div>
           </div>
@@ -58,7 +58,7 @@
               data-bs-placement="top"
               data-bs-title="Will reset everything so you can login again."
               data-bs-dismiss="modal"
-              id="loginExpiredReset"
+              onclick="resetSettings()"
             >
               Reset
             </button>
@@ -248,6 +248,7 @@
             <a
               role="button"
               id="loginButton"
+              onclick="login()"
               class="btn btn-twitch"
               tabindex="0"
               data-bs-container="body"
@@ -257,8 +258,8 @@
               data-bs-toggle="popover"
               data-bs-title="Not signed in"
               data-bs-content="You need sign in first before adding options or enabling voting/suggestions"
-              ><span class="twitch-icon"></span>Sign in with Twitch</a
-            >
+              ><span class="twitch-icon"></span>Sign in with Twitch
+            </a>
             <div class="btn-group" role="group">
               <button
                 id="btnGroupDropLogin"
@@ -277,7 +278,7 @@
                     <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
                   </div>
                   <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
-                  <button type="button" id="connectbtn" class="btn btn-primary float-end">Connect</button>
+                  <button type="button" id="connectbtn" onclick="connect()" class="btn btn-primary float-end">Connect</button>
                 </div>
               </div>
             </div>
@@ -430,6 +431,7 @@
     <script src="/js/bootstrap.bundle.min.js"></script>
     <script src="/js/functions.min.js"></script>
     <script src="/games/games.min.js"></script>
+    <script src="/games/gameshome.min.js"></script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-H43YN7FSSP"></script>
     <script>

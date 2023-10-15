@@ -1,4 +1,3 @@
-const spinner = `<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`;
 let elements = {
   rejectModal: document.getElementById("rejectModal"),
   reason: document.getElementById("reason"),

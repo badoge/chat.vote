@@ -1,7 +1,13 @@
-let GETrequestOptions = {
+const CLIENT_ID = "qn0wimnszbqlwfnszdz3wwfz430eqr";
+const CLIENT_ID_YT = "975425654977-2ckljuapg94eukqrnm1rgqup5npo95m9.apps.googleusercontent.com";
+const API_KEY_YT = "AIzaSyAMCaIslOwxlmotLsNN4NB2ia949h4GLP0";
+
+const GETrequestOptions = {
   method: "GET",
   redirect: "follow",
 };
+
+const spinner = `<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`;
 
 async function get7TVPFP(userID) {
   if (!userID) {

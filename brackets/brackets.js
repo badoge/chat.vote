@@ -1,11 +1,8 @@
 /*jshint esversion: 11 */
-const CLIENT_ID = "qn0wimnszbqlwfnszdz3wwfz430eqr";
 
 let elements = {
   //modals
   loginExpiredModal: document.getElementById("loginExpiredModal"),
-  loginExpiredRenew: document.getElementById("loginExpiredRenew"),
-  loginExpiredReset: document.getElementById("loginExpiredReset"),
 
   deleteBracketModal: document.getElementById("deleteBracketModal"),
   deleteBracketModalBody: document.getElementById("deleteBracketModalBody"),
@@ -155,7 +152,6 @@ const icons = {
   twitch: `<i class="material-icons notranslate">movie_creation</i>`,
   spotify: `<i class="material-icons notranslate">audiotrack</i>`,
 };
-const spinner = `<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`;
 const spotifyURLRegex = /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:(album|track|playlist)\/|\?uri=spotify:track:)((\w|-){22})/;
 
 let darkTheme = true;
@@ -2134,7 +2130,6 @@ async function getYTChannelVideos(id, length = 1) {
   return parts;
 } //getYTChannelVideos
 
-const API_KEY_YT = "AIzaSyAMCaIslOwxlmotLsNN4NB2ia949h4GLP0";
 async function getYTPlaylistPart(id, nextPageToken = null) {
   let requestOptions = {
     method: "GET",
@@ -2368,16 +2363,8 @@ window.onload = async function () {
     connect();
   });
 
-  elements.loginExpiredRenew.addEventListener("click", function () {
-    login();
-  });
-
   elements.loginButton.addEventListener("click", function () {
     login();
-  });
-
-  elements.loginExpiredReset.addEventListener("click", function () {
-    resetSettings();
   });
 
   elements.createBracket.addEventListener("click", function () {

@@ -1,9 +1,5 @@
 /*jshint esversion: 9 */
 
-const CLIENT_ID = "qn0wimnszbqlwfnszdz3wwfz430eqr";
-const CLIENT_ID_YT = "975425654977-2ckljuapg94eukqrnm1rgqup5npo95m9.apps.googleusercontent.com";
-const API_KEY_YT = "AIzaSyAMCaIslOwxlmotLsNN4NB2ia949h4GLP0";
-
 const icon = `iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAWoklEQVR4nO2dCZBdVZnHf+fe+5Z+vaa709l3skMSYhZZFFFQE0BBMiqCo6WZGcsFlBmgGK0ChSkUN2AUGUFQgakRsUSUIhIoBI
 QJIIMgCQkJMTQhe6+v33qXM3Xuu9153el+73X367d1/1Opfst9937nnP/5zne+c77vCDJAdmf6tkwhagG9BXzNEL0XGVkNDF1SrbkOp3MnWO8DDpdboUVdlu8zfVmBBKhGNKwH32ZkzyXgAIlcf/sbYNPYipd/TB
 CgP24G/1UIA2R0uL/tAD4I/GWMZcwrJghwHKqsrcDMUdxD1ciZwN/yLdxYIRsBtHIpSB4ggddHeRtVnWtKojR5wngbAj7mjeXDhPD+O16fEYuA3cUtSm4QdXbG64zSEXXMoVrw1pE/REsjgOYplHLABAF6cc3Ix3

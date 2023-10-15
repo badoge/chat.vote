@@ -10,8 +10,6 @@ let sorted = false;
 let unsortedData = {};
 let darkTheme = true;
 
-const spinner = `<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`;
-
 let elements = {
   captchaModal: document.getElementById("captchaModal"),
   reportModal: document.getElementById("reportModal"),

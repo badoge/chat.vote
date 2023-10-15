@@ -1,5 +1,4 @@
 /*jshint esversion: 11 */
-const CLIENT_ID = "qn0wimnszbqlwfnszdz3wwfz430eqr";
 
 let elements = {
   //modals
@@ -17,8 +16,6 @@ let elements = {
   yesnoTimeOverWinner: document.getElementById("yesnoTimeOverWinner"),
   restartYesno: document.getElementById("restartYesno"),
   loginExpiredModal: document.getElementById("loginExpiredModal"),
-  loginExpiredRenew: document.getElementById("loginExpiredRenew"),
-  loginExpiredReset: document.getElementById("loginExpiredReset"),
   tieModal: document.getElementById("tieModal"),
   randomYesnoModal: document.getElementById("randomYesnoModal"),
   coin: document.getElementById("coin"),
@@ -163,8 +160,6 @@ let customBadges = [];
 let thirdPartyEmotes = [];
 
 let darkTheme = true;
-
-const spinner = `<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`;
 
 let USER = {
   channel: "",
@@ -503,7 +498,7 @@ function login() {
     <div class="btn-group" role="group">
         <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
       </button>
-        <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="btnGroupDropLogin">
+        <ul class="dropdown-menu dropdown-menu-lg-end" aria-label="Log out">
             <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
         </ul>
     </div>
@@ -524,7 +519,7 @@ function connect() {
   <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></button>
   <div class="btn-group" role="group">
   <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
-  <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="btnGroupDrop1">
+  <ul class="dropdown-menu dropdown-menu-lg-end" aria-label="Log out">
   <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
   </ul>
   </div>
@@ -2057,9 +2052,6 @@ window.onload = function () {
   elements.resetSettings.addEventListener("click", function () {
     resetSettings();
   });
-  elements.loginExpiredRenew.addEventListener("click", function () {
-    login();
-  });
 
   elements.loginButton.addEventListener("click", function () {
     login();
@@ -2084,9 +2076,6 @@ window.onload = function () {
   });
   elements.restartPoll.addEventListener("click", function () {
     restartPoll();
-  });
-  elements.loginExpiredReset.addEventListener("click", function () {
-    resetSettings(true);
   });
 
   elements.removeWinner.addEventListener("click", function () {

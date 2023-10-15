@@ -1,4 +1,3 @@
-const CLIENT_ID = "qn0wimnszbqlwfnszdz3wwfz430eqr";
 const USERNAME = "forsen";
 const pfp = "https://static-cdn.jtvnw.net/jtv_user_pictures/forsen-profile_image-48b43e1e4f54b5c8-600x600.png";
 const userid = 22484632;
@@ -50,8 +49,6 @@ let winners = [];
 let raffleCollapse;
 let tickSound, revealSound;
 let thirdPartyEmotes = [];
-
-const spinner = `<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`;
 
 function restartRaffle() {
   raffle_users = [];

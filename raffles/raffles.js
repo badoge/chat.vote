@@ -1,13 +1,10 @@
 /*jshint esversion: 11 */
-const CLIENT_ID = "qn0wimnszbqlwfnszdz3wwfz430eqr";
 
 let elements = {
   //modals
   resetSettingsModal: document.getElementById("resetSettingsModal"),
   resetSettings: document.getElementById("resetSettings"),
   loginExpiredModal: document.getElementById("loginExpiredModal"),
-  loginExpiredRenew: document.getElementById("loginExpiredRenew"),
-  loginExpiredReset: document.getElementById("loginExpiredReset"),
   restartRaffleModal: document.getElementById("restartRaffleModal"),
   restartRaffle: document.getElementById("restartRaffle"),
   fancyRaffleModal: document.getElementById("fancyRaffleModal"),
@@ -131,8 +128,6 @@ let thirdPartyEmotes = [];
 let firstTimeChatters = [];
 
 let darkTheme = true;
-
-const spinner = `<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`;
 
 let USER = {
   channel: "",
@@ -1689,18 +1684,11 @@ window.onload = function () {
   elements.resetSettings.addEventListener("click", function () {
     resetSettings();
   });
-  elements.loginExpiredRenew.addEventListener("click", function () {
-    login();
-  });
   elements.restartRaffle.addEventListener("click", function () {
     restartRaffle();
   });
   elements.loginButton.addEventListener("click", function () {
     login();
-  });
-
-  elements.loginExpiredReset.addEventListener("click", function () {
-    resetSettings(true);
   });
 
   elements.drawRaffleWinner.addEventListener("click", function () {
