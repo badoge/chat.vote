@@ -205,8 +205,6 @@ let DONKHUNT = {
   html: {
     fieldRows: Array.from(document.querySelectorAll("div#dhfield div.dh-field-row")).map((row) => Array.from(row.querySelectorAll("div.dh-field-cell"))),
     allSettingControls: Array.from(document.querySelectorAll(".dhsettings")),
-    sidePicker: document.querySelector('input[name="dhplayer"]:checked').value,
-    movePicker: document.querySelector('input[name="dhfirst"]:checked').value,
     startBtn: document.querySelector("#startdh"),
     gameResult: document.querySelector("#dhgameResult"),
     status: document.querySelector("#adviceFriend"),
@@ -220,6 +218,10 @@ let DONKHUNT = {
   player: {
     move1: null,
     side: null,
+  },
+  settings: {
+    dhplayer: "target",
+    dhfirst: "player",
   },
   field: [
     ["wall", "", "wall"],
@@ -382,11 +384,24 @@ let DONKHUNT = {
     DONKHUNT.html.allSettingControls.forEach((c) => (c.disabled = true));
     DONKHUNT.functions.resetField();
     DONKHUNT.game.turn = 0;
-    DONKHUNT.player.side = DONKHUNT.html.sidePicker.value;
+    DONKHUNT.player.side = DONKHUNT.settings.dhplayer;
     DONKHUNT.game.active = true;
     console.log("Hunt: game has begun.");
-    DONKHUNT.functions.turn(DONKHUNT.html.movePicker.value === "hunter" ? 1 : 0);
-    DONKHUNT.html.status.scrollIntoView(); // mobile friends :)
+
+    /* 
+      because of (turn % 2 == 0) defines whose turn is it now, we check if turn 0 must be skipped
+      this defines who moves first - target or hunters
+
+      player="target" and first="player" => first turn 0 (player goes)
+      player="hunter" and first="player" => first turn 1 (player goes)
+      player="target" and first="enemy"  => first turn 1 (chat goes)
+      player="hunter" and first="enemy"  => first turn 0 (chat goes)
+
+      if (player="target") is boolX and (first="player") is boolY
+      "first turn 1" condition is achieved whenever boolX != boolY
+    */
+    const needSkip0Turn = (DONKHUNT.settings.dhfirst === "player") !== (DONKHUNT.settings.dhplayer === "target");
+    DONKHUNT.functions.turn(Number(needSkip0Turn));
   },
   reset: function () {
     DONKHUNT.html.gameResult.style.visibility = "hidden";
@@ -428,5 +443,20 @@ let DONKHUNT = {
         })
       )
     );
+
+    // assign listeners for settings
+    const settingsInputGroupListener = function (event) {
+        const target = event.target;
+        const refOption = target.name;
+        const refValue = target.value;
+        DONKHUNT.settings[refOption] = refValue;
+    };
+
+    DONKHUNT.html.allSettingControls.forEach((input) => {
+      // initialize the states:
+      input.checked = DONKHUNT.settings[input.name] === input.value;
+      // and assign the listeners:
+      input.addEventListener("change", settingsInputGroupListener);
+    });
   },
 }; //DONKHUNT
