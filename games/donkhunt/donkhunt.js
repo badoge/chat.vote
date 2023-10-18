@@ -126,8 +126,82 @@ window.onload = function () {
     saveSettings();
   };
 
+  initGraph();
+
   DONKHUNT.listeners();
 }; //onload
+
+function initGraph() {
+  if (DONKHUNT.chart) {
+    DONKHUNT.chart.destroy();
+  }
+
+  DONKHUNT.chart = new Chart(DONKHUNT.ctx, {
+    type: "bar",
+    data: {
+      labels: [],
+      datasets: [
+        {
+          label: "score",
+          data: [],
+          borderWidth: 2,
+        },
+      ],
+    },
+    options: {
+      indexAxis: "y",
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          ticks: {
+            color: "white",
+          },
+          beginAtZero: true,
+        },
+        y: {
+          ticks: {
+            textStrokeColor: "rgba(0,0,0,1)",
+            textStrokeWidth: 3,
+            color: "white",
+            mirror: true,
+            font: {
+              size: 32,
+            },
+            z: 1,
+          },
+          beginAtZero: true,
+        },
+      },
+      plugins: {
+        tooltip: {
+          enabled: false,
+        },
+        legend: {
+          display: false,
+        },
+      },
+    },
+  });
+} //initGraph
+
+function updateGraph() {
+  let results = Object.values(DONKHUNT.results);
+
+  let label = results.map((a) => `${a.label} - ${a.data} votes (${Math.round((a.data / voters.length) * 100) || 0}%)`);
+  let data = results.map((a) => a.data);
+  let c1 = results.map((a) => a.c1);
+  let c2 = results.map((a) => a.c2);
+
+  DONKHUNT.html.totalVotesCount.innerHTML = `Total votes: ${data.reduce((ac, cv) => ac + cv, 0)}`;
+
+  DONKHUNT.chart.data.labels = label;
+  DONKHUNT.chart.data.datasets.forEach((dataset) => {
+    dataset.data = data;
+    dataset.backgroundColor = c1;
+    dataset.borderColor = c2;
+  });
+  DONKHUNT.chart.update();
+} //updateGraph
 
 class HuntUnit {
   constructor(type, rowId, cellId) {
@@ -208,7 +282,13 @@ let DONKHUNT = {
     startBtn: document.querySelector("#startdh"),
     gameResult: document.querySelector("#dhgameResult"),
     status: document.querySelector("#adviceFriend"),
+    chartDiv: document.getElementById("dhchartdiv"),
+    totalVotesCount: document.getElementById("totalvotesdh"),
   },
+  ctx: document.getElementById("dhchartCanvas").getContext("2d"),
+  chart: null,
+  results: {}, // unlike other similar games, this prop uses keys as commands
+  colors: ["#f44336", "#f4c236", "#a8f436", "#4336f4"],
   game: {
     hunters: [new HuntHunter(3, 0, "1"), new HuntHunter(3, 1, "2"), new HuntHunter(3, 2, "3")],
     target: new HuntTarget(2, 0),
@@ -318,6 +398,7 @@ let DONKHUNT = {
       }
       if (DONKHUNT.player.side === DONKHUNT.functions.whoGoes()) {
         // player turn
+        DONKHUNT.html.chartDiv.classList.add("blur");
         switch (DONKHUNT.functions.whoGoes()) {
           case "hunter":
             DONKHUNT.html.status.innerHTML = `Click on a ${DONKHUNT.consts.MEGALUL} to move it forward.`;
@@ -329,9 +410,10 @@ let DONKHUNT = {
       } else {
         // opponent turn
         DONKHUNT.html.status.innerText = "Please wait until chat decides on next move.";
-        setTimeout(DONKHUNT.functions.emulateOpponentAction, 2222);
+        DONKHUNT.html.chartDiv.classList.remove("blur");
       }
       DONKHUNT.functions.drawField(DONKHUNT.game.turn === 0);
+      updateGraph("donkhunt");
     },
     endGame: function (winnerSide, reason) {
       switch (winnerSide) {
@@ -352,6 +434,7 @@ let DONKHUNT = {
       DONKHUNT.html.allSettingControls.forEach((c) => (c.disabled = false));
       DONKHUNT.game.active = false;
       DONKHUNT.functions.drawField();
+      DONKHUNT.html.chartDiv.classList.add("blur");
     },
     emulateOpponentAction: function () {
       // this can be replaced by chat's action or by second player's action
