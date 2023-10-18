@@ -281,6 +281,12 @@ class HuntTarget extends HuntUnit {
 
 let DONKHUNT = {
   consts: {
+    ARROWS_MAP: {
+      up: "↑",
+      down: "↓",
+      right: "→",
+      left: "←",
+    },
     MEGALUL: '<img src="/games/pics/megalul.png" alt="MEGALUL" class="icon">',
     DONK: '<img src="/games/pics/donk.png" alt="Donk" class="icon">',
     FEELSDONKMAN: '<img src="/games/pics/feelsdonkman.png" alt="FeelsDonkMan" class="icon">',
@@ -347,7 +353,6 @@ let DONKHUNT = {
           cell.classList.toggle("dh-p-hunter", DONKHUNT.field[rowIndex][cellIndex] === "hunter");
           cell.classList.toggle("dh-p-target", DONKHUNT.field[rowIndex][cellIndex] === "target");
           cell.classList.remove("dh-event-target");
-          cell.innerHTML = "";
           if (newGame) {
             cell.classList.remove("dh-field-winpath");
             cell.classList.remove("dh-p-invert");
@@ -355,7 +360,6 @@ let DONKHUNT = {
         });
       });
       DONKHUNT.game.hunters.forEach((h) => {
-        DONKHUNT.html.fieldRows[h.row][h.cell].innerHTML = `<b>${h.marker}</b>`;
         if (h.cell > DONKHUNT.game.target.cell) DONKHUNT.html.fieldRows[h.row][h.cell].classList.add("dh-p-invert");
         if (h.cell < DONKHUNT.game.target.cell) DONKHUNT.html.fieldRows[h.row][h.cell].classList.remove("dh-p-invert");
       });
@@ -425,7 +429,7 @@ let DONKHUNT = {
         DONKHUNT.html.chartDiv.classList.remove("blur");
         DONKHUNT.results = DONKHUNT.functions.buildChatOptions();
       }
-      DONKHUNT.functions.drawField(DONKHUNT.game.turn === 0);
+      DONKHUNT.functions.drawField(DONKHUNT.game.turn < 2);
       updateGraph("donkhunt");
     },
     endGame: function (winnerSide, reason) {
@@ -530,6 +534,9 @@ let DONKHUNT = {
             const color = DONKHUNT.colors[variants.indexOf(direction)];
             const cell = list[direction];
             list[direction] = { label: direction, data: 0, c1: color, c2: color, _chosenCell: cell };
+
+            // add visual hint:
+            DONKHUNT.html.fieldRows[cell[0]][cell[1]].innerHTML = `<b>${DONKHUNT.consts.ARROWS_MAP[direction]}</b>`;
           }
           break;
         }
@@ -541,6 +548,9 @@ let DONKHUNT = {
               const color = DONKHUNT.colors[hIndex];
               list[h.marker] = { label: h.marker, data: 0, c1: color, c2: color, _chosenUnit: hIndex };
               movableCount += 1;
+
+              // add visual hint:
+              DONKHUNT.html.fieldRows[h.row][h.cell].innerHTML = `<b>${h.marker}</b>`;
             }
           });
 
@@ -605,6 +615,11 @@ let DONKHUNT = {
 
     DONKHUNT.results = {};
     updateGraph("donkhunt");
+    for (const row of DONKHUNT.html.fieldRows) {
+      for (const cell of row) {
+        cell.innerHTML = "";
+      }
+    }
 
     switch (DONKHUNT.functions.whoGoes()) {
       case "hunter": {
