@@ -42,9 +42,25 @@ body {
   opacity: 1;
 }
 
+#dhchartdiv {
+  position: relative;
+  height: 40vh;
+  width: 100%;
+}
+
+.blur {
+  -webkit-filter: blur(10px) grayscale(100%);
+  -moz-filter: blur(10px) grayscale(100%);
+  -o-filter: blur(10px) grayscale(100%);
+  -ms-filter: blur(10px) grayscale(100%);
+  filter: blur(10px) grayscale(100%);
+}
+
 /* -----------------------------donkhunt---------------------------- */
 
 #dhplayground {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-flow: column nowrap;
   align-items: center;
@@ -52,8 +68,13 @@ body {
 }
 
 #dhfield {
+  margin: auto;
   display: flex;
   flex-flow: column nowrap;
+}
+
+#adviceFriend img {
+  max-width: 1.5em;
 }
 
 div.dh-field-row {
