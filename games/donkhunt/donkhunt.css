@@ -122,6 +122,10 @@ div#dhgameResult {
   margin-top: 16px;
 }
 
+div#dhgameResult img {
+  max-width: 1.5em;
+}
+
 /* css experiment - donk is scared */
 
 @keyframes look-around {
