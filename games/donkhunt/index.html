@@ -375,10 +375,10 @@
           </div>
           <div class="col">
             <div class="card h-100 bg-body-tertiary border-light">
-              <img src="/games/pics/dh.png" style="cursor: not-allowed" class="card-img-top" alt="Donk Hunt" />
+              <img src="/games/pics/dh.png" onclick="switchGame('dh')" class="card-img-top" alt="Donk Hunt" />
               <div class="card-body">
                 <h5 class="card-title">Donk Hunt</h5>
-                <p class="card-text">[WIP] Scary looking creatures are trying to trap their prey. Are you the hunter or the hunted one?</p>
+                <p class="card-text">Scary looking creatures are trying to trap their prey. Are you the hunter or the hunted one?</p>
               </div>
             </div>
           </div>
@@ -492,11 +492,11 @@
                   <div class="dh-field-cell dh-field-usable"></div>
                   <div class="dh-field-cell dh-field-wincondition"></div>
                   <div class="dh-field-cell dh-field-usable"></div>
+                </div>
               </div>
-            </div>
 
               <div class="dhgameResult" style="visibility: hidden">
-              <h4>Win condition will be explained here.</h4>
+                <h4>Win condition will be explained here.</h4>
               </div>
             </div>
           </div>
@@ -504,22 +504,22 @@
             <div class="row">
               <div class="col-6">
                 <h4>Streamer plays as:</h4>
-            <div class="form-check">
-              <input checked class="form-check-input dhsettings" type="radio" value="target" name="dhplayer" id="dhplayer1" />
-              <label class="form-check-label" for="dhplayer1"> <img width="24" height="24" src="/games/pics/donk.png" alt="Donk" class="icon" /> Target </label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input dhsettings" type="radio" value="hunter" name="dhplayer" id="dhplayer2" />
-              <label class="form-check-label" for="dhplayer2"> <img width="24" height="24" src="/games/pics/megalul.png" alt="MEGALUL" class="icon" /> Hunter </label>
-            </div>
+                <div class="form-check">
+                  <input checked class="form-check-input dhsettings" type="radio" value="target" name="dhplayer" id="dhplayer1" />
+                  <label class="form-check-label" for="dhplayer1"> <img width="24" height="24" src="/games/pics/donk.png" alt="Donk" class="icon" /> Target </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input dhsettings" type="radio" value="hunter" name="dhplayer" id="dhplayer2" />
+                  <label class="form-check-label" for="dhplayer2"> <img width="24" height="24" src="/games/pics/megalul.png" alt="MEGALUL" class="icon" /> Hunter </label>
+                </div>
               </div>
               <div class="col-6">
                 <h4>First move:</h4>
-            <div class="form-check">
+                <div class="form-check">
                   <input checked class="form-check-input dhsettings" type="radio" value="player" name="dhfirst" id="dhfirst1" />
                   <label class="form-check-label" for="dhfirst1">Streamer</label>
-            </div>
-            <div class="form-check">
+                </div>
+                <div class="form-check">
                   <input class="form-check-input dhsettings" type="radio" value="enemy" name="dhfirst" id="dhfirst2" />
                   <label class="form-check-label" for="dhfirst2">Chat</label>
                 </div>
