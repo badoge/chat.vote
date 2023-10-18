@@ -1,4 +1,5 @@
 /*jshint esversion: 11 */
+let voters = [];
 
 let elements = {
   //modals
@@ -68,6 +69,14 @@ function connect() {
   client.on("message", async (target, context, msg, self) => {
     let input = msg.split(" ").filter(Boolean);
     let command = input[0].toLowerCase();
+
+    if (!voters.includes(context.username)) {
+      if (command in DONKHUNT.results) {
+        voters.push(context.username);
+        DONKHUNT.results[command].data += 1;
+        updateGraph("donkhunt");
+      }
+    }
   }); //message
 
   client.on("timeout", (channel, username, reason, duration, userstate) => {}); //timeout
@@ -216,6 +225,9 @@ class HuntUnit {
     this.cell = cellId;
     this.row = rowId;
     DONKHUNT.field[this.row][this.cell] = this.type;
+  }
+  getLocation() {
+    return [this.row, this.cell];
   }
 }
 
@@ -411,6 +423,7 @@ let DONKHUNT = {
         // opponent turn
         DONKHUNT.html.status.innerText = "Please wait until chat decides on next move.";
         DONKHUNT.html.chartDiv.classList.remove("blur");
+        DONKHUNT.results = DONKHUNT.functions.buildChatOptions();
       }
       DONKHUNT.functions.drawField(DONKHUNT.game.turn === 0);
       updateGraph("donkhunt");
@@ -461,6 +474,88 @@ let DONKHUNT = {
       // after the move call the start of next turn:
       DONKHUNT.functions.turn(1);
     },
+    buildChatOptions: function () {
+      const list = {};
+
+      switch (DONKHUNT.player.side) {
+        case "hunter": {
+          // chat is playing as TARGET; actions: left, up, right, down
+          const variants = ["left", "up", "right", "down"];
+          const moves = DONKHUNT.game.target.getValidMoveList();
+          const location = DONKHUNT.game.target.getLocation();
+
+          const relativeMoves = moves.map((move) => move.map((n, i) => n - location[i]));
+
+          switch (
+            location[0] // target's row
+          ) {
+            case 0: {
+              // row 0 (base): can move to any free cell in row 1
+              for (let i = 0; i < relativeMoves.length; i++) {
+                const m = relativeMoves[i];
+                if (m[0] > 0) {
+                  switch (m[1]) {
+                    case 0: {
+                      list["down"] = moves[i];
+                      break;
+                    }
+                    case -1: {
+                      list["left"] = moves[i];
+                      break;
+                    }
+                    case 1: {
+                      list["right"] = moves[i];
+                      break;
+                    }
+                  }
+                }
+              }
+              break;
+            }
+            default: {
+              // any other row
+              for (let i = 0; i < relativeMoves.length; i++) {
+                const m = relativeMoves[i];
+                if (m[0] !== 0) {
+                  list[m[0] > 0 ? "down" : "up"] = moves[i];
+                } else {
+                  list[m[1] > 0 ? "right" : "left"] = moves[i];
+                }
+              }
+              break;
+            }
+          }
+
+          for (const direction in list) {
+            const color = DONKHUNT.colors[variants.indexOf(direction)];
+            const cell = list[direction];
+            list[direction] = { label: direction, data: 0, c1: color, c2: color, _chosenCell: cell };
+          }
+          break;
+        }
+        case "target": {
+          // chat is playing as HUNTER: vote 1/2/3 to move corresponding unit
+          let movableCount = 0;
+          DONKHUNT.game.hunters.forEach((h, hIndex) => {
+            if (h.isAbleToMove()) {
+              const color = DONKHUNT.colors[hIndex];
+              list[h.marker] = { label: h.marker, data: 0, c1: color, c2: color, _chosenUnit: hIndex };
+              movableCount += 1;
+            }
+          });
+
+          if (movableCount < 1) {
+            setTimeout(() => {
+              //wrap into arrow func to render new DOM
+              showToast("Hunters have no valid moves! Skipping turn.", "warning", 3000);
+              DONKHUNT.functions.turn(1);
+            }, 50);
+          }
+        }
+      }
+
+      return list;
+    },
   },
   start: function () {
     DONKHUNT.html.gameResult.style.visibility = "hidden";
@@ -492,6 +587,46 @@ let DONKHUNT = {
     DONKHUNT.game.active = false;
     DONKHUNT.functions.resetField();
     DONKHUNT.functions.drawField();
+  },
+  playTurn: function () {
+    if (voters.length < 1) return;
+    voters.length = 0;
+
+    DONKHUNT.html.chartDiv.classList.add("blur");
+    DONKHUNT.html.totalVotesCount.innerHTML = `Total votes: 0`;
+
+    let votedOption = { data: -1 };
+    for (const voteOption in DONKHUNT.results) {
+      const data = DONKHUNT.results[voteOption];
+      if (votedOption.data < data.data) {
+        votedOption = data;
+      }
+    }
+
+    DONKHUNT.results = {};
+    updateGraph("donkhunt");
+
+    switch (DONKHUNT.functions.whoGoes()) {
+      case "hunter": {
+        const hunters = DONKHUNT.game.hunters;
+        let i = votedOption._chosenUnit;
+        if (hunters[i].row > 1) {
+          hunters[i].moveTo(hunters[i].row - 1, hunters[i].cell);
+        } else {
+          // row 1 always goes up to [0,1]
+          hunters[i].moveTo(0, 1);
+        }
+        break;
+      }
+      case "target": {
+        const to = votedOption._chosenCell;
+        DONKHUNT.game.target.moveTo(to[0], to[1]);
+        break;
+      }
+    }
+
+    // after the move call the start of next turn:
+    DONKHUNT.functions.turn(1);
   },
   listeners: function () {
     // assign controls to playfield cells
@@ -529,10 +664,10 @@ let DONKHUNT = {
 
     // assign listeners for settings
     const settingsInputGroupListener = function (event) {
-        const target = event.target;
-        const refOption = target.name;
-        const refValue = target.value;
-        DONKHUNT.settings[refOption] = refValue;
+      const target = event.target;
+      const refOption = target.name;
+      const refValue = target.value;
+      DONKHUNT.settings[refOption] = refValue;
     };
 
     DONKHUNT.html.allSettingControls.forEach((input) => {
