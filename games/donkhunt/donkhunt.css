@@ -1,5 +1,5 @@
 body {
-  margin-bottom: 300px;
+  margin-bottom: 1em;
 }
 
 #gameName {
@@ -71,6 +71,7 @@ body {
   margin: auto;
   display: flex;
   flex-flow: column nowrap;
+  gap: 2px;
 }
 
 #adviceFriend img {
@@ -81,6 +82,7 @@ div.dh-field-row {
   flex: 1 0 auto;
   display: flex;
   flex-flow: row nowrap;
+  gap: 2px;
 }
 
 div.dh-field-cell {
@@ -108,6 +110,9 @@ div.dh-p-wall {
 
 div.dh-field-base {
   background-color: rgba(117, 105, 89, 0.3);
+  background-image: none;
+}
+div.dh-field-base:empty {
   background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzc0IDM3NCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMzc0IDM3NDtvcGFjaXR5OjAuNTU7IiB4bWw6c3BhY2U9InByZXNlcnZlIiBzdHJva2U9IiNmZjAiIGZpbGw9IiM4NzAiPg0KPHBhdGggZD0iTTM1Miw2NC4xOThoLTMwYy0xMi4xMzEsMC0yMiw5Ljg2OS0yMiwyMnYyMS4wNEwyMDYuNzk3LDE4LjcxYy0xMS4xMDEtMTAuNTQ1LTI4LjQ5My0xMC41NDQtMzkuNTk0LDANCglMNzQsMTA3LjIzOHYtMjEuMDRjMC0xMi4xMzEtOS44NjktMjItMjItMjJIMjJjLTEyLjEzMSwwLTIyLDkuODY5LTIyLDIydjI3N2g1NS41SDc0aDIyNmgxOC41SDM3NHYtMjc3DQoJQzM3NCw3NC4wNjcsMzY0LjEzMSw2NC4xOTgsMzUyLDY0LjE5OHogTTU0LDM0My4xOThIMjB2LTI1N2MwLTEuMTAzLDAuODk3LTIsMi0yaDMwYzEuMTAzLDAsMiwwLjg5NywyLDJWMzQzLjE5OHogTTE4MC45NzcsMzMuMjExDQoJYzMuMzc4LTMuMjA4LDguNjY5LTMuMjA4LDEyLjA0NywwbDk4Ljk1MSw5My45ODdoLTIzLjU5OWMtOC4yMDIsMC0xNC44NzUsNi42NzMtMTQuODc1LDE0Ljg3NXYxMi4xMjVoLTM0di0xMi4xMjUNCgljMC04LjIwMi02LjY3My0xNC44NzUtMTQuODc1LTE0Ljg3NWgtMzUuMjVjLTguMjAyLDAtMTQuODc1LDYuNjczLTE0Ljg3NSwxNC44NzV2MTIuMTI1aC0zNHYtMTIuMTI1DQoJYzAtOC4yMDItNi42NzMtMTQuODc1LTE0Ljg3NS0xNC44NzVIODIuMDI2TDE4MC45NzcsMzMuMjExeiBNMjI3LDM0My4xOThoLTgwdi01OC4xMjVjMC0xNy4zLDE0LjA3NS0zMS4zNzUsMzEuMzc1LTMxLjM3NWgxNy4yNQ0KCWMxNy4zLDAsMzEuMzc1LDE0LjA3NSwzMS4zNzUsMzEuMzc1VjM0My4xOTh6IE0yOTguNSwzNDMuMTk4SDI0N3YtNTguMTI1YzAtMjguMzI4LTIzLjA0Ny01MS4zNzUtNTEuMzc1LTUxLjM3NWgtMTcuMjUNCgljLTI4LjMyOCwwLTUxLjM3NSwyMy4wNDctNTEuMzc1LDUxLjM3NXY1OC4xMjVINzUuNXYtMTk2aDI1djEyLjEyNWMwLDguMjAyLDYuNjczLDE0Ljg3NSwxNC44NzUsMTQuODc1aDQ0LjI1DQoJYzguMjAyLDAsMTQuODc1LTYuNjczLDE0Ljg3NS0xNC44NzV2LTEyLjEyNWgyNXYxMi4xMjVjMCw4LjIwMiw2LjY3MywxNC44NzUsMTQuODc1LDE0Ljg3NWg0NC4yNQ0KCWM4LjIwMiwwLDE0Ljg3NS02LjY3MywxNC44NzUtMTQuODc1di0xMi4xMjVoMjVWMzQzLjE5OHogTTM1NCwzNDMuMTk4aC0zNHYtMjU3YzAtMS4xMDMsMC44OTctMiwyLTJoMzBjMS4xMDMsMCwyLDAuODk3LDIsMg0KCVYzNDMuMTk4eiIvPg0KPC9zdmc+");
 }
 
@@ -118,19 +123,15 @@ div.dh-field-wincondition {
 }
 
 div.dh-p-target {
-  background-image: url(/games/pics/donk.png);
+  background-image: url(/games/pics/donk.png) !important;
   opacity: 1 !important;
 }
 
 div.dh-p-hunter {
-  background-image: url(/games/pics/megalul.png);
+  background-image: url(/games/pics/megalul.png) !important;
   opacity: 1 !important;
 }
 
-div.dh-p-hunter {
-  background-image: url(/games/pics/megalul.png);
-  opacity: 1 !important;
-}
 div.dh-p-hunter b {
   position: absolute;
   bottom: 0.25rem;
