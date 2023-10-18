@@ -298,7 +298,11 @@ let DONKHUNT = {
     fieldRows: Array.from(document.querySelectorAll("div#dhfield div.dh-field-row")).map((row) => Array.from(row.querySelectorAll("div.dh-field-cell"))),
     allSettingControls: Array.from(document.querySelectorAll(".dhsettings")),
     startBtn: document.querySelector("#startdh"),
-    gameResult: document.querySelector("#dhgameResult"),
+    gameResult: {
+      h2: document.querySelector(".dhgameResult h2"),
+      h4: document.querySelector(".dhgameResult h4"),
+      _all: Array.from(document.querySelectorAll(".dhgameResult")),
+    },
     status: document.querySelector("#adviceFriend"),
     chartDiv: document.getElementById("dhchartdiv"),
     totalVotesCount: document.getElementById("totalvotesdh"),
@@ -435,19 +439,19 @@ let DONKHUNT = {
     endGame: function (winnerSide, reason) {
       switch (winnerSide) {
         case "hunter":
-          DONKHUNT.html.gameResult.querySelector("h2").innerHTML = `${DONKHUNT.consts.FORSENO}${DONKHUNT.consts.KNIFE} Hunters win!`;
-          DONKHUNT.html.gameResult.querySelector("h4").innerText = reason;
+          DONKHUNT.html.gameResult.h2.innerHTML = `${DONKHUNT.consts.FORSENO}${DONKHUNT.consts.KNIFE} Hunters win!`;
+          DONKHUNT.html.gameResult.h4.innerText = reason;
           break;
         case "target":
-          DONKHUNT.html.gameResult.querySelector("h2").innerHTML = `${DONKHUNT.consts.FEELSDONKMAN}${DONKHUNT.consts.CLAP} Target wins!`;
-          DONKHUNT.html.gameResult.querySelector("h4").innerText = reason;
+          DONKHUNT.html.gameResult.h2.innerHTML = `${DONKHUNT.consts.FEELSDONKMAN}${DONKHUNT.consts.CLAP} Target wins!`;
+          DONKHUNT.html.gameResult.h4.innerText = reason;
           break;
         default:
-          DONKHUNT.html.gameResult.querySelector("h2").innerHTML = `${DONKHUNT.consts.DONK} Wait, what?`;
-          DONKHUNT.html.gameResult.querySelector("h4").innerText = reason || "Something went wrong, this should never happen.";
+          DONKHUNT.html.gameResult.h2.innerHTML = `${DONKHUNT.consts.DONK} Wait, what?`;
+          DONKHUNT.html.gameResult.h4.innerText = reason || "Something went wrong, this should never happen.";
           break;
       }
-      DONKHUNT.html.gameResult.style.visibility = "visible";
+      DONKHUNT.html.gameResult._all.forEach((e) => (e.style.visibility = "visible"));
       DONKHUNT.html.allSettingControls.forEach((c) => (c.disabled = false));
       DONKHUNT.game.active = false;
       DONKHUNT.functions.drawField();
@@ -568,7 +572,7 @@ let DONKHUNT = {
     },
   },
   start: function () {
-    DONKHUNT.html.gameResult.style.visibility = "hidden";
+    DONKHUNT.html.gameResult._all.forEach((e) => (e.style.visibility = "hidden"));
     DONKHUNT.html.allSettingControls.forEach((c) => (c.disabled = true));
     DONKHUNT.functions.resetField();
     DONKHUNT.game.turn = 0;
@@ -592,7 +596,7 @@ let DONKHUNT = {
     DONKHUNT.functions.turn(Number(needSkip0Turn));
   },
   reset: function () {
-    DONKHUNT.html.gameResult.style.visibility = "hidden";
+    DONKHUNT.html.gameResult._all.forEach((e) => (e.style.visibility = "hidden"));
     DONKHUNT.html.allSettingControls.forEach((c) => (c.disabled = false));
     DONKHUNT.game.active = false;
     DONKHUNT.functions.resetField();
