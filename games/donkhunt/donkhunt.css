@@ -68,6 +68,7 @@ div.dh-field-cell {
   border-radius: 0.3em;
   width: 5em;
   height: 5em;
+  position: relative;
   background-repeat: no-repeat;
   background-position: center;
   background-size: 60%;
@@ -101,8 +102,23 @@ div.dh-p-hunter {
   opacity: 1 !important;
 }
 
+div.dh-p-hunter {
+  background-image: url(/games/pics/megalul.png);
+  opacity: 1 !important;
+}
+div.dh-p-hunter b {
+  position: absolute;
+  bottom: 0.25rem;
+  left: 0.25rem;
+}
+
 div.dh-p-invert {
   transform: scaleX(-1);
+}
+div.dh-p-invert b {
+  transform: scaleX(-1);
+  left: unset;
+  right: 0.25rem;
 }
 
 div.dh-field-usable:hover {

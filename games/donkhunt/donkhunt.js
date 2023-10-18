@@ -146,8 +146,9 @@ class HuntUnit {
 }
 
 class HuntHunter extends HuntUnit {
-  constructor(rowId, cellId) {
+  constructor(rowId, cellId, marker = "") {
     super("hunter", rowId, cellId);
+    this.marker = marker;
   }
   isAbleToMove() {
     switch (this.row) {
@@ -211,7 +212,7 @@ let DONKHUNT = {
     status: document.querySelector("#adviceFriend"),
   },
   game: {
-    hunters: [new HuntHunter(3, 0), new HuntHunter(3, 1), new HuntHunter(3, 2)],
+    hunters: [new HuntHunter(3, 0, "1"), new HuntHunter(3, 1, "2"), new HuntHunter(3, 2, "3")],
     target: new HuntTarget(2, 0),
     turn: 0,
     active: false,
@@ -252,6 +253,7 @@ let DONKHUNT = {
           cell.classList.toggle("dh-p-hunter", DONKHUNT.field[rowIndex][cellIndex] === "hunter");
           cell.classList.toggle("dh-p-target", DONKHUNT.field[rowIndex][cellIndex] === "target");
           cell.classList.remove("dh-event-target");
+          cell.innerHTML = "";
           if (newGame) {
             cell.classList.remove("dh-field-winpath");
             cell.classList.remove("dh-p-invert");
@@ -259,6 +261,7 @@ let DONKHUNT = {
         });
       });
       DONKHUNT.game.hunters.forEach((h) => {
+        DONKHUNT.html.fieldRows[h.row][h.cell].innerHTML = `<b>${h.marker}</b>`;
         if (h.cell > DONKHUNT.game.target.cell) DONKHUNT.html.fieldRows[h.row][h.cell].classList.add("dh-p-invert");
         if (h.cell < DONKHUNT.game.target.cell) DONKHUNT.html.fieldRows[h.row][h.cell].classList.remove("dh-p-invert");
       });
