@@ -73,6 +73,10 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: background-color 0.25s ease-in, font-size 0.1s ease-in;
+}
+.nwsquare:empty {
+  font-size: 0px;
 }
 
 #nwoutput {
@@ -106,6 +110,7 @@ body {
   font-weight: bold;
   text-shadow: 0px 0px 2px black;
   cursor: pointer;
+  transition: background-color 0.25s ease-in;
 }
 .nw-keyboard-key-wide {
   min-width: 2.5em;
