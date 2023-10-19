@@ -298,9 +298,14 @@ function generateChoices() {
 } //generateChoices
 
 function endGame(win = false) {
-  SHAPES.lives.innerHTML = `Lives: 💀`;
+  if (!win) {
+    SHAPES.lives.innerHTML = `Lives: 💀`;
+  }
 
   SHAPES.shapesGame.gameStarted = false;
+  document.querySelectorAll(".hide-after-game").forEach((e) => {
+    e.style.display = "none";
+  });
   document.querySelector("#endMessage").innerText = win ? "Congrats! You've filled the row!" : "YOU LOST! Wow, you are so bad at this game!";
   document.querySelector("#rule").innerText = SHAPES.shapesGame.rule.desc;
   SHAPES.dVariants.style.visibility = "hidden";
@@ -355,6 +360,9 @@ function start() {
   SHAPES.dShapesLength.disabled = true;
   SHAPES.startBtn.disabled = true;
   SHAPES.dDifficulty.disabled = true;
+  document.querySelectorAll(".hide-after-game").forEach((e) => {
+    e.style.display = "";
+  });
   SHAPES.shapesGame.difficulty = parseInt(SHAPES.dDifficulty.value, 10) || 0;
   SHAPES.shapesGame.lives = parseInt(SHAPES.dStartingLives.value, 10) || 1;
   const rulePool = rules[Object.keys(rules)[SHAPES.shapesGame.difficulty]];

@@ -467,8 +467,8 @@
           <div class="row">
             <div class="col-6" id="shapescol1">
               <div id="lives">Lives: ❤❤❤</div>
-              <h3>Choose which figure will go next:</h3>
-              <div id="variants" class="figure-container">
+              <h3 class="hide-after-game">Choose which figure will go next:</h3>
+              <div id="variants" class="figure-container hide-after-game">
                 <div class="figure unknown shapesoptions" data-choice="0">1</div>
                 <div class="figure unknown shapesoptions" data-choice="1">2</div>
                 <div class="figure unknown shapesoptions" data-choice="2">3</div>
@@ -480,7 +480,7 @@
               </div>
             </div>
             <div class="col-6">
-              <div class="card">
+              <div class="card mb-2">
                 <div class="card-body">
                   <div class="input-group mb-2">
                     <label class="input-group-text" for="difficulty">Difficulty</label>
@@ -507,11 +507,18 @@
                   <button id="startshapesbtn" onclick="start()" type="button" class="btn btn-success">Start new game</button>
                 </div>
               </div>
-              <div id="shapeschartdiv" class="chart-container">
-                <canvas id="shapeschartCanvas"></canvas>
+              <div class="card hide-after-game" style="display: none">
+                <div class="card-body">
+                  <div id="shapeschartdiv" class="chart-container">
+                    <canvas id="shapeschartCanvas"></canvas>
+                  </div>
+                  <div class="d-flex flex-row">
+                    <button type="button" onclick="playTurn()" class="btn btn-success">Play chat's pick</button>
+                    <div class="flex-grow-1"></div>
+                    <span id="totalvotesshapes">Total votes: 0</span>
+                  </div>
+                </div>
               </div>
-              <span id="totalvotesshapes">Total votes: 0</span><br />
-              <button type="button" onclick="playTurn()" class="btn btn-success">Play chat's pick</button>
             </div>
           </div>
         </div>
