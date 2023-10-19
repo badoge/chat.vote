@@ -470,7 +470,7 @@
               <div class="card-header">Settings</div>
               <div class="card-body">
                 <label for="wordlength" class="form-label">Word length: <span id="wordlengthlabel">5</span></label>
-                <input type="range" class="form-range" min="3" max="12" value="5" oninput="updateLabel(this)" id="wordlength" />
+                <input type="range" class="form-range" min="3" max="12" value="5" oninput="updateLabel(this)" onchange="loadwords()" id="wordlength" />
 
                 <label for="guesslimit" class="form-label">Guess limit: <span id="guesslimitlabel">6</span></label>
                 <input type="range" class="form-range" min="1" max="12" value="6" oninput="updateLabel(this)" id="guesslimit" />

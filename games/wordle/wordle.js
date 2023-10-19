@@ -66,7 +66,7 @@ function connect() {
   };
   client = new tmi.client(options);
 
-  client.on("message", async (target, context, msg, self) => {
+  client.on("message", (target, context, msg, self) => {
     let input = msg.split(" ").filter(Boolean);
     if (!WORDLE.nwstarted) {
       if (!voters.includes(context.username)) {
@@ -74,9 +74,6 @@ function connect() {
           return;
         }
         let word = input[0].toLowerCase();
-        if (WORDLE.words.length == 0) {
-          await loadwords();
-        }
         if (WORDLE.verifywords) {
           if (WORDLE.words.includes(word)) {
             addWord(word, context.username);
@@ -147,6 +144,7 @@ window.onload = function () {
   };
 
   listeners();
+  loadwords();
   shownw();
 }; //onload
 
