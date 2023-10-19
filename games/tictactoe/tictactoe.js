@@ -275,11 +275,17 @@ let TTT = {
     [0, 4, 8],
     [2, 4, 6],
   ],
+  pieceClasses: {
+    X: "text-success",
+    O: "text-warning",
+  },
 }; //TTT
 
 function updateGameBoard(index, value, el) {
   TTT.gameBoard[index] = value;
   el.html(value);
+  el.addClass([TTT.pieceClasses[value], "text-shadow"]);
+
   let donk = document.getElementsByClassName("choices");
   for (let i = 0, j = donk.length; i < j; i++) {
     donk[i].innerHTML = 0;
@@ -291,6 +297,7 @@ function updateGameBoard(index, value, el) {
 
 function reset() {
   init();
+  TTT.squares.removeClass(["text-shadow"].concat(Object.values(TTT.pieceClasses)));
   document.getElementById("totalvotesttt").innerHTML = `Total votes: 0`;
   document.getElementById("tttoutput").innerHTML = "";
   document.getElementById("tttchartCanvas").classList = "blur";
