@@ -43,6 +43,7 @@ body {
 }
 
 .nwwrapper {
+  margin: 0 auto;
   width: fit-content;
   overflow: hidden;
   padding: 30px;
@@ -69,7 +70,16 @@ body {
   border-color: #000000;
   border-style: solid;
   overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
+
+#nwoutput {
+  width: 100%;
+  display: flex;
+}
+
 /* keyboard */
 
 #nwkeyboard {
