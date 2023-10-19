@@ -386,7 +386,9 @@ function playTurn() {
   updateGraph("ttt");
   let $theSelectedSquare = $(".square-0" + `${parseInt(theSquareToPlay, 10) - 1}`);
   updateGameBoard(`${parseInt(theSquareToPlay, 10) - 1}`, "O", $theSelectedSquare);
-  checkWin("O");
+  if (checkWin("O")) {
+    document.getElementById("tttoverlay").innerHTML = "";
+  }
   TTT.isComputerPlaying = false;
   document.getElementById("gameboard").classList = "cursorpointer";
   document.getElementById("totalvotesttt").innerHTML = `Total votes: 0`;
