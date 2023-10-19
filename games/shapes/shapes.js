@@ -229,6 +229,7 @@ function updateGraph() {
 } //updateGraph
 
 let SHAPES = {
+  field: document.getElementById("field"),
   figureList: Array.from(document.querySelectorAll("#field div.figure")),
   optionList: Array.from(document.querySelectorAll("#variants div.figure")),
   startBtn: document.querySelector("#startshapesbtn"),
@@ -237,6 +238,8 @@ let SHAPES = {
   dDifficulty: document.querySelector("select#difficulty"),
   dStartingLives: document.querySelector("#startinglives"),
   lblStartingLives: document.querySelector("#startingliveslabel"),
+  dShapesLength: document.getElementById("shapeslength"),
+  lblShapesLength: document.getElementById("shapeslengthlabel"),
   lives: document.querySelector("#lives"),
   ctx: document.getElementById("shapeschartCanvas").getContext("2d"),
   chart: null,
@@ -305,6 +308,7 @@ function endGame(win = false) {
   SHAPES.startBtn.disabled = false;
   SHAPES.dDifficulty.disabled = false;
   SHAPES.dStartingLives.disabled = false;
+  SHAPES.dShapesLength.disabled = false;
 } //endGame
 
 function makeChoice(event) {
@@ -348,6 +352,7 @@ function makeChoice(event) {
 function start() {
   SHAPES.dResult.style.visibility = "hidden";
   SHAPES.dStartingLives.disabled = true;
+  SHAPES.dShapesLength.disabled = true;
   SHAPES.startBtn.disabled = true;
   SHAPES.dDifficulty.disabled = true;
   SHAPES.shapesGame.difficulty = parseInt(SHAPES.dDifficulty.value, 10) || 0;
@@ -416,11 +421,28 @@ function listeners() {
   SHAPES.dStartingLives.onchange = updateStartingLivesListener;
   SHAPES.dStartingLives.dispatchEvent(new Event("change")); // instantly calls listener
 
-  SHAPES.optionList.forEach((o) => o.addEventListener("click", makeChoice));
+  const updateLengthListener = function () {
+    const count = parseInt(this.value, 10) || 5;
+    SHAPES.lblShapesLength.innerText = count;
 
-  document.getElementById("shapeslength").oninput = function () {
-    document.getElementById("shapeslengthlabel").innerHTML = this.value;
+    while (field.firstChild) {
+      field.removeChild(field.lastChild);
+    }
+
+    const figslist = [];
+    for (let i = 0; i < count; i++) {
+      const div = document.createElement("div");
+      div.classList = "figure unknown";
+      SHAPES.field.appendChild(div);
+      figslist.push(div);
+    }
+    SHAPES.figureList = figslist;
   };
+  SHAPES.dShapesLength.oninput = updateLengthListener;
+  SHAPES.dShapesLength.onchange = updateLengthListener;
+  SHAPES.dShapesLength.dispatchEvent(new Event("change")); // instantly calls listener
+
+  SHAPES.optionList.forEach((o) => o.addEventListener("click", makeChoice));
 } //listeners
 
 class Figure {
