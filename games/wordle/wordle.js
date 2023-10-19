@@ -164,6 +164,11 @@ let WORDLE = {
   verifywords: true,
   words: [],
   keys: {},
+  colors: {
+    good: "var(--bs-green)",
+    bad: "var(--bs-orange)",
+    dead: "var(--bs-dark-border-subtle)",
+  },
 }; //WORDLE
 
 function addWord(word, username) {
@@ -260,11 +265,11 @@ function pressKey(key) {
       return;
     }
     for (let index = 0; index < WORDLE.wordlength; index++) {
-      document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`).style.backgroundColor = "black";
+      document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`).style.backgroundColor = WORDLE.colors.dead;
     }
     for (let index = 0; index < WORDLE.wordlength; index++) {
       if (guess[index] == WORDLE.nwword[index]) {
-        document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`).style.backgroundColor = "green";
+        document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`).style.backgroundColor = WORDLE.colors.good;
         let letterindex = tempnwword.indexOf(guess[index]);
         if (letterindex > -1) {
           tempnwword.splice(letterindex, 1);
@@ -282,8 +287,8 @@ function pressKey(key) {
       }
     }
     for (let index = 0; index < WORDLE.wordlength; index++) {
-      if (tempnwword.includes(guess[index]) && document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`).style.backgroundColor != "green") {
-        document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`).style.backgroundColor = "orange";
+      if (tempnwword.includes(guess[index]) && document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`).style.backgroundColor != WORDLE.colors.good) {
+        document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`).style.backgroundColor = WORDLE.colors.bad;
         let letterindex = tempnwword.indexOf(guess[index]);
         if (letterindex > -1) {
           tempnwword.splice(letterindex, 1);
