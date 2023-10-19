@@ -251,7 +251,6 @@ let TTT = {
   chart: null,
   isComputerPlaying: false,
   isGameOver: false,
-  numberOfPlayedSquares: 0,
   gameBoard: [null, null, null, null, null, null, null, null, null],
   squares: $(".square"),
   ctx: document.getElementById("tttchartCanvas").getContext("2d"),
@@ -316,26 +315,21 @@ function init() {
   TTT.gameBoard = [null, null, null, null, null, null, null, null, null];
   TTT.isComputerPlaying = false;
   TTT.isGameOver = false;
-  TTT.numberOfPlayedSquares = 0;
   document.getElementById("gameboard").classList = "pointer";
 } //init
 
 function checkWin(value) {
-  let winner = false;
   for (let combo = 0, j = TTT.winningCombos.length; combo < j; combo++) {
-    let a = TTT.winningCombos[combo][0];
-    let b = TTT.winningCombos[combo][1];
-    let c = TTT.winningCombos[combo][2];
-    if (TTT.gameBoard[a] === TTT.gameBoard[b]) {
-      if (TTT.gameBoard[b] === TTT.gameBoard[c]) {
-        if (TTT.gameBoard[a]) {
-          endGame(value);
-          winner = true;
-        }
-      }
+    if (TTT.winningCombos[combo].every((i) => TTT.gameBoard[i] === value)) {
+      return endGame(value);
     }
   }
-  return winner;
+
+  if (TTT.gameBoard.every((field) => field !== null)) {
+    return endGame("draw");
+  }
+
+  return false;
 } //checkWin
 
 function endGame(value) {
@@ -351,6 +345,8 @@ function endGame(value) {
   //	if(playAgain){
   //		init();
   //	}
+
+  return true;
 } //endGame
 
 function getChatMove() {
@@ -382,7 +378,6 @@ function playTurn() {
   });
   updateGraph("ttt");
   let $theSelectedSquare = $(".square-0" + `${parseInt(theSquareToPlay, 10) - 1}`);
-  TTT.numberOfPlayedSquares++;
   updateGameBoard(`${parseInt(theSquareToPlay, 10) - 1}`, "O", $theSelectedSquare);
   checkWin("O");
   TTT.isComputerPlaying = false;
@@ -401,19 +396,18 @@ function listeners() {
     voters = [];
 
     document.getElementById("gameboard").classList = "cursordefault";
-      document.getElementById("tttchartCanvas").classList = "";
-      document.getElementById("tttoverlay").innerHTML = "";
+    document.getElementById("tttchartCanvas").classList = "";
+    document.getElementById("tttoverlay").innerHTML = "";
 
-      updateGameBoard(squareIndexValue, "X", $(this));
-      TTT.numberOfPlayedSquares++;
+    updateGameBoard(squareIndexValue, "X", $(this));
     checkWin("X");
 
-      TTT.isComputerPlaying = true;
+    TTT.isComputerPlaying = true;
     TTT.results = TTT.results.filter((el) => el.label != `${squareIndexValue + 1}`);
-      TTT.results.forEach((element, index) => {
-        TTT.results[index].data = 0;
-      });
-      updateGraph("ttt");
+    TTT.results.forEach((element, index) => {
+      TTT.results[index].data = 0;
+    });
+    updateGraph("ttt");
   }); //TTT click
 } //listeners
 
