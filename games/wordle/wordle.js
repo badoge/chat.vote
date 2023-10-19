@@ -222,6 +222,7 @@ function reset() {
   WORDLE.nwusers = "";
   WORDLE.words = [];
   WORDLE.nwstarted = false;
+  voters = [];
   shownw();
 } //reset
 
@@ -287,7 +288,7 @@ function pressKey(key) {
           <h2>Word guessed correctly!</h2>
           <p>word submitted by: ${WORDLE.nwusers}</p>
           <button type="button" onclick="startnw()" class="btn btn-success">Pick another word</button>
-          <button type="button" onclick="resetGame()" class="btn btn-warning">Reset</button>`;
+          <button type="button" onclick="reset()" class="btn btn-warning">Reset</button>`;
         }
       }
     }
@@ -327,7 +328,7 @@ function pressKey(key) {
       <h2>Word: ${WORDLE.nwword.join("")}</h2>
       <p>word submitted by: ${WORDLE.nwusers}</p>
       <button type="button" onclick="startnw()" class="btn btn-success">Pick another word</button>
-      <button type="button" onclick="resetGame()" class="btn btn-warning">Reset</button>`;
+      <button type="button" onclick="reset()" class="btn btn-warning">Reset</button>`;
       WORDLE.nwstarted = false;
     }
   }
@@ -352,18 +353,13 @@ function listeners() {
   document.getElementById("verifywords").onchange = function () {
     WORDLE.verifywords = this.checked;
     if (WORDLE.verifywords) {
-      resetGame();
+      reset();
     }
   };
   document.addEventListener("keydown", function (event) {
     if (event.key) pressKey(event.key);
   }); //wordle keypress
 } //listeners
-
-function resetGame() {
-  voters = [];
-  reset();
-} //resetGame
 
 function updateLabel(element) {
   document.getElementById(`${element.id}label`).innerHTML = element.value;
