@@ -1,4 +1,5 @@
 /*jshint esversion: 11 */
+let voters = [];
 
 let elements = {
   //modals
@@ -68,6 +69,14 @@ function connect() {
   client.on("message", async (target, context, msg, self) => {
     let input = msg.split(" ").filter(Boolean);
     let command = input[0].toLowerCase();
+
+    if (!voters.includes(context.username)) {
+      if (command in DONKHUNT.results) {
+        voters.push(context.username);
+        DONKHUNT.results[command].data += 1;
+        updateGraph("donkhunt");
+      }
+    }
   }); //message
 
   client.on("timeout", (channel, username, reason, duration, userstate) => {}); //timeout
@@ -76,7 +85,7 @@ function connect() {
     console.log(`Connected to ${address}:${port}`);
     elements.status.innerHTML = `<h4><span class="badge bg-success">Connected :)</span></h4>`;
     saveSettings();
-    sendUsername(`chat.vote/games/connect4`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
+    sendUsername(`chat.vote/games/donkhunt`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
     if (await checkTags(USER.userID, USER.access_token)) {
       elements.vtsLink.style.display = "";
     }
@@ -126,12 +135,88 @@ window.onload = function () {
     saveSettings();
   };
 
+  initGraph();
+
   DONKHUNT.listeners();
 }; //onload
 
+function initGraph() {
+  if (DONKHUNT.chart) {
+    DONKHUNT.chart.destroy();
+  }
+
+  DONKHUNT.chart = new Chart(DONKHUNT.ctx, {
+    type: "bar",
+    data: {
+      labels: [],
+      datasets: [
+        {
+          label: "score",
+          data: [],
+          borderWidth: 2,
+        },
+      ],
+    },
+    options: {
+      indexAxis: "y",
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          ticks: {
+            color: "white",
+          },
+          beginAtZero: true,
+        },
+        y: {
+          ticks: {
+            textStrokeColor: "rgba(0,0,0,1)",
+            textStrokeWidth: 3,
+            color: "white",
+            mirror: true,
+            font: {
+              size: 32,
+            },
+            z: 1,
+          },
+          beginAtZero: true,
+        },
+      },
+      plugins: {
+        tooltip: {
+          enabled: false,
+        },
+        legend: {
+          display: false,
+        },
+      },
+    },
+  });
+} //initGraph
+
+function updateGraph() {
+  let results = Object.values(DONKHUNT.results);
+
+  let label = results.map((a) => `${a.label} - ${a.data} ${a.data == 1 ? "vote" : "votes"} (${Math.round((a.data / voters.length) * 100) || 0}%)`);
+  let data = results.map((a) => a.data);
+  let c1 = results.map((a) => a.c1);
+  let c2 = results.map((a) => a.c2);
+
+  DONKHUNT.html.totalVotesCount.innerHTML = `Total votes: ${data.reduce((ac, cv) => ac + cv, 0)}`;
+
+  DONKHUNT.chart.data.labels = label;
+  DONKHUNT.chart.data.datasets.forEach((dataset) => {
+    dataset.data = data;
+    dataset.backgroundColor = c1;
+    dataset.borderColor = c2;
+  });
+  DONKHUNT.chart.update();
+} //updateGraph
+
 class HuntUnit {
   constructor(type, rowId, cellId) {
-    if (!["hunter", "target"].includes(type)) throw new Error("Invalid type: " + type);
+    if (!["hunter", "target"].includes(type)) {
+      throw new Error("Invalid type: " + type);
+    }
     this.type = type;
     this.cell = cellId;
     this.row = rowId;
@@ -143,11 +228,15 @@ class HuntUnit {
     this.row = rowId;
     DONKHUNT.field[this.row][this.cell] = this.type;
   }
+  getLocation() {
+    return [this.row, this.cell];
+  }
 }
 
 class HuntHunter extends HuntUnit {
-  constructor(rowId, cellId) {
+  constructor(rowId, cellId, marker = "") {
     super("hunter", rowId, cellId);
+    this.marker = marker;
   }
   isAbleToMove() {
     switch (this.row) {
@@ -160,7 +249,9 @@ class HuntHunter extends HuntUnit {
     }
   }
   getValidMoveList() {
-    if (!this.isAbleToMove()) return [];
+    if (!this.isAbleToMove()) {
+      return [];
+    }
     switch (this.row) {
       case 1: // row 1: can only move to base
         return [0, 1];
@@ -181,11 +272,17 @@ class HuntTarget extends HuntUnit {
         DONKHUNT.field[1].forEach((_c, ci) => result.push([1, ci]));
         break;
       default: // any other row: can only move up down left right
-        if (this.cell > 0) result.push([this.row, this.cell - 1]);
-        if (this.cell < 2) result.push([this.row, this.cell + 1]);
+        if (this.cell > 0) {
+          result.push([this.row, this.cell - 1]);
+        }
+        if (this.cell < 2) {
+          result.push([this.row, this.cell + 1]);
+        }
         result.push([this.row + 1, this.cell]);
         result.push([this.row - 1, this.cell]);
-        if (this.row === 1) result.push([0, 1]); // can move from row1 to base
+        if (this.row === 1) {
+          result.push([0, 1]); // can move from row1 to base
+        }
     }
     // now check valid cells - if they are free or not
     return result.filter((coords) => DONKHUNT.field[coords[0]][coords[1]] === "");
@@ -194,6 +291,12 @@ class HuntTarget extends HuntUnit {
 
 let DONKHUNT = {
   consts: {
+    ARROWS_MAP: {
+      up: "↑",
+      down: "↓",
+      right: "→",
+      left: "←",
+    },
     MEGALUL: '<img src="/games/pics/megalul.png" alt="MEGALUL" class="icon">',
     DONK: '<img src="/games/pics/donk.png" alt="Donk" class="icon">',
     FEELSDONKMAN: '<img src="/games/pics/feelsdonkman.png" alt="FeelsDonkMan" class="icon">',
@@ -204,14 +307,22 @@ let DONKHUNT = {
   html: {
     fieldRows: Array.from(document.querySelectorAll("div#dhfield div.dh-field-row")).map((row) => Array.from(row.querySelectorAll("div.dh-field-cell"))),
     allSettingControls: Array.from(document.querySelectorAll(".dhsettings")),
-    sidePicker: document.querySelector('input[name="dhplayer"]:checked').value,
-    movePicker: document.querySelector('input[name="dhfirst"]:checked').value,
     startBtn: document.querySelector("#startdh"),
-    gameResult: document.querySelector("#dhgameResult"),
+    gameResult: {
+      h2: document.querySelector(".dhgameResult h2"),
+      h4: document.querySelector(".dhgameResult h4"),
+      _all: Array.from(document.querySelectorAll(".dhgameResult")),
+    },
     status: document.querySelector("#adviceFriend"),
+    chartDiv: document.getElementById("dhchartdiv"),
+    totalVotesCount: document.getElementById("totalvotesdh"),
   },
+  ctx: document.getElementById("dhchartCanvas").getContext("2d"),
+  chart: null,
+  results: {}, // unlike other similar games, this prop uses keys as commands
+  colors: ["#f44336", "#f4c236", "#a8f436", "#4336f4"],
   game: {
-    hunters: [new HuntHunter(3, 0), new HuntHunter(3, 1), new HuntHunter(3, 2)],
+    hunters: [new HuntHunter(3, 0, "1"), new HuntHunter(3, 1, "2"), new HuntHunter(3, 2, "3")],
     target: new HuntTarget(2, 0),
     turn: 0,
     active: false,
@@ -219,6 +330,10 @@ let DONKHUNT = {
   player: {
     move1: null,
     side: null,
+  },
+  settings: {
+    dhplayer: "target",
+    dhfirst: "player",
   },
   field: [
     ["wall", "", "wall"],
@@ -231,9 +346,13 @@ let DONKHUNT = {
     getHunterReference: function (row, cell) {
       let ref = null;
       DONKHUNT.game.hunters.forEach((h) => {
-        if (h.row === row && h.cell === cell) ref = h;
+        if (h.row === row && h.cell === cell) {
+          ref = h;
+        }
       });
-      if (!ref) console.warn(`Cell [${row}, ${cell}] does not correspond to any Hunter!`);
+      if (!ref) {
+        console.warn(`Cell [${row}, ${cell}] does not correspond to any Hunter!`);
+      }
       return ref;
     },
     whoGoes: function () {
@@ -259,8 +378,12 @@ let DONKHUNT = {
         });
       });
       DONKHUNT.game.hunters.forEach((h) => {
-        if (h.cell > DONKHUNT.game.target.cell) DONKHUNT.html.fieldRows[h.row][h.cell].classList.add("dh-p-invert");
-        if (h.cell < DONKHUNT.game.target.cell) DONKHUNT.html.fieldRows[h.row][h.cell].classList.remove("dh-p-invert");
+        if (h.cell > DONKHUNT.game.target.cell) {
+          DONKHUNT.html.fieldRows[h.row][h.cell].classList.add("dh-p-invert");
+        }
+        if (h.cell < DONKHUNT.game.target.cell) {
+          DONKHUNT.html.fieldRows[h.row][h.cell].classList.remove("dh-p-invert");
+        }
       });
       if (DONKHUNT.game.active && DONKHUNT.functions.whoGoes() === DONKHUNT.player.side) {
         switch (
@@ -273,8 +396,12 @@ let DONKHUNT = {
                 DONKHUNT.html.fieldRows[h.row][h.cell].classList.add("dh-event-target");
                 ableToMoveCount += 1;
               }
-              if (h.cell > DONKHUNT.game.target.cell) DONKHUNT.html.fieldRows[h.row][h.cell].classList.add("dh-p-invert");
-              if (h.cell < DONKHUNT.game.target.cell) DONKHUNT.html.fieldRows[h.row][h.cell].classList.remove("dh-p-invert");
+              if (h.cell > DONKHUNT.game.target.cell) {
+                DONKHUNT.html.fieldRows[h.row][h.cell].classList.add("dh-p-invert");
+              }
+              if (h.cell < DONKHUNT.game.target.cell) {
+                DONKHUNT.html.fieldRows[h.row][h.cell].classList.remove("dh-p-invert");
+              }
             });
             if (ableToMoveCount < 1)
               setTimeout(() => {
@@ -295,15 +422,21 @@ let DONKHUNT = {
       DONKHUNT.game.turn += inc;
       // check win conditions
       if (DONKHUNT.game.target.getValidMoveList().length < 1) {
-        DONKHUNT.functions.endGame("hunter", "Target is surrounded and cannot move");
+        DONKHUNT.functions.endGame("hunter", "Target is surrounded and has no way to escape!");
       } else {
         // target wins if it has unobstructed path to flag
         let noObstacles = true;
-        for (let i = DONKHUNT.game.target.row + 1; i < DONKHUNT.field.length; i++) if (DONKHUNT.field[i][DONKHUNT.game.target.cell]) noObstacles = false;
+        for (let i = DONKHUNT.game.target.row + 1; i < DONKHUNT.field.length; i++) {
+          if (DONKHUNT.field[i][DONKHUNT.game.target.cell]) {
+            noObstacles = false;
+          }
+        }
         if (noObstacles) {
-          for (let i = DONKHUNT.game.target.row; i < DONKHUNT.field.length; i++) DONKHUNT.html.fieldRows[i][DONKHUNT.game.target.cell].classList.add("dh-field-winpath");
+          for (let i = DONKHUNT.game.target.row; i < DONKHUNT.field.length; i++) {
+            DONKHUNT.html.fieldRows[i][DONKHUNT.game.target.cell].classList.add("dh-field-winpath");
+          }
           DONKHUNT.html.fieldRows[DONKHUNT.field.length - 1][1].classList.add("dh-field-winpath");
-          DONKHUNT.functions.endGame("target", "Target found a way to reach the flag");
+          DONKHUNT.functions.endGame("target", "Target found a way to escape!");
         }
       }
       // prepare for next turn
@@ -313,9 +446,10 @@ let DONKHUNT = {
       }
       if (DONKHUNT.player.side === DONKHUNT.functions.whoGoes()) {
         // player turn
+        DONKHUNT.html.chartDiv.classList.add("blur");
         switch (DONKHUNT.functions.whoGoes()) {
           case "hunter":
-            DONKHUNT.html.status.innerHTML = `Click a ${DONKHUNT.consts.MEGALUL} to move it forward.`;
+            DONKHUNT.html.status.innerHTML = `Click on a ${DONKHUNT.consts.MEGALUL} to move it forward.`;
             break;
           case "target":
             DONKHUNT.html.status.innerHTML = `Move ${DONKHUNT.consts.DONK} by clicking on a free cell.`;
@@ -323,30 +457,33 @@ let DONKHUNT = {
         }
       } else {
         // opponent turn
-        DONKHUNT.html.status.innerText = "Please wait for your opponent to move.";
-        setTimeout(DONKHUNT.functions.emulateOpponentAction, 2222);
+        DONKHUNT.html.status.innerText = "Please wait until chat decides on next move.";
+        DONKHUNT.html.chartDiv.classList.remove("blur");
+        DONKHUNT.results = DONKHUNT.functions.buildChatOptions();
       }
-      DONKHUNT.functions.drawField(DONKHUNT.game.turn === 0);
+      DONKHUNT.functions.drawField(DONKHUNT.game.turn < 2);
+      updateGraph("donkhunt");
     },
     endGame: function (winnerSide, reason) {
       switch (winnerSide) {
         case "hunter":
-          DONKHUNT.html.gameResult.querySelector("h2").innerHTML = `${DONKHUNT.consts.FORSENO}${DONKHUNT.consts.KNIFE} Hunters win!`;
-          DONKHUNT.html.gameResult.querySelector("h4").innerText = reason;
+          DONKHUNT.html.gameResult.h2.innerHTML = `${DONKHUNT.consts.FORSENO}${DONKHUNT.consts.KNIFE} Hunters win!`;
+          DONKHUNT.html.gameResult.h4.innerText = reason;
           break;
         case "target":
-          DONKHUNT.html.gameResult.querySelector("h2").innerHTML = `${DONKHUNT.consts.FEELSDONKMAN}${DONKHUNT.consts.CLAP} Target wins!`;
-          DONKHUNT.html.gameResult.querySelector("h4").innerText = reason;
+          DONKHUNT.html.gameResult.h2.innerHTML = `${DONKHUNT.consts.FEELSDONKMAN}${DONKHUNT.consts.CLAP} Target wins!`;
+          DONKHUNT.html.gameResult.h4.innerText = reason;
           break;
         default:
-          DONKHUNT.html.gameResult.querySelector("h2").innerHTML = `${DONKHUNT.consts.DONK} Wait, what?`;
-          DONKHUNT.html.gameResult.querySelector("h4").innerText = reason || "Something went wrong, this should never hDONKHUNTen.";
+          DONKHUNT.html.gameResult.h2.innerHTML = `${DONKHUNT.consts.DONK} Wait, what?`;
+          DONKHUNT.html.gameResult.h4.innerText = reason || "Something went wrong, this should never happen.";
           break;
       }
-      DONKHUNT.html.gameResult.style.visibility = "visible";
+      DONKHUNT.html.gameResult._all.forEach((e) => (e.style.visibility = "visible"));
       DONKHUNT.html.allSettingControls.forEach((c) => (c.disabled = false));
       DONKHUNT.game.active = false;
       DONKHUNT.functions.drawField();
+      DONKHUNT.html.chartDiv.classList.add("blur");
     },
     emulateOpponentAction: function () {
       // this can be replaced by chat's action or by second player's action
@@ -356,8 +493,11 @@ let DONKHUNT = {
           const hunters = DONKHUNT.game.hunters.filter((h) => h.isAbleToMove());
           if (hunters.length) {
             let i = Math.floor(Math.random() * hunters.length);
-            if (hunters[i].row > 1) hunters[i].moveTo(hunters[i].row - 1, hunters[i].cell);
-            else hunters[i].moveTo(0, 1);
+            if (hunters[i].row > 1) {
+              hunters[i].moveTo(hunters[i].row - 1, hunters[i].cell);
+            } else {
+              hunters[i].moveTo(0, 1);
+            }
           } else {
             console.warn("Bot: Hunters cannot move!");
             showToast("Hunters have no valid moves - they skip their turn.", "warning", 3000);
@@ -365,7 +505,9 @@ let DONKHUNT = {
           break;
         case "target":
           const validMoves = DONKHUNT.game.target.getValidMoveList();
-          if (!validMoves.length) return void console.warn("Bot: Target has nowhere to move!");
+          if (!validMoves.length) {
+            return void console.warn("Bot: Target has nowhere to move!");
+          }
           let j = Math.floor(Math.random() * validMoves.length);
           DONKHUNT.game.target.moveTo(validMoves[j][0], validMoves[j][1]);
           break;
@@ -373,33 +515,187 @@ let DONKHUNT = {
       // after the move call the start of next turn:
       DONKHUNT.functions.turn(1);
     },
+    buildChatOptions: function () {
+      const list = {};
+
+      switch (DONKHUNT.player.side) {
+        case "hunter": {
+          // chat is playing as TARGET; actions: left, up, right, down
+          const variants = ["left", "up", "right", "down"];
+          const moves = DONKHUNT.game.target.getValidMoveList();
+          const location = DONKHUNT.game.target.getLocation();
+
+          const relativeMoves = moves.map((move) => move.map((n, i) => n - location[i]));
+
+          switch (
+            location[0] // target's row
+          ) {
+            case 0: {
+              // row 0 (base): can move to any free cell in row 1
+              for (let i = 0; i < relativeMoves.length; i++) {
+                const m = relativeMoves[i];
+                if (m[0] > 0) {
+                  switch (m[1]) {
+                    case 0: {
+                      list["down"] = moves[i];
+                      break;
+                    }
+                    case -1: {
+                      list["left"] = moves[i];
+                      break;
+                    }
+                    case 1: {
+                      list["right"] = moves[i];
+                      break;
+                    }
+                  }
+                }
+              }
+              break;
+            }
+            default: {
+              // any other row
+              for (let i = 0; i < relativeMoves.length; i++) {
+                const m = relativeMoves[i];
+                if (m[0] !== 0) {
+                  list[m[0] > 0 ? "down" : "up"] = moves[i];
+                } else {
+                  list[m[1] > 0 ? "right" : "left"] = moves[i];
+                }
+              }
+              break;
+            }
+          }
+
+          for (const direction in list) {
+            const color = DONKHUNT.colors[variants.indexOf(direction)];
+            const cell = list[direction];
+            list[direction] = { label: direction, data: 0, c1: color, c2: color, _chosenCell: cell };
+
+            // add visual hint:
+            DONKHUNT.html.fieldRows[cell[0]][cell[1]].innerHTML = `<b>${DONKHUNT.consts.ARROWS_MAP[direction]}</b>`;
+          }
+          break;
+        }
+        case "target": {
+          // chat is playing as HUNTER: vote 1/2/3 to move corresponding unit
+          let movableCount = 0;
+          DONKHUNT.game.hunters.forEach((h, hIndex) => {
+            if (h.isAbleToMove()) {
+              const color = DONKHUNT.colors[hIndex];
+              list[h.marker] = { label: h.marker, data: 0, c1: color, c2: color, _chosenUnit: hIndex };
+              movableCount += 1;
+
+              // add visual hint:
+              DONKHUNT.html.fieldRows[h.row][h.cell].innerHTML = `<b>${h.marker}</b>`;
+            }
+          });
+
+          if (movableCount < 1) {
+            setTimeout(() => {
+              //wrap into arrow func to render new DOM
+              showToast("Hunters have no valid moves! Skipping turn.", "warning", 3000);
+              DONKHUNT.functions.turn(1);
+            }, 50);
+          }
+        }
+      }
+
+      return list;
+    },
   },
   start: function () {
-    DONKHUNT.html.gameResult.style.visibility = "hidden";
+    DONKHUNT.html.gameResult._all.forEach((e) => (e.style.visibility = "hidden"));
     DONKHUNT.html.allSettingControls.forEach((c) => (c.disabled = true));
     DONKHUNT.functions.resetField();
     DONKHUNT.game.turn = 0;
-    DONKHUNT.player.side = DONKHUNT.html.sidePicker.value;
+    DONKHUNT.player.side = DONKHUNT.settings.dhplayer;
     DONKHUNT.game.active = true;
     console.log("Hunt: game has begun.");
-    DONKHUNT.functions.turn(DONKHUNT.html.movePicker.value === "hunter" ? 1 : 0);
-    DONKHUNT.html.status.scrollIntoView(); // mobile friends :)
+
+    /* 
+      because of (turn % 2 == 0) defines whose turn is it now, we check if turn 0 must be skipped
+      this defines who moves first - target or hunters
+
+      player="target" and first="player" => first turn 0 (player goes)
+      player="hunter" and first="player" => first turn 1 (player goes)
+      player="target" and first="enemy"  => first turn 1 (chat goes)
+      player="hunter" and first="enemy"  => first turn 0 (chat goes)
+
+      if (player="target") is boolX and (first="player") is boolY
+      "first turn 1" condition is achieved whenever boolX != boolY
+    */
+    const needSkip0Turn = (DONKHUNT.settings.dhfirst === "player") !== (DONKHUNT.settings.dhplayer === "target");
+    DONKHUNT.functions.turn(Number(needSkip0Turn));
   },
   reset: function () {
-    DONKHUNT.html.gameResult.style.visibility = "hidden";
+    DONKHUNT.html.gameResult._all.forEach((e) => (e.style.visibility = "hidden"));
     DONKHUNT.html.allSettingControls.forEach((c) => (c.disabled = false));
     DONKHUNT.game.active = false;
     DONKHUNT.functions.resetField();
     DONKHUNT.functions.drawField();
+  },
+  playTurn: function () {
+    if (voters.length < 1) {
+      return;
+    }
+    voters.length = 0;
+
+    DONKHUNT.html.chartDiv.classList.add("blur");
+    DONKHUNT.html.totalVotesCount.innerHTML = `Total votes: 0`;
+
+    let votedOption = { data: -1 };
+    for (const voteOption in DONKHUNT.results) {
+      const data = DONKHUNT.results[voteOption];
+      if (votedOption.data < data.data) {
+        votedOption = data;
+      }
+    }
+
+    DONKHUNT.results = {};
+    updateGraph("donkhunt");
+    for (const row of DONKHUNT.html.fieldRows) {
+      for (const cell of row) {
+        cell.innerHTML = "";
+      }
+    }
+
+    switch (DONKHUNT.functions.whoGoes()) {
+      case "hunter": {
+        const hunters = DONKHUNT.game.hunters;
+        let i = votedOption._chosenUnit;
+        if (hunters[i].row > 1) {
+          hunters[i].moveTo(hunters[i].row - 1, hunters[i].cell);
+        } else {
+          // row 1 always goes up to [0,1]
+          hunters[i].moveTo(0, 1);
+        }
+        break;
+      }
+      case "target": {
+        const to = votedOption._chosenCell;
+        DONKHUNT.game.target.moveTo(to[0], to[1]);
+        break;
+      }
+    }
+
+    // after the move call the start of next turn:
+    DONKHUNT.functions.turn(1);
   },
   listeners: function () {
     // assign controls to playfield cells
     DONKHUNT.html.fieldRows.forEach((row) =>
       row.forEach((cell) =>
         cell.addEventListener("click", function (event) {
-          if (!DONKHUNT.game.active) return void console.info("Click ignored: game has not started yet.");
-          if (!event.target.classList.contains("dh-event-target")) return void console.info("Click ignored: target is not defined as a valid playmove cell.");
-          if (DONKHUNT.player.side != DONKHUNT.functions.whoGoes()) return void console.info("Click ignored: it is not player's turn to act.");
+          if (!DONKHUNT.game.active) {
+            return void console.debug("Click ignored: game has not started yet.");
+          }
+          if (!event.target.classList.contains("dh-event-target")) {
+            return void console.debug("Click ignored: target is not defined as a valid playmove cell.");
+          }
+          if (DONKHUNT.player.side != DONKHUNT.functions.whoGoes()) {
+            return void console.debug("Click ignored: it is not player's turn to act.");
+          }
           // detect clicked field's coords
           const coords = {
             row: parseInt(event.target.parentNode.dataset.rowcount, 10),
@@ -409,14 +705,21 @@ let DONKHUNT = {
           switch (DONKHUNT.field[coords.row][coords.cell]) {
             case "hunter":
               const actor = DONKHUNT.functions.getHunterReference(coords.row, coords.cell);
-              if (!actor.isAbleToMove()) return void console.info("Click ignored: Hunter cannot move!");
-              if (actor.row > 1) actor.moveTo(actor.row - 1, actor.cell);
-              else actor.moveTo(0, 1);
+              if (!actor.isAbleToMove()) {
+                return void console.debug("Click ignored: Hunter cannot move!");
+              }
+              if (actor.row > 1) {
+                actor.moveTo(actor.row - 1, actor.cell);
+              } else {
+                actor.moveTo(0, 1);
+              }
               break;
             default: // target clicks on empty fields
               const validMoves = DONKHUNT.game.target.getValidMoveList();
               validMoves.forEach((move) => {
-                if (move[0] == coords.row && move[1] == coords.cell) DONKHUNT.game.target.moveTo(move[0], move[1]);
+                if (move[0] == coords.row && move[1] == coords.cell) {
+                  DONKHUNT.game.target.moveTo(move[0], move[1]);
+                }
               });
               break;
           }
@@ -425,5 +728,20 @@ let DONKHUNT = {
         })
       )
     );
+
+    // assign listeners for settings
+    const settingsInputGroupListener = function (event) {
+      const target = event.target;
+      const refOption = target.name;
+      const refValue = target.value;
+      DONKHUNT.settings[refOption] = refValue;
+    };
+
+    DONKHUNT.html.allSettingControls.forEach((input) => {
+      // initialize the states:
+      input.checked = DONKHUNT.settings[input.name] === input.value;
+      // and assign the listeners:
+      input.addEventListener("change", settingsInputGroupListener);
+    });
   },
 }; //DONKHUNT
