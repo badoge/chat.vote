@@ -196,7 +196,7 @@ function initGraph() {
 function updateGraph() {
   let results = Object.values(DONKHUNT.results);
 
-  let label = results.map((a) => `${a.label} - ${a.data} votes (${Math.round((a.data / voters.length) * 100) || 0}%)`);
+  let label = results.map((a) => `${a.label} - ${a.data} ${a.data == 1 ? "vote" : "votes"} (${Math.round((a.data / voters.length) * 100) || 0}%)`);
   let data = results.map((a) => a.data);
   let c1 = results.map((a) => a.c1);
   let c2 = results.map((a) => a.c2);
@@ -214,7 +214,9 @@ function updateGraph() {
 
 class HuntUnit {
   constructor(type, rowId, cellId) {
-    if (!["hunter", "target"].includes(type)) throw new Error("Invalid type: " + type);
+    if (!["hunter", "target"].includes(type)) {
+      throw new Error("Invalid type: " + type);
+    }
     this.type = type;
     this.cell = cellId;
     this.row = rowId;
@@ -247,7 +249,9 @@ class HuntHunter extends HuntUnit {
     }
   }
   getValidMoveList() {
-    if (!this.isAbleToMove()) return [];
+    if (!this.isAbleToMove()) {
+      return [];
+    }
     switch (this.row) {
       case 1: // row 1: can only move to base
         return [0, 1];
@@ -268,11 +272,17 @@ class HuntTarget extends HuntUnit {
         DONKHUNT.field[1].forEach((_c, ci) => result.push([1, ci]));
         break;
       default: // any other row: can only move up down left right
-        if (this.cell > 0) result.push([this.row, this.cell - 1]);
-        if (this.cell < 2) result.push([this.row, this.cell + 1]);
+        if (this.cell > 0) {
+          result.push([this.row, this.cell - 1]);
+        }
+        if (this.cell < 2) {
+          result.push([this.row, this.cell + 1]);
+        }
         result.push([this.row + 1, this.cell]);
         result.push([this.row - 1, this.cell]);
-        if (this.row === 1) result.push([0, 1]); // can move from row1 to base
+        if (this.row === 1) {
+          result.push([0, 1]); // can move from row1 to base
+        }
     }
     // now check valid cells - if they are free or not
     return result.filter((coords) => DONKHUNT.field[coords[0]][coords[1]] === "");
@@ -336,9 +346,13 @@ let DONKHUNT = {
     getHunterReference: function (row, cell) {
       let ref = null;
       DONKHUNT.game.hunters.forEach((h) => {
-        if (h.row === row && h.cell === cell) ref = h;
+        if (h.row === row && h.cell === cell) {
+          ref = h;
+        }
       });
-      if (!ref) console.warn(`Cell [${row}, ${cell}] does not correspond to any Hunter!`);
+      if (!ref) {
+        console.warn(`Cell [${row}, ${cell}] does not correspond to any Hunter!`);
+      }
       return ref;
     },
     whoGoes: function () {
@@ -364,8 +378,12 @@ let DONKHUNT = {
         });
       });
       DONKHUNT.game.hunters.forEach((h) => {
-        if (h.cell > DONKHUNT.game.target.cell) DONKHUNT.html.fieldRows[h.row][h.cell].classList.add("dh-p-invert");
-        if (h.cell < DONKHUNT.game.target.cell) DONKHUNT.html.fieldRows[h.row][h.cell].classList.remove("dh-p-invert");
+        if (h.cell > DONKHUNT.game.target.cell) {
+          DONKHUNT.html.fieldRows[h.row][h.cell].classList.add("dh-p-invert");
+        }
+        if (h.cell < DONKHUNT.game.target.cell) {
+          DONKHUNT.html.fieldRows[h.row][h.cell].classList.remove("dh-p-invert");
+        }
       });
       if (DONKHUNT.game.active && DONKHUNT.functions.whoGoes() === DONKHUNT.player.side) {
         switch (
@@ -378,8 +396,12 @@ let DONKHUNT = {
                 DONKHUNT.html.fieldRows[h.row][h.cell].classList.add("dh-event-target");
                 ableToMoveCount += 1;
               }
-              if (h.cell > DONKHUNT.game.target.cell) DONKHUNT.html.fieldRows[h.row][h.cell].classList.add("dh-p-invert");
-              if (h.cell < DONKHUNT.game.target.cell) DONKHUNT.html.fieldRows[h.row][h.cell].classList.remove("dh-p-invert");
+              if (h.cell > DONKHUNT.game.target.cell) {
+                DONKHUNT.html.fieldRows[h.row][h.cell].classList.add("dh-p-invert");
+              }
+              if (h.cell < DONKHUNT.game.target.cell) {
+                DONKHUNT.html.fieldRows[h.row][h.cell].classList.remove("dh-p-invert");
+              }
             });
             if (ableToMoveCount < 1)
               setTimeout(() => {
@@ -404,9 +426,15 @@ let DONKHUNT = {
       } else {
         // target wins if it has unobstructed path to flag
         let noObstacles = true;
-        for (let i = DONKHUNT.game.target.row + 1; i < DONKHUNT.field.length; i++) if (DONKHUNT.field[i][DONKHUNT.game.target.cell]) noObstacles = false;
+        for (let i = DONKHUNT.game.target.row + 1; i < DONKHUNT.field.length; i++) {
+          if (DONKHUNT.field[i][DONKHUNT.game.target.cell]) {
+            noObstacles = false;
+          }
+        }
         if (noObstacles) {
-          for (let i = DONKHUNT.game.target.row; i < DONKHUNT.field.length; i++) DONKHUNT.html.fieldRows[i][DONKHUNT.game.target.cell].classList.add("dh-field-winpath");
+          for (let i = DONKHUNT.game.target.row; i < DONKHUNT.field.length; i++) {
+            DONKHUNT.html.fieldRows[i][DONKHUNT.game.target.cell].classList.add("dh-field-winpath");
+          }
           DONKHUNT.html.fieldRows[DONKHUNT.field.length - 1][1].classList.add("dh-field-winpath");
           DONKHUNT.functions.endGame("target", "Target found a way to escape!");
         }
@@ -465,8 +493,11 @@ let DONKHUNT = {
           const hunters = DONKHUNT.game.hunters.filter((h) => h.isAbleToMove());
           if (hunters.length) {
             let i = Math.floor(Math.random() * hunters.length);
-            if (hunters[i].row > 1) hunters[i].moveTo(hunters[i].row - 1, hunters[i].cell);
-            else hunters[i].moveTo(0, 1);
+            if (hunters[i].row > 1) {
+              hunters[i].moveTo(hunters[i].row - 1, hunters[i].cell);
+            } else {
+              hunters[i].moveTo(0, 1);
+            }
           } else {
             console.warn("Bot: Hunters cannot move!");
             showToast("Hunters have no valid moves - they skip their turn.", "warning", 3000);
@@ -474,7 +505,9 @@ let DONKHUNT = {
           break;
         case "target":
           const validMoves = DONKHUNT.game.target.getValidMoveList();
-          if (!validMoves.length) return void console.warn("Bot: Target has nowhere to move!");
+          if (!validMoves.length) {
+            return void console.warn("Bot: Target has nowhere to move!");
+          }
           let j = Math.floor(Math.random() * validMoves.length);
           DONKHUNT.game.target.moveTo(validMoves[j][0], validMoves[j][1]);
           break;
@@ -603,7 +636,9 @@ let DONKHUNT = {
     DONKHUNT.functions.drawField();
   },
   playTurn: function () {
-    if (voters.length < 1) return;
+    if (voters.length < 1) {
+      return;
+    }
     voters.length = 0;
 
     DONKHUNT.html.chartDiv.classList.add("blur");
@@ -652,9 +687,15 @@ let DONKHUNT = {
     DONKHUNT.html.fieldRows.forEach((row) =>
       row.forEach((cell) =>
         cell.addEventListener("click", function (event) {
-          if (!DONKHUNT.game.active) return void console.debug("Click ignored: game has not started yet.");
-          if (!event.target.classList.contains("dh-event-target")) return void console.debug("Click ignored: target is not defined as a valid playmove cell.");
-          if (DONKHUNT.player.side != DONKHUNT.functions.whoGoes()) return void console.debug("Click ignored: it is not player's turn to act.");
+          if (!DONKHUNT.game.active) {
+            return void console.debug("Click ignored: game has not started yet.");
+          }
+          if (!event.target.classList.contains("dh-event-target")) {
+            return void console.debug("Click ignored: target is not defined as a valid playmove cell.");
+          }
+          if (DONKHUNT.player.side != DONKHUNT.functions.whoGoes()) {
+            return void console.debug("Click ignored: it is not player's turn to act.");
+          }
           // detect clicked field's coords
           const coords = {
             row: parseInt(event.target.parentNode.dataset.rowcount, 10),
@@ -664,14 +705,21 @@ let DONKHUNT = {
           switch (DONKHUNT.field[coords.row][coords.cell]) {
             case "hunter":
               const actor = DONKHUNT.functions.getHunterReference(coords.row, coords.cell);
-              if (!actor.isAbleToMove()) return void console.debug("Click ignored: Hunter cannot move!");
-              if (actor.row > 1) actor.moveTo(actor.row - 1, actor.cell);
-              else actor.moveTo(0, 1);
+              if (!actor.isAbleToMove()) {
+                return void console.debug("Click ignored: Hunter cannot move!");
+              }
+              if (actor.row > 1) {
+                actor.moveTo(actor.row - 1, actor.cell);
+              } else {
+                actor.moveTo(0, 1);
+              }
               break;
             default: // target clicks on empty fields
               const validMoves = DONKHUNT.game.target.getValidMoveList();
               validMoves.forEach((move) => {
-                if (move[0] == coords.row && move[1] == coords.cell) DONKHUNT.game.target.moveTo(move[0], move[1]);
+                if (move[0] == coords.row && move[1] == coords.cell) {
+                  DONKHUNT.game.target.moveTo(move[0], move[1]);
+                }
               });
               break;
           }
