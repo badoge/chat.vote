@@ -1,6 +1,8 @@
 /*jshint esversion: 11 */
 let voters = [];
 
+const keyboardLayout = ["QWERTYUIOP", "ASDFGHJKL", "<ZXCVBNM>"].map((row) => row.split(""));
+
 let elements = {
   //modals
   grid: document.getElementById("grid"),
@@ -145,6 +147,7 @@ window.onload = function () {
 
   listeners();
   loadwords();
+  drawKeyboard();
   shownw();
 }; //onload
 
@@ -160,6 +163,7 @@ let WORDLE = {
   multiword: false,
   verifywords: true,
   words: [],
+  keys: {},
 }; //WORDLE
 
 function addWord(word, username) {
@@ -360,3 +364,41 @@ function updateLabel(element) {
   WORDLE.nwusers = "";
   shownw();
 } //updateLabel
+
+function drawKeyboard() {
+  const kb = document.getElementById("nwkeyboard");
+  keyboardLayout.forEach((keyrow) => {
+    const row = document.createElement("div");
+    row.classList = "nw-keyboard-row";
+
+    for (const key of keyrow) {
+      const k = document.createElement("button");
+      k.classList = "btn btn-secondary nw-keyboard-key";
+
+      switch (key) {
+        case "<": {
+          k.classList.add("nw-keyboard-key-wide");
+          k.innerHTML = `<span class="material-icons notranslate">backspace</span>`;
+          k.addEventListener("click", () => pressKey("Backspace"));
+          break;
+        }
+        case ">": {
+          k.classList.add("nw-keyboard-key-wide");
+          k.innerHTML = `<span class="material-icons notranslate">send</span>`;
+          k.addEventListener("click", () => pressKey("Enter"));
+          break;
+        }
+        default: {
+          WORDLE.keys[key] = k;
+          k.innerHTML = key;
+          k.addEventListener("click", () => pressKey(key));
+          break;
+        }
+      }
+
+      row.appendChild(k);
+    }
+
+    kb.appendChild(row);
+  });
+}

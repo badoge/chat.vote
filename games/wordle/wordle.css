@@ -70,3 +70,31 @@ body {
   border-style: solid;
   overflow: hidden;
 }
+/* keyboard */
+
+#nwkeyboard {
+  margin-top: 1em;
+  display: flex;
+  flex-flow: column nowrap;
+  gap: 4px;
+}
+.nw-keyboard-row {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: stretch;
+  justify-content: center;
+  gap: 4px;
+}
+.nw-keyboard-key {
+  min-width: 2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+.nw-keyboard-key-wide {
+  min-width: 2.5em;
+}
