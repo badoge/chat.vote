@@ -489,14 +489,28 @@
             <div class="col-6">
               <div class="card">
                 <div class="card-body">
-                  <h3>Difficulty:</h3>
-                  <select id="difficulty" class="form-select" aria-label="difficulty select">
-                    <option selected value="0">Simple rules</option>
-                    <option value="1">Harder rules</option>
-                    <option value="2">Absolutely dank rules</option>
-                  </select>
-                  <label for="shapeslength" class="form-label text-body-secondary mt-3">Length: <span id="shapeslengthlabel">8</span></label>
-                  <input disabled type="range" class="form-range" min="4" max="12" value="8" id="shapeslength" />
+                  <div class="input-group mb-2">
+                    <label class="input-group-text" for="difficulty">Difficulty</label>
+                    <select id="difficulty" class="form-select" aria-label="difficulty select">
+                      <option selected value="0">Simple rules</option>
+                      <option value="1">Harder rules</option>
+                      <option value="2">Absolutely dank rules</option>
+                    </select>
+                  </div>
+                  <div class="input-group mb-2">
+                    <label class="input-group-text" for="startinglives">Starting lives</label>
+                    <div class="flex-grow-1 px-2 border d-flex align-items-center justify-content-center">
+                      <input disabled type="range" class="form-range" min="1" max="5" value="3" id="startinglives" />
+                    </div>
+                    <span class="input-group-text fw-bold" id="startingliveslabel">3</span>
+                  </div>
+                  <div class="input-group mb-2">
+                    <label class="input-group-text" for="shapeslength">Length</label>
+                    <div class="flex-grow-1 px-2 border d-flex align-items-center justify-content-center">
+                      <input disabled type="range" class="form-range" min="4" max="12" value="8" id="shapeslength" />
+                    </div>
+                    <span class="input-group-text fw-bold" id="shapeslengthlabel">8</span>
+                  </div>
                   <button id="startshapesbtn" onclick="start()" type="button" class="btn btn-success">Start new game</button>
                 </div>
               </div>

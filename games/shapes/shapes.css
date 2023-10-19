@@ -104,10 +104,6 @@ div.unpickable {
   opacity: 0.05 !important;
 }
 
-#difficulty {
-  max-width: 200px;
-}
-
 #variants > div {
   font-size: 1.5em;
   color: #a1a1a1;
