@@ -83,7 +83,7 @@ body {
 /* keyboard */
 
 #nwkeyboard {
-  margin-top: 1em;
+  margin: 1em 0;
   display: flex;
   flex-flow: column nowrap;
   gap: 4px;
@@ -103,6 +103,8 @@ body {
   padding: 4px 0.75rem;
   border-radius: 0.25rem;
   font-size: 1.5rem;
+  font-weight: bold;
+  text-shadow: 0px 0px 2px black;
   cursor: pointer;
 }
 .nw-keyboard-key-wide {

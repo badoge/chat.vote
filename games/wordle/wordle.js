@@ -238,6 +238,11 @@ function shownw() {
   }
   output += `</div>`;
   document.getElementById("nwoutput").innerHTML = output;
+
+  // new word = reset keyboard colors
+  for (const key in WORDLE.keys) {
+    WORDLE.keys[key].style.backgroundColor = "";
+  }
 } //shownw
 
 async function loadwords() {
@@ -265,11 +270,11 @@ function pressKey(key) {
       return;
     }
     for (let index = 0; index < WORDLE.wordlength; index++) {
-      document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`).style.backgroundColor = WORDLE.colors.dead;
-    }
-    for (let index = 0; index < WORDLE.wordlength; index++) {
+      const letterNode = document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`);
+      letterNode.style.backgroundColor = WORDLE.colors.dead;
+
       if (guess[index] == WORDLE.nwword[index]) {
-        document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`).style.backgroundColor = WORDLE.colors.good;
+        letterNode.style.backgroundColor = WORDLE.colors.good;
         let letterindex = tempnwword.indexOf(guess[index]);
         if (letterindex > -1) {
           tempnwword.splice(letterindex, 1);
@@ -287,11 +292,30 @@ function pressKey(key) {
       }
     }
     for (let index = 0; index < WORDLE.wordlength; index++) {
-      if (tempnwword.includes(guess[index]) && document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`).style.backgroundColor != WORDLE.colors.good) {
-        document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`).style.backgroundColor = WORDLE.colors.bad;
+      const letterNode = document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`);
+      if (tempnwword.includes(guess[index]) && letterNode.style.backgroundColor != WORDLE.colors.good) {
+        letterNode.style.backgroundColor = WORDLE.colors.bad;
         let letterindex = tempnwword.indexOf(guess[index]);
         if (letterindex > -1) {
           tempnwword.splice(letterindex, 1);
+        }
+      }
+    }
+
+    // update keys' colors on keyboard:
+    for (let index = 0; index < WORDLE.wordlength; index++) {
+      const letterNode = document.getElementById(`nw${WORDLE.nwrow * WORDLE.wordlength + index}`);
+      const keyNode = WORDLE.keys[letterNode.innerText];
+      if (keyNode) {
+        for (const color in WORDLE.colors) {
+          if (keyNode.style.backgroundColor === WORDLE.colors[color]) {
+            // this prevents going from green to yellow if user submits a worse word
+            break;
+          }
+          if (WORDLE.colors[color] === letterNode.style.backgroundColor) {
+            keyNode.style.backgroundColor = WORDLE.colors[color];
+            break;
+          }
         }
       }
     }
