@@ -229,12 +229,17 @@ function updateGraph() {
 } //updateGraph
 
 let SHAPES = {
+  field: document.getElementById("field"),
   figureList: Array.from(document.querySelectorAll("#field div.figure")),
   optionList: Array.from(document.querySelectorAll("#variants div.figure")),
   startBtn: document.querySelector("#startshapesbtn"),
   dVariants: document.querySelector("#variants"),
   dResult: document.querySelector("#shapesgameResult"),
   dDifficulty: document.querySelector("select#difficulty"),
+  dStartingLives: document.querySelector("#startinglives"),
+  lblStartingLives: document.querySelector("#startingliveslabel"),
+  dShapesLength: document.getElementById("shapeslength"),
+  lblShapesLength: document.getElementById("shapeslengthlabel"),
   lives: document.querySelector("#lives"),
   ctx: document.getElementById("shapeschartCanvas").getContext("2d"),
   chart: null,
@@ -277,7 +282,7 @@ function drawShapes() {
     if (fig.isKnownToBeIncorrect()) f.classList.add("unpickable");
   });
   SHAPES.dVariants.style.visibility = "visible";
-  SHAPES.lives.innerHTML = `Lives: ${"❤".repeat(parseInt(SHAPES.shapesGame.lives, 10))}`;
+  SHAPES.lives.innerHTML = `Lives: ${"❤".repeat(SHAPES.shapesGame.lives)}`;
 } //drawShapes
 
 function generateChoices() {
@@ -293,15 +298,22 @@ function generateChoices() {
 } //generateChoices
 
 function endGame(win = false) {
-  SHAPES.lives.innerHTML = `Lives: 💀`;
+  if (!win) {
+    SHAPES.lives.innerHTML = `Lives: 💀`;
+  }
 
   SHAPES.shapesGame.gameStarted = false;
+  document.querySelectorAll(".hide-after-game").forEach((e) => {
+    e.style.display = "none";
+  });
   document.querySelector("#endMessage").innerText = win ? "Congrats! You've filled the row!" : "YOU LOST! Wow, you are so bad at this game!";
   document.querySelector("#rule").innerText = SHAPES.shapesGame.rule.desc;
   SHAPES.dVariants.style.visibility = "hidden";
   SHAPES.dResult.style.visibility = "visible";
   SHAPES.startBtn.disabled = false;
   SHAPES.dDifficulty.disabled = false;
+  SHAPES.dStartingLives.disabled = false;
+  SHAPES.dShapesLength.disabled = false;
 } //endGame
 
 function makeChoice(event) {
@@ -344,10 +356,15 @@ function makeChoice(event) {
 
 function start() {
   SHAPES.dResult.style.visibility = "hidden";
+  SHAPES.dStartingLives.disabled = true;
+  SHAPES.dShapesLength.disabled = true;
   SHAPES.startBtn.disabled = true;
   SHAPES.dDifficulty.disabled = true;
+  document.querySelectorAll(".hide-after-game").forEach((e) => {
+    e.style.display = "";
+  });
   SHAPES.shapesGame.difficulty = parseInt(SHAPES.dDifficulty.value, 10) || 0;
-  SHAPES.shapesGame.lives = 3 - SHAPES.shapesGame.difficulty;
+  SHAPES.shapesGame.lives = parseInt(SHAPES.dStartingLives.value, 10) || 1;
   const rulePool = rules[Object.keys(rules)[SHAPES.shapesGame.difficulty]];
   SHAPES.shapesGame.rule = rulePool[Math.floor(Math.random() * rulePool.length)];
   SHAPES.shapesGame.figs.length = 0;
@@ -404,14 +421,36 @@ function playTurn() {
 } //playTurn
 
 function listeners() {
-  document.getElementById("difficulty").onchange = function () {
-    document.getElementById("lives").innerHTML = `Lives: ${"❤".repeat(3 - parseInt(this.value, 10))}`;
+  const updateStartingLivesListener = function () {
+    document.getElementById("lives").innerHTML = `Lives: ${"❤".repeat(parseInt(this.value, 10))}`;
+    SHAPES.lblStartingLives.innerText = this.value;
   };
-  SHAPES.optionList.forEach((o) => o.addEventListener("click", makeChoice));
+  SHAPES.dStartingLives.oninput = updateStartingLivesListener;
+  SHAPES.dStartingLives.onchange = updateStartingLivesListener;
+  SHAPES.dStartingLives.dispatchEvent(new Event("change")); // instantly calls listener
 
-  document.getElementById("shapeslength").oninput = function () {
-    document.getElementById("shapeslengthlabel").innerHTML = this.value;
+  const updateLengthListener = function () {
+    const count = parseInt(this.value, 10) || 5;
+    SHAPES.lblShapesLength.innerText = count;
+
+    while (field.firstChild) {
+      field.removeChild(field.lastChild);
+    }
+
+    const figslist = [];
+    for (let i = 0; i < count; i++) {
+      const div = document.createElement("div");
+      div.classList = "figure unknown";
+      SHAPES.field.appendChild(div);
+      figslist.push(div);
+    }
+    SHAPES.figureList = figslist;
   };
+  SHAPES.dShapesLength.oninput = updateLengthListener;
+  SHAPES.dShapesLength.onchange = updateLengthListener;
+  SHAPES.dShapesLength.dispatchEvent(new Event("change")); // instantly calls listener
+
+  SHAPES.optionList.forEach((o) => o.addEventListener("click", makeChoice));
 } //listeners
 
 class Figure {

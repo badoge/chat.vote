@@ -461,21 +461,14 @@
         <div class="row" id="gameRow">
           <div class="row" id="shapesrow">
             <div id="field" class="figure-container">
-              <div class="figure unknown"></div>
-              <div class="figure unknown"></div>
-              <div class="figure unknown"></div>
-              <div class="figure unknown"></div>
-              <div class="figure unknown"></div>
-              <div class="figure unknown"></div>
-              <div class="figure unknown"></div>
-              <div class="figure unknown"></div>
+              <!-- Instantiated by: <div class="figure unknown"></div> -->
             </div>
           </div>
           <div class="row">
             <div class="col-6" id="shapescol1">
               <div id="lives">Lives: ❤❤❤</div>
-              <h3>Choose which figure will go next:</h3>
-              <div id="variants" class="figure-container">
+              <h3 class="hide-after-game">Choose which figure will go next:</h3>
+              <div id="variants" class="figure-container hide-after-game">
                 <div class="figure unknown shapesoptions" data-choice="0">1</div>
                 <div class="figure unknown shapesoptions" data-choice="1">2</div>
                 <div class="figure unknown shapesoptions" data-choice="2">3</div>
@@ -487,24 +480,45 @@
               </div>
             </div>
             <div class="col-6">
-              <div class="card">
+              <div class="card mb-2">
                 <div class="card-body">
-                  <h3>Difficulty:</h3>
-                  <select id="difficulty" class="form-select" aria-label="difficulty select">
-                    <option selected value="0">Simple rules</option>
-                    <option value="1">Harder rules</option>
-                    <option value="2">Absolutely dank rules</option>
-                  </select>
-                  <label for="shapeslength" class="form-label text-body-secondary mt-3">Length: <span id="shapeslengthlabel">8</span></label>
-                  <input disabled type="range" class="form-range" min="4" max="12" value="8" id="shapeslength" />
+                  <div class="input-group mb-2">
+                    <label class="input-group-text" for="difficulty">Difficulty</label>
+                    <select id="difficulty" class="form-select" aria-label="difficulty select">
+                      <option selected value="0">Simple rules</option>
+                      <option value="1">Harder rules</option>
+                      <option value="2">Absolutely dank rules</option>
+                    </select>
+                  </div>
+                  <div class="input-group mb-2">
+                    <label class="input-group-text" for="startinglives">Starting lives</label>
+                    <div class="flex-grow-1 px-2 border d-flex align-items-center justify-content-center">
+                      <input type="range" class="form-range" min="1" max="5" value="3" id="startinglives" />
+                    </div>
+                    <span class="input-group-text fw-bold" id="startingliveslabel">3</span>
+                  </div>
+                  <div class="input-group mb-2">
+                    <label class="input-group-text" for="shapeslength">Length</label>
+                    <div class="flex-grow-1 px-2 border d-flex align-items-center justify-content-center">
+                      <input type="range" class="form-range" min="5" max="10" value="8" id="shapeslength" />
+                    </div>
+                    <span class="input-group-text fw-bold" id="shapeslengthlabel">8</span>
+                  </div>
                   <button id="startshapesbtn" onclick="start()" type="button" class="btn btn-success">Start new game</button>
                 </div>
               </div>
-              <div id="shapeschartdiv" class="chart-container">
-                <canvas id="shapeschartCanvas"></canvas>
+              <div class="card hide-after-game" style="display: none">
+                <div class="card-body">
+                  <div id="shapeschartdiv" class="chart-container">
+                    <canvas id="shapeschartCanvas"></canvas>
+                  </div>
+                  <div class="d-flex flex-row">
+                    <button type="button" onclick="playTurn()" class="btn btn-success">Play chat's pick</button>
+                    <div class="flex-grow-1"></div>
+                    <span id="totalvotesshapes">Total votes: 0</span>
+                  </div>
+                </div>
               </div>
-              <span id="totalvotesshapes">Total votes: 0</span><br />
-              <button type="button" onclick="playTurn()" class="btn btn-success">Play chat's pick</button>
             </div>
           </div>
         </div>
@@ -520,7 +534,7 @@
     <script src="/js/chart.umd.js"></script>
     <script src="/js/functions.min.js"></script>
     <script src="/games/games.min.js"></script>
-    <script src="/games/shapes/shapes.js"></script>
+    <script src="/games/shapes/shapes.min.js"></script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-H43YN7FSSP"></script>
     <script>
