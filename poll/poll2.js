@@ -1,5 +1,3 @@
-/*jshint esversion: 8 */
-
 let myChart;
 let barChart = true;
 let pieChart = false;

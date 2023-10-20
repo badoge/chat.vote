@@ -1,5 +1,3 @@
-/* jshint unused:vars */
-/*jshint esversion: 9 */
 /* globals
   Phaser, arenaSetup,
   ArenaNotification, ArenaKillFeedNotification,

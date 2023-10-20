@@ -1,4 +1,3 @@
-/*jshint esversion: 11 */
 let allEmotes = {
   twitchglobal: [],
   bttvglobal: [],
@@ -24,7 +23,6 @@ let elements = {
   topRight: document.getElementById("topRight"),
   loginButton: document.getElementById("loginButton"),
   channelName: document.getElementById("channelName"),
-  connectbtn: document.getElementById("connectbtn"),
   darkTheme: document.getElementById("darkTheme"),
 
   //main
@@ -521,84 +519,18 @@ function listeners() {
   };
 } //listeners
 
-async function connect() {
-  elements.status.innerHTML = `
-  <h4>
-  <span class="badge bg-warning">Connecting... 
-  <div class="spinner-border" style="width:18px;height:18px;" role="status"><span class="visually-hidden">Loading...</span></div>
-  </span>
-  </h4>`;
-  elements.topRight.innerHTML = `
-  <div class="btn-group" role="group" aria-label="log in button group">
-  <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></button>
-  <div class="btn-group" role="group">
-  <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
-  <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="btnGroupDrop1">
-  <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
-  </ul>
-  </div>
-  </div>`;
-  refreshData();
-
-  allEmotes.twitch = await getChannelTwitchEmotes(USER.channel, true);
-  allEmotes.bttv = await getChannelBTTVEmotes(USER.userID, true);
-  allEmotes.ffz = await getChannelFFZEmotes(USER.userID, true);
-  allEmotes.seventv = await getChannel7TVEmotes(USER.userID, true);
-
-  document.getElementById("twitchdesc").innerHTML = `<br>${allEmotes.twitch.length} emotes`;
-  document.getElementById("bttvdesc").innerHTML = `<br>${allEmotes.bttv.length} emotes`;
-  document.getElementById("ffzdesc").innerHTML = `<br>${allEmotes.ffz.length} emotes`;
-  document.getElementById("7tvdesc").innerHTML = `<br>${allEmotes.seventv.length} emotes`;
-
-  let options = {
-    options: {
-      clientId: CLIENT_ID,
-      debug: false,
-    },
-    connection: {
-      secure: true,
-      reconnect: true,
-    },
-    channels: [USER.channel],
-  };
-  client = new tmi.client(options);
-
-  client.on("message", async (target, context, msg, self) => {
-    if (msg === DRAW.drawanswer) {
-      correct({
-        id: context["user-id"],
-        username: context.username,
-        displayname: context["display-name"],
-        color: context.color,
-        badges: context.badges,
-        firstmsg: context["first-msg"],
-      });
-    }
-  }); //message
-
-  client.on("timeout", (channel, username, reason, duration, userstate) => {}); //timeout
-
-  client.on("connected", async (address, port) => {
-    console.log(`Connected to ${address}:${port}`);
-    elements.status.innerHTML = `<h4><span class="badge bg-success">Connected :)</span></h4>`;
-    saveSettings();
-    sendUsername(`chat.vote/games/draw`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
-    if (await checkTags(USER.userID, USER.access_token)) {
-      elements.vtsLink.style.display = "";
-    }
-    loadPFP();
-  }); //connected
-
-  client.on("disconnected", (reason) => {
-    elements.status.innerHTML = `<h4><span class="badge bg-danger">Disconnected: ${reason}</span></h4>`;
-  }); //disconnected
-
-  client.on("notice", (channel, msgid, message) => {
-    elements.status.innerHTML = `<h4><span class="badge bg-danger">Disconnected: ${message}</span></h4>`;
-  }); //notice
-
-  client.connect().catch(console.error);
-} //connect
+function handleMessage(target, context, msg, self) {
+  if (msg === DRAW.drawanswer) {
+    correct({
+      id: context["user-id"],
+      username: context.username,
+      displayname: context["display-name"],
+      color: context.color,
+      badges: context.badges,
+      firstmsg: context["first-msg"],
+    });
+  }
+} //handleMessage
 
 window.onload = async function () {
   darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
@@ -623,10 +555,6 @@ window.onload = async function () {
     }
   });
 
-  elements.connectbtn.addEventListener("click", function () {
-    connect();
-  });
-
   elements.darkTheme.onchange = function () {
     switchTheme(this.checked);
     saveSettings();
@@ -643,6 +571,18 @@ window.onload = async function () {
   document.getElementById("ffzglobaldesc").innerHTML = `<br>${allEmotes.ffzglobal.length} emotes`;
   document.getElementById("7tvglobaldesc").innerHTML = `<br>${allEmotes.seventvglobal.length} emotes`;
   document.getElementById("emojidesc").innerHTML = `<br>${allEmotes.emoji.length} emoji`;
+
+  if (USER.channel) {
+    allEmotes.twitch = await getChannelTwitchEmotes(USER.channel, true);
+    allEmotes.bttv = await getChannelBTTVEmotes(USER.userID, true);
+    allEmotes.ffz = await getChannelFFZEmotes(USER.userID, true);
+    allEmotes.seventv = await getChannel7TVEmotes(USER.userID, true);
+
+    document.getElementById("twitchdesc").innerHTML = `<br>${allEmotes.twitch.length} emotes`;
+    document.getElementById("bttvdesc").innerHTML = `<br>${allEmotes.bttv.length} emotes`;
+    document.getElementById("ffzdesc").innerHTML = `<br>${allEmotes.ffz.length} emotes`;
+    document.getElementById("7tvdesc").innerHTML = `<br>${allEmotes.seventv.length} emotes`;
+  }
 }; //onload
 
 function addBadges(badges, userid, firstmsg) {

@@ -1,5 +1,3 @@
-/*jshint esversion: 11 */
-
 async function refreshData() {
   darkTheme = elements.darkTheme.checked ?? true;
 
@@ -210,3 +208,60 @@ function toggleGrid() {
   elements.grid.style.display = elements.grid.style.display == "none" ? "" : "none";
   elements.gameDiv.style.display = elements.gameDiv.style.display == "" ? "none" : "";
 } //toggleGrid
+
+function connect() {
+  elements.status.innerHTML = `
+  <h4>
+  <span class="badge bg-warning">Connecting... 
+  <div class="spinner-border" style="width:18px;height:18px;" role="status"><span class="visually-hidden">Loading...</span></div>
+  </span>
+  </h4>`;
+  elements.topRight.innerHTML = `
+  <div class="btn-group" role="group" aria-label="log in button group">
+  <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></button>
+  <div class="btn-group" role="group">
+  <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
+  <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="btnGroupDrop1">
+  <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
+  </ul>
+  </div>
+  </div>`;
+  refreshData();
+  let options = {
+    options: {
+      clientId: CLIENT_ID,
+      debug: false,
+    },
+    connection: {
+      secure: true,
+      reconnect: true,
+    },
+    channels: [USER.channel],
+  };
+  const client = new tmi.client(options);
+
+  client.on("message", handleMessage);
+
+  //client.on("timeout", (channel, username, reason, duration, userstate) => {}); //timeout
+
+  client.on("connected", async (address, port) => {
+    console.log(`Connected to ${address}:${port}`);
+    elements.status.innerHTML = `<h4><span class="badge bg-success">Connected :)</span></h4>`;
+    saveSettings();
+    sendUsername(window.location.href.replace("https://", ""), USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
+    if (await checkTags(USER.userID, USER.access_token)) {
+      elements.vtsLink.style.display = "";
+    }
+    loadPFP();
+  }); //connected
+
+  client.on("disconnected", (reason) => {
+    elements.status.innerHTML = `<h4><span class="badge bg-danger">Disconnected: ${reason}</span></h4>`;
+  }); //disconnected
+
+  client.on("notice", (channel, msgid, message) => {
+    elements.status.innerHTML = `<h4><span class="badge bg-danger">Disconnected: ${message}</span></h4>`;
+  }); //notice
+
+  client.connect().catch(console.error);
+} //connect

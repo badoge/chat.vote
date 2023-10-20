@@ -1,5 +1,3 @@
-/*jshint esversion: 9 */
-
 const obs = new OBSWebSocket();
 
 let fft;

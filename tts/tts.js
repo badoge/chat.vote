@@ -1,14 +1,12 @@
-let cid = "qn0wimnszbqlwfnszdz3wwfz430eqr";
 let synth;
 let username;
-let client;
 synth = window.speechSynthesis;
 
 function connect() {
   username = document.getElementById("username").value;
   let options = {
     options: {
-      clientId: cid,
+      clientId: CLIENT_ID,
       debug: false,
     },
     connection: {
@@ -18,7 +16,7 @@ function connect() {
     channels: [username],
   };
   console.log(`tmi connection options: ${options}`);
-  client = new tmi.client(options);
+  const client = new tmi.client(options);
   client.on("message", onMessageHandler);
   client.on("timeout", onTimeoutHandler);
   client.on("connected", onConnectedHandler);

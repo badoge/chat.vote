@@ -1,5 +1,3 @@
-/*jshint esversion: 11 */
-
 let _game;
 let streamersTurn = true;
 let voters = [];
@@ -18,7 +16,6 @@ let elements = {
   topRight: document.getElementById("topRight"),
   loginButton: document.getElementById("loginButton"),
   channelName: document.getElementById("channelName"),
-  connectbtn: document.getElementById("connectbtn"),
   darkTheme: document.getElementById("darkTheme"),
 
   //main
@@ -52,82 +49,27 @@ let CONNECT4 = {
   ],
 }; //CONNECT4
 
-function connect() {
-  elements.status.innerHTML = `
-  <h4>
-  <span class="badge bg-warning">Connecting... 
-  <div class="spinner-border" style="width:18px;height:18px;" role="status"><span class="visually-hidden">Loading...</span></div>
-  </span>
-  </h4>`;
-  elements.topRight.innerHTML = `
-  <div class="btn-group" role="group" aria-label="log in button group">
-  <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></button>
-  <div class="btn-group" role="group">
-  <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
-  <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="btnGroupDrop1">
-  <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
-  </ul>
-  </div>
-  </div>`;
-  refreshData();
-  let options = {
-    options: {
-      clientId: CLIENT_ID,
-      debug: false,
-    },
-    connection: {
-      secure: true,
-      reconnect: true,
-    },
-    channels: [USER.channel],
-  };
-  client = new tmi.client(options);
+function handleMessage(target, context, msg, self) {
+  let input = msg.split(" ").filter(Boolean);
 
-  client.on("message", async (target, context, msg, self) => {
-    let input = msg.split(" ").filter(Boolean);
+  if (streamersTurn) {
+    return;
+  }
 
-    if (streamersTurn) {
+  let vote_int = parseInt(input[0], 10);
+  if (isNaN(vote_int)) {
+    return;
+  }
+  if (vote_int > 0 && vote_int < 8) {
+    if (!voters.includes(context.username)) {
+      voters.push(context.username);
+      let index = CONNECT4.results.findIndex((obj) => obj.label == vote_int);
+      CONNECT4.results[index].data += 1;
+      updateGraph("c4");
       return;
     }
-
-    let vote_int = parseInt(input[0], 10);
-    if (isNaN(vote_int)) {
-      return;
-    }
-    if (vote_int > 0 && vote_int < 8) {
-      if (!voters.includes(context.username)) {
-        voters.push(context.username);
-        let index = CONNECT4.results.findIndex((obj) => obj.label == vote_int);
-        CONNECT4.results[index].data += 1;
-        updateGraph("c4");
-        return;
-      }
-    }
-  }); //message
-
-  client.on("timeout", (channel, username, reason, duration, userstate) => {}); //timeout
-
-  client.on("connected", async (address, port) => {
-    console.log(`Connected to ${address}:${port}`);
-    elements.status.innerHTML = `<h4><span class="badge bg-success">Connected :)</span></h4>`;
-    saveSettings();
-    sendUsername(`chat.vote/games/donkhunt`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
-    if (await checkTags(USER.userID, USER.access_token)) {
-      elements.vtsLink.style.display = "";
-    }
-    loadPFP();
-  }); //connected
-
-  client.on("disconnected", (reason) => {
-    elements.status.innerHTML = `<h4><span class="badge bg-danger">Disconnected: ${reason}</span></h4>`;
-  }); //disconnected
-
-  client.on("notice", (channel, msgid, message) => {
-    elements.status.innerHTML = `<h4><span class="badge bg-danger">Disconnected: ${message}</span></h4>`;
-  }); //notice
-
-  client.connect().catch(console.error);
-} //connect
+  }
+} //handleMessage
 
 window.onload = function () {
   darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
@@ -150,10 +92,6 @@ window.onload = function () {
     if (event.key === "Enter") {
       connect();
     }
-  });
-
-  elements.connectbtn.addEventListener("click", function () {
-    connect();
   });
 
   elements.darkTheme.onchange = function () {

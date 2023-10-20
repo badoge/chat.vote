@@ -1,5 +1,3 @@
-/*jshint esversion: 11 */
-
 let elements = {
   //modals
   resetSettingsModal: document.getElementById("resetSettingsModal"),
@@ -110,7 +108,6 @@ let elements = {
 let raffle_users = [];
 let raffle_tickets = [];
 let raffle_open;
-let client;
 let extraTimer;
 let timer_raffle;
 let currentTime = 0;
@@ -422,7 +419,7 @@ function connect() {
     },
     channels: [USER.channel],
   };
-  client = new tmi.client(options);
+  const client = new tmi.client(options);
 
   client.on("message", async (target, context, msg, self) => {
     if (context.username == currentRaffleWinner) {

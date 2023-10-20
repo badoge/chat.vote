@@ -1,5 +1,3 @@
-/*jshint esversion: 9 */
-
 let channelBadges = { subscriber: [], bits: [] };
 let globalBadges = {};
 let customBadges = [];
@@ -388,7 +386,7 @@ function connect() {
     },
     channels: [USER.channel],
   };
-  client = new tmi.client(options);
+  const client = new tmi.client(options);
 
   client.on("message", async (target, context, msg, self) => {
     let input = msg.split(" ").filter(Boolean);

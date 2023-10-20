@@ -1,4 +1,3 @@
-/*jshint esversion: 11 */
 let voters = [];
 
 let allEmotes = {
@@ -25,7 +24,6 @@ let elements = {
   topRight: document.getElementById("topRight"),
   loginButton: document.getElementById("loginButton"),
   channelName: document.getElementById("channelName"),
-  connectbtn: document.getElementById("connectbtn"),
   darkTheme: document.getElementById("darkTheme"),
 
   //main
@@ -44,76 +42,35 @@ let USER = {
   userID: "",
   platform: "",
 };
+function handleMessage(target, context, msg, self) {
+  let limit = false;
+  switch (EMOTEBENCHMARK.ebdifficulty) {
+    case 4:
+    case 5:
+      limit = true;
+      break;
+    default:
+      break;
+  }
 
-async function connect() {
-  elements.status.innerHTML = `
-  <h4>
-  <span class="badge bg-warning">Connecting... 
-  <div class="spinner-border" style="width:18px;height:18px;" role="status"><span class="visually-hidden">Loading...</span></div>
-  </span>
-  </h4>`;
-  elements.topRight.innerHTML = `
-  <div class="btn-group" role="group" aria-label="log in button group">
-  <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></button>
-  <div class="btn-group" role="group">
-  <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
-  <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="btnGroupDrop1">
-  <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
-  </ul>
-  </div>
-  </div>`;
-  refreshData();
-
-  allEmotes.twitch = await getChannelTwitchEmotes(USER.channel, true);
-  allEmotes.bttv = await getChannelBTTVEmotes(USER.userID, true);
-  allEmotes.ffz = await getChannelFFZEmotes(USER.userID, true);
-  allEmotes.seventv = await getChannel7TVEmotes(USER.userID, true);
-
-  document.getElementById("twitchdesc").innerHTML = `<br>${allEmotes.twitch.length} emotes`;
-  document.getElementById("bttvdesc").innerHTML = `<br>${allEmotes.bttv.length} emotes`;
-  document.getElementById("ffzdesc").innerHTML = `<br>${allEmotes.ffz.length} emotes`;
-  document.getElementById("7tvdesc").innerHTML = `<br>${allEmotes.seventv.length} emotes`;
-
-  let options = {
-    options: {
-      clientId: CLIENT_ID,
-      debug: false,
-    },
-    connection: {
-      secure: true,
-      reconnect: true,
-    },
-    channels: [USER.channel],
-  };
-  client = new tmi.client(options);
-
-  client.on("message", async (target, context, msg, self) => {
-    ebguess(context, msg);
-  }); //message
-
-  client.on("timeout", (channel, username, reason, duration, userstate) => {}); //timeout
-
-  client.on("connected", async (address, port) => {
-    console.log(`Connected to ${address}:${port}`);
-    elements.status.innerHTML = `<h4><span class="badge bg-success">Connected :)</span></h4>`;
-    saveSettings();
-    sendUsername(`chat.vote/games/emotes`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
-    if (await checkTags(USER.userID, USER.access_token)) {
-      elements.vtsLink.style.display = "";
+  if (limit) {
+    if (!voters.includes(context.username)) {
+      voters.push(context.username);
+      if (msg == EMOTEBENCHMARK.ebanswer.trim()) {
+      }
     }
-    loadPFP();
-  }); //connected
+  } else {
+    if (msg == EMOTEBENCHMARK.ebanswer.trim()) {
+      if (EMOTEBENCHMARK.qualified.includes(context.username) || EMOTEBENCHMARK.ebturn == 1) {
+        if (!EMOTEBENCHMARK.qualifiedcurrentround.includes(context.username)) {
+          EMOTEBENCHMARK.qualifiedcurrentround.push(context.username);
+        }
+      }
 
-  client.on("disconnected", (reason) => {
-    elements.status.innerHTML = `<h4><span class="badge bg-danger">Disconnected: ${reason}</span></h4>`;
-  }); //disconnected
-
-  client.on("notice", (channel, msgid, message) => {
-    elements.status.innerHTML = `<h4><span class="badge bg-danger">Disconnected: ${message}</span></h4>`;
-  }); //notice
-
-  client.connect().catch(console.error);
-} //connect
+      document.getElementById("eboutput").innerHTML = `Qualified players: ${EMOTEBENCHMARK.qualifiedcurrentround.join(", ")}`;
+    }
+  }
+} //handleMessage
 
 window.onload = async function () {
   darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
@@ -138,10 +95,6 @@ window.onload = async function () {
     }
   });
 
-  elements.connectbtn.addEventListener("click", function () {
-    connect();
-  });
-
   elements.darkTheme.onchange = function () {
     switchTheme(this.checked);
     saveSettings();
@@ -157,6 +110,18 @@ window.onload = async function () {
   document.getElementById("bttvglobaldesc").innerHTML = `<br>${allEmotes.bttvglobal.length} emotes`;
   document.getElementById("ffzglobaldesc").innerHTML = `<br>${allEmotes.ffzglobal.length} emotes`;
   document.getElementById("7tvglobaldesc").innerHTML = `<br>${allEmotes.seventvglobal.length} emotes`;
+
+  if (USER.channel) {
+    allEmotes.twitch = await getChannelTwitchEmotes(USER.channel, true);
+    allEmotes.bttv = await getChannelBTTVEmotes(USER.userID, true);
+    allEmotes.ffz = await getChannelFFZEmotes(USER.userID, true);
+    allEmotes.seventv = await getChannel7TVEmotes(USER.userID, true);
+
+    document.getElementById("twitchdesc").innerHTML = `<br>${allEmotes.twitch.length} emotes`;
+    document.getElementById("bttvdesc").innerHTML = `<br>${allEmotes.bttv.length} emotes`;
+    document.getElementById("ffzdesc").innerHTML = `<br>${allEmotes.ffz.length} emotes`;
+    document.getElementById("7tvdesc").innerHTML = `<br>${allEmotes.seventv.length} emotes`;
+  }
 }; //onload
 
 let EMOTEBENCHMARK = {
@@ -360,36 +325,6 @@ function startebturn() {
     document.getElementById("ebemotes").style.opacity = 0;
   }, 2000 + EMOTEBENCHMARK.emotetimer - EMOTEBENCHMARK.ebturn * 100);
 } //startebturn
-
-function ebguess(context, msg) {
-  let limit = false;
-  switch (EMOTEBENCHMARK.ebdifficulty) {
-    case 4:
-    case 5:
-      limit = true;
-      break;
-    default:
-      break;
-  }
-
-  if (limit) {
-    if (!voters.includes(context.username)) {
-      voters.push(context.username);
-      if (msg == EMOTEBENCHMARK.ebanswer.trim()) {
-      }
-    }
-  } else {
-    if (msg == EMOTEBENCHMARK.ebanswer.trim()) {
-      if (EMOTEBENCHMARK.qualified.includes(context.username) || EMOTEBENCHMARK.ebturn == 1) {
-        if (!EMOTEBENCHMARK.qualifiedcurrentround.includes(context.username)) {
-          EMOTEBENCHMARK.qualifiedcurrentround.push(context.username);
-        }
-      }
-
-      document.getElementById("eboutput").innerHTML = `Qualified players: ${EMOTEBENCHMARK.qualifiedcurrentround.join(", ")}`;
-    }
-  }
-} //ebguess
 
 function startebtimer() {
   document.getElementById("ebtimer").style.display = "";

@@ -6,8 +6,6 @@ function copyLink(link) {
   }, 1000);
 } //copyLink
 
-/*jshint esversion: 9 */
-
 let elements = {
   //modals
   modal1: document.getElementById("modal1"),
@@ -28,7 +26,6 @@ let elements = {
   loginButton: document.getElementById("loginButton"),
 };
 
-let client;
 let color = "";
 let currentTime = 0;
 let loginButton;
@@ -125,7 +122,7 @@ function connect() {
     },
     channels: [QUEUE.channel],
   };
-  client = new tmi.client(options);
+  const client = new tmi.client(options);
 
   client.on("message", async (target, context, msg, self) => {
     let input = msg.split(" ").filter(Boolean);

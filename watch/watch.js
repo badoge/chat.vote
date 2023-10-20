@@ -1,6 +1,3 @@
-/*jshint esversion: 6 */
-
-let cid = "qn0wimnszbqlwfnszdz3wwfz430eqr";
 let modal1;
 let modal2;
 let modal3;
@@ -22,7 +19,7 @@ let elements = {
 function connect() {
   let options = {
     options: {
-      clientId: cid,
+      clientId: CLIENT_ID,
       debug: false,
     },
     connection: {
@@ -31,7 +28,7 @@ function connect() {
     },
     channels: [channel],
   };
-  client = new tmi.client(options);
+  const client = new tmi.client(options);
   client.on("message", onMessageHandler);
   client.on("connected", onConnectedHandler);
   client.connect().catch(console.error);

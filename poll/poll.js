@@ -1,5 +1,3 @@
-/*jshint esversion: 11 */
-
 let deleteAllModal, pollModal, captchaModal;
 let mode = 0;
 let level = 1;

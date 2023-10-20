@@ -1,5 +1,3 @@
-/* jshint unused:false */
-/*jshint esversion: 9 */
 /* globals Phaser, arena, arenaSetup */
 
 class AttackProjectile {

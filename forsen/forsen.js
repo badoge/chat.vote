@@ -37,7 +37,6 @@ let n = 0;
 let n2 = 0;
 let n3 = 0;
 let raffle_open;
-let client;
 let color = "";
 let currentTime = 0;
 let modal8, modal9;
@@ -92,7 +91,7 @@ function connect() {
     },
     channels: [USERNAME],
   };
-  client = new tmi.client(options);
+  const client = new tmi.client(options);
 
   client.on("message", async (target, context, msg, self) => {
     let input = msg.split(" ").filter(Boolean);

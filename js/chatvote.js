@@ -1,5 +1,3 @@
-/*jshint esversion: 11 */
-
 let elements = {
   //modals
   deleteAllModal: document.getElementById("deleteAllModal"),
@@ -138,7 +136,6 @@ let suggestions_enabled = false;
 let ctx = "";
 let mainChart;
 let voting_enabled = false;
-let client;
 let numberOfSuggestions = 0;
 let suggestionLimitReached = false;
 let table;
@@ -537,7 +534,7 @@ function connect() {
     },
     channels: [USER.channel],
   };
-  client = new tmi.client(options);
+  const client = new tmi.client(options);
 
   client.on("message", async (target, context, msg, self) => {
     let input = msg.split(" ").filter(Boolean);
