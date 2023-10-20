@@ -258,8 +258,8 @@ window.onload = function () {
 
   let tag1 = document.createElement("script");
   let tag2 = document.createElement("script");
-  tag1.src = "/waytoodank/p5.min.js";
-  tag2.src = "/waytoodank/p5.sound.min.js";
+  tag1.src = "/js/p5.min.js";
+  tag2.src = "/js/p5.sound.min.js";
   document.getElementsByTagName("head")[0].appendChild(tag1);
   setTimeout(() => {
     document.getElementsByTagName("head")[0].appendChild(tag2);
