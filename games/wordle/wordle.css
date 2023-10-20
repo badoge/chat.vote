@@ -15,10 +15,15 @@ body {
 }
 
 #toastContainer {
-  z-index: 1056;
   position: fixed;
-  top: 1%;
-  width: 15vw;
+  bottom: 10px;
+  left: 10px;
+  z-index: 1056;
+  font-weight: bold;
+}
+
+#toastContainer > div > div {
+  font-size: 1.5em;
 }
 
 .resizable {
@@ -43,6 +48,7 @@ body {
 }
 
 .nwwrapper {
+  margin: 0 auto;
   width: fit-content;
   overflow: hidden;
   padding: 30px;
@@ -69,4 +75,48 @@ body {
   border-color: #000000;
   border-style: solid;
   overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.25s ease-in, font-size 0.1s ease-in;
+}
+.nwsquare:empty {
+  font-size: 0px;
+}
+
+#nwoutput {
+  width: 100%;
+  display: flex;
+}
+
+/* keyboard */
+
+#nwkeyboard {
+  margin: 1em 0;
+  display: flex;
+  flex-flow: column nowrap;
+  gap: 4px;
+}
+.nw-keyboard-row {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: stretch;
+  justify-content: center;
+  gap: 4px;
+}
+.nw-keyboard-key {
+  min-width: 2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-shadow: 0px 0px 2px black;
+  cursor: pointer;
+  transition: background-color 0.25s ease-in;
+}
+.nw-keyboard-key-wide {
+  min-width: 2.5em;
 }
