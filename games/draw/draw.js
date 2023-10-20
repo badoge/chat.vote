@@ -459,7 +459,7 @@ function listeners() {
 
   let colorbtns = document.getElementsByClassName("colorpreset");
   Array.from(colorbtns).forEach(function (element) {
-    element.addEventListener("click", DRAW.changeColor);
+    element.addEventListener("click", changeColor);
   });
   document.getElementById("twitchglobal").onchange = function () {
     DRAW.twitchglobal = this.checked;
