@@ -1,15 +1,11 @@
 let elements = {
   //modals
   deleteAllModal: document.getElementById("deleteAllModal"),
-  resetPoll: document.getElementById("resetPoll"),
   randomOptionModal: document.getElementById("randomOptionModal"),
   randomOptionWinner: document.getElementById("randomOptionWinner"),
-  randomOptionReroll: document.getElementById("randomOptionReroll"),
   resetSettingsModal: document.getElementById("resetSettingsModal"),
-  resetSettings: document.getElementById("resetSettings"),
   timeOverModal: document.getElementById("timeOverModal"),
   timeOverWinner: document.getElementById("timeOverWinner"),
-  removeWinner: document.getElementById("removeWinner"),
   yesnoTimeOverModal: document.getElementById("yesnoTimeOverModal"),
   yesnoTimeOverWinner: document.getElementById("yesnoTimeOverWinner"),
   restartYesno: document.getElementById("restartYesno"),
@@ -17,7 +13,6 @@ let elements = {
   tieModal: document.getElementById("tieModal"),
   randomYesnoModal: document.getElementById("randomYesnoModal"),
   coin: document.getElementById("coin"),
-  randomYesnoReroll: document.getElementById("randomYesnoReroll"),
 
   //navbar
   vtsLink: document.getElementById("vtsLink"),
@@ -25,7 +20,6 @@ let elements = {
   topRight: document.getElementById("topRight"),
   loginButton: document.getElementById("loginButton"),
   channelName: document.getElementById("channelName"),
-  connectbtn: document.getElementById("connectbtn"),
   darkTheme: document.getElementById("darkTheme"),
 
   //start voting button
@@ -43,7 +37,6 @@ let elements = {
   enableSuggestionsDropdown: document.getElementById("enableSuggestionsDropdown"),
   suggestionLimitUser: document.getElementById("suggestionLimitUser"),
   suggestionLimit: document.getElementById("suggestionLimit"),
-  suggestCommandLink: document.getElementById("suggestCommandLink"),
 
   //hotbar - quick actions
   restartPoll: document.getElementById("restartPoll"),
@@ -63,7 +56,6 @@ let elements = {
   advancedTab: document.getElementById("advancedTab"),
   contactTab: document.getElementById("contactTab"),
   remove: document.getElementById("remove"),
-  removeAndRestart: document.getElementById("removeAndRestart"),
   multiChoice: document.getElementById("multiChoice"),
   multiChoiceExample: document.getElementById("multiChoiceExample"),
   allowChange: document.getElementById("allowChange"),
@@ -75,7 +67,6 @@ let elements = {
   refreshWarningEnabled: document.getElementById("refreshWarningEnabled"),
   linkPreviewThumbnailsEnabled: document.getElementById("linkPreviewThumbnailsEnabled"),
   confettiLevel: document.getElementById("confettiLevel"),
-  getEmotes: document.getElementById("getEmotes"),
   bttvGlobalEmotes: document.getElementById("bttvGlobalEmotes"),
   bttvChannelEmotes: document.getElementById("bttvChannelEmotes"),
   ffzGlobalEmotes: document.getElementById("ffzGlobalEmotes"),
@@ -85,9 +76,7 @@ let elements = {
   voters_selected: document.getElementById("voters_selected"),
   json_selected: document.getElementById("json_selected"),
   txt_selected: document.getElementById("txt_selected"),
-  download: document.getElementById("download"),
   optionList: document.getElementById("optionList"),
-  addOptionBulk: document.getElementById("addOptionBulk"),
 
   //main
   toastContainer: document.getElementById("toastContainer"),
@@ -881,6 +870,7 @@ async function loadPFP() {
     <a
       role="button"
       id="loginButton"
+      onclick="login()"
       class="btn btn-twitch"
       tabindex="0"
       data-bs-container="body"
@@ -910,7 +900,7 @@ async function loadPFP() {
             <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
           </div>
           <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
-          <button type="button" id="connectbtn" class="btn btn-primary float-end">Connect</button>
+          <button type="button" onclick="connect()" class="btn btn-primary float-end">Connect</button>
         </div>
       </div>
     </div>
@@ -1437,6 +1427,7 @@ function logout() {
   <a
     role="button"
     id="loginButton"
+    onclick="login()"
     class="btn btn-twitch"
     tabindex="0"
     data-bs-container="body"
@@ -1466,7 +1457,7 @@ function logout() {
           <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
         </div>
         <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
-        <button type="button" id="connectbtn" class="btn btn-primary float-end">Connect</button>
+        <button type="button" onclick="connect()" class="btn btn-primary float-end">Connect</button>
       </div>
     </div>
   </div>
@@ -1900,9 +1891,6 @@ window.onload = function () {
     updateChart();
   };
 
-  elements.suggestionLimitUser.onchange = function () {
-    saveSettings();
-  };
   elements.suggestionLimit.onchange = function () {
     let newValue = parseInt(this.value, 10);
     if (newValue > CHATVOTE.suggestionLimit || newValue == 0) {
@@ -1916,17 +1904,11 @@ window.onload = function () {
     saveSettings();
   };
 
-  elements.timerValueMinutes.onchange = function () {
-    saveSettings();
-  };
   elements.confettiLevel.onchange = function () {
     CHATVOTE.confettiLevel = parseInt(this.value, 10);
     saveSettings();
   };
 
-  elements.refreshWarningEnabled.onchange = function () {
-    saveSettings();
-  };
   elements.linkPreviewThumbnailsEnabled.onchange = function () {
     saveSettings();
     const tooltipTriggerList = document.querySelectorAll("a.linktooltip");
@@ -1957,9 +1939,7 @@ window.onload = function () {
     saveSettings();
     updateHint();
   };
-  elements.allowChange.onchange = function () {
-    saveSettings();
-  };
+
   elements.subMode.onchange = function () {
     if (this.checked) {
       elements.subOnlyAlert.style.display = "";
@@ -1985,29 +1965,6 @@ window.onload = function () {
 
   loadChart();
 
-  elements.connectbtn.addEventListener("click", function () {
-    connect();
-  });
-
-  elements.suggestCommandLink.addEventListener("click", function () {
-    changeSuggestionCommand();
-  });
-  elements.resetPoll.addEventListener("click", function () {
-    resetPoll();
-  });
-  elements.randomOptionReroll.addEventListener("click", function () {
-    pickRandomOption();
-  });
-  elements.resetSettings.addEventListener("click", function () {
-    resetSettings();
-  });
-
-  elements.loginButton.addEventListener("click", function () {
-    login();
-  });
-  elements.addOption.addEventListener("click", function () {
-    addOption();
-  });
   elements.pollOption.addEventListener("focus", async function () {
     if (!streamerColor && USER.userID) {
       streamerColor = await getStreamerColor(USER.userID);
@@ -2020,27 +1977,10 @@ window.onload = function () {
     }
     deleteAllModal.show();
   });
-  elements.restartPoll.addEventListener("click", function () {
-    restartPoll();
-  });
-
-  elements.removeWinner.addEventListener("click", function () {
-    removeWinner();
-  });
 
   elements.restartYesno.addEventListener("click", function () {
     yesnoTimeOverModal.hide();
     restartYesNoMode();
-  });
-
-  elements.getEmotes.addEventListener("click", function () {
-    getEmotes();
-  });
-  elements.download.addEventListener("click", function () {
-    download();
-  });
-  elements.addOptionBulk.addEventListener("click", function () {
-    addOptionBulk();
   });
 
   elements.pickRandom.addEventListener("click", function () {
@@ -2049,30 +1989,11 @@ window.onload = function () {
     }
     pickRandomOption();
   });
-  elements.coin.addEventListener("click", function () {
-    pickRandomYesNo();
-  });
-  elements.randomYesnoReroll.addEventListener("click", function () {
-    pickRandomYesNo();
-  });
 
   elements.hideScore.addEventListener("click", function () {
     const tooltip = bootstrap.Tooltip.getInstance("#hideScore");
     tooltip.setContent({ ".tooltip-inner": scoreHidden ? "Hide score" : "Show score" });
     hideScore();
-  });
-
-  elements.removeAndRestart.addEventListener("click", function () {
-    removeAndRestart();
-  });
-  elements.stopTimer.addEventListener("click", function () {
-    stopTimer();
-  });
-  elements.pauseTimer.addEventListener("click", function () {
-    pauseTimer();
-  });
-  elements.unpauseTimer.addEventListener("click", function () {
-    unpauseTimer();
   });
 }; //onload
 

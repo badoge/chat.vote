@@ -6,8 +6,8 @@ const raffle_command2 = "!ticket";
 
 let elements = {
   //modals
-  modal8: document.getElementById("modal8"),
-  modal9: document.getElementById("modal9"),
+  restartRaffleModal: document.getElementById("restartRaffleModal"),
+  fancyRaffleModal: document.getElementById("fancyRaffleModal"),
   slot: document.getElementById("slot"),
   claw: document.getElementById("claw"),
   gameWinner: document.getElementById("gameWinner"),
@@ -17,8 +17,6 @@ let elements = {
   //raffle
   enableRaffle: document.getElementById("enableRaffle"),
   enableRaffleText: document.getElementById("enableRaffleText"),
-  drawRaffleWinner: document.getElementById("drawRaffleWinner"),
-  restartRaffle: document.getElementById("restartRaffle"),
   raffleAccordion: document.getElementById("raffleAccordion"),
   raffleCollapse: document.getElementById("raffleCollapse"),
   rafflePrefix: document.getElementById("rafflePrefix"),
@@ -39,7 +37,7 @@ let n3 = 0;
 let raffle_open;
 let color = "";
 let currentTime = 0;
-let modal8, modal9;
+let restartRaffleModal, fancyRaffleModal;
 let winner = "";
 let winners = [];
 let raffleCollapse;
@@ -277,7 +275,7 @@ const detectWinner = function () {
     p.innerHTML = `Winner #${winners.length}: <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USERNAME}/viewercard/${winnerSlot.username}?popout=","_blank","width=340,height=800")>${winnerSlot.username}</a>`;
     elements.raffleOutput.append(p);
     setTimeout(() => {
-      modal9.hide();
+      fancyRaffleModal.hide();
       elements.gameWinner.innerHTML = "";
       elements.slot.innerHTML = `<div class="spinner-border" style="width: 10rem; height: 10rem; margin-left: auto; margin-right: auto; display:block;" role="status"><span class="visually-hidden">Loading...</span></div>`;
     }, 2000);
@@ -328,7 +326,7 @@ const app = {
 };
 
 async function drawRaffleWinnerFancy() {
-  modal9.show();
+  fancyRaffleModal.show();
   elements.claw.style.display = "none";
   let user_tickets = [];
   for (let index = 0, j = raffle_users.length; index < j; index++) {
@@ -460,8 +458,8 @@ window.onload = async function () {
   connect();
   fpsBenchmark();
 
-  modal8 = new bootstrap.Modal(elements.modal8);
-  modal9 = new bootstrap.Modal(elements.modal9);
+  restartRaffleModal = new bootstrap.Modal(elements.restartRaffleModal);
+  fancyRaffleModal = new bootstrap.Modal(elements.fancyRaffleModal);
 
   enableTooltips();
 
@@ -470,16 +468,6 @@ window.onload = async function () {
   });
   revealSound = new Howl({
     src: ["/raffles/reveal.mp3"],
-  });
-
-  elements.restartRaffle.addEventListener("click", function () {
-    restartRaffle();
-  });
-  elements.t3.addEventListener("change", function () {
-    restartRaffle();
-  });
-  elements.drawRaffleWinner.addEventListener("click", function () {
-    drawRaffleWinner();
   });
 }; //onload
 

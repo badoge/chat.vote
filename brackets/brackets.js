@@ -58,13 +58,11 @@ let elements = {
   topRight: document.getElementById("topRight"),
   loginButton: document.getElementById("loginButton"),
   channelName: document.getElementById("channelName"),
-  connectbtn: document.getElementById("connectbtn"),
   darkTheme: document.getElementById("darkTheme"),
 
   myBrackets: document.getElementById("myBrackets"),
   createBracket: document.getElementById("createBracket"),
   importBracket: document.getElementById("importBracket"),
-  browseBracket: document.getElementById("browseBracket"),
   bracketEditor: document.getElementById("bracketEditor"),
   bracketEditorHeader: document.getElementById("bracketEditorHeader"),
   bracketTitle: document.getElementById("bracketTitle"),
@@ -263,6 +261,7 @@ async function loadPFP() {
       <a
         role="button"
         id="loginButton"
+        onclick="login()"
         class="btn btn-twitch"
         tabindex="0"
         data-bs-container="body"
@@ -292,7 +291,7 @@ async function loadPFP() {
               <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
             </div>
             <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
-            <button type="button" id="connectbtn" class="btn btn-primary float-end">Connect</button>
+            <button type="button" onclick="connect()" class="btn btn-primary float-end">Connect</button>
           </div>
         </div>
       </div>
@@ -348,6 +347,7 @@ function logout() {
     <a
       role="button"
       id="loginButton"
+      onclick="login()"
       class="btn btn-twitch"
       tabindex="0"
       data-bs-container="body"
@@ -377,7 +377,7 @@ function logout() {
             <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
           </div>
           <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
-          <button type="button" id="connectbtn" class="btn btn-primary float-end">Connect</button>
+          <button type="button" onclick="connect()" class="btn btn-primary float-end">Connect</button>
         </div>
       </div>
     </div>
@@ -2356,14 +2356,6 @@ window.onload = async function () {
     hideScore();
   });
 
-  elements.connectbtn.addEventListener("click", function () {
-    connect();
-  });
-
-  elements.loginButton.addEventListener("click", function () {
-    login();
-  });
-
   elements.createBracket.addEventListener("click", function () {
     createBracket();
     enableTooltips();
@@ -2385,8 +2377,6 @@ window.onload = async function () {
     generateModal.show();
   });
 
-  elements.browseBracket.addEventListener("click", function () {});
-
   elements.addOption.addEventListener("click", function () {
     addOption();
     saveBracket();
@@ -2403,13 +2393,6 @@ window.onload = async function () {
     elements.bracketEditor.style.display = "none";
     deleteBracketModal.hide();
     enableTooltips();
-  });
-
-  elements.bracketTitle.addEventListener("change", function () {
-    saveBracket();
-  });
-  elements.bracketDescription.addEventListener("change", function () {
-    saveBracket();
   });
 
   let tag = document.createElement("script");

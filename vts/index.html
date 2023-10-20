@@ -76,8 +76,8 @@
             </p>
             <div class="input-group mb-3">
               <span class="input-group-text">Port</span>
-              <input type="number" class="form-control" id="port" placeholder="8001" value="8001" onchange="saveSettings()" aria-label="VTS port number" aria-describedby="connectVTS" />
-              <button class="btn btn-outline-success" type="button" id="connectVTS">Connect</button>
+              <input type="number" class="form-control" id="port" placeholder="8001" value="8001" onchange="saveSettings()" aria-label="VTS port number" />
+              <button class="btn btn-outline-success" type="button" onclick="connectVTS()">Connect</button>
             </div>
             <p>
               Allow connection in VTS
@@ -94,7 +94,7 @@
             </p>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="cancelVTSlogin">Cancel</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="cancelVTSlogin()">Cancel</button>
           </div>
         </div>
       </div>
@@ -256,7 +256,7 @@
           </div>
           <div class="modal-body" id="modal8body">
             Edit reward details on Twitch:<br />
-            <button class="btn btn-twitch" id="openRewardsPage"><span class="twitch-icon"></span> Edit reward on Twitch</button>
+            <button class="btn btn-twitch" onclick="openRewardsPage()"><span class="twitch-icon"></span> Edit reward on Twitch</button>
             <br /><br />
             <div class="hotkeyList"></div>
           </div>
@@ -462,7 +462,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <button class="btn btn-info mainbuttons" data-bs-dismiss="modal" id="createReward">
+            <button class="btn btn-info mainbuttons" data-bs-dismiss="modal" onclick="createReward()">
               <svg type="color-fill-current" width="25px" height="25px" version="1.1" viewBox="0 0 20 20" x="0px" y="0px">
                 <g>
                   <path d="M10 6a4 4 0 014 4h-2a2 2 0 00-2-2V6z"></path>
@@ -471,7 +471,7 @@
               </svg>
               Create New Reward
             </button>
-            <button class="btn btn-info mainbuttons" data-bs-dismiss="modal" id="addReward">
+            <button class="btn btn-info mainbuttons" data-bs-dismiss="modal" onclick="addReward()">
               <svg type="color-fill-current" width="25px" height="25px" version="1.1" viewBox="0 0 20 20" x="0px" y="0px">
                 <g>
                   <path d="M10 6a4 4 0 014 4h-2a2 2 0 00-2-2V6z"></path>
@@ -513,7 +513,7 @@
           <div class="modal-body">Importing a backup will overwrite your current commands/rewards/alerts</div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="importBackup">Import</button>
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="importBackup" onclick="importBackup()">Import</button>
           </div>
         </div>
       </div>
@@ -714,7 +714,7 @@
         <div class="col-lg-4 maincol">
           <div class="card infocard">
             <div class="card-body">
-              <button class="btn btn-info mainbuttons" id="addCommand"><i class="material-icons notranslate">chat</i> Create New Chat Command</button>
+              <button class="btn btn-info mainbuttons" onclick="addCommand()"><i class="material-icons notranslate">chat</i> Create New Chat Command</button>
 
               <button class="btn btn-info mainbuttons" id="createChannelPointsButton" data-bs-toggle="modal" data-bs-target="#addRewardModal">
                 <svg type="color-fill-current" width="25px" height="25px" version="1.1" viewBox="0 0 20 20" x="0px" y="0px">
@@ -726,7 +726,7 @@
                 Create Channel points Reward
               </button>
 
-              <button class="btn btn-info mainbuttons" id="addSubAlert">
+              <button class="btn btn-info mainbuttons" id="addSubAlert" onclick="addSubAlert()">
                 <svg type="color-fill-current" width="25px" height="25px" version="1.1" viewBox="0 0 20 20" x="0px" y="0px">
                   <g>
                     <path
@@ -739,7 +739,7 @@
                 Create New Subscription Alert
               </button>
 
-              <button class="btn btn-info mainbuttons" id="addGiftedSubAlert">
+              <button class="btn btn-info mainbuttons" id="addGiftedSubAlert" onclick="addGiftedSubAlert()">
                 <svg type="color-fill-current" width="25px" height="25px" version="1.1" viewBox="0 0 20 20" x="0px" y="0px">
                   <g>
                     <path
@@ -752,7 +752,7 @@
                 Create New Gifted Sub Alert
               </button>
 
-              <button class="btn btn-info mainbuttons" id="addBitsAlert">
+              <button class="btn btn-info mainbuttons" id="addBitsAlert" onclick="addBitsAlert()">
                 <svg type="color-fill-current" width="25px" height="25px" version="1.1" viewBox="0 0 20 20" x="0px" y="0px">
                   <path fill-rule="evenodd" clip-rule="evenodd" d="M3 12l7-10 7 10-7 6-7-6zm2.678-.338L10 5.487l4.322 6.173-.85.728L10 11l-3.473 1.39-.849-.729z"></path>
                 </svg>
@@ -789,15 +789,18 @@
                               <div class="card border settingscard">
                                 <div class="card-body">
                                   <label for="commandCooldownGlobal" class="form-label">Global chat command cooldown (seconds)</label>
-                                  <input type="number" min="0" max="3600" value="0" class="form-control" id="commandCooldownGlobal" />
+                                  <input type="number" min="0" max="3600" value="0" class="form-control" id="commandCooldownGlobal" onchange="saveSettings()" />
                                   <small class="text-body-secondary">How long viewers have to wait before using another chat command</small>
                                   <div class="form-check form-switch mt-3">
-                                    <input class="form-check-input" type="checkbox" id="hideDefault" checked />
+                                    <input class="form-check-input" type="checkbox" id="hideDefault" onchange="saveSettings()" checked />
                                     <label class="form-check-label" for="hideDefault"><i class="material-icons notranslate">visibility_off</i> Hide default models</label><br />
                                     <small class="text-body-secondary">Hides the pre-installed models that come with VTS and only shows your models</small>
                                   </div>
                                   <hr />
-                                  <button type="button" id="exportBackup" class="btn btn-primary mt-3"><i class="material-icons notranslate">file_download</i> Export backup</button><br />
+                                  <button type="button" id="exportBackup" onclick="exportBackup()" class="btn btn-primary mt-3">
+                                    <i class="material-icons notranslate">file_download</i> Export backup
+                                  </button>
+                                  <br />
                                   <small class="text-body-secondary"> Makes a backup of all your commands/rewards/alerts</small>
 
                                   <div class="input-group mt-3">

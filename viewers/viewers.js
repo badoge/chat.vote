@@ -1,4 +1,4 @@
-let modal1, modal2;
+let settingsModal, loginExpiredModal;
 let myChart;
 let viewCountArray = [];
 let viewCountLabelsArray = [];
@@ -9,8 +9,8 @@ let channel;
 let updateOnChange = true;
 
 let elements = {
-  modal1: document.getElementById("modal1"),
-  modal2: document.getElementById("modal2"),
+  settingsModal: document.getElementById("settingsModal"),
+  loginExpiredModal: document.getElementById("loginExpiredModal"),
   ctx: document.getElementById("myChart").getContext("2d"),
   toastContainer: document.getElementById("toastContainer"),
   overlay: document.getElementById("overlay"),
@@ -127,7 +127,7 @@ async function loadAndConnect() {
 
   if (USER.twitchLogin && !(await checkToken(USER.access_token))) {
     USER.channel = "";
-    modal2.show();
+    loginExpiredModal.show();
     return;
   }
 
@@ -168,11 +168,11 @@ function loadChart() {
 } //loadChart
 
 window.onload = function () {
-  modal1 = new bootstrap.Modal(elements.modal1);
-  modal2 = new bootstrap.Modal(elements.modal2);
+  settingsModal = new bootstrap.Modal(elements.settingsModal);
+  loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
   loadAndConnect();
   if (!USER.channel) {
-    modal2.show();
+    loginExpiredModal.show();
   }
   loadChart();
 

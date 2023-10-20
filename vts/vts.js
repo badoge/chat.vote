@@ -73,8 +73,6 @@ let elements = {
   youtubeModalBody: document.getElementById("youtubeModalBody"),
   youtubeModalTitle: document.getElementById("youtubeModalTitle"),
   port: document.getElementById("port"),
-  connectVTS: document.getElementById("connectVTS"),
-  cancelVTSlogin: document.getElementById("cancelVTSlogin"),
 
   //commands
   commandName: document.getElementById("commandName"),
@@ -99,7 +97,6 @@ let elements = {
   modal8body: document.getElementById("modal8body"),
   modal8footer: document.getElementById("modal8footer"),
   existingRewardsList: document.getElementById("existingRewardsList"),
-  openRewardsPage: document.getElementById("openRewardsPage"),
 
   //sub alerts
   subAlertMonths: document.getElementById("subAlertMonths"),
@@ -128,17 +125,12 @@ let elements = {
   darkTheme: document.getElementById("darkTheme"),
 
   //settings
-  addCommand: document.getElementById("addCommand"),
   createChannelPointsButton: document.getElementById("createChannelPointsButton"),
-  addReward: document.getElementById("addReward"),
-  createReward: document.getElementById("createReward"),
   addSubAlert: document.getElementById("addSubAlert"),
   addGiftedSubAlert: document.getElementById("addGiftedSubAlert"),
   addBitsAlert: document.getElementById("addBitsAlert"),
   commandCooldownGlobal: document.getElementById("commandCooldownGlobal"),
   hideDefault: document.getElementById("hideDefault"),
-  exportBackup: document.getElementById("exportBackup"),
-  importBackup: document.getElementById("importBackup"),
   backupInput: document.getElementById("backupInput"),
 
   //body
@@ -2456,48 +2448,6 @@ window.onload = function () {
   enableTooltips();
   enablePopovers();
 
-  elements.connectVTS.addEventListener("click", function () {
-    connectVTS();
-  });
-  elements.cancelVTSlogin.addEventListener("click", function () {
-    cancelVTSlogin();
-  });
-  elements.openRewardsPage.addEventListener("click", function () {
-    openRewardsPage();
-  });
-  elements.addCommand.addEventListener("click", function () {
-    addCommand();
-  });
-  elements.addReward.addEventListener("click", function () {
-    addReward();
-  });
-  elements.createReward.addEventListener("click", function () {
-    createReward();
-  });
-  elements.addSubAlert.addEventListener("click", function () {
-    addSubAlert();
-  });
-  elements.addGiftedSubAlert.addEventListener("click", function () {
-    addGiftedSubAlert();
-  });
-  elements.addBitsAlert.addEventListener("click", function () {
-    addBitsAlert();
-  });
-  elements.hideDefault.addEventListener("change", function () {
-    saveSettings();
-  });
-
-  elements.exportBackup.addEventListener("click", function () {
-    exportBackup();
-  });
-
-  elements.importBackup.addEventListener("click", function () {
-    importBackup();
-  });
-
-  elements.commandCooldownGlobal.onchange = function () {
-    saveSettings();
-  };
   elements.darkTheme.onchange = function () {
     switchTheme(this.checked);
     saveSettings();

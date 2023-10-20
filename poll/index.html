@@ -334,7 +334,7 @@
                     <div class="mb-3">
                       <div class="input-group flex-nowrap timer">
                         <input type="number" aria-label="poll timer value" id="pollTimerValue" placeholder="0" min="0" class="form-control" />
-                        <select class="form-select timer" id="pollTimerUnit">
+                        <select class="form-select timer" id="pollTimerUnit" onchange="saveSettings()">
                           <option selected value="m">Minutes</option>
                           <option value="h">Hours</option>
                           <option value="d">Days</option>

@@ -46,7 +46,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="resetPoll">Delete and reset</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="resetPoll()">Delete and reset</button>
           </div>
         </div>
       </div>
@@ -63,7 +63,7 @@
             <p id="randomOptionWinner"></p>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" id="randomOptionReroll"><i class="material-icons notranslate">refresh</i>reroll</button>
+            <button type="button" class="btn btn-secondary" onclick="pickRandomOption()"><i class="material-icons notranslate">refresh</i>reroll</button>
             <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
           </div>
         </div>
@@ -82,7 +82,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="resetSettings">Reset</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="resetSettings()">Reset</button>
           </div>
         </div>
       </div>
@@ -99,7 +99,7 @@
             <p id="timeOverWinner"></p>
           </div>
           <div class="modal-footer">
-            <button type="button" id="removeWinner" class="btn btn-info">Remove winner and restart</button>
+            <button type="button" onclick="removeWinner()" class="btn btn-info">Remove winner and restart</button>
             <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
           </div>
         </div>
@@ -181,14 +181,14 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <div id="coin">
+            <div id="coin" onclick="pickRandomYesNo()">
               <div class="side-a"><img src="/pics/yea.webp" alt="yea" width="150" height="150" /></div>
               <div class="side-b"><img src="/pics/nay.webp" alt="nay" width="150" height="150" /></div>
             </div>
           </div>
 
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" id="randomYesnoReroll"><i class="material-icons notranslate">refresh</i>reroll</button>
+            <button type="button" class="btn btn-secondary" onclick="pickRandomYesNo()"><i class="material-icons notranslate">refresh</i>reroll</button>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
           </div>
         </div>
@@ -310,6 +310,7 @@
             <a
               role="button"
               id="loginButton"
+              onclick="login()"
               class="btn btn-twitch"
               tabindex="0"
               data-bs-container="body"
@@ -319,8 +320,8 @@
               data-bs-toggle="popover"
               data-bs-title="Not signed in"
               data-bs-content="You need sign in first before adding options or enabling voting/suggestions"
-              ><span class="twitch-icon"></span>Sign in with Twitch</a
-            >
+              ><span class="twitch-icon"></span>Sign in with Twitch
+            </a>
             <div class="btn-group" role="group">
               <button
                 id="btnGroupDropLogin"
@@ -339,7 +340,7 @@
                     <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
                   </div>
                   <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
-                  <button type="button" id="connectbtn" class="btn btn-primary float-end">Connect</button>
+                  <button type="button" onclick="connect()" class="btn btn-primary float-end">Connect</button>
                 </div>
               </div>
             </div>
@@ -417,11 +418,12 @@
                 <label for="pollOption" id="pollOptionLabel" class="form-label">Enter poll option:</label>
               </span>
               <div class="input-group mb-3">
-                <input type="text" id="pollOption" class="form-control" placeholder="Poll option" aria-label="Poll option input text field" aria-describedby="addOption" />
+                <input type="text" id="pollOption" class="form-control" placeholder="Poll option" aria-label="Poll option input text field" />
                 <button
                   class="btn btn-outline-secondary"
                   type="button"
                   id="addOption"
+                  onclick="addOption()"
                   data-bs-toggle="tooltip"
                   data-bs-delay="200"
                   data-bs-placement="top"
@@ -449,13 +451,13 @@
             <div class="card-body">
               <div class="values d-inline-flex" style="font-size: 3em"></div>
               <div class="btn-group float-end h-100" role="group" aria-label="Timer controls" id="timerControls">
-                <button class="btn btn-outline-secondary" type="button" id="stopTimer">
+                <button class="btn btn-outline-secondary" type="button" id="stopTimer" onclick="stopTimer()">
                   <i class="material-icons notranslate">stop</i>
                 </button>
-                <button class="btn btn-outline-secondary" type="button" id="pauseTimer">
+                <button class="btn btn-outline-secondary" type="button" id="pauseTimer" onclick="pauseTimer()">
                   <i class="material-icons notranslate">pause</i>
                 </button>
-                <button class="btn btn-outline-secondary" type="button" style="display: none" id="unpauseTimer">
+                <button class="btn btn-outline-secondary" type="button" style="display: none" id="unpauseTimer" onclick="unpauseTimer()">
                   <i class="material-icons notranslate">play_arrow</i>
                 </button>
               </div>
@@ -631,7 +633,7 @@
                         <div class="mb-3">
                           <label for="timerValueMinutes" class="form-label"><i class="material-icons notranslate">timer</i>Poll timer</label>
                           <div class="input-group mb-3">
-                            <input type="number" min="0" value="0" class="form-control" id="timerValueMinutes" aria-describedby="timerDesc" />
+                            <input type="number" min="0" value="0" class="form-control" id="timerValueMinutes" onchange="saveSettings()" aria-describedby="timerDesc" />
                             <span class="input-group-text" id="timerDesc">minutes</span>
                           </div>
                           <div class="form-text">Timer automatically starts when you start voting. Set to 0 to disable the timer</div>
@@ -670,6 +672,7 @@
                           <input
                             type="number"
                             id="suggestionLimitUser"
+                            onchange="saveSettings()"
                             style="max-width: 5em"
                             class="form-control"
                             min="0"
@@ -696,7 +699,7 @@
                         <small class="text-body-secondary">The total amount of suggestions from all viewers. 0=unlimited</small>
                         <hr />
                         The suggestion command can be changed
-                        <span id="suggestCommandLink" style="color: #00bc8c; cursor: pointer">here</span>
+                        <span onclick="changeSuggestionCommand()" style="color: #00bc8c; cursor: pointer">here</span>
                       </div>
                     </div>
                   </div>
@@ -762,7 +765,7 @@
                                                 <option value="10">10</option>
                                               </select>
                                               <label class="input-group-text text-light" for="remove">options and</label>
-                                              <button class="btn btn-secondary" type="button" id="removeAndRestart">restart<i class="material-icons notranslate">refresh</i></button>
+                                              <button class="btn btn-secondary" type="button" onclick="removeAndRestart()">restart<i class="material-icons notranslate">refresh</i></button>
                                             </div>
                                           </div>
                                         </div>
@@ -784,7 +787,7 @@
                                             </small>
                                           </div>
                                           <div class="form-check form-switch mb-3">
-                                            <input type="checkbox" class="form-check-input" id="allowChange" aria-describedby="allowChangeDesc" />
+                                            <input type="checkbox" class="form-check-input" id="allowChange" onchange="saveSettings()" aria-describedby="allowChangeDesc" />
                                             <label class="form-check-label" for="allowChange"><i class="material-icons notranslate">swap_horiz</i>Allow vote changing</label><br />
                                             <small id="allowChangeDesc" class="text-body-secondary">
                                               Viewers will be able to change the option they selected by voting again. They can change their vote only once.</small
@@ -833,7 +836,7 @@
                                           </div>
 
                                           <div class="form-check form-switch mb-3">
-                                            <input class="form-check-input" type="checkbox" id="refreshWarningEnabled" />
+                                            <input class="form-check-input" type="checkbox" id="refreshWarningEnabled" onchange="saveSettings()" />
                                             <label class="form-check-label" for="refreshWarningEnabled"
                                               ><i class="material-icons notranslate">notification_important</i>Enable close/refresh warning</label
                                             >
@@ -868,7 +871,7 @@
                                         <div class="card-body">
                                           <div class="input-group mb-0">
                                             <span class="input-group-text blueborder">Refresh 3rd party emotes</span>
-                                            <button class="btn btn-outline-info" type="button" id="getEmotes"><i class="material-icons notranslate">refresh</i></button>
+                                            <button class="btn btn-outline-info" type="button" onclick="getEmotes()"><i class="material-icons notranslate">refresh</i></button>
                                           </div>
                                           <div class="text-body-secondary mb-3">
                                             Loaded emotes (global/channel): BTTV: <span id="bttvGlobalEmotes">0</span>/<span id="bttvChannelEmotes">0</span> | FFZ:
@@ -916,7 +919,7 @@
                                             </div>
                                           </div>
 
-                                          <button type="button" id="download" class="btn btn-primary"><i class="material-icons notranslate">file_download</i>Download</button>
+                                          <button type="button" onclick="download()" class="btn btn-primary"><i class="material-icons notranslate">file_download</i>Download</button>
                                         </div>
                                       </div>
                                     </div>
@@ -926,7 +929,7 @@
                                         <div class="card-body">
                                           <label for="optionList">Add poll options in bulk</label>
                                           <textarea class="form-control" placeholder="1 option per line" id="optionList" style="white-space: pre-wrap" rows="7"></textarea>
-                                          <button type="button" data-bs-toggle="collapse" data-bs-target="#settingsCollapse" id="addOptionBulk" class="btn btn-primary mt-1">
+                                          <button type="button" data-bs-toggle="collapse" data-bs-target="#settingsCollapse" onclick="addOptionBulk()" class="btn btn-primary mt-1">
                                             <i class="material-icons notranslate">add</i>Add
                                           </button>
                                         </div>
@@ -1024,6 +1027,7 @@
                       type="button"
                       class="btn btn-outline-warning"
                       id="restartPoll"
+                      onclick="restartPoll()"
                       data-bs-toggle="tooltip"
                       data-bs-delay="200"
                       data-bs-placement="left"

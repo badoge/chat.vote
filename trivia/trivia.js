@@ -1,5 +1,5 @@
 let numberOfOptions = 2;
-let modal2;
+let loginExpiredModal;
 let answer = "";
 let started = false;
 let users = [];
@@ -14,7 +14,7 @@ let questionNumber = 1;
 
 let elements = {
   //modals
-  modal2: document.getElementById("modal2"),
+  loginExpiredModal: document.getElementById("loginExpiredModal"),
   twitchStatus: document.getElementById("twitchStatus"),
   topRight: document.getElementById("topRight"),
   start: document.getElementById("start"),
@@ -467,10 +467,10 @@ function hideAnswers() {
 } //hideAnswers
 
 window.onload = function () {
-  modal2 = new bootstrap.Modal(elements.modal2);
+  loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
   loadAndConnect();
   if (!USER.channel) {
-    modal2.show();
+    loginExpiredModal.show();
   }
 
   enableTooltips();

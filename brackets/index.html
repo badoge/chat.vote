@@ -474,6 +474,7 @@
             <a
               role="button"
               id="loginButton"
+              onclick="login()"
               class="btn btn-twitch"
               tabindex="0"
               data-bs-container="body"
@@ -503,7 +504,7 @@
                     <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
                   </div>
                   <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
-                  <button type="button" id="connectbtn" class="btn btn-primary float-end">Connect</button>
+                  <button type="button" onclick="connect()" class="btn btn-primary float-end">Connect</button>
                 </div>
               </div>
             </div>
@@ -753,7 +754,7 @@
         <div class="col-md-5">
           <button type="button" class="btn btn-success btn-lg" id="createBracket"><i class="material-icons notranslate">add_circle_outline</i> Create new bracket</button>
           <button type="button" class="btn btn-info btn-lg" id="importBracket"><i class="material-icons notranslate">auto_awesome</i> Generate bracket</button>
-          <button type="button" class="btn btn-primary btn-lg" id="browseBracket" onclick="loadApproved()"><i class="material-icons notranslate">search</i> Browse brackets</button>
+          <button type="button" class="btn btn-primary btn-lg" onclick="loadApproved()"><i class="material-icons notranslate">search</i> Browse brackets</button>
           <h1 class="display-3">My brackets</h1>
           <div id="myBrackets">
             <span class="text-body-secondary">Nothing here</span>
@@ -767,13 +768,13 @@
             <div class="card-body">
               <div class="mb-3">
                 <label for="bracketTitle" class="form-label">Bracket title</label>
-                <input type="text" class="form-control" id="bracketTitle" placeholder="Bracket title" />
+                <input type="text" class="form-control" id="bracketTitle" onchange="saveBracket()" placeholder="Bracket title" />
                 <small class="text-body-secondary">Bracket title</small>
               </div>
 
               <div class="mb-3">
                 <label for="bracketDescription" class="form-label">Bracket description</label>
-                <textarea class="form-control" id="bracketDescription" rows="2" placeholder="Bracket description"></textarea>
+                <textarea class="form-control" id="bracketDescription" onchange="saveBracket()" rows="2" placeholder="Bracket description"></textarea>
                 <small class="text-body-secondary">Bracket description</small>
               </div>
 

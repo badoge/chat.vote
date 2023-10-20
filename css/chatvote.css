@@ -232,7 +232,7 @@ th {
   cursor: pointer;
 }
 
-#removeAndRestart:hover {
+.restart > button:hover {
   background-color: #960e5b;
   border-color: #9e0f60;
 }

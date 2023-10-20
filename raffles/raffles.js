@@ -1,10 +1,8 @@
 let elements = {
   //modals
   resetSettingsModal: document.getElementById("resetSettingsModal"),
-  resetSettings: document.getElementById("resetSettings"),
   loginExpiredModal: document.getElementById("loginExpiredModal"),
   restartRaffleModal: document.getElementById("restartRaffleModal"),
-  restartRaffle: document.getElementById("restartRaffle"),
   fancyRaffleModal: document.getElementById("fancyRaffleModal"),
   claw: document.getElementById("claw"),
   slot: document.getElementById("slot"),
@@ -16,14 +14,12 @@ let elements = {
   topRight: document.getElementById("topRight"),
   loginButton: document.getElementById("loginButton"),
   channelName: document.getElementById("channelName"),
-  connectbtn: document.getElementById("connectbtn"),
   darkTheme: document.getElementById("darkTheme"),
 
   //raffle
   enableRaffle: document.getElementById("enableRaffle"),
   enableRaffleText: document.getElementById("enableRaffleText"),
   raffleCommandButton: document.getElementById("raffleCommandButton"),
-  drawRaffleWinner: document.getElementById("drawRaffleWinner"),
   raffleCommandText: document.getElementById("raffleCommandText"),
   settingsOffcanvas: document.getElementById("settingsOffcanvas"),
   raffleUsers: document.getElementById("raffleUsers"),
@@ -91,7 +87,6 @@ let elements = {
 
   linkPreviewThumbnailsEnabled: document.getElementById("linkPreviewThumbnailsEnabled"),
   refreshWarningEnabled: document.getElementById("refreshWarningEnabled"),
-  getEmotes: document.getElementById("getEmotes"),
   bttvGlobalEmotes: document.getElementById("bttvGlobalEmotes"),
   bttvChannelEmotes: document.getElementById("bttvChannelEmotes"),
   ffzGlobalEmotes: document.getElementById("ffzGlobalEmotes"),
@@ -584,6 +579,7 @@ async function loadPFP() {
     <a
       role="button"
       id="loginButton"
+      onclick="login()"
       class="btn btn-twitch"
       tabindex="0"
       data-bs-container="body"
@@ -613,7 +609,7 @@ async function loadPFP() {
             <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
           </div>
           <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
-          <button type="button" id="connectbtn" class="btn btn-primary float-end">Connect</button>
+          <button type="button" onclick="connect()" class="btn btn-primary float-end">Connect</button>
         </div>
       </div>
     </div>
@@ -1055,6 +1051,7 @@ function logout() {
   <a
     role="button"
     id="loginButton"
+    onclick="login()"
     class="btn btn-twitch"
     tabindex="0"
     data-bs-container="body"
@@ -1084,7 +1081,7 @@ function logout() {
           <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
         </div>
         <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
-        <button type="button" id="connectbtn" class="btn btn-primary float-end">Connect</button>
+        <button type="button" onclick="connect()" class="btn btn-primary float-end">Connect</button>
       </div>
     </div>
   </div>
@@ -1489,101 +1486,16 @@ window.onload = function () {
     saveSettings();
   };
 
-  elements.raffleCommand.onchange = function () {
-    saveSettings();
-  };
-  elements.removeWinner.onchange = function () {
-    saveSettings();
-  };
-  elements.allowPlebs.onchange = function () {
-    saveSettings();
-  };
-  elements.allowFollowers.onchange = function () {
-    saveSettings();
-  };
-  elements.allowSubs.onchange = function () {
-    saveSettings();
-  };
-  elements.allowTier1.onchange = function () {
-    saveSettings();
-  };
-  elements.allowTier2.onchange = function () {
-    saveSettings();
-  };
-  elements.allowTier3.onchange = function () {
-    saveSettings();
-  };
-  elements.allowMods.onchange = function () {
-    saveSettings();
-  };
-  elements.allowVips.onchange = function () {
-    saveSettings();
-  };
-  elements.allowFirstTimeChatters.onchange = function () {
-    saveSettings();
-  };
-  elements.plebBonus.onchange = function () {
-    saveSettings();
-  };
-  elements.followerBonus.onchange = function () {
-    saveSettings();
-  };
-  elements.subBonus.onchange = function () {
-    saveSettings();
-  };
-  elements.tier1Bonus.onchange = function () {
-    saveSettings();
-  };
-  elements.tier2Bonus.onchange = function () {
-    saveSettings();
-  };
-  elements.tier3Bonus.onchange = function () {
-    saveSettings();
-  };
-  elements.modBonus.onchange = function () {
-    saveSettings();
-  };
-  elements.vipBonus.onchange = function () {
-    saveSettings();
-  };
-  elements.firstTimeChatterBonus.onchange = function () {
-    saveSettings();
-  };
-  elements.followAge.onchange = function () {
-    saveSettings();
-  };
-  elements.followAgeUnit.onchange = function () {
-    saveSettings();
-  };
-  elements.subAge.onchange = function () {
-    saveSettings();
-  };
-  elements.tier1SubAge.onchange = function () {
-    saveSettings();
-  };
-  elements.tier2SubAge.onchange = function () {
-    saveSettings();
-  };
-  elements.tier3SubAge.onchange = function () {
-    saveSettings();
-  };
   elements.splitTiers.onchange = function () {
     splitTiers(this.checked);
     saveSettings();
   };
-  elements.animateDrawing.onchange = function () {
-    saveSettings();
-  };
-  elements.useTwitchPFP.onchange = function () {
-    saveSettings();
-  };
+
   elements.autoRerollEnabled.onchange = function () {
     elements.rerollTimerValueMinutes.disabled = !this.checked;
     saveSettings();
   };
-  elements.rerollTimerValueMinutes.onchange = function () {
-    saveSettings();
-  };
+
   elements.extraTimerEnabled.onchange = function () {
     saveSettings();
     if (this.checked) {
@@ -1591,12 +1503,6 @@ window.onload = function () {
     } else {
       hideExtraTimer();
     }
-  };
-  elements.announceWinner.onchange = function () {
-    saveSettings();
-  };
-  elements.confirmJoin.onchange = function () {
-    saveSettings();
   };
 
   elements.linkPreviewThumbnailsEnabled.onchange = function () {
@@ -1614,51 +1520,12 @@ window.onload = function () {
       });
     });
   };
-  elements.refreshWarningEnabled.onchange = function () {
-    saveSettings();
-  };
-  elements.getEmotes.addEventListener("click", function () {
-    getEmotes();
-  });
+
   tickSound = new Howl({
     src: ["/raffles/tick.mp3"],
   });
   revealSound = new Howl({
     src: ["/raffles/reveal.mp3"],
-  });
-
-  elements.connectbtn.addEventListener("click", function () {
-    connect();
-  });
-  elements.raffleCommandText.addEventListener("click", function () {
-    changeRaffleCommand();
-  });
-
-  elements.resetSettings.addEventListener("click", function () {
-    resetSettings();
-  });
-  elements.restartRaffle.addEventListener("click", function () {
-    restartRaffle();
-  });
-  elements.loginButton.addEventListener("click", function () {
-    login();
-  });
-
-  elements.drawRaffleWinner.addEventListener("click", function () {
-    drawRaffleWinner();
-  });
-
-  elements.startExtraTimer.addEventListener("click", function () {
-    startExtraTimer();
-  });
-  elements.stopExtraTimer.addEventListener("click", function () {
-    stopExtraTimer();
-  });
-  elements.pauseExtraTimer.addEventListener("click", function () {
-    pauseExtraTimer();
-  });
-  elements.unpauseExtraTimer.addEventListener("click", function () {
-    unpauseExtraTimer();
   });
 
   const placeholders = ["Wife giveaway 💿", "Winner gets VIP", "Sub emote raffle", "Steam key giveaway", "Gifted sub giveaway", "eg giveaway 🥚"];

@@ -45,7 +45,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="resetSettings">Reset</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="resetSettings()">Reset</button>
           </div>
         </div>
       </div>
@@ -95,7 +95,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-warning" data-bs-dismiss="modal" id="restartRaffle">Restart raffle</button>
+            <button type="button" class="btn btn-warning" data-bs-dismiss="modal" onclick="restartRaffle()">Restart raffle</button>
           </div>
         </div>
       </div>
@@ -235,6 +235,7 @@
             <a
               role="button"
               id="loginButton"
+              onclick="login()"
               class="btn btn-twitch"
               tabindex="0"
               data-bs-container="body"
@@ -264,7 +265,7 @@
                     <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
                   </div>
                   <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
-                  <button type="button" id="connectbtn" class="btn btn-primary float-end">Connect</button>
+                  <button type="button" onclick="connect()" class="btn btn-primary float-end">Connect</button>
                 </div>
               </div>
             </div>
@@ -344,7 +345,7 @@
                 <span id="enableRaffleText">Open Raffle</span><br /><small id="raffleCommandButton" class="notranslate">!join</small>
               </a>
               <br />
-              <a role="button" tabindex="0" id="drawRaffleWinner" class="btn btn-info m-1"><i class="material-icons notranslate">celebration</i> Draw A Winner</a>
+              <a role="button" tabindex="0" onclick="drawRaffleWinner()" class="btn btn-info m-1"> <i class="material-icons notranslate">celebration</i> Draw A Winner </a>
               <br />
               <br />
               <br />
@@ -361,12 +362,16 @@
             <div class="input-group">
               <label class="input-group-text" for="extraTimerMins">Timer</label>
               <input type="number" style="max-width: 5em" class="form-control" id="extraTimerMins" min="0" placeholder="0" aria-label="minutes" />
-              <button class="btn btn-outline-secondary" type="button" id="stopExtraTimer" style="display: none">Stop<i class="material-icons notranslate">timer_off</i></button>
-              <button class="btn btn-outline-secondary" type="button" id="pauseExtraTimer" style="display: none"><i class="material-icons notranslate">pause</i></button>
-              <button class="btn btn-outline-secondary" type="button" id="unpauseExtraTimer" style="display: none">
+              <button class="btn btn-outline-secondary" type="button" id="stopExtraTimer" onclick="stopExtraTimer()" style="display: none">
+                Stop<i class="material-icons notranslate">timer_off</i>
+              </button>
+              <button class="btn btn-outline-secondary" type="button" id="pauseExtraTimer" onclick="pauseExtraTimer()" style="display: none">
+                <i class="material-icons notranslate">pause</i>
+              </button>
+              <button class="btn btn-outline-secondary" type="button" id="unpauseExtraTimer" onclick="unpauseExtraTimer()" style="display: none">
                 <i class="material-icons notranslate">play_arrow</i>
               </button>
-              <button class="btn btn-outline-secondary" type="button" id="startExtraTimer">Start<i class="material-icons notranslate">timer</i></button>
+              <button class="btn btn-outline-secondary" type="button" id="startExtraTimer" onclick="startExtraTimer()">Start <i class="material-icons notranslate">timer</i></button>
             </div>
             <div class="card border-danger" id="extraCountdown" style="display: none; font-size: 3em">
               <div class="card-body">
@@ -378,7 +383,7 @@
 
         <div class="col-xxl-4 col-lg-5 order-3">
           <h2 class="text-center">
-            Type <span style="color: #00bc8c; cursor: pointer" id="raffleCommandText" class="notranslate">!join</span> in chat to join
+            Type <span style="color: #00bc8c; cursor: pointer" id="raffleCommandText" onclick="changeRaffleCommand()" class="notranslate">!join</span> in chat to join
 
             <div class="role-badge" id="plebBadge">
               <img src="/pics/pleb.png" alt="Non subscriber" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Non subscriber" style="height: 24px; width: 24px" />
@@ -427,13 +432,13 @@
               <div class="col">
                 <div class="form-group">
                   <label for="raffleCommand" class="form-label">Raffle join command</label>
-                  <input type="text" class="form-control notranslate" id="raffleCommand" value="!join" placeholder="!join" aria-describedby="raffleCommandDesc" />
+                  <input type="text" class="form-control notranslate" id="raffleCommand" onchange="saveSettings()" value="!join" placeholder="!join" aria-describedby="raffleCommandDesc" />
                   <small id="raffleCommandDesc" class="text-body-secondary">The command to use to enter the raffle.</small>
                 </div>
               </div>
               <div class="col">
                 <div class="form-check form-switch mb-3">
-                  <input type="checkbox" class="form-check-input" id="removeWinner" aria-describedby="removeWinnerDesc" checked />
+                  <input type="checkbox" class="form-check-input" id="removeWinner" onchange="saveSettings()" aria-describedby="removeWinnerDesc" checked />
                   <label class="form-check-label" for="removeWinner"><i class="material-icons notranslate">block</i> Remove winner from raffle</label>
                   <small id="removeWinnerDesc" class="text-body-secondary">
                     <br />Removes the winner from the raffle and prevents them from joining again. If this is off then a viewer can win multiple times
@@ -468,30 +473,40 @@
                 <tr>
                   <th scope="row">
                     <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" role="switch" id="allowPlebs" checked />
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowPlebs" onchange="saveSettings()" checked />
                     </div>
                   </th>
                   <td>Non subscriber</td>
                   <td>
-                    <input type="number" style="width: 80px" class="form-control" id="plebBonus" value="0" min="0" placeholder="0" />
+                    <input type="number" style="width: 80px" class="form-control" id="plebBonus" onchange="saveSettings()" value="0" min="0" placeholder="0" />
                   </td>
                   <td></td>
                 </tr>
                 <tr style="display: none">
                   <th scope="row">
                     <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" role="switch" id="allowFollowers" checked />
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowFollowers" onchange="saveSettings()" checked />
                     </div>
                   </th>
                   <td>Follower</td>
                   <td>
-                    <input type="number" style="width: 80px" class="form-control" id="followerBonus" value="0" min="0" placeholder="0" />
+                    <input type="number" style="width: 80px" class="form-control" id="followerBonus" onchange="saveSettings()" value="0" min="0" placeholder="0" />
                   </td>
                   <td>
                     <div class="input-group flex-nowrap">
                       <label class="input-group-text" for="followAge">Must be following for at least</label>
-                      <input type="number" id="followAge" style="max-width: 5em" class="form-control" value="0" min="0" placeholder="0" aria-label="Text input for follow age" />
-                      <select style="max-width: 110px" class="form-select" id="followAgeUnit">
+                      <input
+                        type="number"
+                        id="followAge"
+                        onchange="saveSettings()"
+                        style="max-width: 5em"
+                        class="form-control"
+                        value="0"
+                        min="0"
+                        placeholder="0"
+                        aria-label="Text input for follow age"
+                      />
+                      <select style="max-width: 110px" class="form-select" id="followAgeUnit" onchange="saveSettings()">
                         <option value="min" selected>Minutes</option>
                         <option value="hr">Hours</option>
                         <option value="day">Days</option>
@@ -503,17 +518,27 @@
                 <tr id="subsRow">
                   <th scope="row">
                     <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" role="switch" id="allowSubs" checked />
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowSubs" onchange="saveSettings()" checked />
                     </div>
                   </th>
                   <td>Subscriber</td>
                   <td>
-                    <input type="number" style="width: 80px" class="form-control" id="subBonus" value="0" min="0" placeholder="0" />
+                    <input type="number" style="width: 80px" class="form-control" id="subBonus" onchange="saveSettings()" value="0" min="0" placeholder="0" />
                   </td>
                   <td>
                     <div class="input-group flex-nowrap" style="display: none">
                       <label class="input-group-text" for="subAge">Must be subscribed for at least</label>
-                      <input type="number" id="subAge" style="max-width: 5em" class="form-control" value="0" min="0" placeholder="0" aria-label="Text input for sub age" />
+                      <input
+                        type="number"
+                        id="subAge"
+                        onchange="saveSettings()"
+                        style="max-width: 5em"
+                        class="form-control"
+                        value="0"
+                        min="0"
+                        placeholder="0"
+                        aria-label="Text input for sub age"
+                      />
                       <label class="input-group-text" for="subAge">months</label>
                     </div>
                   </td>
@@ -521,17 +546,27 @@
                 <tr id="tier1Row" style="display: none">
                   <th scope="row">
                     <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" role="switch" id="allowTier1" checked />
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowTier1" onchange="saveSettings()" checked />
                     </div>
                   </th>
                   <td>Tier 1 Subscriber</td>
                   <td>
-                    <input type="number" style="width: 80px" class="form-control" id="tier1Bonus" value="0" min="0" placeholder="0" />
+                    <input type="number" style="width: 80px" class="form-control" id="tier1Bonus" onchange="saveSettings()" value="0" min="0" placeholder="0" />
                   </td>
                   <td>
                     <div class="input-group flex-nowrap" style="display: none">
                       <label class="input-group-text" for="tier1SubAge">Must be subscribed for at least</label>
-                      <input type="number" id="tier1SubAge" style="max-width: 5em" class="form-control" value="0" min="0" placeholder="0" aria-label="Text input for tier 2 sub age" />
+                      <input
+                        type="number"
+                        id="tier1SubAge"
+                        onchange="saveSettings()"
+                        style="max-width: 5em"
+                        class="form-control"
+                        value="0"
+                        min="0"
+                        placeholder="0"
+                        aria-label="Text input for tier 2 sub age"
+                      />
                       <label class="input-group-text" for="tier1SubAge">months</label>
                     </div>
                   </td>
@@ -539,17 +574,27 @@
                 <tr id="tier2Row" style="display: none">
                   <th scope="row">
                     <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" role="switch" id="allowTier2" checked />
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowTier2" onchange="saveSettings()" checked />
                     </div>
                   </th>
                   <td>Tier 2 Subscriber</td>
                   <td>
-                    <input type="number" style="width: 80px" class="form-control" id="tier2Bonus" value="0" min="0" placeholder="0" />
+                    <input type="number" style="width: 80px" class="form-control" id="tier2Bonus" onchange="saveSettings()" value="0" min="0" placeholder="0" />
                   </td>
                   <td>
                     <div class="input-group flex-nowrap" style="display: none">
                       <label class="input-group-text" for="tier2SubAge">Must be subscribed for at least</label>
-                      <input type="number" id="tier2SubAge" style="max-width: 5em" class="form-control" value="0" min="0" placeholder="0" aria-label="Text input for tier 2 sub age" />
+                      <input
+                        type="number"
+                        id="tier2SubAge"
+                        onchange="saveSettings()"
+                        style="max-width: 5em"
+                        class="form-control"
+                        value="0"
+                        min="0"
+                        placeholder="0"
+                        aria-label="Text input for tier 2 sub age"
+                      />
                       <label class="input-group-text" for="tier2SubAge">months</label>
                     </div>
                   </td>
@@ -557,17 +602,27 @@
                 <tr id="tier3Row" style="display: none">
                   <th scope="row">
                     <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" role="switch" id="allowTier3" checked />
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowTier3" onchange="saveSettings()" checked />
                     </div>
                   </th>
                   <td>Tier 3 Subscriber</td>
                   <td>
-                    <input type="number" style="width: 80px" class="form-control" id="tier3Bonus" value="0" min="0" placeholder="0" />
+                    <input type="number" style="width: 80px" class="form-control" id="tier3Bonus" onchange="saveSettings()" value="0" min="0" placeholder="0" />
                   </td>
                   <td>
                     <div class="input-group flex-nowrap" style="display: none">
                       <label class="input-group-text" for="tier3SubAge">Must be subscribed for at least</label>
-                      <input type="number" id="tier3SubAge" style="max-width: 5em" class="form-control" value="0" min="0" placeholder="0" aria-label="Text input for sub luck" />
+                      <input
+                        type="number"
+                        id="tier3SubAge"
+                        onchange="saveSettings()"
+                        style="max-width: 5em"
+                        class="form-control"
+                        value="0"
+                        min="0"
+                        placeholder="0"
+                        aria-label="Text input for sub luck"
+                      />
                       <label class="input-group-text" for="tier3SubAge">months</label>
                     </div>
                   </td>
@@ -575,36 +630,36 @@
                 <tr>
                   <th scope="row">
                     <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" role="switch" id="allowMods" checked />
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowMods" onchange="saveSettings()" checked />
                     </div>
                   </th>
                   <td>Mod</td>
                   <td>
-                    <input type="number" style="width: 80px" class="form-control" id="modBonus" value="0" min="0" placeholder="0" />
+                    <input type="number" style="width: 80px" class="form-control" id="modBonus" onchange="saveSettings()" value="0" min="0" placeholder="0" />
                   </td>
                   <td></td>
                 </tr>
                 <tr>
                   <th scope="row">
                     <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" role="switch" id="allowVips" checked />
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowVips" onchange="saveSettings()" checked />
                     </div>
                   </th>
                   <td>VIP</td>
                   <td>
-                    <input type="number" style="width: 80px" class="form-control" id="vipBonus" value="0" min="0" placeholder="0" />
+                    <input type="number" style="width: 80px" class="form-control" id="vipBonus" onchange="saveSettings()" value="0" min="0" placeholder="0" />
                   </td>
                   <td></td>
                 </tr>
                 <tr>
                   <th scope="row">
                     <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" role="switch" id="allowFirstTimeChatters" checked />
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowFirstTimeChatters" onchange="saveSettings()" checked />
                     </div>
                   </th>
                   <td>First time chatter</td>
                   <td>
-                    <input type="number" style="width: 80px" class="form-control" id="firstTimeChatterBonus" value="0" min="0" placeholder="0" />
+                    <input type="number" style="width: 80px" class="form-control" id="firstTimeChatterBonus" onchange="saveSettings()" value="0" min="0" placeholder="0" />
                   </td>
                   <td></td>
                 </tr>
@@ -629,13 +684,13 @@
           <div class="card-header">Bot settings</div>
           <div class="card-body">
             <div class="form-check form-switch mb-3">
-              <input type="checkbox" class="form-check-input" id="announceWinner" aria-describedby="announceWinnerDesc" disabled />
+              <input type="checkbox" class="form-check-input" id="announceWinner" onchange="saveSettings()" aria-describedby="announceWinnerDesc" disabled />
               <label class="form-check-label" for="announceWinner"><i class="material-icons notranslate">smart_toy</i> Announce winner in chat</label><br />
               <small id="announceWinnerDesc" class="text-body-secondary"> Posts a message in chat to notify the winner </small><br />
               <small class="text-warning no-twitch-warn">You need to sign in using Twitch to use this feature</small>
             </div>
             <div class="form-check form-switch mb-3">
-              <input type="checkbox" class="form-check-input" id="confirmJoin" aria-describedby="confirmJoinDesc" disabled />
+              <input type="checkbox" class="form-check-input" id="confirmJoin" onchange="saveSettings()" aria-describedby="confirmJoinDesc" disabled />
               <label class="form-check-label" for="confirmJoin"><i class="material-icons notranslate">smart_toy</i> Confirm joining in chat</label><br />
               <small id="confirmJoinDesc" class="text-body-secondary">
                 Notifies each viewer that joins the raffle in chat to confirm that they joined.<br />
@@ -650,7 +705,7 @@
           <div class="card-header">Animation</div>
           <div class="card-body">
             <div class="form-check form-switch mb-3">
-              <input type="checkbox" class="form-check-input" id="animateDrawing" aria-describedby="animateDrawingDesc" checked />
+              <input type="checkbox" class="form-check-input" id="animateDrawing" onchange="saveSettings()" aria-describedby="animateDrawingDesc" checked />
               <label class="form-check-label" for="animateDrawing"><i class="material-icons notranslate">star</i> Animate raffle drawing</label><br />
               <small id="animateDrawingDesc" class="text-body-secondary">
                 Plays a CS:GO style case unboxing animation when drawing the winner using placeholder
@@ -658,7 +713,7 @@
               </small>
             </div>
             <div class="form-check form-switch ms-5">
-              <input type="checkbox" class="form-check-input" id="useTwitchPFP" aria-describedby="useTwitchPFPDesc" disabled />
+              <input type="checkbox" class="form-check-input" id="useTwitchPFP" onchange="saveSettings()" aria-describedby="useTwitchPFPDesc" disabled />
               <label class="form-check-label" for="useTwitchPFP"><i class="material-icons notranslate">account_circle</i> Use Twitch profile pictures</label>
               <small id="useTwitchPFPDesc" class="text-body-secondary"><br />Replaces the placeholder avatars with the viewers' Twitch avatars </small><br />
               <small class="text-danger">Use with caution; Some viewers might have avatars that break Twitch's TOS.</small> <br />
@@ -679,6 +734,7 @@
                 disabled
                 type="number"
                 id="rerollTimerValueMinutes"
+                onchange="saveSettings()"
                 style="max-width: 5em"
                 class="form-control"
                 value="0"
@@ -706,13 +762,13 @@
               <br /><small class="text-body-secondary"><b class="text-danger">Use with caution; viewers might link images that break Twitch's TOS</b></small>
             </div>
             <div class="form-check form-switch mb-3">
-              <input class="form-check-input" type="checkbox" id="refreshWarningEnabled" />
+              <input class="form-check-input" type="checkbox" id="refreshWarningEnabled" onchange="saveSettings()" />
               <label class="form-check-label" for="refreshWarningEnabled"><i class="material-icons notranslate">notification_important</i>Enable close/refresh warning</label>
               <br /><small class="text-body-secondary">Shows a warning before leaving/refreshing the site so that you don't accidentally lose your raffle results.</small>
             </div>
             <div class="input-group mb-0">
               <span class="input-group-text blueborder">Refresh 3rd party emotes</span>
-              <button class="btn btn-outline-info" type="button" id="getEmotes"><i class="material-icons notranslate">refresh</i></button>
+              <button class="btn btn-outline-info" type="button" onclick="getEmotes()"><i class="material-icons notranslate">refresh</i></button>
             </div>
             <div class="text-body-secondary mb-3">
               Loaded emotes (global/channel): BTTV: <span id="bttvGlobalEmotes">0</span>/<span id="bttvChannelEmotes">0</span> | FFZ: <span id="ffzGlobalEmotes">0</span>/<span

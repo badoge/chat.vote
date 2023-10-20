@@ -672,9 +672,6 @@ window.onload = function () {
     updateTimer(this);
     saveSettings();
   };
-  elements.pollTimerUnit.onchange = function () {
-    saveSettings();
-  };
   elements.multipleAnswersAllowed.onchange = function () {
     if (this.checked) {
       multipleAnswersAllowed = true;
