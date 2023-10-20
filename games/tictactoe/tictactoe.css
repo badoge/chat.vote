@@ -67,6 +67,10 @@ body {
   position: absolute;
 }
 
+.text-shadow {
+  text-shadow: 0px 0px 4px #000000;
+}
+
 .wrapper {
   width: 666px;
   padding: 30px;
