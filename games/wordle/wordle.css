@@ -15,10 +15,15 @@ body {
 }
 
 #toastContainer {
-  z-index: 1056;
   position: fixed;
-  top: 1%;
-  width: 15vw;
+  bottom: 10px;
+  left: 10px;
+  z-index: 1056;
+  font-weight: bold;
+}
+
+#toastContainer > div > div {
+  font-size: 1.5em;
 }
 
 .resizable {
