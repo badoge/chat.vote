@@ -1,6 +1,3 @@
-let channelBadges = { subscriber: [], bits: [] };
-let globalBadges = {};
-let customBadges = [];
 let numberOfOptions = 2;
 let modal2;
 let answer = "";
@@ -101,36 +98,6 @@ function resetSettings() {
   return false;
 }
 
-function addBadges(badges, userid, firstmsg) {
-  try {
-    let badgesHTML = "";
-    if (firstmsg) {
-      badgesHTML += `<i class="material-icons notranslate" style="color:#f18805;" title="First-time chatter">warning_amber</i>`;
-    }
-    for (let index = 0; index < customBadges.length; index++) {
-      if (customBadges[index].users.includes(userid) && customBadges[index].sites.includes("chat.vote")) {
-        badgesHTML += `<img src="${customBadges[index].url}" class="chat-badge" title="${customBadges[index].name}"/>`;
-      }
-    }
-    for (const badge in badges) {
-      if (badge == "subscriber" && badges.subscriber && channelBadges.subscriber.length > 0) {
-        let badge = channelBadges.subscriber.find((obj) => obj.id === badges.subscriber);
-        badgesHTML += `<img src="${badge.url}" class="chat-badge" title="Subscriber"/>`;
-      } else if (badge == "bits" && channelBadges.bits.length > 0) {
-        let badge = channelBadges.bits.find((obj) => obj.id === badges.bits);
-        badgesHTML += `<img src="${badge.url}" class="chat-badge" title="Bits"/>`;
-      } else if (Object.keys(globalBadges).length > 0) {
-        let version = globalBadges[badge].find((obj) => obj.id === badges[badge]);
-        badgesHTML += `<img src="${version.image_url_4x}" class="chat-badge" title="${badge}"/>`;
-      }
-    }
-    return badgesHTML;
-  } catch (error) {
-    console.log(error);
-    return "";
-  }
-} //addBadges
-
 async function start() {
   points = parseInt(elements.points.value, 10);
 
@@ -142,15 +109,6 @@ async function start() {
 
   elements.start.innerHTML = spinner;
 
-  if (Object.keys(globalBadges).length == 0) {
-    globalBadges = await getGlobalBadges();
-  }
-  if (channelBadges.subscriber.length == 0 || true) {
-    channelBadges = await getChannelBadges(USER.channel);
-  }
-  if (customBadges.length == 0) {
-    customBadges = await getCustomBadges();
-  }
   elements.start.innerHTML = "Start";
   let questions = [...document.querySelectorAll(".questions")];
   let answers = [...document.querySelectorAll(".answers")];
@@ -375,6 +333,7 @@ function connect() {
     </ul>
     </div>
     </div>`;
+  loadBadges(USER.channel);
   let options = {
     options: {
       clientId: CLIENT_ID,

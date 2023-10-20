@@ -31,9 +31,6 @@ let elements = {
 
 let loginButton;
 let darkTheme = true;
-let channelBadges = { subscriber: [], bits: [] };
-let globalBadges = {};
-let customBadges = [];
 let loginExpiredModal, aboutModal;
 
 let USER = {
@@ -153,15 +150,6 @@ async function start() {
   DRAW.drawturn++;
   DRAW.winner = false;
   DRAW.correctusers = 0;
-  if (Object.keys(globalBadges).length == 0) {
-    globalBadges = await getGlobalBadges();
-  }
-  if (channelBadges.subscriber.length == 0) {
-    channelBadges = await getChannelBadges(USER.channel);
-  }
-  if (customBadges.length == 0) {
-    customBadges = await getCustomBadges();
-  }
 } //start
 
 function reroll() {
@@ -584,33 +572,3 @@ window.onload = async function () {
     document.getElementById("7tvdesc").innerHTML = `<br>${allEmotes.seventv.length} emotes`;
   }
 }; //onload
-
-function addBadges(badges, userid, firstmsg) {
-  try {
-    let badgesHTML = "";
-    if (firstmsg) {
-      badgesHTML += `<i class="material-icons notranslate" style="color:#f18805;" title="First-time chatter">warning_amber</i>`;
-    }
-    for (let index = 0; index < customBadges.length; index++) {
-      if (customBadges[index].users.includes(userid) && customBadges[index].sites.includes("chat.vote")) {
-        badgesHTML += `<img src="${customBadges[index].url}" class="chat-badge" title="${customBadges[index].name}"/>`;
-      }
-    }
-    for (const badge in badges) {
-      if (badge == "subscriber" && badges.subscriber && channelBadges.subscriber.length > 0) {
-        let badge = channelBadges.subscriber.find((obj) => obj.id === badges.subscriber);
-        badgesHTML += `<img src="${badge.url}" class="chat-badge" title="Subscriber"/>`;
-      } else if (badge == "bits" && channelBadges.bits.length > 0) {
-        let badge = channelBadges.bits.find((obj) => obj.id === badges.bits);
-        badgesHTML += `<img src="${badge.url}" class="chat-badge" title="Bits"/>`;
-      } else if (Object.keys(globalBadges).length > 0) {
-        let version = globalBadges[badge].find((obj) => obj.id === badges[badge]);
-        badgesHTML += `<img src="${version.image_url_4x}" class="chat-badge" title="${badge}"/>`;
-      }
-    }
-    return badgesHTML;
-  } catch (error) {
-    console.log(error);
-    return "";
-  }
-} //addBadges

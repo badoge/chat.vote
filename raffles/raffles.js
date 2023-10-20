@@ -114,9 +114,6 @@ let currentTime = 0;
 let rafflePopover;
 let loginButton;
 let resetSettingsModal, loginExpiredModal, restartRaffleModal, fancyRaffleModal;
-let channelBadges = { subscriber: [], bits: [] };
-let globalBadges = {};
-let customBadges = [];
 let currentRaffleWinner = "";
 let raffleWinners = [];
 let settingsOffcanvas;
@@ -408,6 +405,7 @@ function connect() {
   </div>`;
   refreshData();
   getEmotes();
+  loadBadges(USER.channel);
   let options = {
     options: {
       clientId: CLIENT_ID,
@@ -644,7 +642,7 @@ function addUserToRaffle(user) {
   raffle_users.push(user);
   let name = user.username == user.displayname.toLowerCase() ? `${user.displayname}` : `${user.displayname} (${user.username})`;
   let color = !user.color ? "#FFFFFF" : user.color;
-  let badges = addBadges(user.badges, user.id, user.username);
+  let badges = addBadges(user.badges, user.id, firstTimeChatters.includes(user.username));
   let deletebtn = `<i class="material-icons notranslate deletebtn float-end" onclick="removeFromRaffle('${user.username}')">highlight_off</i>`;
   elements.raffleUsers.innerHTML =
     `<li id="${user.username}_raffle" class="list-group-item">
@@ -976,36 +974,6 @@ async function getPFP(users) {
   });
 } //getPFP
 
-function addBadges(badges, userid, username) {
-  try {
-    let badgesHTML = "";
-    if (firstTimeChatters.includes(username)) {
-      badgesHTML += `<i class="material-icons notranslate" style="color:#f18805;" title="First-time chatter">warning_amber</i>`;
-    }
-    for (let index = 0; index < customBadges.length; index++) {
-      if (customBadges[index].users.includes(userid) && customBadges[index].sites.includes("chat.vote")) {
-        badgesHTML += `<img src="${customBadges[index].url}" class="chat-badge" title="${customBadges[index].name}"/>`;
-      }
-    }
-    for (const badge in badges) {
-      if (badge == "subscriber" && badges.subscriber && channelBadges.subscriber.length > 0) {
-        let badge = channelBadges.subscriber.find((obj) => obj.id === badges.subscriber);
-        badgesHTML += `<img src="${badge.url}" class="chat-badge" title="Subscriber"/>`;
-      } else if (badge == "bits" && channelBadges.bits.length > 0) {
-        let badge = channelBadges.bits.find((obj) => obj.id === badges.bits);
-        badgesHTML += `<img src="${badge.url}" class="chat-badge" title="Bits"/>`;
-      } else if (Object.keys(globalBadges).length > 0) {
-        let version = globalBadges[badge].find((obj) => obj.id === badges[badge]);
-        badgesHTML += `<img src="${version.image_url_4x}" class="chat-badge" title="${badge}"/>`;
-      }
-    }
-    return badgesHTML;
-  } catch (error) {
-    console.log(error);
-    return "";
-  }
-} //addBadges
-
 function relativeTime(timestamp) {
   const rtf = new Intl.RelativeTimeFormat("en", {
     numeric: "auto",
@@ -1035,7 +1003,7 @@ function raffleWinnerChat(context, msg, joinMessage = false) {
   msg_s = replaceEmotes(msg_s, thirdPartyEmotes);
   let name = context.username == context["display-name"].toLowerCase() ? `${context["display-name"]}` : `${context["display-name"]} (${context.username})`;
   let color = !context.color ? "#FFFFFF" : context.color;
-  let badges = addBadges(context.badges, context["user-id"], context.username);
+  let badges = addBadges(context.badges, context["user-id"], firstTimeChatters.includes(context.username));
   let p = document.createElement("p");
   p.innerHTML = `${joinMessage ? relativeTime(context.time) : ""} ${badges}<span ${joinMessage ? `class="text-body-secondary"` : `style="color:${color};"`}> ${name}:</span> ${
     joinMessage ? `<span class="text-body-secondary"> ${msg_s}</span>` : msg_s
@@ -1214,23 +1182,12 @@ async function enableRaffleButton() {
     }, 1000);
     return;
   }
-  elements.raffleCommandButton.innerHTML = spinner;
 
-  if (Object.keys(globalBadges).length == 0) {
-    globalBadges = await getGlobalBadges();
-  }
-  if (channelBadges.subscriber.length == 0) {
-    channelBadges = await getChannelBadges(USER.channel);
-  }
-  if (customBadges.length == 0) {
-    customBadges = await getCustomBadges();
-  }
   fpsBenchmark();
   raffle_open = true;
   elements.enableRaffle.classList.remove("btn-success");
   elements.enableRaffle.classList.add("btn-danger");
   elements.enableRaffleText.innerText = "Close Raffle";
-  elements.raffleCommandButton.innerText = RAFFLES.raffleCommand;
 } //enableRaffleButton
 
 function disableRaffleButton() {
@@ -1238,7 +1195,6 @@ function disableRaffleButton() {
   elements.enableRaffle.classList.remove("btn-danger");
   elements.enableRaffle.classList.add("btn-success");
   elements.enableRaffleText.innerText = "Open Raffle";
-  elements.raffleCommandButton.innerText = RAFFLES.raffleCommand;
 } //disableRaffleButton
 
 function changeRaffleCommand() {

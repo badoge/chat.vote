@@ -227,6 +227,8 @@ function connect() {
   </div>
   </div>`;
   refreshData();
+  loadBadges(USER.channel);
+
   let options = {
     options: {
       clientId: CLIENT_ID,

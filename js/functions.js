@@ -9,6 +9,10 @@ const GETrequestOptions = {
 
 const spinner = `<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`;
 
+let channelBadges = { subscriber: [], bits: [] };
+let globalBadges = {};
+let customBadges = [];
+
 async function get7TVPFP(userID) {
   if (!userID) {
     return "/pics/donk.png";
@@ -521,6 +525,52 @@ async function getCustomBadges() {
     }
   });
 } //getCustomBadges
+
+async function loadBadges(channel) {
+  if (Object.keys(globalBadges).length == 0) {
+    globalBadges = await getGlobalBadges();
+  }
+  if (channelBadges.subscriber.length == 0) {
+    channelBadges = await getChannelBadges(channel);
+  }
+  if (customBadges.length == 0) {
+    customBadges = await getCustomBadges();
+  }
+} //loadBadges
+
+function addBadges(badges, userid, firstmsg) {
+  try {
+    let badgesHTML = "";
+    if (firstmsg) {
+      badgesHTML += `<i class="material-icons notranslate" style="color:#f18805;" title="First-time chatter">warning_amber</i>`;
+    }
+    for (let index = 0; index < customBadges.length; index++) {
+      if (customBadges[index].users.includes(userid) && customBadges[index].sites.includes("chat.vote")) {
+        badgesHTML += `<img src="${customBadges[index].url}" class="chat-badge" title="${customBadges[index].name}"/>`;
+      }
+    }
+    if (badges == "streamer") {
+      badgesHTML += `<img src="https://static-cdn.jtvnw.net/badges/v1/5527c58c-fb7d-422d-b71b-f309dcb85cc1/3" class="chat-badge" title="Broadcaster"/>`;
+      return badgesHTML;
+    }
+    for (const badge in badges) {
+      if (badge == "subscriber" && badges.subscriber && channelBadges.subscriber.length > 0) {
+        let badge = channelBadges.subscriber.find((obj) => obj.id === badges.subscriber);
+        badgesHTML += `<img src="${badge.url}" class="chat-badge" title="Subscriber"/>`;
+      } else if (badge == "bits" && channelBadges.bits.length > 0) {
+        let badge = channelBadges.bits.find((obj) => obj.id === badges.bits);
+        badgesHTML += `<img src="${badge.url}" class="chat-badge" title="Bits"/>`;
+      } else if (Object.keys(globalBadges).length > 0) {
+        let version = globalBadges[badge].find((obj) => obj.id === badges[badge]);
+        badgesHTML += `<img src="${version.image_url_4x}" class="chat-badge" title="${badge}"/>`;
+      }
+    }
+    return badgesHTML;
+  } catch (error) {
+    console.log(error);
+    return "";
+  }
+} //addBadges
 
 function replaceEmotes(input, thirdPartyEmotes) {
   input = input.split(" ");

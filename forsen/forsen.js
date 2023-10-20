@@ -40,9 +40,6 @@ let raffle_open;
 let color = "";
 let currentTime = 0;
 let modal8, modal9;
-let channelBadges = { subscriber: [], bits: [] };
-let globalBadges = {};
-let customBadges = [];
 let winner = "";
 let winners = [];
 let raffleCollapse;
@@ -80,6 +77,8 @@ function connect() {
   </div>
   </div>`;
   getEmotes();
+  loadBadges(USERNAME);
+
   let options = {
     options: {
       clientId: CLIENT_ID,
@@ -411,36 +410,6 @@ const fpsBenchmark = function () {
   }, 1000);
 };
 
-function addBadges(badges, userid, firstmsg) {
-  try {
-    let badgesHTML = "";
-    if (firstmsg) {
-      badgesHTML += `<i class="material-icons notranslate" style="color:#f18805;" title="First-time chatter">warning_amber</i>`;
-    }
-    for (let index = 0; index < customBadges.length; index++) {
-      if (customBadges[index].users.includes(userid) && customBadges[index].sites.includes("chat.vote")) {
-        badgesHTML += `<img src="${customBadges[index].url}" class="chat-badge" title="${customBadges[index].name}"/>`;
-      }
-    }
-    for (const badge in badges) {
-      if (badge == "subscriber" && badges.subscriber && channelBadges.subscriber.length > 0) {
-        let badge = channelBadges.subscriber.find((obj) => obj.id === badges.subscriber);
-        badgesHTML += `<img src="${badge.url}" class="chat-badge" title="Subscriber"/>`;
-      } else if (badge == "bits" && channelBadges.bits.length > 0) {
-        let badge = channelBadges.bits.find((obj) => obj.id === badges.bits);
-        badgesHTML += `<img src="${badge.url}" class="chat-badge" title="Bits"/>`;
-      } else if (Object.keys(globalBadges).length > 0) {
-        let version = globalBadges[badge].find((obj) => obj.id === badges[badge]);
-        badgesHTML += `<img src="${version.image_url_4x}" class="chat-badge" title="${badge}"/>`;
-      }
-    }
-    return badgesHTML;
-  } catch (error) {
-    console.log(error);
-    return "";
-  }
-} //addBadges
-
 function raffleWinnerChat(context, msg) {
   let msg_s = validator.escape(msg);
   if (context.emotes) {
@@ -490,9 +459,7 @@ async function getEmotes() {
 window.onload = async function () {
   connect();
   fpsBenchmark();
-  globalBadges = await getGlobalBadges();
-  channelBadges = await getChannelBadges(USERNAME);
-  customBadges = await getCustomBadges();
+
   modal8 = new bootstrap.Modal(elements.modal8);
   modal9 = new bootstrap.Modal(elements.modal9);
 

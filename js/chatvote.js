@@ -151,9 +151,7 @@ let settingsCollapse;
 let basicTab, advancedTab, contactTab;
 let enableVotingDropdown, enableSuggestionsDropdown;
 let tableTab, chartTab, yesnoTab;
-let channelBadges = { subscriber: [], bits: [] };
-let globalBadges = {};
-let customBadges = [];
+
 let thirdPartyEmotes = [];
 
 let darkTheme = true;
@@ -523,6 +521,7 @@ function connect() {
   </div>`;
   refreshData();
   getEmotes();
+  loadBadges(USER.channel);
   let options = {
     options: {
       clientId: CLIENT_ID,
@@ -956,40 +955,6 @@ async function getEmotes() {
     }
   }, 3000);
 } //getEmotes
-
-function addBadges(badges, userid, firstmsg) {
-  try {
-    let badgesHTML = "";
-    if (firstmsg) {
-      badgesHTML += `<i class="material-icons notranslate" style="color:#f18805;" title="First-time chatter">warning_amber</i>`;
-    }
-    for (let index = 0; index < customBadges.length; index++) {
-      if (customBadges[index].users.includes(userid) && customBadges[index].sites.includes("chat.vote")) {
-        badgesHTML += `<img src="${customBadges[index].url}" class="chat-badge" title="${customBadges[index].name}"/>`;
-      }
-    }
-    if (badges == "streamer") {
-      badgesHTML += `<img src="https://static-cdn.jtvnw.net/badges/v1/5527c58c-fb7d-422d-b71b-f309dcb85cc1/3" class="chat-badge" title="Broadcaster"/>`;
-      return badgesHTML;
-    }
-    for (const badge in badges) {
-      if (badge == "subscriber" && badges.subscriber && channelBadges.subscriber.length > 0) {
-        let badge = channelBadges.subscriber.find((obj) => obj.id === badges.subscriber);
-        badgesHTML += `<img src="${badge.url}" class="chat-badge" title="Subscriber"/>`;
-      } else if (badge == "bits" && channelBadges.bits.length > 0) {
-        let badge = channelBadges.bits.find((obj) => obj.id === badges.bits);
-        badgesHTML += `<img src="${badge.url}" class="chat-badge" title="Bits"/>`;
-      } else if (Object.keys(globalBadges).length > 0) {
-        let version = globalBadges[badge].find((obj) => obj.id === badges[badge]);
-        badgesHTML += `<img src="${version.image_url_4x}" class="chat-badge" title="${badge}"/>`;
-      }
-    }
-    return badgesHTML;
-  } catch (error) {
-    console.log(error);
-    return "";
-  }
-} //addBadges
 
 function startYesNo() {
   if (!checkLogin()) {
@@ -1681,24 +1646,12 @@ async function enableSuggestButton() {
   if (!checkLogin()) {
     return;
   }
-  elements.suggestionsCommand.innerHTML = spinner;
-
-  if (Object.keys(globalBadges).length == 0) {
-    globalBadges = await getGlobalBadges();
-  }
-  if (channelBadges.subscriber.length == 0) {
-    channelBadges = await getChannelBadges(USER.channel);
-  }
-  if (customBadges.length == 0) {
-    customBadges = await getCustomBadges();
-  }
   suggestions_enabled = true;
   elements.enableSuggestions.classList.remove("btn-success");
   elements.enableSuggestions.classList.add("btn-danger");
   elements.enableSuggestionsDropdown.classList.remove("btn-success");
   elements.enableSuggestionsDropdown.classList.add("btn-danger");
   elements.enableSuggestionsText.innerText = "Disable viewer suggestions";
-  elements.suggestionsCommand.innerText = CHATVOTE.suggestion_prefix;
 } //enableSuggestButton
 
 function disableSuggestButton() {
@@ -1708,7 +1661,6 @@ function disableSuggestButton() {
   elements.enableSuggestionsDropdown.classList.remove("btn-danger");
   elements.enableSuggestionsDropdown.classList.add("btn-success");
   elements.enableSuggestionsText.innerText = "Enable viewer suggestions";
-  elements.suggestionsCommand.innerText = CHATVOTE.suggestion_prefix;
 } //disableSuggestButton
 
 function changeSuggestionCommand() {
@@ -2057,9 +2009,6 @@ window.onload = function () {
     addOption();
   });
   elements.pollOption.addEventListener("focus", async function () {
-    if (customBadges.length == 0) {
-      customBadges = await getCustomBadges();
-    }
     if (!streamerColor && USER.userID) {
       streamerColor = await getStreamerColor(USER.userID);
     }
