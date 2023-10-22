@@ -152,6 +152,7 @@ const spotifyURLRegex = /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:(albu
 
 let darkTheme = true;
 
+let client;
 let loginButton;
 let loginExpiredModal, deleteBracketModal, quitBracketModal, tierlistEditorModal, previewModal, generateModal, browseModal, startModal;
 let votePopover, votePopoverTierlist;
@@ -414,7 +415,7 @@ function connect() {
     },
     channels: [USER.channel],
   };
-  const client = new tmi.client(options);
+  client = new tmi.client(options);
 
   client.on("message", async (target, context, msg, self) => {
     let input = msg.split(" ").filter(Boolean);

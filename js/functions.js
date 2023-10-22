@@ -745,10 +745,9 @@ async function checkToken(access_token) {
   });
 } //checkToken
 
-function spamTest(message, count) {
-  for (let index = 0; index < count; index++) {
-    let username = uuidv4();
-    let context = {
+function spamTest(type, count, delay = 100, votes = null) {
+  let badges = [
+    {
       "badge-info": {
         subscriber: "30",
       },
@@ -757,6 +756,68 @@ function spamTest(message, count) {
         subscriber: "3030",
         "glhf-pledge": "1",
       },
+      "badge-info-raw": "subscriber/30",
+      "badges-raw": "moderator/1,subscriber/3030,glhf-pledge/1",
+    },
+    {
+      "badge-info": {
+        subscriber: "33",
+      },
+      badges: {
+        moderator: "1",
+        subscriber: "3030",
+        "game-developer": "1",
+      },
+      "badge-info-raw": "subscriber/30",
+      "badges-raw": "moderator/1,subscriber/3030,game-developer/1",
+    },
+    {
+      "badge-info": null,
+      badges: {
+        moderator: "1",
+      },
+      "badge-info-raw": null,
+      "badges-raw": "moderator/1",
+    },
+    {
+      "badge-info": null,
+      badges: {
+        vip: "1",
+      },
+      "badge-info-raw": null,
+      "badges-raw": "vip/1",
+    },
+    {
+      "badge-info": null,
+      badges: null,
+      "badge-info-raw": null,
+      "badges-raw": null,
+    },
+  ];
+
+  for (let index = 0; index < count; index++) {
+    let username = uuidv4();
+    let randomBadge = badges[Math.floor(Math.random() * badges.length)];
+    let message = "";
+    switch (type) {
+      case "suggest":
+        message = `!suggest  ${uuidv4()}`;
+        break;
+      case "join":
+        message = `!join  ${uuidv4()}`;
+        break;
+      case "vote":
+        if (!votes) {
+          return `no number of options provided - spamTest("vote", count, number of options)`;
+        }
+        message = (Math.floor(Math.random() * votes) + 1).toString();
+        break;
+      default:
+        return `invalid input - spamTest("vote/suggest/join", count, optional max delay in ms, optional number of options for type vote)`;
+    }
+    let context = {
+      "badge-info": randomBadge["badge-info"],
+      badges: randomBadge.badges,
       color: "#" + ((Math.random() * 0xffffff) << 0).toString(16),
       "display-name": username,
       emotes: null,
@@ -772,8 +833,8 @@ function spamTest(message, count) {
       "user-id": Math.floor(Math.random() * 1000000000).toString(),
       "user-type": "mod",
       "emotes-raw": null,
-      "badge-info-raw": "subscriber/30",
-      "badges-raw": "moderator/1,subscriber/3030,glhf-pledge/1",
+      "badge-info-raw": randomBadge["badge-info-raw"],
+      "badges-raw": randomBadge["badges-raw"],
       username: username,
       "message-type": "chat",
     };
@@ -781,7 +842,7 @@ function spamTest(message, count) {
     //type, target, context, msg, self
     setTimeout(() => {
       client.emit("message", "#mwwmwwwwmwwwwwwwmwwwwmwww", context, message, false);
-    }, 100);
+    }, Math.random() * delay);
   }
 } //spamTest
 

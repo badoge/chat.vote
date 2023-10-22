@@ -100,6 +100,7 @@ let elements = {
   titleHint: document.getElementById("titleHint"),
 };
 
+let client;
 let raffle_users = [];
 let raffle_tickets = [];
 let raffle_open;
@@ -412,7 +413,7 @@ function connect() {
     },
     channels: [USER.channel],
   };
-  const client = new tmi.client(options);
+  client = new tmi.client(options);
 
   client.on("message", async (target, context, msg, self) => {
     if (context.username == currentRaffleWinner) {

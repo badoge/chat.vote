@@ -29,6 +29,7 @@ let elements = {
   //main
 };
 
+let client;
 let raffle_users = [];
 let raffle_tickets = [];
 let n = 0;
@@ -88,7 +89,7 @@ function connect() {
     },
     channels: [USERNAME],
   };
-  const client = new tmi.client(options);
+  client = new tmi.client(options);
 
   client.on("message", async (target, context, msg, self) => {
     let input = msg.split(" ").filter(Boolean);

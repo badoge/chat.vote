@@ -113,6 +113,7 @@ let elements = {
   yesnoTotalVotes: document.getElementById("yesnoTotalVotes"),
 };
 
+let client;
 let voters = [];
 let voters_options = [];
 let vote_results = [];
@@ -522,7 +523,7 @@ function connect() {
     },
     channels: [USER.channel],
   };
-  const client = new tmi.client(options);
+  client = new tmi.client(options);
 
   client.on("message", async (target, context, msg, self) => {
     let input = msg.split(" ").filter(Boolean);

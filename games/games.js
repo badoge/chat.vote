@@ -1,3 +1,5 @@
+let client;
+
 async function refreshData() {
   darkTheme = elements.darkTheme.checked ?? true;
 
@@ -240,7 +242,7 @@ function connect() {
     },
     channels: [USER.channel],
   };
-  const client = new tmi.client(options);
+  client = new tmi.client(options);
 
   client.on("message", handleMessage);
 

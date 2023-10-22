@@ -1,3 +1,4 @@
+let client;
 let modal1;
 let modal2;
 let modal3;
@@ -28,7 +29,7 @@ function connect() {
     },
     channels: [channel],
   };
-  const client = new tmi.client(options);
+  client = new tmi.client(options);
   client.on("message", onMessageHandler);
   client.on("connected", onConnectedHandler);
   client.connect().catch(console.error);

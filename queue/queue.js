@@ -26,6 +26,7 @@ let elements = {
   loginButton: document.getElementById("loginButton"),
 };
 
+let client;
 let color = "";
 let currentTime = 0;
 let loginButton;
@@ -122,7 +123,7 @@ function connect() {
     },
     channels: [QUEUE.channel],
   };
-  const client = new tmi.client(options);
+  client = new tmi.client(options);
 
   client.on("message", async (target, context, msg, self) => {
     let input = msg.split(" ").filter(Boolean);

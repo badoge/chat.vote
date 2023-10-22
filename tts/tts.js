@@ -1,3 +1,4 @@
+let client;
 let synth;
 let username;
 synth = window.speechSynthesis;
@@ -16,7 +17,7 @@ function connect() {
     channels: [username],
   };
   console.log(`tmi connection options: ${options}`);
-  const client = new tmi.client(options);
+  client = new tmi.client(options);
   client.on("message", onMessageHandler);
   client.on("timeout", onTimeoutHandler);
   client.on("connected", onConnectedHandler);

@@ -1,3 +1,4 @@
+let client;
 let numberOfOptions = 2;
 let loginExpiredModal;
 let answer = "";
@@ -345,7 +346,7 @@ function connect() {
     },
     channels: [USER.channel],
   };
-  const client = new tmi.client(options);
+  client = new tmi.client(options);
 
   client.on("message", async (target, context, msg, self) => {
     let input = msg.split(" ").filter(Boolean);

@@ -147,6 +147,7 @@ let elements = {
   toastContainer: document.getElementById("toastContainer"),
 };
 
+let client;
 let PubSub;
 let apiClient;
 let loginButton;
@@ -1827,7 +1828,7 @@ function connectTwitch() {
     </div>
 </div>`;
 
-  const client = new tmi.Client({
+  client = new tmi.Client({
     connection: {
       reconnect: true,
       secure: true,
