@@ -640,10 +640,14 @@ function addUserToRaffle(user) {
   let name = user.username == user.displayname.toLowerCase() ? `${user.displayname}` : `${user.displayname} (${user.username})`;
   let color = !user.color ? "#FFFFFF" : user.color;
   let badges = addBadges(user.badges, user.id, firstTimeChatters.includes(user.username));
-  let deletebtn = `<i class="material-icons notranslate deletebtn float-end" onclick="removeFromRaffle('${user.username}')">highlight_off</i>`;
-  elements.raffleUsers.innerHTML =
-    `<li id="${user.username}_raffle" class="list-group-item">
-  ${badges}<span style="color:${color};"> ${name}</span>: ${user.tickets} ${user.tickets == 1 ? "ticket" : "tickets"} ${deletebtn}</li>` + elements.raffleUsers.innerHTML;
+  elements.raffleUsers.insertAdjacentHTML(
+    "afterbegin",
+    `
+    <li id="${user.username}_raffle" class="list-group-item">
+    ${badges}<span style="color:${color};"> ${name}</span>: ${user.tickets} ${user.tickets == 1 ? "ticket" : "tickets"} 
+    <i class="material-icons notranslate deletebtn float-end" onclick="removeFromRaffle('${user.username}')">highlight_off</i>
+    </li>`
+  );
   elements.entrants.innerHTML = `Entrants: ${raffle_users.length}`;
   joinedUsers.push(user.username);
 } //addUserToRaffle
