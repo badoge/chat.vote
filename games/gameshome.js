@@ -28,6 +28,8 @@ let USER = {
   platform: "",
 };
 
+function handleMessage(target, context, msg, self) {} //handleMessage
+
 window.onload = function () {
   darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
   elements.darkTheme.checked = darkTheme ?? true;
