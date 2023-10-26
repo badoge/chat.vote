@@ -62,7 +62,15 @@ body {
   max-width: 250px;
 }
 
-#timebar {
+#timeBar {
   background: green;
   height: 20px;
+}
+
+#settingsOffcanvas {
+  height: 50vh;
+}
+
+#settingsOffcanvas > .offcanvas-body {
+  padding-bottom: 200px;
 }

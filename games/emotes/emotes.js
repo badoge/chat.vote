@@ -1,20 +1,18 @@
 let voters = [];
 
 let allEmotes = {
-  twitchglobal: [],
-  bttvglobal: [],
-  ffzglobal: [],
-  seventvglobal: [],
-  twitch: [],
-  bttv: [],
-  ffz: [],
-  seventv: [],
+  twitchGlobal: [],
+  bttvGlobal: [],
+  ffzGlobal: [],
+  seventvGlobal: [],
+  twitchChannel: [],
+  bttvChannel: [],
+  ffzChannel: [],
+  seventvChannel: [],
 };
 let elements = {
   //modals
   grid: document.getElementById("grid"),
-  gameDiv: document.getElementById("gameDiv"),
-
   loginExpiredModal: document.getElementById("loginExpiredModal"),
   aboutModal: document.getElementById("aboutModal"),
 
@@ -28,11 +26,45 @@ let elements = {
 
   //main
   toastContainer: document.getElementById("toastContainer"),
+  settingsOffcanvas: document.getElementById("settingsOffcanvas"),
+  twitchGlobal: document.getElementById("twitchGlobal"),
+  bttvGlobal: document.getElementById("bttvGlobal"),
+  ffzGlobal: document.getElementById("ffzGlobal"),
+  seventvGlobal: document.getElementById("seventvGlobal"),
+  twitchChannel: document.getElementById("twitchChannel"),
+  bttvChannel: document.getElementById("bttvChannel"),
+  ffzChannel: document.getElementById("ffzChannel"),
+  seventvChannel: document.getElementById("seventvChannel"),
+  oneAnswer: document.getElementById("oneAnswer"),
+  hideName: document.getElementById("hideName"),
+  blurEmote: document.getElementById("blurEmote"),
+  emotesPerRound: document.getElementById("emotesPerRound"),
+  emotesPerRoundLabel: document.getElementById("emotesPerRoundLabel"),
+  turnLength: document.getElementById("turnLength"),
+  turnLengthLabel: document.getElementById("turnLengthLabel"),
+  emoteTimer: document.getElementById("emoteTimer"),
+  emoteTimerLabel: document.getElementById("emoteTimerLabel"),
+  timerDecay: document.getElementById("timerDecay"),
+  timerDecayLabel: document.getElementById("timerDecayLabel"),
+  twitchGlobalCount: document.getElementById("twitchGlobalCount"),
+  bttvGlobalCount: document.getElementById("bttvGlobalCount"),
+  ffzGlobalCount: document.getElementById("ffzGlobalCount"),
+  seventvGlobalCount: document.getElementById("seventvGlobalCount"),
+  twitchChannelCount: document.getElementById("twitchChannelCount"),
+  bttvChannelCount: document.getElementById("bttvChannelCount"),
+  ffzChannelCount: document.getElementById("ffzChannelCount"),
+  seventvChannelCount: document.getElementById("seventvChannelCount"),
+  output: document.getElementById("output"),
+  timeBar: document.getElementById("timeBar"),
+  emotes: document.getElementById("emotes"),
+
+  timer: document.getElementById("timer"),
+  timerValue: document.getElementById("timerValue"),
 };
 
 let loginButton;
 let darkTheme = true;
-
+let settingsOffcanvas;
 let loginExpiredModal, aboutModal;
 
 let USER = {
@@ -42,6 +74,7 @@ let USER = {
   userID: "",
   platform: "",
 };
+
 function handleMessage(target, context, msg, self) {
   let limit = false;
   switch (EMOTEBENCHMARK.ebdifficulty) {
@@ -56,21 +89,272 @@ function handleMessage(target, context, msg, self) {
   if (limit) {
     if (!voters.includes(context.username)) {
       voters.push(context.username);
-      if (msg == EMOTEBENCHMARK.ebanswer.trim()) {
+      if (msg == EMOTEBENCHMARK.answer.trim()) {
       }
     }
   } else {
-    if (msg == EMOTEBENCHMARK.ebanswer.trim()) {
-      if (EMOTEBENCHMARK.qualified.includes(context.username) || EMOTEBENCHMARK.ebturn == 1) {
-        if (!EMOTEBENCHMARK.qualifiedcurrentround.includes(context.username)) {
-          EMOTEBENCHMARK.qualifiedcurrentround.push(context.username);
+    if (msg == EMOTEBENCHMARK.answer.trim()) {
+      if (EMOTEBENCHMARK.qualified.includes(context.username) || EMOTEBENCHMARK.turn == 1) {
+        if (!EMOTEBENCHMARK.qualifiedCurrentRound.includes(context.username)) {
+          EMOTEBENCHMARK.qualifiedCurrentRound.push(context.username);
         }
       }
 
-      document.getElementById("eboutput").innerHTML = `Qualified players: ${EMOTEBENCHMARK.qualifiedcurrentround.join(", ")}`;
+      elements.output.innerHTML = `Qualified players: ${EMOTEBENCHMARK.qualifiedCurrentRound.join(", ")}`;
     }
   }
 } //handleMessage
+
+let EMOTEBENCHMARK = {
+  interval: null,
+  turn: 0,
+  turnLength: 20000,
+  emotesPerRound: 1,
+  emoteTimer: 2000,
+  timerDecay: 80,
+  oneAnswer: false,
+  hideName: false,
+  blurEmote: false,
+  answer: "",
+  qualified: [],
+  qualifiedCurrentRound: [],
+  wrong: [],
+  usedEmotes: [],
+  timer: null,
+  twitchGlobal: false,
+  bttvGlobal: false,
+  ffzGlobal: false,
+  seventvGlobal: false,
+  twitchChannel: false,
+  bttvChannel: false,
+  ffzChannel: false,
+  seventvChannel: false,
+}; //EMOTEBENCHMARK
+
+function start() {
+  EMOTEBENCHMARK.emotesPerRound = parseInt(elements.emotesPerRound.value, 10);
+  EMOTEBENCHMARK.turnLength = parseInt(elements.turnLength.value, 10) * 1000;
+  EMOTEBENCHMARK.emoteTimer = parseInt(elements.emoteTimer.value, 10) * 1000;
+  EMOTEBENCHMARK.timerDecay = parseInt(elements.timerDecay.value, 10) * 1000;
+  EMOTEBENCHMARK.oneAnswer = elements.oneAnswer.checked;
+  EMOTEBENCHMARK.hideName = elements.hideName.checked;
+  EMOTEBENCHMARK.blurEmote = elements.blurEmote.checked;
+
+  if (!EMOTEBENCHMARK.interval) {
+    startTurn();
+    startTimer();
+    EMOTEBENCHMARK.interval = setInterval(startTurn, EMOTEBENCHMARK.turnLength);
+  } else {
+    console.log("interval already running");
+  }
+} //start
+
+function reset() {
+  clearInterval(EMOTEBENCHMARK.interval);
+  EMOTEBENCHMARK.interval = null;
+  EMOTEBENCHMARK.turn = 0;
+  EMOTEBENCHMARK.answer = "";
+  elements.emotes.innerHTML = "";
+  elements.output.innerHTML = "";
+  elements.timeBar.style.display = "none";
+  EMOTEBENCHMARK.qualified = [];
+  EMOTEBENCHMARK.qualifiedCurrentRound = [];
+  EMOTEBENCHMARK.twitchGlobal = false;
+  EMOTEBENCHMARK.bttvGlobal = false;
+  EMOTEBENCHMARK.ffzGlobal = false;
+  EMOTEBENCHMARK.seventvGlobal = false;
+  EMOTEBENCHMARK.twitchChannel = false;
+  EMOTEBENCHMARK.bttvChannel = false;
+  EMOTEBENCHMARK.ffzChannel = false;
+  EMOTEBENCHMARK.seventvChannel = false;
+  elements.twitchGlobal.checked = false;
+  elements.bttvGlobal.checked = false;
+  elements.ffzGlobal.checked = false;
+  elements.seventvGlobal.checked = false;
+  elements.twitchChannel.checked = false;
+  elements.bttvChannel.checked = false;
+  elements.ffzChannel.checked = false;
+  elements.seventvChannel.checked = false;
+  elements.oneAnswer.checked = false;
+  elements.hideName.checked = false;
+  elements.blurEmote.checked = false;
+  elements.emotesPerRound.value = 1;
+  elements.emotesPerRoundLabel.innerHTML = "1";
+  elements.turnLength.value = 20;
+  elements.turnLengthLabel.innerHTML = "20";
+  elements.emoteTimer.value = 2;
+  elements.emoteTimerLabel.innerHTML = "2";
+  elements.timerDecay.value = 80;
+  elements.timerDecayLabel.innerHTML = "80";
+  EMOTEBENCHMARK.usedEmotes = [];
+  //stopTimer();
+} //reset
+
+function startTurn() {
+  EMOTEBENCHMARK.turn++;
+  startTimer();
+
+  let selectedemotes = [];
+  let randomemotes = [];
+  EMOTEBENCHMARK.answer = "";
+  elements.emotes.innerHTML = "";
+  EMOTEBENCHMARK.qualified = EMOTEBENCHMARK.qualifiedCurrentRound;
+  EMOTEBENCHMARK.qualifiedCurrentRound = [];
+  if (EMOTEBENCHMARK.qualified.length == 1) {
+    elements.output.innerHTML = `Game is over. WINNER: ${EMOTEBENCHMARK.qualified.join(", ")}`;
+    stopTimer();
+    clearInterval(EMOTEBENCHMARK.interval);
+    EMOTEBENCHMARK.interval = null;
+    EMOTEBENCHMARK.turn = 0;
+    return;
+  } else {
+    elements.output.innerHTML = `Qualified players: ${EMOTEBENCHMARK.qualified.join(", ")}`;
+  }
+  if (EMOTEBENCHMARK.qualified.length == 0 && EMOTEBENCHMARK.turn > 1) {
+    elements.output.innerHTML = `Game is over. No one won`;
+    stopTimer();
+    clearInterval(EMOTEBENCHMARK.interval);
+    EMOTEBENCHMARK.interval = null;
+    EMOTEBENCHMARK.turn = 0;
+    return;
+  }
+
+  if (EMOTEBENCHMARK.twitchGlobal) {
+    allEmotes.twitchGlobal.forEach((element) => {
+      selectedemotes.push(element);
+    });
+  }
+  if (EMOTEBENCHMARK.bttvGlobal) {
+    allEmotes.bttvGlobal.forEach((element) => {
+      selectedemotes.push(element);
+    });
+  }
+  if (EMOTEBENCHMARK.ffzGlobal) {
+    allEmotes.ffzGlobal.forEach((element) => {
+      selectedemotes.push(element);
+    });
+  }
+  if (EMOTEBENCHMARK.seventvGlobal) {
+    allEmotes.seventvGlobal.forEach((element) => {
+      selectedemotes.push(element);
+    });
+  }
+  if (EMOTEBENCHMARK.twitchChannel) {
+    allEmotes.twitchChannel.forEach((element) => {
+      selectedemotes.push(element);
+    });
+  }
+  if (EMOTEBENCHMARK.bttvChannel) {
+    allEmotes.bttvChannel.forEach((element) => {
+      selectedemotes.push(element);
+    });
+  }
+  if (EMOTEBENCHMARK.ffzChannel) {
+    allEmotes.ffzChannel.forEach((element) => {
+      selectedemotes.push(element);
+    });
+  }
+  if (EMOTEBENCHMARK.seventvChannel) {
+    allEmotes.seventvChannel.forEach((element) => {
+      selectedemotes.push(element);
+    });
+  }
+
+  EMOTEBENCHMARK.usedEmotes.forEach((element) => {
+    selectedemotes = selectedemotes.filter((list) => list.name != element);
+  });
+  if (selectedemotes.length < 5) {
+    stopTimer();
+    elements.timeBar.style.display = "none";
+    clearInterval(EMOTEBENCHMARK.interval);
+    EMOTEBENCHMARK.interval = null;
+    EMOTEBENCHMARK.turn = 0;
+    showToast("Not enough emotes remaining.", "warning", 5000);
+    settingsOffcanvas.show();
+    return;
+  }
+  for (let i = 0; i < EMOTEBENCHMARK.emotesPerRound; i++) {
+    randomemotes.push(selectedemotes[Math.floor(Math.random() * selectedemotes.length)]);
+    randomemotes.forEach((element) => {
+      EMOTEBENCHMARK.usedEmotes.push(element.name);
+    });
+  }
+  elements.emotes.style.opacity = 0;
+  for (let i = 0; i < randomemotes.length; i++) {
+    let name = "";
+    if (!EMOTEBENCHMARK.hideName) name = `<div class="text-body-secondary text-center">${randomemotes[i].name}</div>`;
+    elements.emotes.innerHTML += `<div class="border border-secondary emote">
+          <img src="${randomemotes[i].url}" alt="${randomemotes[i].name}" title="${randomemotes[i].name}">
+          ${name}
+          </div>`;
+    EMOTEBENCHMARK.answer += `${randomemotes[i].name} `;
+  }
+
+  elements.output.innerHTML = `Qualified players:`;
+  elements.timeBar.style.display = "block";
+
+  elements.timeBar.style.width = "100%";
+  setTimeout(() => {
+    elements.emotes.style.opacity = 1;
+    $("#timeBar").animate(
+      {
+        width: "0px",
+      },
+      EMOTEBENCHMARK.emoteTimer - EMOTEBENCHMARK.turn * 100
+    );
+  }, 2000);
+  setTimeout(() => {
+    elements.emotes.style.opacity = 0;
+  }, 2000 + EMOTEBENCHMARK.emoteTimer - EMOTEBENCHMARK.turn * 100);
+} //startTurn
+
+function startTimer() {
+  elements.timer.style.display = "";
+
+  if (EMOTEBENCHMARK.timer) {
+    if (EMOTEBENCHMARK.timer.isRunning()) {
+      EMOTEBENCHMARK.timer.reset();
+      EMOTEBENCHMARK.timer.stop();
+    }
+  }
+  if (isNaN(EMOTEBENCHMARK.turnLength)) {
+    return;
+  }
+  if (EMOTEBENCHMARK.turnLength == 0) {
+    return;
+  }
+
+  EMOTEBENCHMARK.timer = new easytimer.Timer();
+  EMOTEBENCHMARK.timer.addEventListener("secondTenthsUpdated", function (e) {
+    elements.timerValue.innerHTML = "Round ends in " + EMOTEBENCHMARK.timer.getTimeValues().toString(["minutes", "seconds", "secondTenths"]);
+  });
+  EMOTEBENCHMARK.timer.addEventListener("targetAchieved", function (e) {
+    elements.timerValue.innerHTML = `Round #${EMOTEBENCHMARK.turn} starting...`;
+    EMOTEBENCHMARK.timer.reset();
+    EMOTEBENCHMARK.timer.stop();
+  });
+  elements.timerValue.innerHTML = `Round #${EMOTEBENCHMARK.turn} starting...`;
+
+  setTimeout(() => {
+    EMOTEBENCHMARK.timer.start({
+      countdown: true,
+      precision: "secondTenths",
+      startValues: {
+        seconds: EMOTEBENCHMARK.turnLength / 1000 - 2,
+      },
+    });
+  }, 2000);
+} //startTimer
+
+function stopTimer() {
+  if (EMOTEBENCHMARK.timer) {
+    if (EMOTEBENCHMARK.timer.isRunning()) {
+      EMOTEBENCHMARK.timer.reset();
+      EMOTEBENCHMARK.timer.stop();
+    }
+  }
+  elements.timer.style.display = "none";
+} //stopTimer
 
 window.onload = async function () {
   darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
@@ -85,6 +369,7 @@ window.onload = async function () {
 
   loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
   aboutModal = new bootstrap.Modal(elements.aboutModal);
+  settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
 
   enableTooltips();
   enablePopovers();
@@ -100,316 +385,62 @@ window.onload = async function () {
     saveSettings();
   };
 
-  listeners();
-  allEmotes.twitchglobal = await getGlobalTwitchEmotes(true);
-  allEmotes.bttvglobal = await getGlobalBTTVEmotes(true);
-  allEmotes.ffzglobal = await getGlobalFFZEmotes(true);
-  allEmotes.seventvglobal = await getGlobal7TVEmotes(true);
+  elements.twitchGlobal.onchange = function () {
+    EMOTEBENCHMARK.twitchGlobal = this.checked;
+  };
+  elements.bttvGlobal.onchange = function () {
+    EMOTEBENCHMARK.bttvGlobal = this.checked;
+  };
+  elements.ffzGlobal.onchange = function () {
+    EMOTEBENCHMARK.ffzGlobal = this.checked;
+  };
+  elements.seventvGlobal.onchange = function () {
+    EMOTEBENCHMARK.seventvGlobal = this.checked;
+  };
+  elements.twitchChannel.onchange = function () {
+    EMOTEBENCHMARK.twitchChannel = this.checked;
+  };
+  elements.bttvChannel.onchange = function () {
+    EMOTEBENCHMARK.bttvChannel = this.checked;
+  };
+  elements.ffzChannel.onchange = function () {
+    EMOTEBENCHMARK.ffzChannel = this.checked;
+  };
+  elements.seventvChannel.onchange = function () {
+    EMOTEBENCHMARK.seventvChannel = this.checked;
+  };
 
-  document.getElementById("twitchglobaldesc").innerHTML = `<br>${allEmotes.twitchglobal.length} emotes`;
-  document.getElementById("bttvglobaldesc").innerHTML = `<br>${allEmotes.bttvglobal.length} emotes`;
-  document.getElementById("ffzglobaldesc").innerHTML = `<br>${allEmotes.ffzglobal.length} emotes`;
-  document.getElementById("7tvglobaldesc").innerHTML = `<br>${allEmotes.seventvglobal.length} emotes`;
+  elements.emotesPerRound.oninput = function () {
+    elements.emotesPerRoundLabel.innerHTML = this.value;
+  };
+  elements.turnLength.oninput = function () {
+    elements.turnLengthLabel.innerHTML = this.value;
+  };
+  elements.emoteTimer.oninput = function () {
+    elements.emoteTimerLabel.innerHTML = this.value;
+  };
+  elements.timerDecay.oninput = function () {
+    elements.timerDecayLabel.innerHTML = this.value;
+  };
+  allEmotes.twitchGlobal = await getGlobalTwitchEmotes(true);
+  allEmotes.bttvGlobal = await getGlobalBTTVEmotes(true);
+  allEmotes.ffzGlobal = await getGlobalFFZEmotes(true);
+  allEmotes.seventvGlobal = await getGlobal7TVEmotes(true);
+
+  elements.twitchGlobalCount.innerHTML = `<br>${allEmotes.twitchGlobal.length} emotes`;
+  elements.bttvGlobalCount.innerHTML = `<br>${allEmotes.bttvGlobal.length} emotes`;
+  elements.ffzGlobalCount.innerHTML = `<br>${allEmotes.ffzGlobal.length} emotes`;
+  elements.seventvGlobalCount.innerHTML = `<br>${allEmotes.seventvGlobal.length} emotes`;
 
   if (USER.channel) {
-    allEmotes.twitch = await getChannelTwitchEmotes(USER.channel, true);
-    allEmotes.bttv = await getChannelBTTVEmotes(USER.userID, true);
-    allEmotes.ffz = await getChannelFFZEmotes(USER.userID, true);
-    allEmotes.seventv = await getChannel7TVEmotes(USER.userID, true);
+    allEmotes.twitchChannel = await getChannelTwitchEmotes(USER.channel, true);
+    allEmotes.bttvChannel = await getChannelBTTVEmotes(USER.userID, true);
+    allEmotes.ffzChannel = await getChannelFFZEmotes(USER.userID, true);
+    allEmotes.seventvChannel = await getChannel7TVEmotes(USER.userID, true);
 
-    document.getElementById("twitchdesc").innerHTML = `<br>${allEmotes.twitch.length} emotes`;
-    document.getElementById("bttvdesc").innerHTML = `<br>${allEmotes.bttv.length} emotes`;
-    document.getElementById("ffzdesc").innerHTML = `<br>${allEmotes.ffz.length} emotes`;
-    document.getElementById("7tvdesc").innerHTML = `<br>${allEmotes.seventv.length} emotes`;
+    elements.twitchChannelCount.innerHTML = `<br>${allEmotes.twitchChannel.length} emotes`;
+    elements.bttvChannelCount.innerHTML = `<br>${allEmotes.bttvChannel.length} emotes`;
+    elements.ffzChannelCount.innerHTML = `<br>${allEmotes.ffzChannel.length} emotes`;
+    elements.seventvChannelCount.innerHTML = `<br>${allEmotes.seventvChannel.length} emotes`;
   }
 }; //onload
-
-let EMOTEBENCHMARK = {
-  ebinterval: null,
-  ebturn: 0,
-  turnlength: 20000,
-  emoteperround: 1,
-  emotetimer: 2000,
-  timerdecay: 80,
-  oneguess: false,
-  hidename: false,
-  bluremote: false,
-  ebanswer: "",
-  qualified: [],
-  qualifiedcurrentround: [],
-  wrong: [],
-  usedEmotes: [],
-  ebtimer: null,
-  twitchglobal: false,
-  bttvglobal: false,
-  ffzglobal: false,
-  seventvglobal: false,
-  twitch: false,
-  bttv: false,
-  ffz: false,
-  seventv: false,
-}; //EMOTEBENCHMARK
-
-function start() {
-  EMOTEBENCHMARK.emoteperround = parseInt(document.getElementById("emoteperround").value, 10);
-  EMOTEBENCHMARK.turnlength = parseInt(document.getElementById("turnlength").value, 10) * 1000;
-  EMOTEBENCHMARK.emotetimer = parseInt(document.getElementById("emotetimer").value, 10) * 1000;
-  EMOTEBENCHMARK.timerdecay = parseInt(document.getElementById("timerdecay").value, 10) * 1000;
-  EMOTEBENCHMARK.oneguess = document.getElementById("oneguess").checked;
-  EMOTEBENCHMARK.hidename = document.getElementById("hidename").checked;
-  EMOTEBENCHMARK.bluremote = document.getElementById("bluremote").checked;
-
-  if (!EMOTEBENCHMARK.ebinterval) {
-    startebturn();
-    startebtimer();
-    EMOTEBENCHMARK.ebinterval = setInterval(EMOTEBENCHMARK.startebturn, EMOTEBENCHMARK.turnlength);
-  } else {
-    console.log("interval already running");
-  }
-} //start
-
-function reset() {
-  clearInterval(EMOTEBENCHMARK.ebinterval);
-  EMOTEBENCHMARK.ebinterval = null;
-  EMOTEBENCHMARK.ebturn = 0;
-  EMOTEBENCHMARK.ebanswer = "";
-  document.getElementById("ebemotes").innerHTML = "";
-  document.getElementById("eboutput").innerHTML = "";
-  document.getElementById("timebar").style.display = "none";
-  EMOTEBENCHMARK.qualified = [];
-  EMOTEBENCHMARK.qualifiedcurrentround = [];
-  EMOTEBENCHMARK.twitchglobal = false;
-  EMOTEBENCHMARK.bttvglobal = false;
-  EMOTEBENCHMARK.ffzglobal = false;
-  EMOTEBENCHMARK.seventvglobal = false;
-  EMOTEBENCHMARK.twitch = false;
-  EMOTEBENCHMARK.bttv = false;
-  EMOTEBENCHMARK.ffz = false;
-  EMOTEBENCHMARK.seventv = false;
-  document.getElementById("twitchglobal").checked = false;
-  document.getElementById("bttvglobal").checked = false;
-  document.getElementById("ffzglobal").checked = false;
-  document.getElementById("7tvglobal").checked = false;
-  document.getElementById("twitch").checked = false;
-  document.getElementById("bttv").checked = false;
-  document.getElementById("ffz").checked = false;
-  document.getElementById("7tv").checked = false;
-  document.getElementById("oneguess").checked = false;
-  document.getElementById("hidename").checked = false;
-  document.getElementById("bluremote").checked = false;
-  document.getElementById("emoteperround").value = 1;
-  document.getElementById("emoteperroundlabel").innerHTML = "1";
-  document.getElementById("turnlength").value = 20;
-  document.getElementById("turnlengthlabel").innerHTML = "20";
-  document.getElementById("emotetimer").value = 2;
-  document.getElementById("emotetimerlabel").innerHTML = "2";
-  document.getElementById("timerdecay").value = 80;
-  document.getElementById("timerdecaylabel").innerHTML = "80";
-  EMOTEBENCHMARK.usedEmotes = [];
-  //stopebtimer();
-} //reset
-
-function startebturn() {
-  EMOTEBENCHMARK.ebturn++;
-  startebtimer();
-
-  let selectedemotes = [];
-  let randomemotes = [];
-  EMOTEBENCHMARK.ebanswer = "";
-  document.getElementById("ebemotes").innerHTML = "";
-  EMOTEBENCHMARK.qualified = EMOTEBENCHMARK.qualifiedcurrentround;
-  EMOTEBENCHMARK.qualifiedcurrentround = [];
-  if (EMOTEBENCHMARK.qualified.length == 1) {
-    document.getElementById("eboutput").innerHTML = `Game is over. WINNER: ${EMOTEBENCHMARK.qualified.join(", ")}`;
-    stopebtimer();
-    clearInterval(EMOTEBENCHMARK.ebinterval);
-    EMOTEBENCHMARK.ebinterval = null;
-    EMOTEBENCHMARK.ebturn = 0;
-    return;
-  } else {
-    document.getElementById("eboutput").innerHTML = `Qualified players: ${EMOTEBENCHMARK.qualified.join(", ")}`;
-  }
-  if (EMOTEBENCHMARK.qualified.length == 0 && EMOTEBENCHMARK.ebturn > 1) {
-    document.getElementById("eboutput").innerHTML = `Game is over. No one won`;
-    stopebtimer();
-    clearInterval(EMOTEBENCHMARK.ebinterval);
-    EMOTEBENCHMARK.ebinterval = null;
-    EMOTEBENCHMARK.ebturn = 0;
-    return;
-  }
-
-  if (EMOTEBENCHMARK.twitchglobal) {
-    allEmotes.twitchglobal.forEach((element) => {
-      selectedemotes.push(element);
-    });
-  }
-  if (EMOTEBENCHMARK.bttvglobal) {
-    allEmotes.bttvglobal.forEach((element) => {
-      selectedemotes.push(element);
-    });
-  }
-  if (EMOTEBENCHMARK.ffzglobal) {
-    allEmotes.ffzglobal.forEach((element) => {
-      selectedemotes.push(element);
-    });
-  }
-  if (EMOTEBENCHMARK.seventvglobal) {
-    allEmotes.seventvglobal.forEach((element) => {
-      selectedemotes.push(element);
-    });
-  }
-  if (EMOTEBENCHMARK.twitch) {
-    allEmotes.twitch.forEach((element) => {
-      selectedemotes.push(element);
-    });
-  }
-  if (EMOTEBENCHMARK.bttv) {
-    allEmotes.bttv.forEach((element) => {
-      selectedemotes.push(element);
-    });
-  }
-  if (EMOTEBENCHMARK.ffz) {
-    allEmotes.ffz.forEach((element) => {
-      selectedemotes.push(element);
-    });
-  }
-  if (EMOTEBENCHMARK.seventv) {
-    allEmotes.seventv.forEach((element) => {
-      selectedemotes.push(element);
-    });
-  }
-
-  EMOTEBENCHMARK.usedEmotes.forEach((element) => {
-    selectedemotes = selectedemotes.filter((list) => list.name != element);
-  });
-  if (selectedemotes.length < 5) {
-    stopebtimer();
-    document.getElementById("timebar").style.display = "none";
-    clearInterval(EMOTEBENCHMARK.ebinterval);
-    EMOTEBENCHMARK.ebinterval = null;
-    EMOTEBENCHMARK.ebturn = 0;
-    showToast("Not enough emotes remaining.", "warning", 5000);
-    return;
-  }
-  for (let i = 0; i < EMOTEBENCHMARK.emoteperround; i++) {
-    randomemotes.push(selectedemotes[Math.floor(Math.random() * selectedemotes.length)]);
-    randomemotes.forEach((element) => {
-      EMOTEBENCHMARK.usedEmotes.push(element.name);
-    });
-  }
-  document.getElementById("ebemotes").style.opacity = 0;
-  for (let i = 0; i < randomemotes.length; i++) {
-    let name = "";
-    if (!EMOTEBENCHMARK.hidename) name = `<div class="text-body-secondary text-center">${randomemotes[i].name}</div>`;
-    document.getElementById("ebemotes").innerHTML += `<div class="border border-secondary emote">
-          <img src="${randomemotes[i].url}" alt="${randomemotes[i].name}" title="${randomemotes[i].name}">
-          ${name}
-          </div>`;
-    EMOTEBENCHMARK.ebanswer += `${randomemotes[i].name} `;
-  }
-
-  document.getElementById("eboutput").innerHTML = `Qualified players:`;
-  document.getElementById("timebar").style.display = "block";
-
-  document.getElementById("timebar").style.width = "100%";
-  setTimeout(() => {
-    document.getElementById("ebemotes").style.opacity = 1;
-    $("#timebar").animate(
-      {
-        width: "0px",
-      },
-      EMOTEBENCHMARK.emotetimer - EMOTEBENCHMARK.ebturn * 100
-    );
-  }, 2000);
-  setTimeout(() => {
-    document.getElementById("ebemotes").style.opacity = 0;
-  }, 2000 + EMOTEBENCHMARK.emotetimer - EMOTEBENCHMARK.ebturn * 100);
-} //startebturn
-
-function startebtimer() {
-  document.getElementById("ebtimer").style.display = "";
-
-  if (EMOTEBENCHMARK.ebtimer) {
-    if (EMOTEBENCHMARK.ebtimer.isRunning()) {
-      EMOTEBENCHMARK.ebtimer.reset();
-      EMOTEBENCHMARK.ebtimer.stop();
-    }
-  }
-  if (isNaN(EMOTEBENCHMARK.turnlength)) {
-    return;
-  }
-  if (EMOTEBENCHMARK.turnlength == 0) {
-    return;
-  }
-
-  EMOTEBENCHMARK.ebtimer = new easytimer.Timer();
-  EMOTEBENCHMARK.ebtimer.addEventListener("secondTenthsUpdated", function (e) {
-    document.querySelector("#ebtimer .values").innerHTML = "Round ends in " + EMOTEBENCHMARK.ebtimer.getTimeValues().toString(["minutes", "seconds", "secondTenths"]);
-  });
-  EMOTEBENCHMARK.ebtimer.addEventListener("targetAchieved", function (e) {
-    document.querySelector("#ebtimer .values").innerHTML = `Round #${EMOTEBENCHMARK.ebturn} starting...`;
-    EMOTEBENCHMARK.ebtimer.reset();
-    EMOTEBENCHMARK.ebtimer.stop();
-  });
-  document.querySelector("#ebtimer .values").innerHTML = `Round #${EMOTEBENCHMARK.ebturn} starting...`;
-
-  setTimeout(() => {
-    EMOTEBENCHMARK.ebtimer.start({
-      countdown: true,
-      precision: "secondTenths",
-      startValues: {
-        seconds: EMOTEBENCHMARK.turnlength / 1000 - 2,
-      },
-    });
-  }, 2000);
-} //startebtimer
-
-function stopebtimer() {
-  if (EMOTEBENCHMARK.ebtimer) {
-    if (EMOTEBENCHMARK.ebtimer.isRunning()) {
-      EMOTEBENCHMARK.ebtimer.reset();
-      EMOTEBENCHMARK.ebtimer.stop();
-    }
-  }
-  document.getElementById("ebtimer").style.display = "none";
-} //stopebtimer
-
-function listeners() {
-  document.getElementById("twitchglobal").onchange = function () {
-    EMOTEBENCHMARK.twitchglobal = this.checked;
-  };
-  document.getElementById("bttvglobal").onchange = function () {
-    EMOTEBENCHMARK.bttvglobal = this.checked;
-  };
-  document.getElementById("ffzglobal").onchange = function () {
-    EMOTEBENCHMARK.ffzglobal = this.checked;
-  };
-  document.getElementById("7tvglobal").onchange = function () {
-    EMOTEBENCHMARK.seventvglobal = this.checked;
-  };
-  document.getElementById("twitch").onchange = function () {
-    EMOTEBENCHMARK.twitch = this.checked;
-  };
-  document.getElementById("bttv").onchange = function () {
-    EMOTEBENCHMARK.bttv = this.checked;
-  };
-  document.getElementById("ffz").onchange = function () {
-    EMOTEBENCHMARK.ffz = this.checked;
-  };
-  document.getElementById("7tv").onchange = function () {
-    EMOTEBENCHMARK.seventv = this.checked;
-  };
-
-  document.getElementById("emoteperround").oninput = function () {
-    document.getElementById("emoteperroundlabel").innerHTML = this.value;
-  };
-  document.getElementById("turnlength").oninput = function () {
-    document.getElementById("turnlengthlabel").innerHTML = this.value;
-  };
-  document.getElementById("emotetimer").oninput = function () {
-    document.getElementById("emotetimerlabel").innerHTML = this.value;
-  };
-  document.getElementById("timerdecay").oninput = function () {
-    document.getElementById("timerdecaylabel").innerHTML = this.value;
-  };
-} //listeners

@@ -94,7 +94,7 @@ async function loadPFP() {
             <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
           </div>
           <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
-          <button type="button" id="connectbtn" onclick="connect()" class="btn btn-primary float-end">Connect</button>
+          <button type="button" onclick="connect()" class="btn btn-primary float-end">Connect</button>
         </div>
       </div>
     </div>
@@ -165,7 +165,7 @@ function logout() {
           <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
         </div>
         <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
-        <button type="button" id="connectbtn" onclick="connect()" class="btn btn-primary float-end">Connect</button>
+        <button type="button" onclick="connect()" class="btn btn-primary float-end">Connect</button>
       </div>
     </div>
   </div>

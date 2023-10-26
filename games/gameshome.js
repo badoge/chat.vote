@@ -10,7 +10,6 @@ let elements = {
   topRight: document.getElementById("topRight"),
   loginButton: document.getElementById("loginButton"),
   channelName: document.getElementById("channelName"),
-  connectbtn: document.getElementById("connectbtn"),
   darkTheme: document.getElementById("darkTheme"),
 };
 
