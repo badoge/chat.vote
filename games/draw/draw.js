@@ -1,8 +1,8 @@
 let allEmotes = {
-  twitchglobal: [],
-  bttvglobal: [],
-  ffzglobal: [],
-  seventvglobal: [],
+  twitchGlobal: [],
+  bttvGlobal: [],
+  ffzGlobal: [],
+  seventvGlobal: [],
   twitch: [],
   bttv: [],
   ffz: [],
@@ -13,7 +13,6 @@ let elements = {
   //modals
   grid: document.getElementById("grid"),
   gameDiv: document.getElementById("gameDiv"),
-
   loginExpiredModal: document.getElementById("loginExpiredModal"),
   aboutModal: document.getElementById("aboutModal"),
 
@@ -27,11 +26,49 @@ let elements = {
 
   //main
   toastContainer: document.getElementById("toastContainer"),
+  drawemotecardbody: document.getElementById("drawemotecardbody"),
+  drawoutput: document.getElementById("drawoutput"),
+  drawlblist: document.getElementById("drawlblist"),
+  twitchGlobal: document.getElementById("twitchGlobal"),
+  bttvGlobal: document.getElementById("bttvGlobal"),
+  ffzGlobal: document.getElementById("ffzGlobal"),
+  seventvGlobal: document.getElementById("seventvGlobal"),
+  twitch: document.getElementById("twitch"),
+  bttv: document.getElementById("bttv"),
+  ffz: document.getElementById("ffz"),
+  seventv: document.getElementById("seventv"),
+  emoji: document.getElementById("emoji"),
+  drawscoring1: document.getElementById("drawscoring1"),
+  drawscoring2: document.getElementById("drawscoring2"),
+  turnLength: document.getElementById("turnLength"),
+  timerReveal: document.getElementById("timerReveal"),
+  points: document.getElementById("points"),
+  pointsTarget: document.getElementById("pointsTarget"),
+  twitchGlobalCount: document.getElementById("twitchGlobalCount"),
+  bttvGlobalCount: document.getElementById("bttvGlobalCount"),
+  ffzGlobalCount: document.getElementById("ffzGlobalCount"),
+  seventvGlobalCount: document.getElementById("seventvGlobalCount"),
+  emojiCount: document.getElementById("emojiCount"),
+  twitchCount: document.getElementById("twitchCount"),
+  bttvCount: document.getElementById("bttvCount"),
+  ffzCount: document.getElementById("ffzCount"),
+  seventvCount: document.getElementById("seventvCount"),
+  color: document.getElementById("color"),
+  LineWidth: document.getElementById("LineWidth"),
+  LineWidthLabel: document.getElementById("LineWidthLabel"),
+  clearCanvas: document.getElementById("clearCanvas"),
+  redo: document.getElementById("redo"),
+  undo: document.getElementById("undo"),
+  settingsOffcanvas: document.getElementById("settingsOffcanvas"),
+  countdown: document.getElementById("countdown"),
+  countdownValue: document.getElementById("countdownValue"),
 };
 
 let loginButton;
 let darkTheme = true;
 let loginExpiredModal, aboutModal;
+let settingsOffcanvas;
+let timer;
 
 let USER = {
   channel: "",
@@ -42,53 +79,54 @@ let USER = {
 };
 
 let DRAW = {
-  drawanswer: "",
-  drawanswerurl: "",
-  drawanswerdesc: "",
-  drawturn: 0,
-  winner: false,
+  gameActive: false,
+  answer: "",
+  answerURL: "",
+  answerDesc: "",
+  turn: 0,
+  winner: null,
   canvas: null,
   redo_list: [],
   undo_list: [],
   state: null,
-  twitchglobal: false,
-  bttvglobal: false,
-  ffzglobal: false,
-  seventvglobal: false,
+  twitchGlobal: false,
+  bttvGlobal: false,
+  ffzGlobal: false,
+  seventvGlobal: false,
   twitch: false,
   bttv: false,
   ffz: false,
   seventv: false,
   emoji: false,
-  firstonly: false,
-  drawturnlength: 60,
-  drawpoints: 10,
-  drawpointswin: 100,
-  correctusers: 0,
+  firstOnly: false,
+  turnLength: 0,
+  timerReveal: false,
+  points: 10,
+  pointsTarget: 100,
+  correctUsers: 0,
   users: {},
   usedEmotes: [],
 }; //DRAW
 
-async function start() {
+async function start(reroll = false) {
   let selectedemotes = [];
-  let randomemotes = [];
-  if (DRAW.twitchglobal) {
-    allEmotes.twitchglobal.forEach((element) => {
+  if (DRAW.twitchGlobal) {
+    allEmotes.twitchGlobal.forEach((element) => {
       selectedemotes.push(element);
     });
   }
-  if (DRAW.bttvglobal) {
-    allEmotes.bttvglobal.forEach((element) => {
+  if (DRAW.bttvGlobal) {
+    allEmotes.bttvGlobal.forEach((element) => {
       selectedemotes.push(element);
     });
   }
-  if (DRAW.ffzglobal) {
-    allEmotes.ffzglobal.forEach((element) => {
+  if (DRAW.ffzGlobal) {
+    allEmotes.ffzGlobal.forEach((element) => {
       selectedemotes.push(element);
     });
   }
-  if (DRAW.seventvglobal) {
-    allEmotes.seventvglobal.forEach((element) => {
+  if (DRAW.seventvGlobal) {
+    allEmotes.seventvGlobal.forEach((element) => {
       selectedemotes.push(element);
     });
   }
@@ -118,165 +156,84 @@ async function start() {
     });
   }
 
+  //remove used emotes
   DRAW.usedEmotes.forEach((element) => {
     selectedemotes = selectedemotes.filter((list) => list.name !== element);
   });
   if (selectedemotes.length < 2) {
     showToast(`Not enough emotes selected`, "warning", 3000);
+    settingsOffcanvas.show();
     return;
   }
-  randomemotes.push(selectedemotes[Math.floor(Math.random() * selectedemotes.length)]);
-  randomemotes.forEach((element) => {
-    DRAW.usedEmotes.push(element.name);
-  });
-  if (randomemotes[0].url == "emoji") {
-    document.getElementById("drawemotecardbody").innerHTML = `<div class="border border-secondary emote">
-          ${randomemotes[0].name}<br>
-          ${randomemotes[0].desc}
-          </div>`;
-    DRAW.drawanswerdesc = randomemotes[0].desc;
-    twemoji.parse(document.getElementById("drawemotecardbody"));
-  } else {
-    document.getElementById("drawemotecardbody").innerHTML = `<div class="border border-secondary emote">
-          <img src="${randomemotes[0].url}" alt="${randomemotes[0].name}" title="${randomemotes[0].name}"><br>
-          ${randomemotes[0].name}
-          </div>`;
+
+  //pick a random emote
+  let randomEmote = selectedemotes[Math.floor(Math.random() * selectedemotes.length)];
+  elements.drawemotecardbody.innerHTML = `
+  ${randomEmote.url == "emoji" ? randomEmote.name : `<img src="${randomEmote.url}" alt="${randomEmote.name}" title="${randomEmote.name}" class="emote">`}<br>
+  ${randomEmote.url == "emoji" ? randomEmote.desc : randomEmote.name}`;
+  if (randomEmote.url == "emoji") {
+    twemoji.parse(elements.drawemotecardbody);
   }
 
-  DRAW.drawanswer = randomemotes[0].name;
-  DRAW.drawanswerurl = randomemotes[0].url;
+  DRAW.answer = randomEmote.name;
+  DRAW.answerURL = randomEmote.url;
+  DRAW.answerDesc = randomEmote.desc;
+  DRAW.usedEmotes.push(randomEmote.name);
   DRAW.canvas.clear();
-  document.getElementById("drawoutput").innerHTML = "";
-  DRAW.drawturn++;
-  DRAW.winner = false;
-  DRAW.correctusers = 0;
+  elements.drawoutput.innerHTML = "";
+  DRAW.winner = null;
+  DRAW.correctUsers = 0;
+  startTimer();
+
+  if (!reroll) {
+    DRAW.turn++;
+  }
+  DRAW.gameActive = true;
 } //start
 
-function reroll() {
-  DRAW.winner = false;
-  DRAW.correctusers = 0;
-  let selectedemotes = [];
-  let randomemotes = [];
-  DRAW.drawanswer = "";
-  document.getElementById("drawoutput").innerHTML = "";
-
-  if (DRAW.twitchglobal) {
-    allEmotes.twitchglobal.forEach((element) => {
-      selectedemotes.push(element);
-    });
-  }
-  if (DRAW.bttvglobal) {
-    allEmotes.bttvglobal.forEach((element) => {
-      selectedemotes.push(element);
-    });
-  }
-  if (DRAW.ffzglobal) {
-    allEmotes.ffzglobal.forEach((element) => {
-      selectedemotes.push(element);
-    });
-  }
-  if (DRAW.seventvglobal) {
-    allEmotes.seventvglobal.forEach((element) => {
-      selectedemotes.push(element);
-    });
-  }
-  if (DRAW.twitch) {
-    allEmotes.twitch.forEach((element) => {
-      selectedemotes.push(element);
-    });
-  }
-  if (DRAW.bttv) {
-    allEmotes.bttv.forEach((element) => {
-      selectedemotes.push(element);
-    });
-  }
-  if (DRAW.ffz) {
-    allEmotes.ffz.forEach((element) => {
-      selectedemotes.push(element);
-    });
-  }
-  if (DRAW.seventv) {
-    allEmotes.seventv.forEach((element) => {
-      selectedemotes.push(element);
-    });
-  }
-  if (DRAW.emoji) {
-    allEmotes.emoji.forEach((element) => {
-      selectedemotes.push(element);
-    });
-  }
-
-  DRAW.usedEmotes.forEach((element) => {
-    selectedemotes = selectedemotes.filter((list) => list.name !== element);
-  });
-  if (selectedemotes.length < 2) {
-    showToast(`Not enough emotes selected`, "warning", 3000);
-    return;
-  }
-  randomemotes.push(selectedemotes[Math.floor(Math.random() * selectedemotes.length)]);
-  randomemotes.forEach((element) => {
-    DRAW.usedEmotes.push(element.name);
-  });
-  if (randomemotes[0].url == "emoji") {
-    document.getElementById("drawemotecardbody").innerHTML = `<div class="border border-secondary emote">
-          ${randomemotes[0].name}<br>
-          ${randomemotes[0].desc}
-          </div>`;
-    DRAW.drawanswerdesc = randomemotes[0].desc;
-    twemoji.parse(document.getElementById("drawemotecardbody"));
-  } else {
-    document.getElementById("drawemotecardbody").innerHTML = `<div class="border border-secondary emote">
-          <img src="${randomemotes[0].url}" alt="${randomemotes[0].name}" title="${randomemotes[0].name}"><br>
-          ${randomemotes[0].name}
-          </div>`;
-  }
-  DRAW.drawanswer = randomemotes[0].name;
-  DRAW.drawanswerurl = randomemotes[0].url;
-  DRAW.canvas.clear();
-} //reroll
-
 function correct(user) {
-  if (DRAW.correctusers >= DRAW.drawpoints) {
+  if (DRAW.correctUsers >= DRAW.points) {
     showToast(`No more points left; starting new round`, "warning", 3000);
     start();
     return;
   }
+
   if (!DRAW.users[user.username]) {
     let name = user.username == user.displayname.toLowerCase() ? `${user.displayname}` : `${user.displayname} (${user.username})`;
     let color = !user.color ? "#FFFFFF" : user.color;
     let badges = addBadges(user.badges, user.id, user.firstmsg);
 
-    if (DRAW.firstonly && !DRAW.winner) {
-      user.score = DRAW.drawpoints;
-      user.lastTurn = DRAW.drawturn;
+    if (DRAW.firstOnly && !DRAW.winner) {
+      user.score = DRAW.points;
+      user.lastTurn = DRAW.turn;
       user.badges = badges;
       user.name = name;
       user.color = color;
       DRAW.users[user.username] = user;
-      DRAW.correctusers++;
-    } else if (!DRAW.firstonly) {
-      user.score = DRAW.drawpoints - DRAW.correctusers;
-      user.lastTurn = DRAW.drawturn;
+      DRAW.correctUsers++;
+    } else if (!DRAW.firstOnly) {
+      user.score = DRAW.points - DRAW.correctUsers;
+      user.lastTurn = DRAW.turn;
       user.badges = badges;
       user.name = name;
       user.color = color;
       DRAW.users[user.username] = user;
-      DRAW.correctusers++;
+      DRAW.correctUsers++;
     } else {
       return;
     }
   } else {
-    if (DRAW.users[user.username].lastTurn == DRAW.drawturn) {
+    if (DRAW.users[user.username].lastTurn == DRAW.turn) {
       return;
     } else {
-      if (DRAW.firstonly && !DRAW.winner) {
-        DRAW.users[user.username].score += DRAW.drawpoints;
-        DRAW.users[user.username].lastTurn = DRAW.drawturn;
-        DRAW.correctusers++;
-      } else if (!DRAW.firstonly) {
-        DRAW.users[user.username].score += DRAW.drawpoints - DRAW.correctusers;
-        DRAW.users[user.username].lastTurn = DRAW.drawturn;
-        DRAW.correctusers++;
+      if (DRAW.firstOnly && !DRAW.winner) {
+        DRAW.users[user.username].score += DRAW.points;
+        DRAW.users[user.username].lastTurn = DRAW.turn;
+        DRAW.correctUsers++;
+      } else if (!DRAW.firstOnly) {
+        DRAW.users[user.username].score += DRAW.points - DRAW.correctUsers;
+        DRAW.users[user.username].lastTurn = DRAW.turn;
+        DRAW.correctUsers++;
       } else {
         return;
       }
@@ -291,84 +248,100 @@ function correct(user) {
     .forEach((element) => {
       lb += `<li id="${DRAW.users[element].name}_draw" class="list-group-item">${DRAW.users[element].badges}<span style="color:${DRAW.users[element].color};"> ${DRAW.users[element].name}</span>: ${DRAW.users[element].score} point </li>`;
     });
-  document.getElementById("drawlblist").innerHTML = lb;
+  elements.drawlblist.innerHTML = lb;
 
   if (!DRAW.winner) {
-    if (DRAW.drawanswerurl == "emoji") {
-      document.getElementById("drawoutput").innerHTML = `
+    DRAW.winner = user.username;
+
+    if (!DRAW.timerReveal || DRAW.firstOnly) {
+      elements.drawoutput.innerHTML = `
       <div class="card border-success">
       <div class="card-body">
-      <h4>${user.username} was the first to get it right</h4><div class="border border-secondary emote"><br>
-      ${DRAW.drawanswer}<br>
-      ${DRAW.drawanswerdesc}
-      </div><br>
+      <h4>${user.username} was the first to get it right</h4><br>
+      ${DRAW.answerURL == "emoji" ? DRAW.answer : `<img src="${DRAW.answerURL}" alt="${DRAW.answer}" title="${DRAW.answer}" class="emote">`}<br>
+      ${DRAW.answerURL == "emoji" ? DRAW.answerDesc : DRAW.answer}<br>
       <button type="button" onclick="start()" class="btn btn-success"><i class="material-icons notranslate">navigate_next</i>Next round</button>
       </div>
       </div>`;
-      twemoji.parse(document.getElementById("drawoutput"));
-    } else {
-      document.getElementById("drawoutput").innerHTML = `
-      <div class="card border-success">
-      <div class="card-body">
-      <h4>${user.username} was the first to get it right</h4><div class="border border-secondary emote"><br>
-      <img src="${DRAW.drawanswerurl}" alt="${DRAW.drawanswer}" title="${DRAW.drawanswer}"><br>
-      ${DRAW.drawanswer}
-      </div><br>
-      <button type="button" onclick="start()" class="btn btn-success"><i class="material-icons notranslate">navigate_next</i>Next round</button>
-      </div>
-      </div>`;
+      if (DRAW.answerURL == "emoji") {
+        twemoji.parse(elements.drawoutput);
+      }
+      stopTimer();
     }
-    DRAW.winner = true;
+  }
+
+  if (DRAW.users[user.username].score >= DRAW.pointsTarget) {
+    elements.drawoutput.innerHTML = `
+  <div class="card border-success">
+  <div class="card-body">
+  <h4>Game over! ${user.username} Won by reaching the points target (${DRAW.pointsTarget})</h4><br>
+  ${DRAW.answerURL == "emoji" ? DRAW.answer : `<img src="${DRAW.answerURL}" alt="${DRAW.answer}" title="${DRAW.answer}" class="emote">`}<br>
+  ${DRAW.answerURL == "emoji" ? DRAW.answerDesc : DRAW.answer}<br>
+  <button type="button" onclick="reset(true)" class="btn btn-warning"><i class="material-icons notranslate">replay</i>Play again</button>
+  </div>
+  </div>`;
+    if (DRAW.answerURL == "emoji") {
+      twemoji.parse(elements.drawoutput);
+    }
+    stopTimer();
+    DRAW.gameActive = false;
   }
 } //correct
 
-function reset() {
-  DRAW.drawturn = 0;
-  DRAW.correctusers = 0;
-  DRAW.drawanswer = "";
-  document.getElementById(
-    "drawemotecardbody"
-  ).innerHTML = `<span style="font-size: 4vh;">Place your facecam here<br><i class="material-icons notranslate" style="font-size: 6vh;">photo_camera</i></span>`;
-  DRAW.firstonly = false;
-  DRAW.drawturnlength = 60;
-  DRAW.drawpoints = 10;
-  DRAW.drawpointswin = 100;
-  document.getElementById("drawscoring1").checked = true;
-  document.getElementById("drawturnlength").value = 60;
-  document.getElementById("drawpoints").value = 10;
-  document.getElementById("drawpointswin").value = 100;
+function reset(newGame = false) {
+  DRAW.gameActive = false;
+  DRAW.turn = 0;
+  DRAW.correctUsers = 0;
+  DRAW.answer = "";
+  elements.drawemotecardbody.innerHTML = `<span style="font-size: 4vh;">Place your facecam here<br><i class="material-icons notranslate" style="font-size: 6vh;">photo_camera</i></span>`;
 
   DRAW.canvas.clear();
   DRAW.redo_list = [];
   DRAW.undo_list = [];
   DRAW.users = {};
   DRAW.state = null;
-  document.getElementById("drawlblist").innerHTML = "";
+  elements.drawlblist.innerHTML = "";
+  elements.drawoutput.innerHTML = "";
+  stopTimer();
 
-  DRAW.twitchglobal = false;
-  DRAW.bttvglobal = false;
-  DRAW.ffzglobal = false;
-  DRAW.seventvglobal = false;
-  DRAW.twitch = false;
-  DRAW.bttv = false;
-  DRAW.ffz = false;
-  DRAW.seventv = false;
-  DRAW.emoji = false;
-  document.getElementById("twitchglobal").checked = false;
-  document.getElementById("bttvglobal").checked = false;
-  document.getElementById("ffzglobal").checked = false;
-  document.getElementById("7tvglobal").checked = false;
-  document.getElementById("twitch").checked = false;
-  document.getElementById("bttv").checked = false;
-  document.getElementById("ffz").checked = false;
-  document.getElementById("7tv").checked = false;
-  document.getElementById("emoji").checked = false;
-  DRAW.usedEmotes = [];
+  if (!newGame) {
+    DRAW.firstOnly = false;
+    DRAW.turnLength = 0;
+    DRAW.timerReveal = false;
+    DRAW.points = 10;
+    DRAW.pointsTarget = 100;
+    elements.drawscoring1.checked = true;
+    elements.turnLength.value = 0;
+    elements.timerReveal.checked = DRAW.timerReveal;
+    elements.points.value = 10;
+    elements.pointsTarget.value = 100;
+    DRAW.twitchGlobal = false;
+    DRAW.bttvGlobal = false;
+    DRAW.ffzGlobal = false;
+    DRAW.seventvGlobal = false;
+    DRAW.twitch = false;
+    DRAW.bttv = false;
+    DRAW.ffz = false;
+    DRAW.seventv = false;
+    DRAW.emoji = false;
+    elements.twitchGlobal.checked = false;
+    elements.bttvGlobal.checked = false;
+    elements.ffzGlobal.checked = false;
+    elements.seventvGlobal.checked = false;
+    elements.twitch.checked = false;
+    elements.bttv.checked = false;
+    elements.ffz.checked = false;
+    elements.seventv.checked = false;
+    elements.emoji.checked = false;
+    DRAW.usedEmotes = [];
+  } else {
+    start();
+  }
 } //reset
 
 function changeColor() {
   DRAW.canvas.freeDrawingBrush.color = this.value;
-  document.getElementById("drawing-color").value = this.value;
+  elements.color.value = this.value;
   let brushsvg = document.getElementsByClassName("brushsvg");
   Array.from(brushsvg).forEach((element) => {
     element.style.fill = this.value;
@@ -377,15 +350,15 @@ function changeColor() {
 
 function changeBrush(element) {
   DRAW.canvas.freeDrawingBrush.width = parseInt(element.value, 10) || 1;
-  document.getElementById("drawing-line-width").value = parseInt(element.value, 10) || 1;
-  document.getElementById("drawing-line-widthlabel").innerHTML = parseInt(element.value, 10) || 1;
+  elements.LineWidth.value = parseInt(element.value, 10) || 1;
+  elements.LineWidthLabel.innerHTML = parseInt(element.value, 10) || 1;
 } //changeBrush
 
 function replay(playStack, saveStack, buttonsOn, buttonsOff) {
   saveStack.push(DRAW.state);
   DRAW.state = playStack.pop();
-  let on = document.getElementById(buttonsOn);
-  let off = document.getElementById(buttonsOff.id);
+  let on = elements[buttonsOn];
+  let off = elements[buttonsOff.id];
   // turn both buttons off for the moment to prevent rapid clicking
   on.disabled = true;
   off.disabled = true;
@@ -402,113 +375,17 @@ function replay(playStack, saveStack, buttonsOn, buttonsOff) {
 
 function save() {
   DRAW.redo_list = [];
-  document.getElementById("redo").disabled = true;
+  elements.redo.disabled = true;
   // initial call won"t have a state
   if (DRAW.state) {
     DRAW.undo_list.push(DRAW.state);
-    document.getElementById("undo").disabled = false;
+    elements.undo.disabled = false;
   }
   DRAW.state = JSON.stringify(DRAW.canvas);
 } //save
 
-function listeners() {
-  DRAW.canvas = new fabric.Canvas("drawcanvas", {
-    isDrawingMode: true,
-  });
-  DRAW.canvas.on("mouse:up", function () {
-    save();
-  });
-
-  document.getElementById("undo").addEventListener("click", function () {
-    replay(DRAW.undo_list, DRAW.redo_list, "redo", this);
-  });
-
-  document.getElementById("redo").addEventListener("click", function () {
-    replay(DRAW.redo_list, DRAW.undo_list, "undo", this);
-  });
-
-  fabric.Object.prototype.transparentCorners = false;
-
-  let drawingColorEl = document.getElementById("drawing-color");
-  let drawingLineWidthEl = document.getElementById("drawing-line-width");
-  let clearEl = document.getElementById("clear-canvas");
-
-  clearEl.onclick = function () {
-    DRAW.canvas.clear();
-  };
-
-  drawingColorEl.oninput = function () {
-    let brush = DRAW.canvas.freeDrawingBrush;
-    brush.color = this.value;
-    brush.width = parseInt(drawingLineWidthEl.value, 10) || 1;
-    let brushsvg = document.getElementsByClassName("brushsvg");
-    Array.from(brushsvg).forEach((element) => {
-      element.style.fill = parseInt(this.value, 10);
-    });
-  };
-  drawingLineWidthEl.oninput = function () {
-    document.getElementById("drawing-line-widthlabel").innerHTML = this.value;
-    DRAW.canvas.freeDrawingBrush.width = parseInt(this.value, 10) || 1;
-    this.previousSibling.innerHTML = parseInt(this.value, 10);
-  };
-
-  if (DRAW.canvas.freeDrawingBrush) {
-    DRAW.canvas.freeDrawingBrush.color = drawingColorEl.value;
-    DRAW.canvas.freeDrawingBrush.width = parseInt(drawingLineWidthEl.value, 10) || 1;
-  }
-
-  let colorbtns = document.getElementsByClassName("colorpreset");
-  Array.from(colorbtns).forEach(function (element) {
-    element.addEventListener("click", changeColor);
-  });
-  document.getElementById("twitchglobal").onchange = function () {
-    DRAW.twitchglobal = this.checked;
-  };
-  document.getElementById("bttvglobal").onchange = function () {
-    DRAW.bttvglobal = this.checked;
-  };
-  document.getElementById("ffzglobal").onchange = function () {
-    DRAW.ffzglobal = this.checked;
-  };
-  document.getElementById("7tvglobal").onchange = function () {
-    DRAW.seventvglobal = this.checked;
-  };
-  document.getElementById("twitch").onchange = function () {
-    DRAW.twitch = this.checked;
-  };
-  document.getElementById("bttv").onchange = function () {
-    DRAW.bttv = this.checked;
-  };
-  document.getElementById("ffz").onchange = function () {
-    DRAW.ffz = this.checked;
-  };
-  document.getElementById("7tv").onchange = function () {
-    DRAW.seventv = this.checked;
-  };
-  document.getElementById("emoji").onchange = function () {
-    DRAW.emoji = this.checked;
-  };
-
-  document.getElementById("drawturnlength").onchange = function () {
-    DRAW.drawturnlength = parseInt(this.value, 10);
-  };
-
-  document.getElementById("drawscoring1").onchange = function () {
-    DRAW.firstonly = !this.checked;
-  };
-  document.getElementById("drawscoring2").onchange = function () {
-    DRAW.firstonly = this.checked;
-  };
-  document.getElementById("drawpoints").onchange = function () {
-    DRAW.drawpoints = parseInt(this.value, 10);
-  };
-  document.getElementById("drawpointswin").onchange = function () {
-    DRAW.drawpointswin = parseInt(this.value, 10);
-  };
-} //listeners
-
 function handleMessage(target, context, msg, self) {
-  if (msg === DRAW.drawanswer) {
+  if (msg.trim() === DRAW.answer && DRAW.gameActive) {
     correct({
       id: context["user-id"],
       username: context.username,
@@ -519,6 +396,76 @@ function handleMessage(target, context, msg, self) {
     });
   }
 } //handleMessage
+
+function startTimer() {
+  if (isNaN(DRAW.turnLength) || DRAW.turnLength == 0) {
+    return;
+  }
+  if (timer && timer.isRunning()) {
+    timer.reset();
+    timer.stop();
+  }
+  timer = new easytimer.Timer();
+  timer.addEventListener("secondTenthsUpdated", function (e) {
+    elements.countdownValue.innerHTML = timer.getTimeValues().toString(["minutes", "seconds", "secondTenths"]);
+  });
+  timer.addEventListener("targetAchieved", function (e) {
+    elements.countdown.style.display = "none";
+    timer.reset();
+    timer.stop();
+
+    //show winner if using show answer after timer runs out only setting
+    if ((DRAW.timerReveal && DRAW.winner) || !elements.drawoutput.innerHTML) {
+      elements.drawoutput.innerHTML = `
+      <div class="card border-success">
+      <div class="card-body">
+      <h4>${DRAW.winner} was the first to get it right</h4><br>
+      ${DRAW.answerURL == "emoji" ? DRAW.answer : `<img src="${DRAW.answerURL}" alt="${DRAW.answer}" title="${DRAW.answer}" class="emote">`}<br>
+      ${DRAW.answerURL == "emoji" ? DRAW.answerDesc : DRAW.answer}<br>
+      <button type="button" onclick="start()" class="btn btn-success"><i class="material-icons notranslate">navigate_next</i>Next round</button>
+      </div>
+      </div>`;
+      if (DRAW.answerURL == "emoji") {
+        twemoji.parse(elements.drawoutput);
+      }
+    }
+
+    //show the answer if no one got it
+    if (!DRAW.winner) {
+      elements.drawoutput.innerHTML = `
+      <div class="card border-danger">
+      <div class="card-body">
+      <h4>No one got the emote</h4><br>
+      ${DRAW.answerURL == "emoji" ? DRAW.answer : `<img src="${DRAW.answerURL}" alt="${DRAW.answer}" title="${DRAW.answer}" class="emote">`}<br>
+      ${DRAW.answerURL == "emoji" ? DRAW.answerDesc : DRAW.answer}<br>
+      <button type="button" onclick="start()" class="btn btn-success"><i class="material-icons notranslate">navigate_next</i>Next round</button>
+      </div>
+      </div>`;
+      if (DRAW.answerURL == "emoji") {
+        twemoji.parse(elements.drawoutput);
+      }
+    }
+  });
+
+  elements.countdownValue.innerHTML = timer.getTimeValues().toString(["minutes", "seconds", "secondTenths"]);
+  elements.countdown.style.display = "";
+
+  timer.start({
+    countdown: true,
+    precision: "secondTenths",
+    startValues: {
+      seconds: DRAW.turnLength,
+    },
+  });
+} //startTimer
+
+function stopTimer() {
+  if (timer && timer.isRunning()) {
+    timer.reset();
+    timer.stop();
+  }
+  elements.countdown.style.display = "none";
+} //stopTimer
 
 window.onload = async function () {
   darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
@@ -533,6 +480,7 @@ window.onload = async function () {
 
   loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
   aboutModal = new bootstrap.Modal(elements.aboutModal);
+  settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
 
   enableTooltips();
   enablePopovers();
@@ -548,17 +496,109 @@ window.onload = async function () {
     saveSettings();
   };
 
-  listeners();
-  allEmotes.twitchglobal = await getGlobalTwitchEmotes(true);
-  allEmotes.bttvglobal = await getGlobalBTTVEmotes(true);
-  allEmotes.ffzglobal = await getGlobalFFZEmotes(true);
-  allEmotes.seventvglobal = await getGlobal7TVEmotes(true);
+  DRAW.canvas = new fabric.Canvas("canvas", {
+    isDrawingMode: true,
+  });
+  DRAW.canvas.on("mouse:up", function () {
+    save();
+  });
+
+  elements.undo.addEventListener("click", function () {
+    replay(DRAW.undo_list, DRAW.redo_list, "redo", this);
+  });
+
+  elements.redo.addEventListener("click", function () {
+    replay(DRAW.redo_list, DRAW.undo_list, "undo", this);
+  });
+
+  fabric.Object.prototype.transparentCorners = false;
+
+  elements.clearCanvas.onclick = function () {
+    DRAW.canvas.clear();
+  };
+
+  elements.color.oninput = function () {
+    let brush = DRAW.canvas.freeDrawingBrush;
+    brush.color = this.value;
+    brush.width = parseInt(elements.LineWidth.value, 10) || 1;
+    let brushsvg = document.getElementsByClassName("brushsvg");
+    Array.from(brushsvg).forEach((element) => {
+      element.style.fill = parseInt(this.value, 10);
+    });
+  };
+  elements.LineWidth.oninput = function () {
+    elements.LineWidthLabel.innerHTML = this.value;
+    DRAW.canvas.freeDrawingBrush.width = parseInt(this.value, 10) || 1;
+    this.previousSibling.innerHTML = parseInt(this.value, 10);
+  };
+
+  if (DRAW.canvas.freeDrawingBrush) {
+    DRAW.canvas.freeDrawingBrush.color = elements.color.value;
+    DRAW.canvas.freeDrawingBrush.width = parseInt(elements.LineWidth.value, 10) || 1;
+  }
+
+  let colorbtns = document.getElementsByClassName("colorpreset");
+  Array.from(colorbtns).forEach(function (element) {
+    element.addEventListener("click", changeColor);
+  });
+  elements.twitchGlobal.onchange = function () {
+    DRAW.twitchGlobal = this.checked;
+  };
+  elements.bttvGlobal.onchange = function () {
+    DRAW.bttvGlobal = this.checked;
+  };
+  elements.ffzGlobal.onchange = function () {
+    DRAW.ffzGlobal = this.checked;
+  };
+  elements.seventvGlobal.onchange = function () {
+    DRAW.seventvGlobal = this.checked;
+  };
+  elements.twitch.onchange = function () {
+    DRAW.twitch = this.checked;
+  };
+  elements.bttv.onchange = function () {
+    DRAW.bttv = this.checked;
+  };
+  elements.ffz.onchange = function () {
+    DRAW.ffz = this.checked;
+  };
+  elements.seventv.onchange = function () {
+    DRAW.seventv = this.checked;
+  };
+  elements.emoji.onchange = function () {
+    DRAW.emoji = this.checked;
+  };
+
+  elements.turnLength.onchange = function () {
+    DRAW.turnLength = parseInt(this.value, 10);
+  };
+  elements.timerReveal.onchange = function () {
+    DRAW.timerReveal = this.checked;
+  };
+
+  elements.drawscoring1.onchange = function () {
+    DRAW.firstOnly = !this.checked;
+  };
+  elements.drawscoring2.onchange = function () {
+    DRAW.firstOnly = this.checked;
+  };
+  elements.points.onchange = function () {
+    DRAW.points = parseInt(this.value, 10);
+  };
+  elements.pointsTarget.onchange = function () {
+    DRAW.pointsTarget = parseInt(this.value, 10);
+  };
+
+  allEmotes.twitchGlobal = await getGlobalTwitchEmotes(true);
+  allEmotes.bttvGlobal = await getGlobalBTTVEmotes(true);
+  allEmotes.ffzGlobal = await getGlobalFFZEmotes(true);
+  allEmotes.seventvGlobal = await getGlobal7TVEmotes(true);
   allEmotes.emoji = await getEmoji();
-  document.getElementById("twitchglobaldesc").innerHTML = `<br>${allEmotes.twitchglobal.length} emotes`;
-  document.getElementById("bttvglobaldesc").innerHTML = `<br>${allEmotes.bttvglobal.length} emotes`;
-  document.getElementById("ffzglobaldesc").innerHTML = `<br>${allEmotes.ffzglobal.length} emotes`;
-  document.getElementById("7tvglobaldesc").innerHTML = `<br>${allEmotes.seventvglobal.length} emotes`;
-  document.getElementById("emojidesc").innerHTML = `<br>${allEmotes.emoji.length} emoji`;
+  elements.twitchGlobalCount.innerHTML = `<br>${allEmotes.twitchGlobal.length} emotes`;
+  elements.bttvGlobalCount.innerHTML = `<br>${allEmotes.bttvGlobal.length} emotes`;
+  elements.ffzGlobalCount.innerHTML = `<br>${allEmotes.ffzGlobal.length} emotes`;
+  elements.seventvGlobalCount.innerHTML = `<br>${allEmotes.seventvGlobal.length} emotes`;
+  elements.emojiCount.innerHTML = `<br>${allEmotes.emoji.length} emoji`;
 
   if (USER.channel) {
     allEmotes.twitch = await getChannelTwitchEmotes(USER.channel, true);
@@ -566,9 +606,9 @@ window.onload = async function () {
     allEmotes.ffz = await getChannelFFZEmotes(USER.userID, true);
     allEmotes.seventv = await getChannel7TVEmotes(USER.userID, true);
 
-    document.getElementById("twitchdesc").innerHTML = `<br>${allEmotes.twitch.length} emotes`;
-    document.getElementById("bttvdesc").innerHTML = `<br>${allEmotes.bttv.length} emotes`;
-    document.getElementById("ffzdesc").innerHTML = `<br>${allEmotes.ffz.length} emotes`;
-    document.getElementById("7tvdesc").innerHTML = `<br>${allEmotes.seventv.length} emotes`;
+    elements.twitchCount.innerHTML = `<br>${allEmotes.twitch.length} emotes`;
+    elements.bttvCount.innerHTML = `<br>${allEmotes.bttv.length} emotes`;
+    elements.ffzCount.innerHTML = `<br>${allEmotes.ffz.length} emotes`;
+    elements.seventvCount.innerHTML = `<br>${allEmotes.seventv.length} emotes`;
   }
 }; //onload

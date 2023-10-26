@@ -162,92 +162,96 @@
         <div class="row">
           <div class="col-auto">
             <div class="form-check form-switch">
-              <input type="checkbox" class="form-check-input" id="twitchglobal" aria-describedby="twitchglobaldesc" />
-              <label class="form-check-label" for="twitchglobal">Twitch global</label>
-              <small id="twitchglobaldesc" class="form-text text-body-secondary"><br />0 emotes</small>
+              <input type="checkbox" class="form-check-input" id="twitchGlobal" aria-describedby="twitchGlobalCount" />
+              <label class="form-check-label" for="twitchGlobal">Twitch global</label>
+              <small id="twitchGlobalCount" class="form-text text-body-secondary"><br />0 emotes</small>
             </div>
 
             <div class="form-check form-switch">
-              <input type="checkbox" class="form-check-input" id="bttvglobal" aria-describedby="bttvglobaldesc" />
-              <label class="form-check-label" for="bttvglobal">BTTV global</label>
-              <small id="bttvglobaldesc" class="form-text text-body-secondary"><br />0 emotes</small>
+              <input type="checkbox" class="form-check-input" id="bttvGlobal" aria-describedby="bttvGlobalCount" />
+              <label class="form-check-label" for="bttvGlobal">BTTV global</label>
+              <small id="bttvGlobalCount" class="form-text text-body-secondary"><br />0 emotes</small>
             </div>
 
             <div class="form-check form-switch">
-              <input type="checkbox" class="form-check-input" id="ffzglobal" aria-describedby="ffzglobaldesc" />
-              <label class="form-check-label" for="ffzglobal">FFZ global</label>
-              <small id="ffzglobaldesc" class="form-text text-body-secondary"><br />0 emotes</small>
+              <input type="checkbox" class="form-check-input" id="ffzGlobal" aria-describedby="ffzGlobalCount" />
+              <label class="form-check-label" for="ffzGlobal">FFZ global</label>
+              <small id="ffzGlobalCount" class="form-text text-body-secondary"><br />0 emotes</small>
             </div>
 
             <div class="form-check form-switch">
-              <input type="checkbox" class="form-check-input" id="7tvglobal" aria-describedby="7tvglobaldesc" />
-              <label class="form-check-label" for="7tvglobal">7TV global</label>
-              <small id="7tvglobaldesc" class="form-text text-body-secondary"><br />0 emotes</small>
+              <input type="checkbox" class="form-check-input" id="seventvGlobal" aria-describedby="seventvGlobalCount" />
+              <label class="form-check-label" for="seventvGlobal">7TV global</label>
+              <small id="seventvGlobalCount" class="form-text text-body-secondary"><br />0 emotes</small>
             </div>
 
             <div class="form-check form-switch">
-              <input type="checkbox" class="form-check-input" id="emoji" aria-describedby="emojidesc" />
+              <input type="checkbox" class="form-check-input" id="emoji" aria-describedby="emojiCount" />
               <label class="form-check-label" for="emoji">Emoji</label>
-              <small id="emojidesc" class="form-text text-body-secondary"><br />0 emoji</small>
+              <small id="emojiCount" class="form-text text-body-secondary"><br />0 emoji</small>
             </div>
           </div>
 
           <div class="col-auto">
             <div class="form-check form-switch">
-              <input type="checkbox" class="form-check-input" id="twitch" aria-describedby="twitchdesc" />
+              <input type="checkbox" class="form-check-input" id="twitch" aria-describedby="twitchCount" />
               <label class="form-check-label" for="twitch">Twitch channel</label>
-              <small id="twitchdesc" class="form-text text-body-secondary"><br />0 emotes</small>
+              <small id="twitchCount" class="form-text text-body-secondary"><br />0 emotes</small>
             </div>
 
             <div class="form-check form-switch">
-              <input type="checkbox" class="form-check-input" id="bttv" aria-describedby="bttvdesc" />
+              <input type="checkbox" class="form-check-input" id="bttv" aria-describedby="bttvCount" />
               <label class="form-check-label" for="bttv">BTTV channel</label>
-              <small id="bttvdesc" class="form-text text-body-secondary"><br />0 emotes</small>
+              <small id="bttvCount" class="form-text text-body-secondary"><br />0 emotes</small>
             </div>
 
             <div class="form-check form-switch">
-              <input type="checkbox" class="form-check-input" id="ffz" aria-describedby="ffzdesc" />
+              <input type="checkbox" class="form-check-input" id="ffz" aria-describedby="ffzCount" />
               <label class="form-check-label" for="ffz">FFZ channel</label>
-              <small id="ffzdesc" class="form-text text-body-secondary"><br />0 emotes</small>
+              <small id="ffzCount" class="form-text text-body-secondary"><br />0 emotes</small>
             </div>
 
             <div class="form-check form-switch">
-              <input type="checkbox" class="form-check-input" id="7tv" aria-describedby="7tvdesc" />
-              <label class="form-check-label" for="7tv">7TV channel</label>
-              <small id="7tvdesc" class="form-text text-body-secondary"><br />0 emotes</small>
+              <input type="checkbox" class="form-check-input" id="seventv" aria-describedby="seventvCount" />
+              <label class="form-check-label" for="seventv">7TV channel</label>
+              <small id="seventvCount" class="form-text text-body-secondary"><br />0 emotes</small>
             </div>
           </div>
         </div>
         <br />
 
         <div class="mb-3">
-          <label for="drawturnlength" class="form-label"><i class="material-icons notranslate">timer</i>Round timer</label>
-          <div class="input-group mb-3">
-            <input disabled type="number" min="0" value="60" max="300" class="form-control" id="drawturnlength" aria-describedby="timerDesc" />
+          <label for="turnLength" class="form-label"><i class="material-icons notranslate">timer</i>Round timer</label>
+          <div class="input-group">
+            <input type="number" min="0" value="0" max="300" class="form-control" id="turnLength" aria-describedby="timerDesc" />
             <span class="input-group-text" id="timerDesc">seconds</span>
           </div>
-          <div class="form-text">Set to 0 to disable the timer</div>
+          <small>Set to 0 to disable the timer</small>
+          <div class="form-check form-switch mt-3">
+            <input class="form-check-input" type="checkbox" role="switch" id="timerReveal" />
+            <label class="form-check-label" for="timerReveal"><i class="material-icons notranslate">visibility_off</i>Show answer after timer runs out only</label>
+          </div>
         </div>
 
         <br />
         <h4><i class="material-icons notranslate">scoreboard</i>Scoring & Points</h4>
         <div class="form-check mb-3">
           <input class="form-check-input" type="radio" name="drawscoring" id="drawscoring1" checked />
-          <label class="form-check-label" for="drawscoring1">Fastest answer</label>
+          <label class="form-check-label" for="drawscoring1"><i class="material-icons notranslate">sort</i>Fastest answer</label>
           <br /><small>First correct guess is worth 10 points, 2nd is worth 9 and so on.</small>
         </div>
         <div class="form-check mb-5">
           <input class="form-check-input" type="radio" name="drawscoring" id="drawscoring2" />
-          <label class="form-check-label" for="drawscoring2">First to guess</label>
+          <label class="form-check-label" for="drawscoring2"><i class="material-icons notranslate">bolt</i>First answer only</label>
           <br /><small>Only the first viewer to guess correctly will get points.</small>
         </div>
         <div class="input-group mb-3">
-          <input id="drawpoints" type="number" min="1" max="1000000" value="10" class="form-control" />
-          <span class="input-group-text">points per guess</span>
+          <span class="input-group-text"><i class="material-icons notranslate">scoreboard</i>Points per round</span>
+          <input id="points" type="number" min="1" max="1000000" value="10" class="form-control" />
         </div>
         <div class="input-group mb-3">
-          <input disabled id="drawpointswin" type="number" min="1" max="1000000" value="100" class="form-control" />
-          <span class="input-group-text">points needed to win</span>
+          <span class="input-group-text"><i class="material-icons notranslate">emoji_events</i>Points needed to win</span>
+          <input id="pointsTarget" type="number" min="1" max="1000000" value="100" class="form-control" />
         </div>
       </div>
     </div>
@@ -557,22 +561,23 @@
             </div>
           </div>
         </div>
-        <div class="row" id="gameRow">
+        <div class="row">
           <div class="col">
             <div class="canvas-container" style="z-index: 1000; width: 850px; height: 850px; position: relative; user-select: none; background: #666666">
               <canvas
                 class="lower-canvas"
                 width="850"
                 height="850"
-                id="drawcanvas"
+                id="canvas"
                 style="z-index: 1000; position: absolute; width: 850px; height: 850px; left: 0px; top: 0px; touch-action: none; user-select: none"
-              ></canvas>
+              >
+              </canvas>
               <canvas class="upper-canvas" style="position: absolute; width: 850px; height: 850px; left: 0px; top: 0px; touch-action: none; user-select: none; cursor: crosshair"></canvas>
             </div>
           </div>
 
           <div class="col-auto">
-            <label for="drawing-line-width" class="form-label"><i class="material-icons notranslate">brush</i>Brush size: <span id="drawing-line-widthlabel">5</span></label>
+            <label for="LineWidth" class="form-label"><i class="material-icons notranslate">brush</i>Brush size: <span id="LineWidthLabel">5</span></label>
             <br />
             <div class="btn-group" role="group" aria-label="brush size presets" id="brushpresetsgroup">
               <input onclick="changeBrush(this);" value="1" class="btn-check" type="radio" name="brushpresets" id="brush1" />
@@ -607,10 +612,10 @@
               </label>
             </div>
             <br />
-            <input type="range" class="form-range" min="1" max="40" value="5" id="drawing-line-width" />
+            <input type="range" class="form-range" min="1" max="40" value="5" id="LineWidth" />
             <br />
 
-            <label for="drawing-color"><i class="material-icons notranslate">palette</i> Colors</label><br />
+            <label for="color"><i class="material-icons notranslate">palette</i> Colors</label><br />
             <div class="colorpresetgroup" aria-label="color presets">
               <button type="button" class="btn btn-primary colorpreset" value="#000000" style="background-color: #000000"></button>
               <button type="button" class="btn btn-primary colorpreset" value="#404040" style="background-color: #404040"></button>
@@ -634,9 +639,9 @@
               <button type="button" class="btn btn-primary colorpreset" value="#017420" style="background-color: #017420"></button>
             </div>
 
-            <input type="color" value="#22b14c" id="drawing-color" /><br />
+            <input type="color" value="#22b14c" id="color" /><br />
             <button type="button" id="eraser" class="btn btn-warning colorpreset" value="#666666"><i class="material-icons notranslate">edit_off</i>Eraser</button>
-            <button type="button" id="clear-canvas" class="btn btn-danger"><i class="material-icons notranslate">delete</i>Clear</button>
+            <button type="button" id="clearCanvas" class="btn btn-danger"><i class="material-icons notranslate">delete</i>Clear</button>
             <br />
 
             <div class="btn-group" role="group" id="undoredo" aria-label="undo redo">
@@ -644,15 +649,19 @@
               <button type="button" title="redo" id="redo" class="btn btn-primary"><i class="material-icons notranslate">redo</i></button>
             </div>
             <br />
-
+            <div class="card border-danger mt-3" id="countdown" style="display: none">
+              <div class="card-body">
+                <div id="countdownValue"></div>
+              </div>
+            </div>
             <div id="drawoutput"></div>
           </div>
 
           <div class="col">
-            <div class="card" id="drawlbcard">
+            <div class="card mt-1">
               <div class="btn-group" role="group" aria-label="Basic example">
                 <button type="button" onclick="start()" class="btn btn-success"><i class="material-icons notranslate">play_arrow</i>Start</button>
-                <button type="button" onclick="reroll()" class="btn btn-warning"><i class="material-icons notranslate">skip_next</i>Skip emote</button>
+                <button type="button" onclick="start(true)" class="btn btn-warning"><i class="material-icons notranslate">skip_next</i>Skip emote</button>
                 <button type="button" onclick="reset()" class="btn btn-danger"><i class="material-icons notranslate">clear</i>Reset</button>
                 <button type="button" class="btn btn-secondary" data-bs-toggle="offcanvas" data-bs-target="#settingsOffcanvas" aria-controls="settingsOffcanvas">
                   <i class="material-icons notranslate">settings</i> Settings
@@ -665,7 +674,7 @@
                   <ul class="list-group" id="drawlblist"></ul>
                 </div>
 
-                <div class="card border border-danger" id="drawemotecard">
+                <div class="card border-danger" id="drawemotecard">
                   <div class="card-body" id="drawemotecardbody">
                     <span style="font-size: 4vh">Place your facecam here<br /><i class="material-icons notranslate" style="font-size: 6vh">photo_camera</i></span>
                   </div>
@@ -685,6 +694,7 @@
     <script src="/js/bootstrap.bundle.min.js"></script>
     <script src="/js/twemoji.min.js"></script>
     <script src="/js/fabric.min.js"></script>
+    <script src="/js/easytimer.min.js"></script>
     <script src="/js/functions.min.js"></script>
     <script src="/games/games.min.js"></script>
     <script src="/games/draw/draw.min.js"></script>
