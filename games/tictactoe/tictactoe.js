@@ -52,7 +52,7 @@ function handleMessage(target, context, msg, self) {
       voters.push(context.username);
       let index = TTT.results.findIndex((obj) => obj.label == vote_int);
       TTT.results[index].data += 1;
-      updateGraph("ttt");
+      updateGraph();
       return;
     }
   }
@@ -321,7 +321,7 @@ function playTurn() {
   TTT.results.sort(function (a, b) {
     return parseInt(a.label, 10) < parseInt(b.label, 10) ? -1 : parseInt(a.label, 10) == parseInt(b.label, 10) ? 0 : 1;
   });
-  updateGraph("ttt");
+  updateGraph();
   let $theSelectedSquare = $(".square-0" + `${parseInt(theSquareToPlay, 10) - 1}`);
   updateGameBoard(`${parseInt(theSquareToPlay, 10) - 1}`, "O", $theSelectedSquare);
   if (checkWin("O")) {
@@ -354,7 +354,7 @@ function listeners() {
     TTT.results.forEach((element, index) => {
       TTT.results[index].data = 0;
     });
-    updateGraph("ttt");
+    updateGraph();
   }); //TTT click
 } //listeners
 

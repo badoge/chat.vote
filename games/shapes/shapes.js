@@ -43,7 +43,7 @@ function handleMessage(target, context, msg, self) {
       voters.push(context.username);
       let index = SHAPES.results.findIndex((obj) => obj.label == vote_int);
       SHAPES.results[index].data += 1;
-      updateGraph("shapes");
+      updateGraph();
       return;
     }
   }
@@ -265,7 +265,7 @@ function makeChoice(event) {
       SHAPES.results = SHAPES.results.filter(function (el) {
         return parseInt(el.label, 10) != selected + 1;
       });
-      updateGraph("shapes");
+      updateGraph();
       SHAPES.shapesGame.lives -= 1;
       SHAPES.shapesGame.choices[selected].isKnownToBeIncorrect(true);
       showToast("Incorrect choice!", "danger", 3000);
@@ -279,7 +279,7 @@ function makeChoice(event) {
         { label: "2", data: 0, c1: "#f4c236", c2: "#f5c237" },
         { label: "3", data: 0, c1: "#a8f436", c2: "#a9e437" },
       ];
-      updateGraph("shapes");
+      updateGraph();
       SHAPES.shapesGame.figs.push(SHAPES.shapesGame.choices[SHAPES.shapesGame.correct]);
       if (SHAPES.shapesGame.figs.length >= SHAPES.figureList.length) {
         endGame(true);
@@ -320,7 +320,7 @@ function start() {
     { label: "2", data: 0, c1: "#f4c236", c2: "#f5c237" },
     { label: "3", data: 0, c1: "#a8f436", c2: "#a9e437" },
   ];
-  updateGraph("shapes");
+  updateGraph();
 } //start
 
 function reset() {
@@ -357,7 +357,7 @@ function playTurn() {
   SHAPES.results.sort(function (a, b) {
     return parseInt(a.label, 10) < parseInt(b.label, 10) ? -1 : parseInt(a.label, 10) == parseInt(b.label, 10) ? 0 : 1;
   });
-  updateGraph("shapes");
+  updateGraph();
 } //playTurn
 
 function listeners() {

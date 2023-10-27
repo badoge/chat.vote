@@ -457,7 +457,8 @@
             </div>
           </div>
         </div>
-        <div class="card m-3" id="nimgame">
+
+        <div class="card m-3 bg-body-tertiary" id="nimgame">
           <div class="card-body" id="nimfield">
             <!-- div.field-row have dynamic contents! -->
             <div class="nim-field-row">
@@ -491,7 +492,7 @@
           </div>
         </div>
 
-        <div class="row">
+        <div class="row m-1">
           <div class="col-8">
             <div class="row">
               <div class="col-6">
@@ -500,9 +501,9 @@
                     <div class="nim-player-controls">
                       <h4>Streamer</h4>
                       <div class="btn-group" role="group">
-                        <button disabled type="button" class="btn btn-success nim-p1-control" data-intake="1">Eat 1</button>
-                        <button disabled type="button" class="btn btn-success nim-p1-control" data-intake="2">Eat 2</button>
-                        <button disabled type="button" class="btn btn-success nim-p1-control" data-intake="3">Eat 3</button>
+                        <button disabled type="button" class="btn btn-success nim-p1-control" data-intake="1" onclick="makeMove(this)">Eat 1</button>
+                        <button disabled type="button" class="btn btn-success nim-p1-control" data-intake="2" onclick="makeMove(this)">Eat 2</button>
+                        <button disabled type="button" class="btn btn-success nim-p1-control" data-intake="3" onclick="makeMove(this)">Eat 3</button>
                       </div>
                     </div>
                   </div>
@@ -512,11 +513,11 @@
                 <div class="card">
                   <div class="card-body">
                     <h4>Chat</h4>
-                    <div id="nimchartdiv" class="chart-container">
-                      <div id="nimoverlay"></div>
-                      <canvas id="nimchartCanvas" class="blur"></canvas>
+                    <div id="chartDiv" class="chart-container">
+                      <div id="overlay"></div>
+                      <canvas id="chartCanvas" class="blur"></canvas>
                     </div>
-                    <span id="totalvotesnim">Total votes: 0</span><br />
+                    <span id="totalVotes">Total votes: 0</span><br />
                     <button type="button" onclick="makeMove()" class="btn btn-success">Play chat's pick</button>
                   </div>
                 </div>
@@ -524,9 +525,9 @@
             </div>
           </div>
 
-          <div class="col-4" id="nimsettings">
-            <label for="popCount" class="form-label">Popsicle count: <span id="popCountX">20</span></label>
-            <input type="range" class="form-range" value="20" min="12" max="36" step="1" name="popCount" id="popCount" />
+          <div class="col-4" id="settings">
+            <label for="popCount" class="form-label">Popsicle count: <span id="popCountNumber">20</span></label>
+            <input type="range" class="form-range" value="20" min="12" max="36" step="1" name="popCount" id="popCount" oninput="setInitialCount(this)" />
             <br />
             <div class="input-group">
               <label class="input-group-text" for="popCondition">Player who eats the last popsicle</label>
@@ -535,10 +536,10 @@
                 <option value="win">Wins</option>
               </select>
             </div>
-            <button type="button" class="btn btn-success mt-3" id="nimstartGame">Start game</button>
+            <button type="button" class="btn btn-success mt-3" id="nimstartGame" onclick="startGame()">Start game</button>
             <div id="nimgameState" style="visibility: hidden">
               <h4 id="nimwinMessage">Win message goes here</h4>
-              <button type="button" class="btn btn-success" id="nimrestartGame">Play again</button>
+              <button type="button" class="btn btn-success" id="nimrestartGame" onclick="startGame()">Play again</button>
             </div>
           </div>
         </div>

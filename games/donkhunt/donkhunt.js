@@ -41,7 +41,7 @@ function handleMessage(target, context, msg, self) {
     if (command in DONKHUNT.results) {
       voters.push(context.username);
       DONKHUNT.results[command].data += 1;
-      updateGraph("donkhunt");
+      updateGraph();
     }
   }
 } //handleMessage
@@ -401,7 +401,7 @@ let DONKHUNT = {
         DONKHUNT.results = DONKHUNT.functions.buildChatOptions();
       }
       DONKHUNT.functions.drawField(DONKHUNT.game.turn < 2);
-      updateGraph("donkhunt");
+      updateGraph();
     },
     endGame: function (winnerSide, reason) {
       switch (winnerSide) {
@@ -592,7 +592,7 @@ let DONKHUNT = {
     }
 
     DONKHUNT.results = {};
-    updateGraph("donkhunt");
+    updateGraph();
     for (const row of DONKHUNT.html.fieldRows) {
       for (const cell of row) {
         cell.innerHTML = "";

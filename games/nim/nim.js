@@ -1,6 +1,3 @@
-let streamersTurn = true;
-let voters = [];
-
 let elements = {
   //modals
   grid: document.getElementById("grid"),
@@ -19,12 +16,18 @@ let elements = {
 
   //main
   toastContainer: document.getElementById("toastContainer"),
+  popCondition: document.getElementById("popCondition"),
+  popCountNumber: document.getElementById("popCountNumber"),
+  settings: document.getElementById("settings"),
+  fieldrows: Array.from(document.querySelectorAll("#nimfield div.nim-field-row")),
+  gamestate: document.getElementById("nimgameState"),
+  winmessage: document.querySelector("h4#nimwinMessage"),
+  controls: document.querySelectorAll("div.nim-player-controls"),
+  p1controls: Array.from(document.querySelectorAll("button.nim-p1-control")),
+  totalVotes: document.getElementById("totalVotes"),
+  chartCanvas: document.getElementById("chartCanvas"),
+  overlay: document.getElementById("overlay"),
 };
-
-let loginButton;
-let darkTheme = true;
-
-let loginExpiredModal, aboutModal;
 
 let USER = {
   channel: "",
@@ -33,6 +36,30 @@ let USER = {
   userID: "",
   platform: "",
 };
+
+let NIM = {
+  ctx: elements.chartCanvas.getContext("2d"),
+  chart: null,
+  results: [
+    { label: "1", data: 0, c1: "#f44336", c2: "#f53337" },
+    { label: "2", data: 0, c1: "#f4c236", c2: "#f5c237" },
+    { label: "3", data: 0, c1: "#a8f436", c2: "#a9e437" },
+  ],
+  game: {
+    condition: "lose",
+    initialCount: 20,
+    count: 0,
+    firstMove: 0,
+    turn: 0,
+  },
+}; //NIM
+
+let loginButton;
+let darkTheme = true;
+let loginExpiredModal, aboutModal;
+let streamersTurn = true;
+let voters = [];
+
 function handleMessage(target, context, msg, self) {
   let input = msg.split(" ").filter(Boolean);
   if (streamersTurn) {
@@ -47,45 +74,11 @@ function handleMessage(target, context, msg, self) {
       voters.push(context.username);
       let index = NIM.results.findIndex((obj) => obj.label == vote_int);
       NIM.results[index].data += 1;
-      updateGraph("nim");
+      updateGraph();
       return;
     }
   }
 } //handleMessage
-
-window.onload = function () {
-  darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
-  elements.darkTheme.checked = darkTheme ?? true;
-  switchTheme(elements.darkTheme.checked);
-
-  loadAndConnect();
-
-  if (!USER.channel) {
-    loginButton = new bootstrap.Popover(elements.loginButton);
-  }
-
-  loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
-  aboutModal = new bootstrap.Modal(elements.aboutModal);
-
-  enableTooltips();
-  enablePopovers();
-
-  elements.channelName.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      connect();
-    }
-  });
-
-  elements.darkTheme.onchange = function () {
-    switchTheme(this.checked);
-    saveSettings();
-  };
-
-  initGraph();
-
-  listeners();
-  document.getElementById("nimoverlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
-}; //onload
 
 function initGraph() {
   if (NIM.chart) {
@@ -161,7 +154,7 @@ function updateGraph() {
     total += list[k].data;
   }
 
-  document.getElementById("totalvotesnim").innerHTML = `Total votes: ${total}`;
+  elements.totalVotes.innerHTML = `Total votes: ${total}`;
   NIM.chart.data.labels = label;
   NIM.chart.data.datasets.forEach((dataset) => {
     dataset.data = data;
@@ -171,49 +164,18 @@ function updateGraph() {
   NIM.chart.update();
 } //updateGraph
 
-let NIM = {
-  ctx: document.getElementById("nimchartCanvas").getContext("2d"),
-  chart: null,
-  results: [
-    { label: "1", data: 0, c1: "#f44336", c2: "#f53337" },
-    { label: "2", data: 0, c1: "#f4c236", c2: "#f5c237" },
-    { label: "3", data: 0, c1: "#a8f436", c2: "#a9e437" },
-  ],
-  html: {
-    startGameBtn: document.querySelector("#nimstartGame"),
-    restartGameBtn: document.querySelector("#nimrestartGame"),
-    popCondition: document.querySelector("#popCondition"),
-    popCountSlider: document.querySelector("#popCount"),
-    popCountNumber: document.querySelector("#popCountX"),
-    settings: document.querySelector("#nimsettings"),
-    fieldrows: Array.from(document.querySelectorAll("#nimfield div.nim-field-row")),
-    gamestate: document.querySelector("#nimgameState"),
-    winmessage: document.querySelector("h4#nimwinMessage"),
-    controls: document.querySelectorAll("div.nim-player-controls"),
-    p1controls: Array.from(document.querySelectorAll("button.nim-p1-control")),
-    p2controls: Array.from(document.querySelectorAll("button.nim-p2-control")),
-  },
-  game: {
-    condition: "lose",
-    initialCount: 20,
-    count: 0,
-    firstMove: 0,
-    turn: 0,
-  },
-}; //NIM
-
 function whoGoes() {
   // returns number of current player - player1 or player2
   return NIM.game.firstMove == NIM.game.turn % 2 ? 1 : 2;
 } //whoGoes
 
 function setInitialCount(event) {
-  NIM.game.initialCount = Math.max(12, Math.min(36, parseInt(event.target.value, 10)));
-  NIM.html.popCountNumber.innerText = NIM.game.initialCount;
+  NIM.game.initialCount = Math.max(12, Math.min(36, parseInt(event.value, 10)));
+  elements.popCountNumber.innerText = NIM.game.initialCount;
   NIM.game.count = NIM.game.initialCount;
-  NIM.game.condition = NIM.html.popCondition.value || "lose";
+  NIM.game.condition = elements.popCondition.value || "lose";
   NIM.game.turn = 0;
-  NIM.html.fieldrows.forEach((row) => (row.innerHTML = ""));
+  elements.fieldrows.forEach((row) => (row.innerHTML = ""));
   NIM.game.firstMove = Math.round(Math.random()); // who goes first? player 1 or 2?
   // fill field with fresh tasty popsicles:
   let rowNm = 0; // add as many "div.field-row" as you want, script will fill them evenly
@@ -221,31 +183,32 @@ function setInitialCount(event) {
     let popsicle = document.createElement("div");
     popsicle.classList.add("nim-popsicle");
     popsicle.style.filter = `hue-rotate(${Math.random() * 360}deg)`; // a bit of flair
-    NIM.html.fieldrows[rowNm].appendChild(popsicle);
+    elements.fieldrows[rowNm].appendChild(popsicle);
     rowNm += 1;
-    if (rowNm >= NIM.html.fieldrows.length) rowNm = 0;
+    if (rowNm >= elements.fieldrows.length) {
+      rowNm = 0;
+    }
   }
 } //setInitialCount
 
 function turn() {
   NIM.game.turn += 1;
-  NIM.html.p1controls.forEach((c) => (c.disabled = whoGoes() == 2));
-  NIM.html.p2controls.forEach((c) => (c.disabled = whoGoes() == 1));
+  elements.p1controls.forEach((c) => (c.disabled = whoGoes() == 2));
   if (whoGoes() == 1) {
     streamersTurn = true;
-    document.getElementById("nimchartCanvas").classList = "blur";
-    document.getElementById("nimoverlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
+    elements.chartCanvas.classList = "blur";
+    elements.overlay.innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
   } else {
     streamersTurn = false;
-    document.getElementById("nimchartCanvas").classList = "";
-    document.getElementById("nimoverlay").innerHTML = "";
+    elements.chartCanvas.classList = "";
+    elements.overlay.innerHTML = "";
   }
 } //turn
 
 function makeMove(event) {
   let eatCount = 0;
   if (streamersTurn) {
-    eatCount = parseInt(event.target.dataset.intake, 10);
+    eatCount = parseInt(event.dataset.intake, 10);
   } else {
     if (voters.length == 0) {
       return;
@@ -257,28 +220,30 @@ function makeMove(event) {
       { label: "2", data: 0, c1: "#f4c236", c2: "#f5c237" },
       { label: "3", data: 0, c1: "#a8f436", c2: "#a9e437" },
     ];
-    updateGraph("nim");
+    updateGraph();
   }
   NIM.game.count -= eatCount;
   turn();
   if (NIM.game.count < 1) {
     // check game end condition
-    if (NIM.game.condition == "win") NIM.game.turn += 1; // hack: switch player # depending on turn #
-    NIM.html.winmessage.innerText = `${whoGoes() == 1 ? USER.channel : "Chat"} wins!`;
-    NIM.html.controls.forEach((c) => (c.style.visibility = "hidden"));
-    NIM.html.gamestate.style.visibility = "visible";
-    NIM.html.settings.style.display = "block";
+    if (NIM.game.condition == "win") {
+      NIM.game.turn += 1; // hack: switch player # depending on turn #
+    }
+    elements.winmessage.innerText = `${whoGoes() == 1 ? USER.channel : "Chat"} wins!`;
+    elements.controls.forEach((c) => (c.style.visibility = "hidden"));
+    elements.gamestate.style.visibility = "visible";
+    elements.settings.style.display = "block";
   }
   // clear last-taken state from all the popsicles
-  NIM.html.fieldrows.forEach((row) => row.querySelectorAll("div.nim-popsicle.nim-last-taken").forEach((p) => p.classList.remove("nim-last-taken")));
+  elements.fieldrows.forEach((row) => row.querySelectorAll("div.nim-popsicle.nim-last-taken").forEach((p) => p.classList.remove("nim-last-taken")));
   // iterator: eating the popsicles one by one
-  const popsicles = NIM.html.fieldrows.map((row) => Array.from(row.querySelectorAll("div.nim-popsicle")));
+  const popsicles = elements.fieldrows.map((row) => Array.from(row.querySelectorAll("div.nim-popsicle")));
   // player1 eats leftmost popsicles, player2 eats rightmost ones
-  let maxX = Math.max(...popsicles.map((p) => p.length)),
-    maxY = popsicles.length,
-    x = whoGoes() == 2 ? 0 : maxX - 1,
-    y = whoGoes() == 2 ? 0 : maxY - 1,
-    dir = whoGoes() == 2 ? 1 : -1;
+  let maxX = Math.max(...popsicles.map((p) => p.length));
+  let maxY = popsicles.length;
+  let x = whoGoes() == 2 ? 0 : maxX - 1;
+  let y = whoGoes() == 2 ? 0 : maxY - 1;
+  let dir = whoGoes() == 2 ? 1 : -1;
   while (eatCount > 0) {
     if (popsicles[y].length > x) {
       if (!popsicles[y][x].classList.contains("nim-taken")) {
@@ -290,7 +255,9 @@ function makeMove(event) {
     if (y < 0 || y >= maxY) {
       y = whoGoes() == 2 ? 0 : maxY - 1;
       x += dir;
-      if (x < 0 || x >= maxX) break;
+      if (x < 0 || x >= maxX) {
+        break;
+      }
     }
   }
 } //makeMove
@@ -305,18 +272,18 @@ function getChatMove() {
 
 function startGame() {
   NIM.game.count = NIM.game.initialCount;
-  NIM.game.condition = NIM.html.popCondition.value || "lose";
+  NIM.game.condition = elements.popCondition.value || "lose";
   NIM.game.turn = 0;
-  NIM.html.fieldrows.forEach((row) => (row.innerHTML = ""));
+  elements.fieldrows.forEach((row) => (row.innerHTML = ""));
   NIM.game.firstMove = Math.round(Math.random()); // who goes first? player 1 or 2?
   if (NIM.game.firstMove == 1) {
     streamersTurn = true;
-    document.getElementById("nimchartCanvas").classList = "blur";
-    document.getElementById("nimoverlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
+    elements.chartCanvas.classList = "blur";
+    elements.overlay.innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
   } else {
     streamersTurn = false;
-    document.getElementById("nimchartCanvas").classList = "";
-    document.getElementById("nimoverlay").innerHTML = "";
+    elements.chartCanvas.classList = "";
+    elements.overlay.innerHTML = "";
   }
 
   // fill field with fresh tasty popsicles:
@@ -325,51 +292,81 @@ function startGame() {
     let popsicle = document.createElement("div");
     popsicle.classList.add("nim-popsicle");
     popsicle.style.filter = `hue-rotate(${Math.random() * 360}deg)`; // a bit of flair
-    NIM.html.fieldrows[rowNm].appendChild(popsicle);
+    elements.fieldrows[rowNm].appendChild(popsicle);
     rowNm += 1;
-    if (rowNm >= NIM.html.fieldrows.length) rowNm = 0;
+    if (rowNm >= elements.fieldrows.length) {
+      rowNm = 0;
+    }
   }
   // mandatory stuff
-  NIM.html.gamestate.style.visibility = "hidden";
-  NIM.html.controls.forEach((c) => (c.style.visibility = "visible"));
-  NIM.html.settings.style.display = "none";
+  elements.gamestate.style.visibility = "hidden";
+  elements.controls.forEach((c) => (c.style.visibility = "visible"));
+  elements.settings.style.display = "none";
   turn();
 } //startGame
 
 function reset() {
-  NIM.html.settings.style.display = "block";
+  elements.settings.style.display = "block";
   NIM.results = [
     { label: "1", data: 0, c1: "#f44336", c2: "#f53337" },
     { label: "2", data: 0, c1: "#f4c236", c2: "#f5c237" },
     { label: "3", data: 0, c1: "#a8f436", c2: "#a9e437" },
   ];
-  document.getElementById("nimoverlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
-  document.getElementById("nimchartCanvas").classList = "blur";
+  elements.overlay.innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
+  elements.chartCanvas.classList = "blur";
   NIM.game.count = NIM.game.initialCount;
-  NIM.game.condition = NIM.html.popCondition.value || "lose";
+  NIM.game.condition = elements.popCondition.value || "lose";
   NIM.game.turn = 0;
-  NIM.html.fieldrows.forEach((row) => (row.innerHTML = ""));
+  elements.fieldrows.forEach((row) => (row.innerHTML = ""));
 
   let rowNm = 0; // add as many "div.field-row" as you want, script will fill them evenly
   for (let i = 0; i < NIM.game.count; i++) {
     let popsicle = document.createElement("div");
     popsicle.classList.add("nim-popsicle");
     popsicle.style.filter = `hue-rotate(${Math.random() * 360}deg)`; // a bit of flair
-    NIM.html.fieldrows[rowNm].appendChild(popsicle);
+    elements.fieldrows[rowNm].appendChild(popsicle);
     rowNm += 1;
-    if (rowNm >= NIM.html.fieldrows.length) rowNm = 0;
+    if (rowNm >= elements.fieldrows.length) {
+      rowNm = 0;
+    }
   }
   // mandatory stuff
-  NIM.html.gamestate.style.visibility = "hidden";
+  elements.gamestate.style.visibility = "hidden";
 } //reset
 
-function listeners() {
-  // settings: set initial count (sliders)
-  NIM.html.popCountSlider.addEventListener("input", setInitialCount);
-  // start game button listeners
-  NIM.html.startGameBtn.addEventListener("click", startGame);
-  NIM.html.restartGameBtn.addEventListener("click", startGame);
-  // game control listeners
-  NIM.html.p1controls.forEach((c) => c.addEventListener("click", makeMove));
-  NIM.html.p2controls.forEach((c) => c.addEventListener("click", makeMove));
-} //listeners
+window.onload = function () {
+  darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
+  elements.darkTheme.checked = darkTheme ?? true;
+  switchTheme(elements.darkTheme.checked);
+
+  let popsicles = document.querySelectorAll(".nim-popsicle");
+  for (let i = 0; i < popsicles.length; i++) {
+    popsicles[i].style.filter = `hue-rotate(${Math.random() * 360}deg)`;
+  }
+
+  loadAndConnect();
+
+  if (!USER.channel) {
+    loginButton = new bootstrap.Popover(elements.loginButton);
+  }
+
+  loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
+  aboutModal = new bootstrap.Modal(elements.aboutModal);
+
+  enableTooltips();
+  enablePopovers();
+
+  elements.channelName.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      connect();
+    }
+  });
+
+  elements.darkTheme.onchange = function () {
+    switchTheme(this.checked);
+    saveSettings();
+  };
+
+  initGraph();
+  elements.overlay.innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
+}; //onload

@@ -65,7 +65,7 @@ function handleMessage(target, context, msg, self) {
       voters.push(context.username);
       let index = CONNECT4.results.findIndex((obj) => obj.label == vote_int);
       CONNECT4.results[index].data += 1;
-      updateGraph("c4");
+      updateGraph();
       return;
     }
   }
@@ -240,7 +240,7 @@ function playTurn() {
   CONNECT4.results.sort(function (a, b) {
     return parseInt(a.label, 10) < parseInt(b.label, 10) ? -1 : parseInt(a.label, 10) == parseInt(b.label, 10) ? 0 : 1;
   });
-  updateGraph("c4");
+  updateGraph();
 } //playTurn
 
 class C4 {
