@@ -447,7 +447,7 @@
         </div>
       </div>
 
-      <div class="offcanvas offcanvas-bottom" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="settingsOffcanvas" aria-labelledby="settingsOffcanvasLabel">
+      <div class="offcanvas offcanvas-bottom" data-bs-scroll="true" tabindex="-1" id="settingsOffcanvas" aria-labelledby="settingsOffcanvasLabel">
         <div class="offcanvas-header">
           <h5 class="offcanvas-title" id="settingsOffcanvasLabel"><i class="material-icons notranslate">settings</i>Settings</h5>
           <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -526,12 +526,7 @@
                       <small id="hideNameDesc" class="form-text text-body-secondary"><br />Shows only the emote without the name</small>
                     </div>
                     <div class="form-check form-switch">
-                      <input disabled type="checkbox" class="form-check-input" id="oneAnswer" aria-describedby="oneAnswerDesc" />
-                      <label class="form-check-label" for="oneAnswer">Allow only 1 answer per viewer</label>
-                      <small id="oneAnswerDesc" class="form-text text-body-secondary"><br />The first message each viewer types will be counted as an answer attempt</small>
-                    </div>
-                    <div class="form-check form-switch">
-                      <input disabled type="checkbox" class="form-check-input" id="blurEmote" aria-describedby="blurEmoteDesc" />
+                      <input type="checkbox" class="form-check-input" id="blurEmote" aria-describedby="blurEmoteDesc" />
                       <label class="form-check-label" for="blurEmote">Blur emote</label>
                       <small id="blurEmoteDesc" class="form-text text-body-secondary"><br />Blurs the emotes to add more difficulty :)</small>
                     </div>
@@ -546,17 +541,13 @@
                     <input type="range" class="form-range" min="1" max="5" value="1" id="emotesPerRound" />
                     <small class="form-text text-body-secondary">How many emotes to display each round</small>
                     <br />
-                    <label for="turnLength" class="form-label mt-3">Turn length (seconds): <span id="turnLengthLabel">20</span></label>
-                    <input type="range" class="form-range" min="5" max="60" value="20" id="turnLength" />
-                    <small class="form-text text-body-secondary">How much time viewers get to type their answers after the emotes are shown</small>
-                    <br />
                     <label for="emoteTimer" class="form-label mt-3">Emote timer (seconds): <span id="emoteTimerLabel">2</span></label>
                     <input type="range" class="form-range" min="1" max="10" value="2" id="emoteTimer" />
                     <small class="form-text text-body-secondary">How long the emotes will be shown</small>
                     <br />
-                    <label for="timerDecay" class="form-label mt-3">Timer decay (%): <span id="timerDecayLabel">80</span></label>
-                    <input disabled type="range" class="form-range" min="1" max="99" value="80" id="timerDecay" />
-                    <small class="form-text text-body-secondary">decay</small>
+                    <label for="turnLength" class="form-label mt-3">Turn length (seconds): <span id="turnLengthLabel">15</span></label>
+                    <input type="range" class="form-range" min="5" max="60" value="15" id="turnLength" />
+                    <small class="form-text text-body-secondary">How much time viewers get to type their answers</small>
                   </div>
                 </div>
               </div>
@@ -579,27 +570,46 @@
         </div>
 
         <div class="row">
+          <div class="col-xl-2"></div>
           <div class="col-xl-8">
-            <div class="card border-danger" id="timer" style="text-align: center; margin: 10px; display: none">
-              <div class="card-body" style="padding: 0px">
-                <div id="timerValue" style="font-size: 3em"></div>
+            <div class="card border-danger text-center mb-3" id="timer" style="visibility: hidden">
+              <div class="card-body p-0">
+                <div id="timerValue" style="font-size: 3em">:)</div>
               </div>
             </div>
-            <div id="emotes" style="height: 200px"></div>
-            <div id="timeBar" style="display: none"></div>
+            <div class="card border-info mb-3" style="height: 200px">
+              <div class="card-body" id="emotes">
+                <div class="card placeholder-emote">
+                  <div class="card-body">
+                    <img src="/pics/donk.png" alt="placeholder donk" title="placeholder donk" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="timeBar" class="mb-3" style="visibility: hidden">
+              <div class="progress" id="progress" role="progressbar" aria-label="emote timer" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar" id="progressBar"></div>
+              </div>
+            </div>
           </div>
+          <div class="col-xl-2"></div>
         </div>
 
         <div class="row">
-          <div id="output"></div>
-        </div>
+          <div class="col-xl-2"></div>
+          <div class="col-xl-8">
+            <div class="card mb-3">
+              <div class="card-header">Qualified players</div>
+              <div class="card-body" id="qualified"></div>
+            </div>
+            <h1 class="display-6" id="output"></h1>
+          </div>
+          <div class="col-xl-2">
+            <button class="btn btn-lg btn-success float-end m-1" type="button" id="start" onclick="start()">Start</button>
 
-        <div class="row float-end">
-          <div class="col">
-            <button class="btn btn-lg btn-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#settingsOffcanvas" aria-controls="settingsOffcanvas">
+            <button class="btn btn-lg btn-secondary float-end m-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#settingsOffcanvas" aria-controls="settingsOffcanvas">
               <i class="material-icons notranslate">settings</i>Settings
             </button>
-            <button class="btn btn-lg btn-success" type="button" onclick="start()">Start</button>
           </div>
         </div>
       </div>
@@ -611,7 +621,7 @@
 
     <script src="/js/tmi.min.js"></script>
     <script src="/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/jquery.min.js"></script>
+    <script src="/js/anime.min.js"></script>
     <script src="/js/easytimer.min.js"></script>
     <script src="/js/functions.min.js"></script>
     <script src="/games/games.min.js"></script>

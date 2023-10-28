@@ -1,15 +1,9 @@
-let voters = [];
+const placeholder = `<div class="card placeholder-emote">
+<div class="card-body">
+<img src="/pics/donk.png" alt="placeholder donk" title="placeholder donk" />
+</div>
+</div>`;
 
-let allEmotes = {
-  twitchGlobal: [],
-  bttvGlobal: [],
-  ffzGlobal: [],
-  seventvGlobal: [],
-  twitchChannel: [],
-  bttvChannel: [],
-  ffzChannel: [],
-  seventvChannel: [],
-};
 let elements = {
   //modals
   grid: document.getElementById("grid"),
@@ -35,7 +29,6 @@ let elements = {
   bttvChannel: document.getElementById("bttvChannel"),
   ffzChannel: document.getElementById("ffzChannel"),
   seventvChannel: document.getElementById("seventvChannel"),
-  oneAnswer: document.getElementById("oneAnswer"),
   hideName: document.getElementById("hideName"),
   blurEmote: document.getElementById("blurEmote"),
   emotesPerRound: document.getElementById("emotesPerRound"),
@@ -44,8 +37,6 @@ let elements = {
   turnLengthLabel: document.getElementById("turnLengthLabel"),
   emoteTimer: document.getElementById("emoteTimer"),
   emoteTimerLabel: document.getElementById("emoteTimerLabel"),
-  timerDecay: document.getElementById("timerDecay"),
-  timerDecayLabel: document.getElementById("timerDecayLabel"),
   twitchGlobalCount: document.getElementById("twitchGlobalCount"),
   bttvGlobalCount: document.getElementById("bttvGlobalCount"),
   ffzGlobalCount: document.getElementById("ffzGlobalCount"),
@@ -54,18 +45,16 @@ let elements = {
   bttvChannelCount: document.getElementById("bttvChannelCount"),
   ffzChannelCount: document.getElementById("ffzChannelCount"),
   seventvChannelCount: document.getElementById("seventvChannelCount"),
+  qualified: document.getElementById("qualified"),
   output: document.getElementById("output"),
   timeBar: document.getElementById("timeBar"),
+  progressBar: document.getElementById("progressBar"),
+  progress: document.getElementById("progress"),
   emotes: document.getElementById("emotes"),
-
   timer: document.getElementById("timer"),
   timerValue: document.getElementById("timerValue"),
+  start: document.getElementById("start"),
 };
-
-let loginButton;
-let darkTheme = true;
-let settingsOffcanvas;
-let loginExpiredModal, aboutModal;
 
 let USER = {
   channel: "",
@@ -75,44 +64,28 @@ let USER = {
   platform: "",
 };
 
-function handleMessage(target, context, msg, self) {
-  let limit = false;
-  switch (EMOTEBENCHMARK.ebdifficulty) {
-    case 4:
-    case 5:
-      limit = true;
-      break;
-    default:
-      break;
-  }
+let allEmotes = {
+  twitchGlobal: [],
+  bttvGlobal: [],
+  ffzGlobal: [],
+  seventvGlobal: [],
+  twitchChannel: [],
+  bttvChannel: [],
+  ffzChannel: [],
+  seventvChannel: [],
+};
 
-  if (limit) {
-    if (!voters.includes(context.username)) {
-      voters.push(context.username);
-      if (msg == EMOTEBENCHMARK.answer.trim()) {
-      }
-    }
-  } else {
-    if (msg == EMOTEBENCHMARK.answer.trim()) {
-      if (EMOTEBENCHMARK.qualified.includes(context.username) || EMOTEBENCHMARK.turn == 1) {
-        if (!EMOTEBENCHMARK.qualifiedCurrentRound.includes(context.username)) {
-          EMOTEBENCHMARK.qualifiedCurrentRound.push(context.username);
-        }
-      }
-
-      elements.output.innerHTML = `Qualified players: ${EMOTEBENCHMARK.qualifiedCurrentRound.join(", ")}`;
-    }
-  }
-} //handleMessage
+let loginButton;
+let darkTheme = true;
+let settingsOffcanvas;
+let loginExpiredModal, aboutModal;
 
 let EMOTEBENCHMARK = {
   interval: null,
   turn: 0,
-  turnLength: 20000,
+  turnLength: 15000,
   emotesPerRound: 1,
   emoteTimer: 2000,
-  timerDecay: 80,
-  oneAnswer: false,
   hideName: false,
   blurEmote: false,
   answer: "",
@@ -131,93 +104,55 @@ let EMOTEBENCHMARK = {
   seventvChannel: false,
 }; //EMOTEBENCHMARK
 
-function start() {
-  EMOTEBENCHMARK.emotesPerRound = parseInt(elements.emotesPerRound.value, 10);
-  EMOTEBENCHMARK.turnLength = parseInt(elements.turnLength.value, 10) * 1000;
-  EMOTEBENCHMARK.emoteTimer = parseInt(elements.emoteTimer.value, 10) * 1000;
-  EMOTEBENCHMARK.timerDecay = parseInt(elements.timerDecay.value, 10) * 1000;
-  EMOTEBENCHMARK.oneAnswer = elements.oneAnswer.checked;
-  EMOTEBENCHMARK.hideName = elements.hideName.checked;
-  EMOTEBENCHMARK.blurEmote = elements.blurEmote.checked;
+function handleMessage(target, context, msg, self) {
+  if (msg.trim() == EMOTEBENCHMARK.answer.trim()) {
+    if (EMOTEBENCHMARK.qualified.includes(context.username) || EMOTEBENCHMARK.turn == 1) {
+      if (!EMOTEBENCHMARK.qualifiedCurrentRound.includes(context.username)) {
+        EMOTEBENCHMARK.qualifiedCurrentRound.push(context.username);
+      }
+    }
 
-  if (!EMOTEBENCHMARK.interval) {
-    startTurn();
-    startTimer();
-    EMOTEBENCHMARK.interval = setInterval(startTurn, EMOTEBENCHMARK.turnLength);
-  } else {
-    console.log("interval already running");
+    elements.qualified.insertAdjacentHTML(
+      "afterbegin",
+      `<span class="badge qualified rounded-pill me-1" style="background-color: ${context.color}">
+      ${addBadges(context.badges, context["user-id"], context["first-msg"])} ${context.username}
+      </span>`
+    );
   }
-} //start
+} //handleMessage
 
-function reset() {
-  clearInterval(EMOTEBENCHMARK.interval);
-  EMOTEBENCHMARK.interval = null;
-  EMOTEBENCHMARK.turn = 0;
-  EMOTEBENCHMARK.answer = "";
-  elements.emotes.innerHTML = "";
-  elements.output.innerHTML = "";
-  elements.timeBar.style.display = "none";
-  EMOTEBENCHMARK.qualified = [];
-  EMOTEBENCHMARK.qualifiedCurrentRound = [];
-  EMOTEBENCHMARK.twitchGlobal = false;
-  EMOTEBENCHMARK.bttvGlobal = false;
-  EMOTEBENCHMARK.ffzGlobal = false;
-  EMOTEBENCHMARK.seventvGlobal = false;
-  EMOTEBENCHMARK.twitchChannel = false;
-  EMOTEBENCHMARK.bttvChannel = false;
-  EMOTEBENCHMARK.ffzChannel = false;
-  EMOTEBENCHMARK.seventvChannel = false;
-  elements.twitchGlobal.checked = false;
-  elements.bttvGlobal.checked = false;
-  elements.ffzGlobal.checked = false;
-  elements.seventvGlobal.checked = false;
-  elements.twitchChannel.checked = false;
-  elements.bttvChannel.checked = false;
-  elements.ffzChannel.checked = false;
-  elements.seventvChannel.checked = false;
-  elements.oneAnswer.checked = false;
-  elements.hideName.checked = false;
-  elements.blurEmote.checked = false;
-  elements.emotesPerRound.value = 1;
-  elements.emotesPerRoundLabel.innerHTML = "1";
-  elements.turnLength.value = 20;
-  elements.turnLengthLabel.innerHTML = "20";
-  elements.emoteTimer.value = 2;
-  elements.emoteTimerLabel.innerHTML = "2";
-  elements.timerDecay.value = 80;
-  elements.timerDecayLabel.innerHTML = "80";
-  EMOTEBENCHMARK.usedEmotes = [];
-  //stopTimer();
-} //reset
-
-function startTurn() {
-  EMOTEBENCHMARK.turn++;
-  startTimer();
-
+function start() {
   let selectedemotes = [];
   let randomemotes = [];
   EMOTEBENCHMARK.answer = "";
-  elements.emotes.innerHTML = "";
+  elements.emotes.innerHTML = placeholder.repeat(EMOTEBENCHMARK.emotesPerRound);
+
   EMOTEBENCHMARK.qualified = EMOTEBENCHMARK.qualifiedCurrentRound;
   EMOTEBENCHMARK.qualifiedCurrentRound = [];
   if (EMOTEBENCHMARK.qualified.length == 1) {
-    elements.output.innerHTML = `Game is over. WINNER: ${EMOTEBENCHMARK.qualified.join(", ")}`;
+    elements.output.innerHTML = `Game over. WINNER: ${EMOTEBENCHMARK.qualified[0]}`;
+    elements.qualified.innerHTML = "";
     stopTimer();
     clearInterval(EMOTEBENCHMARK.interval);
     EMOTEBENCHMARK.interval = null;
     EMOTEBENCHMARK.turn = 0;
+    elements.start.disabled = false;
     return;
-  } else {
-    elements.output.innerHTML = `Qualified players: ${EMOTEBENCHMARK.qualified.join(", ")}`;
   }
-  if (EMOTEBENCHMARK.qualified.length == 0 && EMOTEBENCHMARK.turn > 1) {
-    elements.output.innerHTML = `Game is over. No one won`;
+  if (EMOTEBENCHMARK.qualified.length == 0 && EMOTEBENCHMARK.turn > 0) {
+    elements.output.innerHTML = `Game over. No one won`;
+    elements.qualified.innerHTML = "";
     stopTimer();
     clearInterval(EMOTEBENCHMARK.interval);
     EMOTEBENCHMARK.interval = null;
     EMOTEBENCHMARK.turn = 0;
+    elements.start.disabled = false;
     return;
   }
+
+  //get settings
+  EMOTEBENCHMARK.hideName = elements.hideName.checked;
+  EMOTEBENCHMARK.blurEmote = elements.blurEmote.checked;
 
   if (EMOTEBENCHMARK.twitchGlobal) {
     allEmotes.twitchGlobal.forEach((element) => {
@@ -260,56 +195,124 @@ function startTurn() {
     });
   }
 
+  //remove already seen emotes
   EMOTEBENCHMARK.usedEmotes.forEach((element) => {
     selectedemotes = selectedemotes.filter((list) => list.name != element);
   });
-  if (selectedemotes.length < 5) {
+
+  if (selectedemotes.length < EMOTEBENCHMARK.emotesPerRound) {
     stopTimer();
-    elements.timeBar.style.display = "none";
+    elements.timeBar.style.visibility = "hidden";
     clearInterval(EMOTEBENCHMARK.interval);
     EMOTEBENCHMARK.interval = null;
     EMOTEBENCHMARK.turn = 0;
     showToast("Not enough emotes remaining.", "warning", 5000);
     settingsOffcanvas.show();
+    elements.start.disabled = false;
     return;
   }
+
+  elements.start.disabled = true;
+  EMOTEBENCHMARK.turn++;
+  startTimer();
+
   for (let i = 0; i < EMOTEBENCHMARK.emotesPerRound; i++) {
-    randomemotes.push(selectedemotes[Math.floor(Math.random() * selectedemotes.length)]);
-    randomemotes.forEach((element) => {
-      EMOTEBENCHMARK.usedEmotes.push(element.name);
-    });
-  }
-  elements.emotes.style.opacity = 0;
-  for (let i = 0; i < randomemotes.length; i++) {
-    let name = "";
-    if (!EMOTEBENCHMARK.hideName) name = `<div class="text-body-secondary text-center">${randomemotes[i].name}</div>`;
-    elements.emotes.innerHTML += `<div class="border border-secondary emote">
-          <img src="${randomemotes[i].url}" alt="${randomemotes[i].name}" title="${randomemotes[i].name}">
-          ${name}
-          </div>`;
-    EMOTEBENCHMARK.answer += `${randomemotes[i].name} `;
+    let randomEmote = selectedemotes[Math.floor(Math.random() * selectedemotes.length)];
+    EMOTEBENCHMARK.usedEmotes.push(randomEmote.name);
+    randomemotes.push(randomEmote);
   }
 
-  elements.output.innerHTML = `Qualified players:`;
-  elements.timeBar.style.display = "block";
-
-  elements.timeBar.style.width = "100%";
+  elements.progressBar.style.width = "100%";
+  elements.progress.ariaValueNow = 100;
+  elements.timeBar.style.visibility = "visible";
   setTimeout(() => {
-    elements.emotes.style.opacity = 1;
-    $("#timeBar").animate(
-      {
-        width: "0px",
-      },
-      EMOTEBENCHMARK.emoteTimer - EMOTEBENCHMARK.turn * 100
-    );
+    elements.emotes.innerHTML = "";
+
+    for (let i = 0; i < randomemotes.length; i++) {
+      let name = `<div class="text-body-secondary text-center">${!EMOTEBENCHMARK.hideName ? randomemotes[i].name : "🤔"}</div>`;
+      elements.emotes.innerHTML += `
+      <div class="border border-secondary rounded bg-body-tertiary emote">
+      <img src="${randomemotes[i].url}" alt="${randomemotes[i].name}" ${EMOTEBENCHMARK.blurEmote ? `class="blur"` : ""} title="${randomemotes[i].name}">
+      ${name}
+      </div>`;
+      EMOTEBENCHMARK.answer += `${randomemotes[i].name} `;
+    }
+    animateTimer(Math.max(EMOTEBENCHMARK.emoteTimer - (EMOTEBENCHMARK.turn - 1) * 100, 1000));
+    elements.output.innerHTML = ``;
+    elements.qualified.innerHTML = ``;
   }, 2000);
-  setTimeout(() => {
-    elements.emotes.style.opacity = 0;
-  }, 2000 + EMOTEBENCHMARK.emoteTimer - EMOTEBENCHMARK.turn * 100);
-} //startTurn
+
+  if (!EMOTEBENCHMARK.interval) {
+    EMOTEBENCHMARK.interval = setInterval(start, EMOTEBENCHMARK.turnLength);
+  } else {
+    console.log("interval already running");
+  }
+} //start
+
+function reset() {
+  clearInterval(EMOTEBENCHMARK.interval);
+  stopTimer();
+  elements.start.disabled = false;
+  EMOTEBENCHMARK.interval = null;
+  EMOTEBENCHMARK.turn = 0;
+  EMOTEBENCHMARK.answer = "";
+  elements.emotes.innerHTML = placeholder;
+  elements.qualified.innerHTML = "";
+  elements.output.innerHTML = "";
+  elements.timeBar.style.visibility = "hidden";
+  EMOTEBENCHMARK.qualified = [];
+  EMOTEBENCHMARK.qualifiedCurrentRound = [];
+  EMOTEBENCHMARK.twitchGlobal = false;
+  EMOTEBENCHMARK.bttvGlobal = false;
+  EMOTEBENCHMARK.ffzGlobal = false;
+  EMOTEBENCHMARK.seventvGlobal = false;
+  EMOTEBENCHMARK.twitchChannel = false;
+  EMOTEBENCHMARK.bttvChannel = false;
+  EMOTEBENCHMARK.ffzChannel = false;
+  EMOTEBENCHMARK.seventvChannel = false;
+  elements.twitchGlobal.checked = false;
+  elements.bttvGlobal.checked = false;
+  elements.ffzGlobal.checked = false;
+  elements.seventvGlobal.checked = false;
+  elements.twitchChannel.checked = false;
+  elements.bttvChannel.checked = false;
+  elements.ffzChannel.checked = false;
+  elements.seventvChannel.checked = false;
+  elements.hideName.checked = false;
+  elements.blurEmote.checked = false;
+  elements.emotesPerRound.value = 1;
+  elements.emotesPerRoundLabel.innerHTML = "1";
+  elements.turnLength.value = 15;
+  elements.turnLengthLabel.innerHTML = "15";
+  elements.emoteTimer.value = 2;
+  elements.emoteTimerLabel.innerHTML = "2";
+  EMOTEBENCHMARK.usedEmotes = [];
+} //reset
+
+function animateTimer(time) {
+  let value = {
+    percent: 100,
+  };
+
+  anime({
+    targets: value,
+    percent: 0,
+    round: 1,
+    duration: time,
+    easing: "easeOutQuart",
+    update: function () {
+      elements.progressBar.style.width = `${value.percent}%`;
+      elements.progress.ariaValueNow = value.percent;
+    },
+    complete: function (anim) {
+      elements.emotes.innerHTML = placeholder.repeat(EMOTEBENCHMARK.emotesPerRound);
+      elements.timeBar.style.visibility = "hidden";
+    },
+  });
+} //animateTimer
 
 function startTimer() {
-  elements.timer.style.display = "";
+  elements.timer.style.visibility = "visible";
 
   if (EMOTEBENCHMARK.timer) {
     if (EMOTEBENCHMARK.timer.isRunning()) {
@@ -353,7 +356,7 @@ function stopTimer() {
       EMOTEBENCHMARK.timer.stop();
     }
   }
-  elements.timer.style.display = "none";
+  elements.timer.style.visibility = "hidden";
 } //stopTimer
 
 window.onload = async function () {
@@ -411,17 +414,19 @@ window.onload = async function () {
   };
 
   elements.emotesPerRound.oninput = function () {
+    EMOTEBENCHMARK.emotesPerRound = parseInt(this.value, 10) || 1;
     elements.emotesPerRoundLabel.innerHTML = this.value;
+    elements.emotes.innerHTML = placeholder.repeat(this.value);
   };
   elements.turnLength.oninput = function () {
+    EMOTEBENCHMARK.turnLength = (parseInt(this.value, 10) || 15) * 1000;
     elements.turnLengthLabel.innerHTML = this.value;
   };
   elements.emoteTimer.oninput = function () {
+    EMOTEBENCHMARK.emoteTimer = (parseInt(this.value, 10) || 2) * 1000;
     elements.emoteTimerLabel.innerHTML = this.value;
   };
-  elements.timerDecay.oninput = function () {
-    elements.timerDecayLabel.innerHTML = this.value;
-  };
+
   allEmotes.twitchGlobal = await getGlobalTwitchEmotes(true);
   allEmotes.bttvGlobal = await getGlobalBTTVEmotes(true);
   allEmotes.ffzGlobal = await getGlobalFFZEmotes(true);

@@ -48,6 +48,8 @@ body {
 }
 
 .emote {
+  height: 166px;
+  width: 166px;
   margin: 5px;
   width: fit-content;
   display: inline-block;
@@ -58,13 +60,32 @@ body {
 }
 
 .emote > img {
-  min-height: 112px;
-  max-width: 250px;
+  height: 85%;
 }
 
-#timeBar {
-  background: green;
-  height: 20px;
+.placeholder-emote {
+  height: 166px;
+  width: 166px;
+  display: inline-flex;
+  margin-right: 16px;
+}
+
+.placeholder-emote > .card-body > img {
+  height: 100%;
+  width: 100%;
+  -webkit-filter: blur(5px) grayscale(80%);
+  -moz-filter: blur(5px) grayscale(80%);
+  -o-filter: blur(5px) grayscale(80%);
+  -ms-filter: blur(5px) grayscale(80%);
+  filter: blur(5px) grayscale(80%);
+}
+
+.blur {
+  -webkit-filter: blur(10px) grayscale(80%);
+  -moz-filter: blur(10px) grayscale(80%);
+  -o-filter: blur(10px) grayscale(80%);
+  -ms-filter: blur(10px) grayscale(80%);
+  filter: blur(10px) grayscale(80%);
 }
 
 #settingsOffcanvas {
@@ -73,4 +94,9 @@ body {
 
 #settingsOffcanvas > .offcanvas-body {
   padding-bottom: 200px;
+}
+
+.qualified {
+  font-size: 16px;
+  text-shadow: 1px 1px 4px #000000;
 }
