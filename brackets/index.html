@@ -133,6 +133,47 @@
       </div>
     </div>
 
+    <div class="modal fade" id="createBracketModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Create a new bracket</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="hstack gap-3 mb-5">
+              <button type="button" class="btn btn-success btn-lg" data-bs-dismiss="modal" id="createBracket">
+                <div class="hstack"><i class="material-icons notranslate">add</i> Create empty bracket</div>
+              </button>
+              Creates an empty bracket that you have to fill out manually
+            </div>
+            <div class="hstack gap-3 mb-5">
+              <button type="button" class="btn btn-info btn-lg" data-bs-dismiss="modal" id="importBracket">
+                <div class="hstack"><i class="material-icons notranslate">auto_awesome</i> Generate bracket</div>
+              </button>
+              Automatically generates a bracket from 3rd party sources
+              <i
+                class="material-icons notranslate"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                data-bs-title="Sources include: Spotify playlists, TierMaker.com tier list, Twitch clips & emotes, UwUFUFU.com brackets, YouTube channels & playlists"
+                >help
+              </i>
+            </div>
+            <div class="hstack gap-3">
+              <button type="button" class="btn btn-primary btn-lg" data-bs-dismiss="modal" onclick="loadApproved()">
+                <div class="hstack"><i class="material-icons notranslate">search</i> Browse brackets</div>
+              </button>
+              Browse and download brackets created by other users
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="modal fade" id="generateModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -167,8 +208,8 @@
                   aria-label="Spotify Playlist link"
                   aria-describedby="spotifyPlaylistLinkLabel"
                 />
+                <button type="button" class="btn btn-outline-info" onclick="previewSpotifyPlaylist()"><i class="material-icons notranslate">file_download</i> Load</button>
               </div>
-              <button type="button" class="btn btn-info float-end" onclick="previewSpotifyPlaylist()"><i class="material-icons notranslate">preview</i> Preview</button>
               <div id="spotifyPlaylistPreview" class="generate-preview"></div>
             </div>
 
@@ -184,8 +225,8 @@
                   aria-label="TierMaker.com link"
                   aria-describedby="tiermakerLinkLabel"
                 />
+                <button type="button" class="btn btn-outline-info" onclick="previewTiermaker()"><i class="material-icons notranslate">file_download</i> Load</button>
               </div>
-              <button type="button" class="btn btn-info float-end" onclick="previewTiermaker()"><i class="material-icons notranslate">preview</i> Preview</button>
               <div id="tiermakerPreview" class="generate-preview"></div>
             </div>
 
@@ -194,8 +235,8 @@
               <div class="input-group mb-3">
                 <span class="input-group-text" id="clipsChannelLabel">twitch.tv/</span>
                 <input type="text" class="form-control generate-value" id="clipsChannel" placeholder="username" aria-label="Twitch username" aria-describedby="clipsChannelLabel" />
+                <button type="button" class="btn btn-outline-info" onclick="previewClips()"><i class="material-icons notranslate">file_download</i> Load</button>
               </div>
-              <button type="button" class="btn btn-info float-end" onclick="previewClips()"><i class="material-icons notranslate">preview</i> Preview</button>
               <div id="clipsPreview" class="generate-preview"></div>
             </div>
 
@@ -204,8 +245,8 @@
               <div class="input-group mb-3">
                 <span class="input-group-text" id="emotesChannelLabel">twitch.tv/</span>
                 <input type="text" class="form-control generate-value" id="emotesChannel" placeholder="username" aria-label="Twitch username" aria-describedby="emotesChannelLabel" />
+                <button type="button" class="btn btn-outline-info" onclick="previewEmotes()"><i class="material-icons notranslate">file_download</i> Load</button>
               </div>
-              <button type="button" class="btn btn-info float-end" onclick="previewEmotes()"><i class="material-icons notranslate">preview</i> Preview</button>
               <div id="emotesPreview" class="generate-preview"></div>
             </div>
 
@@ -221,8 +262,8 @@
                   aria-label="uwufufu URL"
                   aria-describedby="uwufufuLinkLabel"
                 />
+                <button type="button" class="btn btn-outline-info" onclick="previewUwufufu()"><i class="material-icons notranslate">file_download</i> Load</button>
               </div>
-              <button type="button" class="btn btn-info float-end" onclick="previewUwufufu()"><i class="material-icons notranslate">preview</i> Preview</button>
               <div id="uwufufuPreview" class="generate-preview"></div>
             </div>
 
@@ -231,8 +272,8 @@
               <div class="input-group mb-3">
                 <span class="input-group-text" id="ytchannelLinkLabel">YouTube handle</span>
                 <input type="text" class="form-control generate-value" id="ytchannelLink" placeholder="@username" aria-label="YouTube channel URL" aria-describedby="ytchannelLinkLabel" />
+                <button type="button" class="btn btn-outline-info" onclick="previewYTChannel()"><i class="material-icons notranslate">file_download</i> Load</button>
               </div>
-              <button type="button" class="btn btn-info float-end" onclick="previewYTChannel()"><i class="material-icons notranslate">preview</i> Preview</button>
               <div id="ytchannelPreview" class="generate-preview"></div>
             </div>
 
@@ -248,12 +289,13 @@
                   aria-label="YouTube playlist URL"
                   aria-describedby="ytplaylistLinkLabel"
                 />
+                <button type="button" class="btn btn-outline-info" onclick="previewYTPlaylist()"><i class="material-icons notranslate">file_download</i> Load</button>
               </div>
-              <button type="button" class="btn btn-info float-end" onclick="previewYTPlaylist()"><i class="material-icons notranslate">preview</i> Preview</button>
               <div id="ytplaylistPreview" class="generate-preview"></div>
             </div>
           </div>
           <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#createBracketModal"><i class="material-icons notranslate">arrow_back</i> Back</button>
             <button type="button" class="btn btn-success" onclick="generateBracket()"><i class="material-icons notranslate">auto_awesome</i> Generate</button>
           </div>
         </div>
@@ -269,6 +311,7 @@
           </div>
           <div class="modal-body" style="max-height: 80vh; overflow: auto" id="browseModalBody">nothing here :)</div>
           <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#createBracketModal"><i class="material-icons notranslate">arrow_back</i> Back</button>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </div>
         </div>
@@ -752,9 +795,10 @@
       <div class="row">
         <div class="col-md-1"></div>
         <div class="col-md-5">
-          <button type="button" class="btn btn-success btn-lg" id="createBracket"><i class="material-icons notranslate">add_circle_outline</i> Create new bracket</button>
-          <button type="button" class="btn btn-info btn-lg" id="importBracket"><i class="material-icons notranslate">auto_awesome</i> Generate bracket</button>
-          <button type="button" class="btn btn-primary btn-lg" onclick="loadApproved()"><i class="material-icons notranslate">search</i> Browse brackets</button>
+          <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#createBracketModal">
+            <i class="material-icons notranslate">add_circle_outline</i> Create new bracket
+          </button>
+
           <h1 class="display-3">My brackets</h1>
           <div id="myBrackets">
             <span class="text-body-secondary">Nothing here</span>

@@ -11,7 +11,7 @@ let elements = {
 
   previewModal: document.getElementById("previewModal"),
   previewModalBody: document.getElementById("previewModalBody"),
-
+  createBracketModal: document.getElementById("createBracketModal"),
   generateModal: document.getElementById("generateModal"),
   generateBracketType: document.getElementById("generateBracketType"),
   spotifyplaylistSettings: document.getElementById("spotifyplaylistSettings"),
@@ -154,7 +154,7 @@ let darkTheme = true;
 
 let client;
 let loginButton;
-let loginExpiredModal, deleteBracketModal, quitBracketModal, tierlistEditorModal, previewModal, generateModal, browseModal, startModal;
+let loginExpiredModal, deleteBracketModal, quitBracketModal, tierlistEditorModal, previewModal, createBracketModal, generateModal, browseModal, startModal;
 let votePopover, votePopoverTierlist;
 let currentBracket = {};
 let currentTierlist = {};
@@ -552,8 +552,8 @@ function addOption(name = "", type = "", value = "", thumbnail = "") {
         </div>
 
         <div class="input-group mb-3">
-          <span class="input-group-text">Tier list thumbnail</span>
-          <input type="text" class="form-control option-thumbnail" data-option-id="${optionNumber}" onchange="saveBracket()" value="${thumbnail}" placeholder="Tier list thumbnail" aria-label="Tier list thumbnail" />
+          <span class="input-group-text">Thumbnail</span>
+          <input type="text" class="form-control option-thumbnail" data-option-id="${optionNumber}" onchange="saveBracket()" value="${thumbnail}" placeholder="Thumbnail" aria-label="Thumbnail" />
         </div>
       </div>
     </div>`
@@ -1899,7 +1899,7 @@ async function generateBracket() {
   }
 
   if (previewedBracket.length == 0) {
-    showToast("You must preview the bracket first", "warning", 3000);
+    showToast(`You must <button type="button" class="btn btn-info" ><i class="material-icons notranslate">file_download</i> Load</button> the bracket first`, "warning", 3000);
     return;
   }
   createBracket(true, type);
@@ -2291,6 +2291,7 @@ window.onload = async function () {
   quitBracketModal = new bootstrap.Modal(elements.quitBracketModal);
   tierlistEditorModal = new bootstrap.Modal(elements.tierlistEditorModal);
   previewModal = new bootstrap.Modal(elements.previewModal);
+  createBracketModal = new bootstrap.Modal(elements.createBracketModal);
   generateModal = new bootstrap.Modal(elements.generateModal);
   browseModal = new bootstrap.Modal(elements.browseModal);
   startModal = new bootstrap.Modal(elements.startModal);
