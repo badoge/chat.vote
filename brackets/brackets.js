@@ -1479,9 +1479,8 @@ function loadBrackets() {
     <div class="card-header">
       ${BRACKETS.brackets[index].title || "Untitled bracket"} ${warning}
       <div class="btn-group btn-group-sm float-end" role="group" aria-label="bracket controls">
-        <button type="button" class="btn btn-success"
-         data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Start bracket" onclick="showStartModal(${BRACKETS.brackets[index].id})">
-          <i class="material-icons notranslate">play_arrow</i>
+        <button type="button" class="btn btn-success" onclick="showStartModal(${BRACKETS.brackets[index].id})">
+          <i class="material-icons notranslate">play_arrow</i> Start bracket
         </button>
         <button type="button" class="btn btn-secondary" ${BRACKETS.brackets[index]?.generated ? `style="display: none"` : ""}
         data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Publish bracket" onclick="publishBracket(${BRACKETS.brackets[index].id},this)">
