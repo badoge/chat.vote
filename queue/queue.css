@@ -57,21 +57,8 @@
   max-width: 100%;
 }
 
-#openOffcanvasbtn {
-  position: fixed;
-  bottom: 10px;
-  left: 0;
-  transform-origin: bottom left;
-  border-radius: 0 1em 1em 0;
-  z-index: 0;
-}
-
 .values {
   margin: -10px;
-}
-
-.offcanvas {
-  width: 80% !important;
 }
 
 #toastContainer {
@@ -79,6 +66,10 @@
   position: fixed;
   top: 1%;
   width: 15vw;
+}
+
+#settingsOffcanvas {
+  width: 40vw;
 }
 
 .custom-popover {
@@ -114,15 +105,13 @@
   cursor: pointer;
 }
 
-.offcanvas-body {
-  padding-top: 5px;
-  padding-left: 5px;
+iframe {
+  border-radius: 6px;
 }
 
 #queueList {
-  height: 85vh;
+  height: 57.3vh;
   overflow-y: scroll;
-  margin-top: 10px;
 }
 
 #profileLink > i,
@@ -135,6 +124,7 @@
 #profileLink {
   border-color: #d3c22e;
   cursor: pointer;
+  width: 15vw;
 }
 
 #copyLinkButton:hover {
@@ -143,12 +133,5 @@
 }
 
 #playersCard {
-  margin-top: 10px;
   height: 85vh;
-}
-
-#offcanvasSettings {
-  width: 50% !important;
-  height: 50% !important;
-  overflow-y: scroll;
 }

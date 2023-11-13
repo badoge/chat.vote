@@ -1,82 +1,83 @@
-function copyLink(link) {
-  navigator.clipboard.writeText(link);
-  copyTooltip.show();
-  setTimeout(() => {
-    copyTooltip.hide();
-  }, 1000);
-} //copyLink
-
 let elements = {
-  //modals
-  modal1: document.getElementById("modal1"),
-  modal2: document.getElementById("modal2"),
-  modal3: document.getElementById("modal3"),
-  modal4: document.getElementById("modal4"),
-  modal5: document.getElementById("modal5"),
-  modal6: document.getElementById("modal6"),
-  modal7: document.getElementById("modal7"),
-  modal8: document.getElementById("modal8"),
-  modal9: document.getElementById("modal9"),
-  modal10: document.getElementById("modal10"),
+  loginExpiredModal: document.getElementById("loginExpiredModal"),
+  resetSettingsModal: document.getElementById("resetSettingsModal"),
 
   //navbar
+  vtsLink: document.getElementById("vtsLink"),
   status: document.getElementById("status"),
-  botStatus: document.getElementById("botStatus"),
   topRight: document.getElementById("topRight"),
   loginButton: document.getElementById("loginButton"),
+  channelName: document.getElementById("channelName"),
+  darkTheme: document.getElementById("darkTheme"),
 };
 
 let client;
 let color = "";
 let currentTime = 0;
 let loginButton;
-let modal1, modal2, modal3, modal4, modal5, modal6, modal7, modal8, modal9, modal10;
 
-let QUEUE = {
-  userID: "",
+let loginExpiredModal, resetSettingsModal;
+
+let USER = {
   channel: "",
+  twitchLogin: false,
   access_token: "",
-  refresh_token: "",
+  userID: "",
   platform: "",
 };
 
-function refreshData() {} //refreshdata
+let QUEUE = {};
+
+async function refreshData() {
+  darkTheme = elements.darkTheme.checked ?? true;
+  if (!USER.twitchLogin) {
+    USER.channel = validator.escape(elements.channelName.value.replace(/\s+/g, "").toLowerCase());
+    USER.platform = "twitch";
+  }
+  if (!USER.userID && USER.channel) {
+    USER.userID = await getUserID(USER.channel);
+  }
+} //refreshdata
 
 function saveSettings() {
   refreshData();
+  localStorage.setItem("USER", JSON.stringify(USER));
   localStorage.setItem("QUEUE", JSON.stringify(QUEUE));
+  localStorage.setItem("darkTheme", darkTheme);
 } //saveSettings
 
 function load_localStorage() {
-  if (!localStorage.getItem("QUEUE")) {
+  if (!localStorage.getItem("USER")) {
     console.log("localStorage user info not found");
   } else {
-    QUEUE = JSON.parse(localStorage.getItem("QUEUE"));
+    USER = JSON.parse(localStorage.getItem("USER"));
+    elements.channelName.value = USER.channel;
   }
 
   if (!localStorage.getItem("QUEUE")) {
     console.log("localStorage settings not found");
   } else {
+    QUEUE = JSON.parse(localStorage.getItem("QUEUE"));
   }
 } //load_localStorage
 
-function resetSettings() {
-  localStorage.setItem(
-    "QUEUE",
-    JSON.stringify({
-      userID: "",
-      channel: "",
-      access_token: "",
-      refresh_token: "",
-      platform: "",
-    })
-  );
+function resetSettings(logout = false) {
+  if (logout) {
+    localStorage.setItem(
+      "USER",
+      JSON.stringify({
+        channel: "",
+        twitchLogin: false,
+        access_token: "",
+        userID: "",
+        platform: "",
+      })
+    );
+  }
   localStorage.setItem("QUEUE", JSON.stringify({}));
   location.reload();
   return false;
 } //resetSettings
-
-function reset() {} //reset
 
 function login() {
   elements.topRight.innerHTML = `<div class="btn-group" role="group" aria-label="log in button group">
@@ -84,7 +85,7 @@ function login() {
     <div class="btn-group" role="group">
         <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
       </button>
-        <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="btnGroupDrop1">
+        <ul class="dropdown-menu dropdown-menu-lg-end" aria-label="Log out">
             <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
         </ul>
     </div>
@@ -104,14 +105,16 @@ function connect() {
   <div class="btn-group" role="group" aria-label="log in button group">
   <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></button>
   <div class="btn-group" role="group">
-  <button id="btnGroupDroplogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
-  <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="btnGroupDrop1">
+  <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
+  <ul class="dropdown-menu dropdown-menu-lg-end" aria-label="Log out">
   <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
   </ul>
   </div>
   </div>`;
 
   refreshData();
+  loadBadges(USER.channel);
+
   let options = {
     options: {
       clientId: CLIENT_ID,
@@ -121,7 +124,7 @@ function connect() {
       secure: true,
       reconnect: true,
     },
-    channels: [QUEUE.channel],
+    channels: [USER.channel],
   };
   client = new tmi.client(options);
 
@@ -137,8 +140,8 @@ function connect() {
     console.log(`Connected to ${address}:${port}`);
     elements.status.innerHTML = `<h4><span class="badge bg-success">Connected :)</span></h4>`;
     saveSettings();
-    sendUsername(`chat.vote/queue`, QUEUE.channel, QUEUE.platform);
-    if (await checkTags(QUEUE.userID, QUEUE.access_token)) {
+    sendUsername(`chat.vote/queue`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
+    if (await checkTags(USER.userID, USER.access_token)) {
       elements.vtsLink.style.display = "";
     }
     loadPFP();
@@ -156,33 +159,58 @@ function connect() {
 } //connect
 
 async function loadPFP() {
-  if (!QUEUE.channel) {
-    elements.topRight.innerHTML = `<a
-    role="button"
-    id="loginButton"
-    onclick="login()"
-    class="btn btn-twitch"
-    tabindex="0"
-    data-bs-container="body"
-    data-bs-custom-class="custom-popover"
-    data-bs-placement="bottom"
-    data-bs-trigger="manual"
-    data-bs-toggle="popover"
-    data-bs-title="Not signed in"
-    data-bs-content="You need sign in first">
-    <span class="twitch-icon"></span>Sign in with Twitch</a>`;
+  if (!USER.channel) {
+    elements.topRight.innerHTML = ` <div class="btn-group" role="group" aria-label="login options">
+    <a
+      role="button"
+      id="loginButton"
+      onclick="login()"
+      class="btn btn-twitch"
+      tabindex="0"
+      data-bs-container="body"
+      data-bs-custom-class="custom-popover"
+      data-bs-placement="bottom"
+      data-bs-trigger="manual"
+      data-bs-toggle="popover"
+      data-bs-title="Not signed in"
+      data-bs-content="You need sign in first before adding options or enabling voting/suggestions"
+      ><span class="twitch-icon"></span>Sign in with Twitch</a
+    >
+    <div class="btn-group" role="group">
+      <button
+        id="btnGroupDropLogin"
+        type="button"
+        class="btn btn-twitch dropdown-toggle"
+        data-bs-toggle="dropdown"
+        data-bs-auto-close="outside"
+        aria-label="other login option, connect manually"
+        aria-expanded="false"
+      ></button>
+      <div class="dropdown-menu dropdown-menu-end" aria-labelledby="btnGroupDropLogin">
+        <div class="p-3" style="width: 300px">
+          <label for="channelName" class="form-label">Connect to chat directly</label>
+          <div class="input-group mb-3">
+            <span class="input-group-text" id="directLoginChannel">twitch.tv/</span>
+            <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
+          </div>
+          <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
+          <button type="button" onclick="connect()" class="btn btn-primary float-end">Connect</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
     return;
   }
-  let profilepicurl = await get7TVPFP(QUEUE.userID);
-  if (profilepicurl == "/pics/donk.png" && QUEUE.access_token) {
-    profilepicurl = await getTwitchPFP(QUEUE.channel, QUEUE.access_token);
+  let profilepicurl = await get7TVPFP(USER.userID);
+  if (profilepicurl == "/pics/donk.png" && USER.access_token) {
+    profilepicurl = await getTwitchPFP(USER.channel, USER.access_token);
   }
   elements.topRight.innerHTML = `
   <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
-  <button type="button" class="btn btn-secondary"><img src="${profilepicurl}" alt="profile pic" style="height:2em;"></button>
+  <button type="button" id="btnGroupDrop2" class="btn btn-${darkTheme ? "dark" : "secondary"}"><img src="${profilepicurl}" alt="profile pic" style="height:2em;"></button>
   <div class="btn-group" role="group">
-  <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-  ${QUEUE.channel}
+  <button id="btnGroupDrop1" type="button" class="btn btn-${darkTheme ? "dark" : "secondary"} dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+  ${USER.channel}
   </button>
   <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="btnGroupDrop1">
   <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
@@ -192,7 +220,7 @@ async function loadPFP() {
 } //loadPFP
 
 function checkLogin() {
-  if (!QUEUE.channel) {
+  if (!USER.channel) {
     loginButton.show();
     setTimeout(function () {
       loginButton.hide();
@@ -202,12 +230,9 @@ function checkLogin() {
   return true;
 } //checkLogin
 
-function firstMessageWarning(username) {
-  showToast(`<i class="material-icons notranslate">warning_amber</i>${username}'s first ever message in chat was a vote.`, "warning", 3000);
-} //firstMessageWarning
-
 function logout() {
-  elements.topRight.innerHTML = `<a
+  elements.topRight.innerHTML = ` <div class="btn-group" role="group" aria-label="login options">
+  <a
     role="button"
     id="loginButton"
     onclick="login()"
@@ -219,47 +244,95 @@ function logout() {
     data-bs-trigger="manual"
     data-bs-toggle="popover"
     data-bs-title="Not signed in"
-    data-bs-content="You need sign in first">
-    <span class="twitch-icon"></span>Sign in with Twitch</a>`;
-  resetSettings();
+    data-bs-content="You need sign in first before adding options or enabling voting/suggestions"
+    ><span class="twitch-icon"></span>Sign in with Twitch</a
+  >
+  <div class="btn-group" role="group">
+    <button
+      id="btnGroupDropLogin"
+      type="button"
+      class="btn btn-twitch dropdown-toggle"
+      data-bs-toggle="dropdown"
+      data-bs-auto-close="outside"
+      aria-label="other login option, connect manually"
+      aria-expanded="false"
+    ></button>
+    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="btnGroupDropLogin">
+      <div class="p-3" style="width: 300px">
+        <label for="channelName" class="form-label">Connect to chat directly</label>
+        <div class="input-group mb-3">
+          <span class="input-group-text" id="directLoginChannel">twitch.tv/</span>
+          <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
+        </div>
+        <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
+        <button type="button" onclick="connect()" class="btn btn-primary float-end">Connect</button>
+      </div>
+    </div>
+  </div>
+</div>`;
+  resetSettings(true);
 } //logout
 
 async function loadAndConnect() {
   load_localStorage();
   refreshData();
-
-  if (QUEUE.channel) {
+  const params = new Proxy(new URLSearchParams(window.location.search), {
+    get: (searchParams, prop) => searchParams.get(prop),
+  });
+  if (params.channel && !USER.channel && !USER.twitchLogin && !USER.access_token && !USER.userID) {
+    let input = params.channel.replace(/\s+/g, "").toLowerCase();
+    elements.channelName.value = input;
+    USER.channel = input;
+    window.history.replaceState({}, document.title, "/");
+  }
+  if (USER.twitchLogin && !(await checkToken(USER.access_token))) {
+    USER.channel = "";
+    loginExpiredModal.show();
+    return;
+  }
+  if (USER.channel) {
     connect();
   }
 } //loadAndConnect
 
-window.onload = function () {
-  //loadAndConnect();
+function copyLink() {
+  navigator.clipboard.writeText(`https://queue.chat.vote/${USER.channel || ""}`);
+  copyTooltip.show();
+  setTimeout(() => {
+    copyTooltip.hide();
+  }, 1000);
+} //copyLink
 
-  if (!QUEUE.channel) {
+function switchTheme(checkbox) {
+  document.documentElement.setAttribute("data-bs-theme", checkbox ? "dark" : "light");
+  document.getElementById("twitchLogo").style.filter = `invert(${checkbox ? 0.25 : 0.65})`;
+  if (document.getElementById("btnGroupDrop1") && document.getElementById("btnGroupDrop2")) {
+    document.getElementById("btnGroupDrop1").classList.remove(`${checkbox ? "btn-secondary" : "btn-dark"}`);
+    document.getElementById("btnGroupDrop1").classList.add(`${checkbox ? "btn-dark" : "btn-secondary"}`);
+    document.getElementById("btnGroupDrop2").classList.remove(`${checkbox ? "btn-secondary" : "btn-dark"}`);
+    document.getElementById("btnGroupDrop2").classList.add(`${checkbox ? "btn-dark" : "btn-secondary"}`);
+  }
+} //switchTheme
+
+window.onload = function () {
+  darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
+  elements.darkTheme.checked = darkTheme ?? true;
+  switchTheme(elements.darkTheme.checked);
+
+  loadAndConnect();
+
+  loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
+  resetSettingsModal = new bootstrap.Modal(elements.resetSettingsModal);
+
+  if (!USER.channel) {
     loginButton = new bootstrap.Popover(elements.loginButton);
   }
 
-  //   modal1 = new bootstrap.Modal(elements.modal1);
-  //   modal2 = new bootstrap.Modal(elements.modal2);
-  //   modal3 = new bootstrap.Modal(elements.modal3);
-  //   modal4 = new bootstrap.Modal(elements.modal4);
-  //   modal5 = new bootstrap.Modal(elements.modal5);
-  //   modal6 = new bootstrap.Modal(elements.modal6);
-  //   modal7 = new bootstrap.Modal(elements.modal7);
-  //   modal8 = new bootstrap.Modal(elements.modal8);
-  //   modal9 = new bootstrap.Modal(elements.modal9);
-  //   modal10 = new bootstrap.Modal(elements.modal10);
+  elements.darkTheme.onchange = function () {
+    switchTheme(this.checked);
+    saveSettings();
+  };
 
   enableTooltips();
   enablePopovers();
-
-  const offcanvasElementList = document.querySelectorAll(".offcanvas");
-  const offcanvasList = [...offcanvasElementList].map((offcanvasEl) => new bootstrap.Offcanvas(offcanvasEl));
 }; //onload
-
-window.onbeforeunload = function () {
-  disconnectBot();
-
-  return null;
-}; //onbeforeunload
