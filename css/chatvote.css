@@ -40,6 +40,10 @@ body {
   padding-right: 10px;
 }
 
+#enterPollOptionCardBody > .input-group {
+  padding-bottom: 10px;
+}
+
 .card-header,
 #hideQuestion:hover,
 .cursorPointer {
@@ -176,13 +180,6 @@ th {
   margin-bottom: 0px !important;
 }
 
-#tableAndChartDiv {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  white-space: normal;
-}
-
 #enableVoting,
 #enableVotingDropdown {
   height: 62px;
@@ -193,7 +190,7 @@ th {
 }
 
 #tableAndChartDiv > .card-body {
-  padding: 5px;
+  padding: 10px;
 }
 
 #mainButtonsCard {
