@@ -85,98 +85,234 @@
 
     <div class="offcanvas offcanvas-start" tabindex="-1" id="settingsOffcanvas" aria-labelledby="settingsOffcanvasLabel">
       <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="settingsOffcanvasLabel">Settings</h5>
+        <h5 class="offcanvas-title" id="settingsOffcanvasLabel"><i class="material-icons notranslate">settings</i>Settings</h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
       </div>
       <div class="offcanvas-body">
         <div class="container-fluid">
           <div class="row">
-            <div class="col-xl-6">
-              <div class="card border">
-                <div class="card-header">Enabled Platforms</div>
+            <div class="col-xl-5">
+              <div class="card mb-3">
+                <div class="card-header"><i class="material-icons notranslate">checklist</i>Enabled Platforms</div>
                 <div class="card-body">
                   <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked />
-                    <label class="form-check-label" for="flexSwitchCheckChecked">Youtube</label>
+                    <input class="form-check-input" type="checkbox" role="switch" id="allowSpotify" checked />
+                    <label class="form-check-label" for="allowSpotify">Spotify</label>
+                  </div>
+
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="allowTwitch" checked />
+                    <label class="form-check-label" for="allowTwitch">Twitch</label>
+                  </div>
+                  <div class="form-check form-switch ms-5">
+                    <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchClips" checked />
+                    <label class="form-check-label" for="allowTwitch">Clips</label>
+                  </div>
+                  <div class="form-check form-switch ms-5">
+                    <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchStreams" checked />
+                    <label class="form-check-label" for="allowTwitch">Live Streams</label>
+                  </div>
+                  <div class="form-check form-switch ms-5">
+                    <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchVODs" checked />
+                    <label class="form-check-label" for="allowTwitch">VODs</label>
                   </div>
                   <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked />
-                    <label class="form-check-label" for="flexSwitchCheckChecked">Spotify</label>
+                    <input class="form-check-input" type="checkbox" role="switch" id="allowYT" checked />
+                    <label class="form-check-label" for="allowYT">Youtube</label>
                   </div>
-                  <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked />
-                    <label class="form-check-label" for="flexSwitchCheckChecked">SoundCloud</label>
+                  <div class="form-check form-switch ms-5">
+                    <input class="form-check-input" type="checkbox" role="switch" id="allowYTStreams" checked />
+                    <label class="form-check-label" for="allowTwitch">Live Streams</label>
                   </div>
-                  <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked />
-                    <label class="form-check-label" for="flexSwitchCheckChecked">Twitch</label>
+                  <div class="form-check form-switch ms-5">
+                    <input class="form-check-input" type="checkbox" role="switch" id="allowYTShorts" checked />
+                    <label class="form-check-label" for="allowTwitch">Shorts</label>
                   </div>
                 </div>
               </div>
 
-              <div class="card border">
-                <div class="card-header">Queue Settings</div>
+              <div class="card mb-3">
+                <div class="card-header"><i class="material-icons notranslate">settings</i>Queue Settings</div>
                 <div class="card-body">
-                  <div class="form-check form-switch">
-                    <input type="checkbox" class="form-check-input" id="subMode" aria-describedby="submodedesc" />
-                    <label class="form-check-label" for="subMode"><i class="material-icons notranslate">attach_money</i>Subscribers only queue</label>
-                    <small id="submodedesc" class="text-body-secondary"><br />asdasd</small>
+                  <h6>Max queue length</h6>
+                  <div class="input-group flex-nowrap">
+                    <input type="number" aria-label="Max queue length" id="maxLength" placeholder="0" min="0" class="form-control" />
+                    <select class="form-select" id="maxLengthUnit" onchange="saveSettings()">
+                      <option selected value="m">Minutes</option>
+                      <option value="h">Hours</option>
+                    </select>
                   </div>
+                  <small class="form-text text-body-secondary">The max duration of all videos/songs added up</small>
 
-                  <div class="input-group">
-                    <span class="input-group-text">Request limit</span>
-                    <input
-                      type="number"
-                      id="suggestionLimit"
-                      style="max-width: 5em"
-                      class="form-control"
-                      min="1"
-                      placeholder="1"
-                      value="1"
-                      aria-label="Text input with checkbox for suggestion limit"
-                    />
+                  <h6 class="mt-3">Max song/video length</h6>
+                  <div class="input-group flex-nowrap">
+                    <input type="number" aria-label="Max queue length" id="maxLength" placeholder="0" min="0" class="form-control" />
+                    <span class="input-group-text">Minutes</span>
                   </div>
-                  <small class="text-body-secondary">asdasd.</small>
+                  <small class="form-text text-body-secondary">How long a single video/song can be</small>
+
+                  <div class="input-group flex-nowrap mt-3">
+                    <span class="input-group-text">Max queue size</span>
+                    <input type="number" aria-label="Max queue length" id="maxLength" placeholder="0" min="0" class="form-control" />
+                  </div>
+                  <small class="form-text text-body-secondary">How many videos/songs are allowed to be in the queue</small>
                 </div>
               </div>
 
-              <div class="input-group mb-0">
-                <span class="input-group-text redborder"><i class="material-icons notranslate">restore</i>Restore default settings</span>
+              <div class="input-group">
                 <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#resetSettingsModal">
-                  <i class="material-icons notranslate">delete_forever</i>Reset settings
+                  <i class="material-icons notranslate">restore</i>Reset settings
                 </button>
               </div>
               <small class="text-body-secondary">Resets all settings and reloads the page.</small>
             </div>
-            <div class="col-xl-6">
-              <div class="card border">
-                <div class="card-header">Chat Commands</div>
-
+            <div class="col-xl-7">
+              <div class="card mb-3">
+                <div class="card-header"><i class="material-icons notranslate">chat</i>Chat Commands</div>
                 <div class="card-body">
                   <div class="form-group mb-3">
-                    <label for="votePrefix">Song Request</label>
-                    <input type="text" class="form-control notranslate" id="votePrefix" value="!sr" aria-describedby="description2" />
-                    <small id="description2" class="text-body-secondary">asdasd</small>
+                    <label for="requestCommand">Request</label>
+                    <div class="input-group">
+                      <input type="text" id="requestCommand" value="!request" aria-label="Request command" placeholder="command" class="form-control" />
+                      <input type="text" id="requestCommandAlias" value="!r" aria-label="Request command alias" placeholder="alias" class="form-control" />
+                    </div>
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" role="switch" id="noCommand" />
+                      <label class="form-check-label" for="noCommand">Add any link in chat to the queue</label>
+                    </div>
                   </div>
                   <div class="form-group mb-3">
-                    <label for="votePrefix">Song Request</label>
-                    <input type="text" class="form-control notranslate" id="votePrefix" value="!sr" aria-describedby="description2" />
-                    <small id="description2" class="text-body-secondary">asdasd</small>
+                    <label for="voteskipCommand">Vote Skip</label>
+                    <div class="input-group">
+                      <input type="text" id="voteskipCommand" value="!voteskip" aria-label="vote skip command" placeholder="command" class="form-control" />
+                      <input type="text" id="voteskipCommandAlias" value="!vs" aria-label="vote skip command alias" placeholder="alias" class="form-control" />
+                    </div>
+                    <div class="input-group flex-nowrap mt-2">
+                      <span class="input-group-text">Skip after</span>
+                      <input type="number" aria-label="Max queue length" id="maxLength" placeholder="0" min="0" class="form-control" />
+                      <span class="input-group-text">votes</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card mb-3">
+                <div class="card-header"><i class="material-icons notranslate">smart_toy</i>Bot Commands</div>
+                <div class="card-body">
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" role="switch" id="enableBot" />
+                    <label class="form-check-label" for="enableBot"><i class="material-icons notranslate">smart_toy</i>Enable chat bot</label>
+                    <br /><small class="text-body-secondary"></small>
                   </div>
                   <div class="form-group mb-3">
-                    <label for="votePrefix">Song Request</label>
-                    <input type="text" class="form-control notranslate" id="votePrefix" value="!sr" aria-describedby="description2" />
-                    <small id="description2" class="text-body-secondary">asdasd</small>
+                    <label for="requestCommand">Song name</label>
+                    <div class="input-group">
+                      <input type="text" id="requestCommand" value="!song" aria-label="Request command" placeholder="command" class="form-control" />
+                      <input type="text" id="requestCommandAlias" value="!s" aria-label="Request command alias" placeholder="alias" class="form-control" />
+                    </div>
                   </div>
                   <div class="form-group mb-3">
-                    <label for="votePrefix">Song Request</label>
-                    <input type="text" class="form-control notranslate" id="votePrefix" value="!sr" aria-describedby="description2" />
-                    <small id="description2" class="text-body-secondary">asdasd</small>
+                    <label for="requestCommand">Queue</label>
+                    <div class="input-group">
+                      <input type="text" id="requestCommand" value="!queue" aria-label="Request command" placeholder="command" class="form-control" />
+                      <input type="text" id="requestCommandAlias" value="!q" aria-label="Request command alias" placeholder="alias" class="form-control" />
+                    </div>
                   </div>
-                  <div class="form-group mb-3">
-                    <label for="votePrefix">Song Request</label>
-                    <input type="text" class="form-control notranslate" id="votePrefix" value="!sr" aria-describedby="description2" />
-                    <small id="description2" class="text-body-secondary">asdasd</small>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header"><i class="material-icons notranslate">group</i>Who can send requests</div>
+                <div class="card-body">
+                  <p id="whoCanRequest">Everyone will be able to send requests.</p>
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th scope="col">Role</th>
+                        <th
+                          scope="col"
+                          data-bs-toggle="tooltip"
+                          data-bs-delay="200"
+                          data-bs-placement="top"
+                          data-bs-title="How many requests each user can make, The limit stacks for viewers that have more than 1 role"
+                        >
+                          Request limit
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="table-group-divider">
+                      <tr>
+                        <th scope="row">
+                          <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="allowPlebs" onchange="saveSettings()" checked />
+                            <label class="form-check-label" for="allowPlebs">Non subscriber</label>
+                          </div>
+                        </th>
+                        <td>
+                          <input type="number" style="width: 80px" class="form-control" id="plebBonus" onchange="saveSettings()" value="0" min="0" placeholder="0" />
+                        </td>
+                      </tr>
+                      <tr style="display: none">
+                        <th scope="row">
+                          <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="allowFollowers" onchange="saveSettings()" checked />
+                            <label class="form-check-label" for="allowFollowers">Follower</label>
+                          </div>
+                        </th>
+                        <td>
+                          <input type="number" style="width: 80px" class="form-control" id="plebBonus" onchange="saveSettings()" value="0" min="0" placeholder="0" />
+                        </td>
+                      </tr>
+                      <tr id="subsRow">
+                        <th scope="row">
+                          <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="allowSubs" onchange="saveSettings()" checked />
+                            <label class="form-check-label" for="allowSubs">Subscriber</label>
+                          </div>
+                        </th>
+                        <td>
+                          <input type="number" style="width: 80px" class="form-control" id="plebBonus" onchange="saveSettings()" value="0" min="0" placeholder="0" />
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <th scope="row">
+                          <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="allowMods" onchange="saveSettings()" checked />
+                            <label class="form-check-label" for="allowMods">Mod</label>
+                          </div>
+                        </th>
+                        <td>
+                          <input type="number" style="width: 80px" class="form-control" id="plebBonus" onchange="saveSettings()" value="0" min="0" placeholder="0" />
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">
+                          <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="allowVips" onchange="saveSettings()" checked />
+                            <label class="form-check-label" for="allowVips">VIP</label>
+                          </div>
+                        </th>
+                        <td>
+                          <input type="number" style="width: 80px" class="form-control" id="plebBonus" onchange="saveSettings()" value="0" min="0" placeholder="0" />
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">
+                          <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="allowFirstTimeChatters" onchange="saveSettings()" checked />
+                            <label class="form-check-label" for="allowFirstTimeChatters">First time chatter</label>
+                          </div>
+                        </th>
+                        <td>
+                          <input type="number" style="width: 80px" class="form-control" id="plebBonus" onchange="saveSettings()" value="0" min="0" placeholder="0" />
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div class="btn-group mb-3" role="group" aria-label="Check all/Uncheck all">
+                    <button type="button" id="selectAll" class="btn btn-sm btn-success">Select all</button>
+                    <button type="button" id="unselectAll" class="btn btn-sm btn-danger">Unselect all</button>
                   </div>
                 </div>
               </div>

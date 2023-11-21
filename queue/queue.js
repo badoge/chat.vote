@@ -9,6 +9,20 @@ let elements = {
   loginButton: document.getElementById("loginButton"),
   channelName: document.getElementById("channelName"),
   darkTheme: document.getElementById("darkTheme"),
+
+  //settings
+  allowSpotify: document.getElementById("allowSpotify"),
+  allowTwitch: document.getElementById("allowTwitch"),
+  allowTwitchClips: document.getElementById("allowTwitchClips"),
+  allowTwitchStreams: document.getElementById("allowTwitchStreams"),
+  allowTwitchVODs: document.getElementById("allowTwitchVODs"),
+  allowYT: document.getElementById("allowYT"),
+  allowYTStreams: document.getElementById("allowYTStreams"),
+  allowYTShorts: document.getElementById("allowYTShorts"),
+  subMode: document.getElementById("subMode"),
+  requestLimit: document.getElementById("requestLimit"),
+  maxLength: document.getElementById("maxLength"),
+  maxLengthUnit: document.getElementById("maxLengthUnit"),
 };
 
 let client;
