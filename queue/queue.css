@@ -12,10 +12,6 @@
   cursor: pointer;
 }
 
-.arrows {
-  font-size: 2rem;
-}
-
 [data-placeholder]:empty:before {
   content: attr(data-placeholder);
 }
@@ -27,21 +23,6 @@
   -ms-filter: blur(10px) grayscale(100%);
   filter: blur(10px) grayscale(100%);
   position: absolute;
-}
-
-.undertwitchbtn {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  border: 0;
-  border-top: 1px solid rgba(150, 147, 147, 0.3);
-}
-
-.defaultbtn {
-  margin-top: 5px;
-  margin-bottom: 5px;
-  margin-left: 5px;
-  margin-right: 0;
-  vertical-align: middle;
 }
 
 #linkpreview {
@@ -57,19 +38,20 @@
   max-width: 100%;
 }
 
-.values {
-  margin: -10px;
+#toastContainer {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  z-index: 1056;
+  font-weight: bold;
 }
 
-#toastContainer {
-  z-index: 1056;
-  position: fixed;
-  top: 1%;
-  width: 15vw;
+#toastContainer > div > div {
+  font-size: 1.5em;
 }
 
 #settingsOffcanvas {
-  width: 50vw;
+  width: 55vw;
 }
 
 .custom-popover {
@@ -82,6 +64,10 @@
 .accordion-button i {
   padding: 5px;
   font-size: 2rem;
+}
+
+.request-limit {
+  width: 120px;
 }
 
 .redborder {
@@ -109,11 +95,6 @@ iframe {
   border-radius: 6px;
 }
 
-#queueList {
-  height: 57.3vh;
-  overflow-y: scroll;
-}
-
 #profileLink > i,
 #copyLinkButton {
   color: #000000;
@@ -134,4 +115,32 @@ iframe {
 
 #playersCard {
   height: 85vh;
+}
+
+#volumeSlider {
+  width: 10vw;
+}
+
+#volumeSliderValue {
+  width: 50px;
+}
+
+#queue {
+  height: 57.3vh;
+}
+
+#queueList,
+#approvalList {
+  height: 51vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  text-align: start;
+}
+
+#queueTabs {
+  margin-left: -17px;
+  margin-right: -17px;
+  margin-top: -17px;
+  border-top-right-radius: 6px;
+  border-top-left-radius: 6px;
 }

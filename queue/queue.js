@@ -1,4 +1,5 @@
 let elements = {
+  //modals
   loginExpiredModal: document.getElementById("loginExpiredModal"),
   resetSettingsModal: document.getElementById("resetSettingsModal"),
 
@@ -11,26 +12,80 @@ let elements = {
   darkTheme: document.getElementById("darkTheme"),
 
   //settings
-  allowSpotify: document.getElementById("allowSpotify"),
-  allowTwitch: document.getElementById("allowTwitch"),
+  settingsOffcanvas: document.getElementById("settingsOffcanvas"),
+  allowSpotifySongs: document.getElementById("allowSpotifySongs"),
   allowTwitchClips: document.getElementById("allowTwitchClips"),
   allowTwitchStreams: document.getElementById("allowTwitchStreams"),
   allowTwitchVODs: document.getElementById("allowTwitchVODs"),
-  allowYT: document.getElementById("allowYT"),
   allowYTStreams: document.getElementById("allowYTStreams"),
   allowYTShorts: document.getElementById("allowYTShorts"),
-  subMode: document.getElementById("subMode"),
-  requestLimit: document.getElementById("requestLimit"),
+  allowYTVideos: document.getElementById("allowYTVideos"),
+  maxDuration: document.getElementById("maxDuration"),
+  maxDurationUnit: document.getElementById("maxDurationUnit"),
   maxLength: document.getElementById("maxLength"),
-  maxLengthUnit: document.getElementById("maxLengthUnit"),
+  maxSize: document.getElementById("maxSize"),
+  whoCanRequest: document.getElementById("whoCanRequest"),
+  allowPlebs: document.getElementById("allowPlebs"),
+  allowSubs: document.getElementById("allowSubs"),
+  allowMods: document.getElementById("allowMods"),
+  allowVips: document.getElementById("allowVips"),
+  allowFirstTimeChatters: document.getElementById("allowFirstTimeChatters"),
+  plebLimit: document.getElementById("plebLimit"),
+  subLimit: document.getElementById("subLimit"),
+  modLimit: document.getElementById("modLimit"),
+  vipLimit: document.getElementById("vipLimit"),
+  firstTimeChatterLimit: document.getElementById("firstTimeChatterLimit"),
+  selectAll: document.getElementById("selectAll"),
+  unselectAll: document.getElementById("unselectAll"),
+  noCommand: document.getElementById("noCommand"),
+  requestCommand: document.getElementById("requestCommand"),
+  requestCommandAlias: document.getElementById("requestCommandAlias"),
+  allowVoteSkip: document.getElementById("allowVoteSkip"),
+  voteskipCommand: document.getElementById("voteskipCommand"),
+  voteskipCommandAlias: document.getElementById("voteskipCommandAlias"),
+  voteskipCount: document.getElementById("voteskipCount"),
+  enableBot: document.getElementById("enableBot"),
+  botCooldown: document.getElementById("botCooldown"),
+  songCommand: document.getElementById("songCommand"),
+  songCommandAlias: document.getElementById("songCommandAlias"),
+  queueCommand: document.getElementById("queueCommand"),
+  queueCommandAlias: document.getElementById("queueCommandAlias"),
+  approvalQueue: document.getElementById("approvalQueue"),
+  skipCommand: document.getElementById("skipCommand"),
+  modSkip: document.getElementById("modSkip"),
+  minViewCount: document.getElementById("minViewCount"),
+
+  //main
+  toastContainer: document.getElementById("toastContainer"),
+  playersCard: document.getElementById("playersCard"),
+  commandHint: document.getElementById("commandHint"),
+  link: document.getElementById("link"),
+  addLink: document.getElementById("addLink"),
+
+  //queue
+  queue: document.getElementById("queue"),
+  queueTabs: document.getElementById("queueTabs"),
+  queueTab: document.getElementById("queueTab"),
+  approvalTab: document.getElementById("approvalTab"),
+  queueList: document.getElementById("queueList"),
+  approvalList: document.getElementById("approvalList"),
+
+  //bottom row
+  profileLink: document.getElementById("profileLink"),
+  copyLinkButton: document.getElementById("copyLinkButton"),
+  volumeSliderIcon: document.getElementById("volumeSliderIcon"),
+  volumeSlider: document.getElementById("volumeSlider"),
+  volumeSliderValue: document.getElementById("volumeSliderValue"),
 };
 
 let client;
 let color = "";
 let currentTime = 0;
 let loginButton;
-
+let settingsOffcanvas;
 let loginExpiredModal, resetSettingsModal;
+let copyLinkButton;
+let queueTab, approvalTab;
 
 let USER = {
   channel: "",
@@ -40,7 +95,46 @@ let USER = {
   platform: "",
 };
 
-let QUEUE = {};
+let QUEUE = {
+  allowSpotifySongs: true,
+  allowTwitchClips: true,
+  allowTwitchStreams: true,
+  allowTwitchVODs: true,
+  allowYTStreams: true,
+  allowYTShorts: true,
+  allowYTVideos: true,
+  maxDuration: "",
+  maxDurationUnit: "m",
+  maxLength: "",
+  maxSize: "",
+  allowPlebs: true,
+  allowSubs: true,
+  allowMods: true,
+  allowVips: true,
+  allowFirstTimeChatters: true,
+  plebLimit: 1,
+  subLimit: 1,
+  modLimit: 1,
+  vipLimit: 1,
+  firstTimeChatterLimit: 1,
+  noCommand: false,
+  requestCommand: "!request",
+  requestCommandAlias: "!r",
+  allowVoteSkip: false,
+  voteskipCommand: "!voteskip",
+  voteskipCommandAlias: "!vs",
+  voteskipCount: 1,
+  enableBot: false,
+  botCooldown: 1,
+  songCommand: "!song",
+  songCommandAlias: "!s",
+  queueCommand: "!queue",
+  queueCommandAlias: "!q",
+  approvalQueue: false,
+  skipCommand: "!skip",
+  modSkip: false,
+  minViewCount: "",
+};
 
 async function refreshData() {
   darkTheme = elements.darkTheme.checked ?? true;
@@ -51,6 +145,67 @@ async function refreshData() {
   if (!USER.userID && USER.channel) {
     USER.userID = await getUserID(USER.channel);
   }
+
+  QUEUE.allowSpotifySongs = elements.allowSpotifySongs.checked;
+  QUEUE.allowTwitchClips = elements.allowTwitchClips.checked;
+  QUEUE.allowTwitchStreams = elements.allowTwitchStreams.checked;
+  QUEUE.allowTwitchVODs = elements.allowTwitchVODs.checked;
+  QUEUE.allowYTStreams = elements.allowYTStreams.checked;
+  QUEUE.allowYTShorts = elements.allowYTShorts.checked;
+  QUEUE.allowYTVideos = elements.allowYTVideos.checked;
+  QUEUE.maxDuration = parseInt(elements.maxDuration.value, 10) || "";
+  QUEUE.maxDurationUnit = elements.maxDurationUnit.value || "m";
+  QUEUE.maxLength = parseInt(elements.maxLength.value, 10) || "";
+  QUEUE.maxSize = parseInt(elements.maxSize.value, 10) || "";
+  QUEUE.allowPlebs = elements.allowPlebs.checked;
+  QUEUE.allowSubs = elements.allowSubs.checked;
+  QUEUE.allowMods = elements.allowMods.checked;
+  QUEUE.allowVips = elements.allowVips.checked;
+  QUEUE.allowFirstTimeChatters = elements.allowFirstTimeChatters.checked;
+  QUEUE.plebLimit = parseInt(elements.plebLimit.value, 10) || 1;
+  QUEUE.subLimit = parseInt(elements.subLimit.value, 10) || 1;
+  QUEUE.modLimit = parseInt(elements.modLimit.value, 10) || 1;
+  QUEUE.vipLimit = parseInt(elements.vipLimit.value, 10) || 1;
+  QUEUE.firstTimeChatterLimit = parseInt(elements.firstTimeChatterLimit.value, 10) || 1;
+  QUEUE.noCommand = elements.noCommand.checked;
+  QUEUE.requestCommand = elements.requestCommand.value.replace(/\s+/g, "").toLowerCase() || "!request";
+  QUEUE.requestCommandAlias = elements.requestCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!r";
+  QUEUE.allowVoteSkip = elements.allowVoteSkip.checked;
+  QUEUE.voteskipCommand = elements.voteskipCommand.value.replace(/\s+/g, "").toLowerCase() || "!voteskip";
+  QUEUE.voteskipCommandAlias = elements.voteskipCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!vs";
+  QUEUE.voteskipCount = parseInt(elements.voteskipCount.value, 10) || 1;
+  QUEUE.enableBot = elements.enableBot.checked;
+  QUEUE.botCooldown = parseInt(elements.botCooldown.value, 10) || 1;
+  QUEUE.songCommand = elements.songCommand.value.replace(/\s+/g, "").toLowerCase() || "!song";
+  QUEUE.songCommandAlias = elements.songCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!s";
+  QUEUE.queueCommand = elements.queueCommand.value.replace(/\s+/g, "").toLowerCase() || "!queue";
+  QUEUE.queueCommandAlias = elements.queueCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!q";
+  QUEUE.approvalQueue = elements.approvalQueue.checked;
+  QUEUE.skipCommand = elements.skipCommand.value.replace(/\s+/g, "").toLowerCase() || "!skip";
+  QUEUE.modSkip = elements.modSkip.checked;
+  QUEUE.minViewCount = parseInt(elements.minViewCount.value, 10) || "";
+
+  elements.voteskipCommand.disabled = !QUEUE.allowVoteSkip;
+  elements.voteskipCommandAlias.disabled = !QUEUE.allowVoteSkip;
+  elements.voteskipCount.disabled = !QUEUE.allowVoteSkip;
+  elements.botCooldown.disabled = !QUEUE.enableBot;
+  elements.songCommand.disabled = !QUEUE.enableBot;
+  elements.songCommandAlias.disabled = !QUEUE.enableBot;
+  elements.queueCommand.disabled = !QUEUE.enableBot;
+  elements.queueCommandAlias.disabled = !QUEUE.enableBot;
+
+  elements.queueTabs.style.display = QUEUE.approvalQueue ? "" : "none";
+
+  if (QUEUE.noCommand) {
+    elements.commandHint.innerHTML = `Add songs or videos to the queue by posting a link in chat`;
+  } else {
+    elements.commandHint.innerHTML = `Add songs or videos to the queue using 
+    <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">${QUEUE.requestCommand}</kbd> or 
+    <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">${QUEUE.requestCommandAlias}</kbd>`;
+  }
+
+  updateWhoCanRequest();
+  checkCommands();
 } //refreshdata
 
 function saveSettings() {
@@ -72,6 +227,67 @@ function load_localStorage() {
     console.log("localStorage settings not found");
   } else {
     QUEUE = JSON.parse(localStorage.getItem("QUEUE"));
+
+    elements.allowSpotifySongs.checked = QUEUE.allowSpotifySongs ?? true;
+    elements.allowTwitchClips.checked = QUEUE.allowTwitchClips ?? true;
+    elements.allowTwitchStreams.checked = QUEUE.allowTwitchStreams ?? true;
+    elements.allowTwitchVODs.checked = QUEUE.allowTwitchVODs ?? true;
+    elements.allowYTStreams.checked = QUEUE.allowYTStreams ?? true;
+    elements.allowYTShorts.checked = QUEUE.allowYTShorts ?? true;
+    elements.allowYTVideos.checked = QUEUE.allowYTVideos ?? true;
+    elements.maxDuration.value = QUEUE.maxDuration || "";
+    elements.maxDurationUnit.value = QUEUE.maxDurationUnit || "m";
+    elements.maxLength.value = QUEUE.maxLength || "";
+    elements.maxSize.value = QUEUE.maxSize || "";
+    elements.allowPlebs.checked = QUEUE.allowPlebs ?? true;
+    elements.allowSubs.checked = QUEUE.allowSubs ?? true;
+    elements.allowMods.checked = QUEUE.allowMods ?? true;
+    elements.allowVips.checked = QUEUE.allowVips ?? true;
+    elements.allowFirstTimeChatters.checked = QUEUE.allowFirstTimeChatters ?? true;
+    elements.plebLimit.value = QUEUE.plebLimit || 1;
+    elements.subLimit.value = QUEUE.subLimit || 1;
+    elements.modLimit.value = QUEUE.modLimit || 1;
+    elements.vipLimit.value = QUEUE.vipLimit || 1;
+    elements.firstTimeChatterLimit.value = QUEUE.firstTimeChatterLimit || 1;
+    elements.noCommand.checked = QUEUE.noCommand ?? false;
+    elements.requestCommand.value = QUEUE.requestCommand || "!request";
+    elements.requestCommandAlias.value = QUEUE.requestCommandAlias || "!r";
+    elements.allowVoteSkip.checked = QUEUE.allowVoteSkip ?? false;
+    elements.voteskipCommand.value = QUEUE.voteskipCommand || "!voteskip";
+    elements.voteskipCommandAlias.value = QUEUE.voteskipCommandAlias || "!vs";
+    elements.voteskipCount.value = QUEUE.voteskipCount || 1;
+    elements.enableBot.checked = QUEUE.enableBot ?? false;
+    elements.botCooldown.value = QUEUE.botCooldown || 1;
+    elements.songCommand.value = QUEUE.songCommand || "!song";
+    elements.songCommandAlias.value = QUEUE.songCommandAlias || "!s";
+    elements.queueCommand.value = QUEUE.queueCommand || "!queue";
+    elements.queueCommandAlias.value = QUEUE.queueCommandAlias || "!q";
+    elements.approvalQueue.checked = QUEUE.approvalQueue ?? false;
+    elements.skipCommand.value = QUEUE.skipCommand || "!skip";
+    elements.modSkip.checked = QUEUE.modSkip ?? false;
+    elements.minViewCount.value = QUEUE.minViewCount || "";
+
+    elements.voteskipCommand.disabled = !QUEUE.allowVoteSkip;
+    elements.voteskipCommandAlias.disabled = !QUEUE.allowVoteSkip;
+    elements.voteskipCount.disabled = !QUEUE.allowVoteSkip;
+    elements.botCooldown.disabled = !QUEUE.enableBot;
+    elements.songCommand.disabled = !QUEUE.enableBot;
+    elements.songCommandAlias.disabled = !QUEUE.enableBot;
+    elements.queueCommand.disabled = !QUEUE.enableBot;
+    elements.queueCommandAlias.disabled = !QUEUE.enableBot;
+
+    elements.queueTabs.style.display = QUEUE.approvalQueue ? "" : "none";
+
+    if (QUEUE.noCommand) {
+      elements.commandHint.innerHTML = `Add songs or videos to the queue by posting a link in chat`;
+    } else {
+      elements.commandHint.innerHTML = `Add songs or videos to the queue using 
+      <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">${QUEUE.requestCommand}</kbd> or 
+      <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">${QUEUE.requestCommandAlias}</kbd>`;
+    }
+
+    updateWhoCanRequest();
+    checkCommands();
   }
 } //load_localStorage
 
@@ -88,7 +304,49 @@ function resetSettings(logout = false) {
       })
     );
   }
-  localStorage.setItem("QUEUE", JSON.stringify({}));
+  localStorage.setItem(
+    "QUEUE",
+    JSON.stringify({
+      allowSpotifySongs: true,
+      allowTwitchClips: true,
+      allowTwitchStreams: true,
+      allowTwitchVODs: true,
+      allowYTStreams: true,
+      allowYTShorts: true,
+      allowYTVideos: true,
+      maxDuration: "",
+      maxDurationUnit: "m",
+      maxLength: "",
+      maxSize: "",
+      allowPlebs: true,
+      allowSubs: true,
+      allowMods: true,
+      allowVips: true,
+      allowFirstTimeChatters: true,
+      plebLimit: 1,
+      subLimit: 1,
+      modLimit: 1,
+      vipLimit: 1,
+      firstTimeChatterLimit: 1,
+      noCommand: false,
+      requestCommand: "!request",
+      requestCommandAlias: "!r",
+      allowVoteSkip: false,
+      voteskipCommand: "!voteskip",
+      voteskipCommandAlias: "!vs",
+      voteskipCount: 1,
+      enableBot: false,
+      botCooldown: 1,
+      songCommand: "!song",
+      songCommandAlias: "!s",
+      queueCommand: "!queue",
+      queueCommandAlias: "!q",
+      approvalQueue: false,
+      skipCommand: "!skip",
+      modSkip: false,
+      minViewCount: "",
+    })
+  );
   location.reload();
   return false;
 } //resetSettings
@@ -306,14 +564,15 @@ async function loadAndConnect() {
   }
   if (USER.channel) {
     connect();
+    elements.profileLink.value = `https://queue.chat.vote/${USER.channel || ""}`;
   }
 } //loadAndConnect
 
 function copyLink() {
   navigator.clipboard.writeText(`https://queue.chat.vote/${USER.channel || ""}`);
-  copyTooltip.show();
+  copyLinkButton.show();
   setTimeout(() => {
-    copyTooltip.hide();
+    copyLinkButton.hide();
   }, 1000);
 } //copyLink
 
@@ -328,6 +587,121 @@ function switchTheme(checkbox) {
   }
 } //switchTheme
 
+function toggleEveryone(allow) {
+  elements.allowPlebs.checked = allow;
+  elements.allowSubs.checked = allow;
+  elements.allowMods.checked = allow;
+  elements.allowVips.checked = allow;
+  elements.allowFirstTimeChatters.checked = allow;
+} //toggleEveryone
+
+function updateWhoCanRequest() {
+  let roles = {
+    "Non subscribers": { allowed: QUEUE.allowPlebs, limit: QUEUE.plebLimit },
+    Subscribers: { allowed: QUEUE.allowSubs, limit: QUEUE.subLimit },
+    Mods: { allowed: QUEUE.allowMods, limit: QUEUE.modLimit },
+    VIPs: { allowed: QUEUE.allowVips, limit: QUEUE.vipLimit },
+    "First time chatters": { allowed: QUEUE.allowFirstTimeChatters, limit: QUEUE.firstTimeChatterLimit },
+  };
+
+  let allowed = [];
+  let limit = [];
+  let totalLimit = 0;
+  for (let [key, value] of Object.entries(roles)) {
+    if (value.allowed) {
+      allowed.push(key);
+      limit.push(`${key} can make ${value.limit} ${value.limit == 1 ? "request" : "requests"}`);
+      totalLimit += value.limit - 1;
+    }
+  }
+
+  if (allowed.length == 0) {
+    elements.whoCanRequest.innerHTML = `<span class="text-danger">No one will be able to request</span>`;
+    return;
+  }
+  elements.whoCanRequest.innerHTML = `${allowed.length == 1 ? "Only" : ""} ${allowed.length == 5 ? "Everyone" : allowed.join(", ")} will be able to request.<br>
+  ${totalLimit == 0 ? "Everyone will get 1 request." : limit.join(" - ")}`;
+} //updateWhoCanRequest
+
+function checkCommands() {
+  let commandElements = [
+    elements.requestCommand,
+    elements.requestCommandAlias,
+    elements.voteskipCommand,
+    elements.voteskipCommandAlias,
+    elements.songCommand,
+    elements.songCommandAlias,
+    elements.queueCommand,
+    elements.queueCommandAlias,
+    elements.skipCommand,
+  ];
+
+  let commands = commandElements.map((e) => e.value.replace(/\s+/g, "").toLowerCase());
+  let duplicateCommands = commands.filter((element, index) => commands.indexOf(element.replace(/\s+/g, "").toLowerCase()) !== index);
+  let duplicateElements = commandElements.filter((element) => duplicateCommands.includes(element.value.replace(/\s+/g, "").toLowerCase()));
+
+  let warn = false;
+
+  for (let index = 0; index < duplicateElements.length; index++) {
+    duplicateElements[index].value = duplicateElements[index].dataset.default;
+    QUEUE[duplicateElements[index].id] = duplicateElements[index].dataset.default;
+    warn = true;
+  }
+
+  if (warn) {
+    showToast("Commands must be unique", "warning", 2000);
+  }
+} //checkCommands
+
+function editRequestCommand(alias = false) {
+  settingsOffcanvas.show();
+  setTimeout(() => {
+    if (alias) {
+      elements.requestCommandAlias.focus();
+      elements.requestCommandAlias.select();
+    } else {
+      elements.requestCommand.focus();
+      elements.requestCommand.select();
+    }
+  }, 500);
+} //editRequestCommand
+
+let oldSliderValue;
+function toggleMute() {
+  if (elements.volumeSliderIcon.innerHTML == "volume_off") {
+    if (oldSliderValue == 0) {
+      elements.volumeSliderIcon.innerHTML = "volume_mute";
+    }
+    if (oldSliderValue > 0 && oldSliderValue < 50) {
+      elements.volumeSliderIcon.innerHTML = "volume_down";
+    }
+    if (oldSliderValue >= 50) {
+      elements.volumeSliderIcon.innerHTML = "volume_up";
+    }
+
+    elements.volumeSlider.value = oldSliderValue;
+    elements.volumeSliderValue.innerHTML = oldSliderValue;
+  } else {
+    oldSliderValue = elements.volumeSlider.value;
+    elements.volumeSliderIcon.innerHTML = "volume_off";
+    elements.volumeSlider.value = 0;
+    elements.volumeSliderValue.innerHTML = 0;
+  }
+} //toggleMute
+
+function changeVolume(slider) {
+  elements.volumeSliderValue.innerHTML = slider.value;
+  if (slider.value == 0) {
+    elements.volumeSliderIcon.innerHTML = "volume_mute";
+  }
+  if (slider.value > 0 && slider.value < 50) {
+    elements.volumeSliderIcon.innerHTML = "volume_down";
+  }
+  if (slider.value >= 50) {
+    elements.volumeSliderIcon.innerHTML = "volume_up";
+  }
+} //changeVolume
+
 window.onload = function () {
   darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
   elements.darkTheme.checked = darkTheme ?? true;
@@ -337,6 +711,11 @@ window.onload = function () {
 
   loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
   resetSettingsModal = new bootstrap.Modal(elements.resetSettingsModal);
+  settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
+  copyLinkButton = new bootstrap.Popover(elements.copyLinkButton);
+
+  queueTab = new bootstrap.Tab(elements.queueTab);
+  approvalTab = new bootstrap.Tab(elements.approvalTab);
 
   if (!USER.channel) {
     loginButton = new bootstrap.Popover(elements.loginButton);
@@ -346,6 +725,15 @@ window.onload = function () {
     switchTheme(this.checked);
     saveSettings();
   };
+
+  elements.selectAll.addEventListener("click", (event) => {
+    toggleEveryone(true);
+    saveSettings();
+  });
+  elements.unselectAll.addEventListener("click", (event) => {
+    toggleEveryone(false);
+    saveSettings();
+  });
 
   enableTooltips();
   enablePopovers();

@@ -1201,8 +1201,10 @@ function disableRaffleButton() {
 
 function changeRaffleCommand() {
   settingsOffcanvas.show();
-  elements.raffleCommand.focus();
-  elements.raffleCommand.select();
+  setTimeout(() => {
+    elements.raffleCommand.focus();
+    elements.raffleCommand.select();
+  }, 500);
   let flashBorder = setInterval(() => {
     elements.raffleCommand.classList.toggle("border-info");
   }, 100);

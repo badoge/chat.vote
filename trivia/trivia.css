@@ -83,13 +83,6 @@ label.list-group-item {
   padding: 0px;
 }
 
-.undertwitchbtn {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  border: 0;
-  border-top: 1px solid rgba(150, 147, 147, 0.3);
-}
-
 #question {
   text-align: center;
 }
