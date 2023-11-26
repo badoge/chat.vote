@@ -59,16 +59,21 @@ let elements = {
   toastContainer: document.getElementById("toastContainer"),
   playersCard: document.getElementById("playersCard"),
   commandHint: document.getElementById("commandHint"),
+  toggleQueue: document.getElementById("toggleQueue"),
+  toggleQueueLabel: document.getElementById("toggleQueueLabel"),
+  resetQueue: document.getElementById("resetQueue"),
   link: document.getElementById("link"),
   addLink: document.getElementById("addLink"),
 
   //queue
   queue: document.getElementById("queue"),
-  queueTabs: document.getElementById("queueTabs"),
   queueTab: document.getElementById("queueTab"),
+  approvalTabButton: document.getElementById("approvalTabButton"),
   approvalTab: document.getElementById("approvalTab"),
   queueList: document.getElementById("queueList"),
   approvalList: document.getElementById("approvalList"),
+  historyTab: document.getElementById("historyTab"),
+  historyList: document.getElementById("historyList"),
 
   //bottom row
   profileLink: document.getElementById("profileLink"),
@@ -85,7 +90,8 @@ let loginButton;
 let settingsOffcanvas;
 let loginExpiredModal, resetSettingsModal;
 let copyLinkButton;
-let queueTab, approvalTab;
+let queueTab, approvalTab, historyTab;
+let queue_open = false;
 
 let USER = {
   channel: "",
@@ -194,7 +200,7 @@ async function refreshData() {
   elements.queueCommand.disabled = !QUEUE.enableBot;
   elements.queueCommandAlias.disabled = !QUEUE.enableBot;
 
-  elements.queueTabs.style.display = QUEUE.approvalQueue ? "" : "none";
+  elements.approvalTabButton.style.display = QUEUE.approvalQueue ? "" : "none";
 
   if (QUEUE.noCommand) {
     elements.commandHint.innerHTML = `Add songs or videos to the queue by posting a link in chat`;
@@ -276,7 +282,7 @@ function load_localStorage() {
     elements.queueCommand.disabled = !QUEUE.enableBot;
     elements.queueCommandAlias.disabled = !QUEUE.enableBot;
 
-    elements.queueTabs.style.display = QUEUE.approvalQueue ? "" : "none";
+    elements.approvalTabButton.style.display = QUEUE.approvalQueue ? "" : "none";
 
     if (QUEUE.noCommand) {
       elements.commandHint.innerHTML = `Add songs or videos to the queue by posting a link in chat`;
@@ -716,6 +722,7 @@ window.onload = function () {
 
   queueTab = new bootstrap.Tab(elements.queueTab);
   approvalTab = new bootstrap.Tab(elements.approvalTab);
+  historyTab = new bootstrap.Tab(elements.historyTab);
 
   if (!USER.channel) {
     loginButton = new bootstrap.Popover(elements.loginButton);
@@ -724,6 +731,24 @@ window.onload = function () {
   elements.darkTheme.onchange = function () {
     switchTheme(this.checked);
     saveSettings();
+  };
+
+  elements.approvalQueue.onchange = function () {
+    saveSettings();
+    if (elements.approvalTab.classList.contains("active")) {
+      queueTab.show();
+    }
+  };
+
+  elements.toggleQueue.onchange = function () {
+    queue_open = this.checked;
+    if (this.checked) {
+      elements.toggleQueueLabel.classList = "btn btn-lg btn-danger";
+      elements.toggleQueueLabel.innerHTML = `Close<br>Queue`;
+    } else {
+      elements.toggleQueueLabel.classList = "btn btn-lg btn-success";
+      elements.toggleQueueLabel.innerHTML = `Open<br>Queue`;
+    }
   };
 
   elements.selectAll.addEventListener("click", (event) => {

@@ -89,330 +89,326 @@
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
       </div>
       <div class="offcanvas-body">
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-xl-5">
-              <div class="card mb-3">
-                <div class="card-header"><i class="material-icons notranslate">checklist</i>Enabled Platforms</div>
-                <div class="card-body">
-                  <div class="container-fluid">
-                    <div class="row">
-                      <div class="col-sm-6">
-                        <h6>Spotify</h6>
-                        <div class="form-check form-switch mb-3">
-                          <input class="form-check-input" type="checkbox" role="switch" id="allowSpotifySongs" onchange="saveSettings()" checked />
-                          <label class="form-check-label" for="allowSpotifySongs">Songs</label>
-                        </div>
-                        <h6>Twitch</h6>
-                        <div class="form-check form-switch">
-                          <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchClips" onchange="saveSettings()" checked />
-                          <label class="form-check-label" for="allowTwitchClips">Clips</label>
-                        </div>
-                        <div class="form-check form-switch">
-                          <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchStreams" onchange="saveSettings()" checked />
-                          <label class="form-check-label" for="allowTwitchStreams">Live Streams</label>
-                        </div>
-                        <div class="form-check form-switch mb-3">
-                          <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchVODs" onchange="saveSettings()" checked />
-                          <label class="form-check-label" for="allowTwitchVODs">VODs</label>
-                        </div>
-                      </div>
-                      <div class="col-sm-6">
-                        <h6>Youtube</h6>
-                        <div class="form-check form-switch">
-                          <input class="form-check-input" type="checkbox" role="switch" id="allowYTStreams" onchange="saveSettings()" checked />
-                          <label class="form-check-label" for="allowYTStreams">Live Streams</label>
-                        </div>
-                        <div class="form-check form-switch">
-                          <input class="form-check-input" type="checkbox" role="switch" id="allowYTShorts" onchange="saveSettings()" checked />
-                          <label class="form-check-label" for="allowYTShorts">Shorts</label>
-                        </div>
-                        <div class="form-check form-switch">
-                          <input class="form-check-input" type="checkbox" role="switch" id="allowYTVideos" onchange="saveSettings()" checked />
-                          <label class="form-check-label" for="allowYTVideos">Videos</label>
-                        </div>
-                      </div>
-                    </div>
+        <div class="card mb-3">
+          <div class="card-header"><i class="material-icons notranslate">checklist</i>Enabled Platforms</div>
+          <div class="card-body">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-xl-4">
+                  <h6>Spotify</h6>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" role="switch" id="allowSpotifySongs" onchange="saveSettings()" checked />
+                    <label class="form-check-label" for="allowSpotifySongs">Songs</label>
                   </div>
                 </div>
-              </div>
-
-              <div class="card mb-3">
-                <div class="card-header"><i class="material-icons notranslate">settings</i>Queue Settings</div>
-                <div class="card-body">
-                  <h6>Max queue duration</h6>
-                  <div class="input-group">
-                    <input type="number" aria-label="Max queue duration" id="maxDuration" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
-                    <select class="form-select" id="maxDurationUnit" onchange="saveSettings()">
-                      <option selected value="m">Minutes</option>
-                      <option value="h">Hours</option>
-                    </select>
-                  </div>
-                  <small class="form-text text-body-secondary">The max duration of all videos/songs added up</small>
-
-                  <h6 class="mt-3">Max song/video length</h6>
-                  <div class="input-group">
-                    <input type="number" aria-label="Max song/video length" id="maxLength" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
-                    <span class="input-group-text">Minutes</span>
-                  </div>
-                  <small class="form-text text-body-secondary">How long a single video/song can be</small>
-
-                  <div class="input-group mt-3">
-                    <span class="input-group-text">Max queue size</span>
-                    <input type="number" aria-label="Max queue length" id="maxSize" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
-                  </div>
-                  <small class="form-text text-body-secondary">How many videos/songs are allowed to be in the queue</small>
-                </div>
-              </div>
-
-              <div class="card">
-                <div class="card-header"><i class="material-icons notranslate">group</i>Who can send requests</div>
-                <div class="card-body">
-                  <p id="whoCanRequest">Everyone will be able to request.<br />Everyone will get 1 request.</p>
-                  <table class="table table-hover">
-                    <thead>
-                      <tr>
-                        <th scope="col">Role</th>
-                        <th
-                          scope="col"
-                          data-bs-toggle="tooltip"
-                          data-bs-delay="200"
-                          data-bs-placement="top"
-                          data-bs-title="How many requests each user can make based on the highest role limit they have"
-                        >
-                          Request limit
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody class="table-group-divider">
-                      <tr>
-                        <th scope="row">
-                          <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="allowPlebs" onchange="saveSettings()" checked />
-                            <label class="form-check-label" for="allowPlebs">Non subscriber</label>
-                          </div>
-                        </th>
-                        <td>
-                          <input type="number" class="form-control request-limit" id="plebLimit" onchange="saveSettings()" value="1" min="1" placeholder="Unlimited" />
-                        </td>
-                      </tr>
-                      <tr>
-                        <th scope="row">
-                          <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="allowSubs" onchange="saveSettings()" checked />
-                            <label class="form-check-label" for="allowSubs">Subscriber</label>
-                          </div>
-                        </th>
-                        <td>
-                          <input type="number" class="form-control request-limit" id="subLimit" onchange="saveSettings()" value="1" min="1" placeholder="Unlimited" />
-                        </td>
-                      </tr>
-
-                      <tr>
-                        <th scope="row">
-                          <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="allowMods" onchange="saveSettings()" checked />
-                            <label class="form-check-label" for="allowMods">Mod</label>
-                          </div>
-                        </th>
-                        <td>
-                          <input type="number" class="form-control request-limit" id="modLimit" onchange="saveSettings()" value="1" min="1" placeholder="Unlimited" />
-                        </td>
-                      </tr>
-                      <tr>
-                        <th scope="row">
-                          <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="allowVips" onchange="saveSettings()" checked />
-                            <label class="form-check-label" for="allowVips">VIP</label>
-                          </div>
-                        </th>
-                        <td>
-                          <input type="number" class="form-control request-limit" id="vipLimit" onchange="saveSettings()" value="1" min="1" placeholder="Unlimited" />
-                        </td>
-                      </tr>
-                      <tr>
-                        <th scope="row">
-                          <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="allowFirstTimeChatters" onchange="saveSettings()" checked />
-                            <label class="form-check-label" for="allowFirstTimeChatters">First time chatter</label>
-                          </div>
-                        </th>
-                        <td>
-                          <input type="number" class="form-control request-limit" id="firstTimeChatterLimit" onchange="saveSettings()" value="1" min="1" placeholder="Unlimited" />
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <div class="btn-group mb-3" role="group" aria-label="Check all/Uncheck all">
-                    <button type="button" id="selectAll" class="btn btn-sm btn-success">Select all</button>
-                    <button type="button" id="unselectAll" class="btn btn-sm btn-danger">Unselect all</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-xl-7">
-              <div class="card mb-3">
-                <div class="card-header"><i class="material-icons notranslate">chat</i>Chat Commands</div>
-                <div class="card-body">
+                <div class="col-xl-4">
+                  <h6>Twitch</h6>
                   <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" role="switch" id="noCommand" onchange="saveSettings()" />
-                    <label class="form-check-label" for="noCommand"><i class="material-icons notranslate">link</i>Add any link in chat to the queue</label>
+                    <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchClips" onchange="saveSettings()" checked />
+                    <label class="form-check-label" for="allowTwitchClips">Clips</label>
                   </div>
-                  <div class="input-group mb-3">
-                    <span class="input-group-text">Request</span>
-                    <input
-                      type="text"
-                      id="requestCommand"
-                      data-default="!request"
-                      value="!request"
-                      aria-label="Request command"
-                      placeholder="command"
-                      class="form-control"
-                      onchange="saveSettings()"
-                    />
-                    <input
-                      type="text"
-                      id="requestCommandAlias"
-                      data-default="!r"
-                      value="!r"
-                      aria-label="Request command alias"
-                      placeholder="alias"
-                      class="form-control"
-                      onchange="saveSettings()"
-                    />
-                  </div>
-
                   <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" role="switch" id="allowVoteSkip" onchange="saveSettings()" />
-                    <label class="form-check-label" for="allowVoteSkip"><i class="material-icons notranslate">how_to_vote</i>Allow viewers to vote skip</label>
+                    <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchStreams" onchange="saveSettings()" checked />
+                    <label class="form-check-label" for="allowTwitchStreams">Live Streams</label>
                   </div>
-                  <div class="input-group mb-1">
-                    <span class="input-group-text">Vote Skip</span>
-                    <input
-                      disabled
-                      type="text"
-                      id="voteskipCommand"
-                      data-default="!voteskip"
-                      value="!voteskip"
-                      aria-label="vote skip command"
-                      placeholder="command"
-                      class="form-control"
-                      onchange="saveSettings()"
-                    />
-                    <input
-                      disabled
-                      type="text"
-                      id="voteskipCommandAlias"
-                      data-default="!vs"
-                      value="!vs"
-                      aria-label="vote skip command alias"
-                      placeholder="alias"
-                      class="form-control"
-                      onchange="saveSettings()"
-                    />
-                  </div>
-                  <div class="input-group mb-5">
-                    <span class="input-group-text">Skip after</span>
-                    <input disabled type="number" aria-label="vote skip votes needed" id="voteskipCount" placeholder="1" value="1" min="1" class="form-control" onchange="saveSettings()" />
-                    <span class="input-group-text">votes</span>
-                  </div>
-
                   <div class="form-check form-switch mb-3">
-                    <input class="form-check-input" type="checkbox" role="switch" id="enableBot" onchange="saveSettings()" />
-                    <label class="form-check-label" for="enableBot"><i class="material-icons notranslate">smart_toy</i>Enable chat bot</label>
-                    <br /><small class="text-body-secondary">Enables the bot commands below and adds confirmation replies for some commands</small>
-                  </div>
-                  <div class="input-group mb-3">
-                    <span class="input-group-text">Bot commands cooldown</span>
-                    <input disabled type="number" aria-label="Bot commands cooldown" id="botCooldown" placeholder="1" value="1" min="1" class="form-control" onchange="saveSettings()" />
-                    <span class="input-group-text">seconds</span>
-                  </div>
-                  <h6>Bot Commands</h6>
-                  <div class="input-group mb-3">
-                    <span class="input-group-text">Song name</span>
-                    <input
-                      disabled
-                      type="text"
-                      id="songCommand"
-                      data-default="!song"
-                      value="!song"
-                      aria-label="Song name command"
-                      placeholder="command"
-                      class="form-control"
-                      onchange="saveSettings()"
-                    />
-                    <input
-                      disabled
-                      type="text"
-                      id="songCommandAlias"
-                      data-default="!s"
-                      value="!s"
-                      aria-label="Song name command alias"
-                      placeholder="alias"
-                      class="form-control"
-                      onchange="saveSettings()"
-                    />
-                  </div>
-                  <div class="input-group mb-3">
-                    <span class="input-group-text">Queue</span>
-                    <input
-                      disabled
-                      type="text"
-                      id="queueCommand"
-                      data-default="!queue"
-                      value="!queue"
-                      aria-label="Queue command"
-                      placeholder="command"
-                      class="form-control"
-                      onchange="saveSettings()"
-                    />
-                    <input
-                      disabled
-                      type="text"
-                      id="queueCommandAlias"
-                      data-default="!q"
-                      value="!q"
-                      aria-label="Queue command alias"
-                      placeholder="alias"
-                      class="form-control"
-                      onchange="saveSettings()"
-                    />
+                    <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchVODs" onchange="saveSettings()" checked />
+                    <label class="form-check-label" for="allowTwitchVODs">VODs</label>
                   </div>
                 </div>
-              </div>
-              <div class="card mb-3">
-                <div class="card-header"><i class="material-icons notranslate">shield</i>Moderation Settings</div>
-                <div class="card-body">
-                  <div class="form-check form-switch mb-3">
-                    <input class="form-check-input" type="checkbox" role="switch" id="approvalQueue" onchange="saveSettings()" />
-                    <label class="form-check-label" for="approvalQueue"><i class="material-icons notranslate">rule</i>Approval queue</label>
-                    <br /><small class="form-text text-body-secondary">Requests will have to be manually approved by you before they get added to the queue</small>
+                <div class="col-xl-4">
+                  <h6>Youtube</h6>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="allowYTStreams" onchange="saveSettings()" checked />
+                    <label class="form-check-label" for="allowYTStreams">Live Streams</label>
                   </div>
-
-                  <div class="input-group mb-1">
-                    <span class="input-group-text">Skip current video/song</span>
-                    <input type="text" id="skipCommand" data-default="!skip" value="!skip" aria-label="Skip command" placeholder="command" class="form-control" onchange="saveSettings()" />
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="allowYTShorts" onchange="saveSettings()" checked />
+                    <label class="form-check-label" for="allowYTShorts">Shorts</label>
                   </div>
-                  <div class="form-check form-switch mb-3">
-                    <input class="form-check-input" type="checkbox" role="switch" id="modSkip" onchange="saveSettings()" />
-                    <label class="form-check-label" for="modSkip"><i class="material-icons notranslate">verified_user</i>Allow mods to skip</label>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="allowYTVideos" onchange="saveSettings()" checked />
+                    <label class="form-check-label" for="allowYTVideos">Videos</label>
                   </div>
-
-                  <div class="input-group mt-3">
-                    <span class="input-group-text">Minimum view count</span>
-                    <input type="number" aria-label="Max queue length" id="minViewCount" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
-                  </div>
-                  <small class="form-text text-body-secondary">Videos/songs that have less views than this will be blocked</small>
                 </div>
-              </div>
-
-              <div class="input-group">
-                <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#resetSettingsModal">
-                  <i class="material-icons notranslate">restart_alt</i>Reset settings
-                </button>
               </div>
             </div>
           </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-header"><i class="material-icons notranslate">settings</i>Queue Settings</div>
+          <div class="card-body">
+            <h6>Max queue duration</h6>
+            <div class="input-group">
+              <input type="number" aria-label="Max queue duration" id="maxDuration" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
+              <select class="form-select" id="maxDurationUnit" onchange="saveSettings()">
+                <option selected value="m">Minutes</option>
+                <option value="h">Hours</option>
+              </select>
+            </div>
+            <small class="form-text text-body-secondary">The max duration of all videos/songs added up</small>
+
+            <h6 class="mt-3">Max song/video length</h6>
+            <div class="input-group">
+              <input type="number" aria-label="Max song/video length" id="maxLength" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
+              <span class="input-group-text">Minutes</span>
+            </div>
+            <small class="form-text text-body-secondary">How long a single video/song can be</small>
+
+            <div class="input-group mt-3">
+              <span class="input-group-text">Max queue size</span>
+              <input type="number" aria-label="Max queue length" id="maxSize" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
+            </div>
+            <small class="form-text text-body-secondary">How many videos/songs are allowed to be in the queue</small>
+          </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-header"><i class="material-icons notranslate">chat</i>Chat Commands</div>
+          <div class="card-body">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="noCommand" onchange="saveSettings()" />
+              <label class="form-check-label" for="noCommand"><i class="material-icons notranslate">link</i>Add any link in chat to the queue</label>
+            </div>
+            <div class="input-group mb-3">
+              <span class="input-group-text">Request</span>
+              <input
+                type="text"
+                id="requestCommand"
+                data-default="!request"
+                value="!request"
+                aria-label="Request command"
+                placeholder="command"
+                class="form-control"
+                onchange="saveSettings()"
+              />
+              <input
+                type="text"
+                id="requestCommandAlias"
+                data-default="!r"
+                value="!r"
+                aria-label="Request command alias"
+                placeholder="alias"
+                class="form-control"
+                onchange="saveSettings()"
+              />
+            </div>
+
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="allowVoteSkip" onchange="saveSettings()" />
+              <label class="form-check-label" for="allowVoteSkip"><i class="material-icons notranslate">how_to_vote</i>Allow viewers to vote skip</label>
+            </div>
+            <div class="input-group mb-1">
+              <span class="input-group-text">Vote Skip</span>
+              <input
+                disabled
+                type="text"
+                id="voteskipCommand"
+                data-default="!voteskip"
+                value="!voteskip"
+                aria-label="vote skip command"
+                placeholder="command"
+                class="form-control"
+                onchange="saveSettings()"
+              />
+              <input
+                disabled
+                type="text"
+                id="voteskipCommandAlias"
+                data-default="!vs"
+                value="!vs"
+                aria-label="vote skip command alias"
+                placeholder="alias"
+                class="form-control"
+                onchange="saveSettings()"
+              />
+            </div>
+            <div class="input-group mb-5">
+              <span class="input-group-text">Skip after</span>
+              <input disabled type="number" aria-label="vote skip votes needed" id="voteskipCount" placeholder="1" value="1" min="1" class="form-control" onchange="saveSettings()" />
+              <span class="input-group-text">votes</span>
+            </div>
+
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" role="switch" id="enableBot" onchange="saveSettings()" />
+              <label class="form-check-label" for="enableBot"><i class="material-icons notranslate">smart_toy</i>Enable chat bot</label>
+              <br /><small class="text-body-secondary">Enables the bot commands below and adds confirmation replies for some commands</small>
+            </div>
+            <div class="input-group mb-3">
+              <span class="input-group-text">Bot commands cooldown</span>
+              <input disabled type="number" aria-label="Bot commands cooldown" id="botCooldown" placeholder="1" value="1" min="1" class="form-control" onchange="saveSettings()" />
+              <span class="input-group-text">seconds</span>
+            </div>
+            <h6>Bot Commands</h6>
+            <div class="input-group mb-3">
+              <span class="input-group-text">Song name</span>
+              <input
+                disabled
+                type="text"
+                id="songCommand"
+                data-default="!song"
+                value="!song"
+                aria-label="Song name command"
+                placeholder="command"
+                class="form-control"
+                onchange="saveSettings()"
+              />
+              <input
+                disabled
+                type="text"
+                id="songCommandAlias"
+                data-default="!s"
+                value="!s"
+                aria-label="Song name command alias"
+                placeholder="alias"
+                class="form-control"
+                onchange="saveSettings()"
+              />
+            </div>
+            <div class="input-group mb-3">
+              <span class="input-group-text">Queue</span>
+              <input
+                disabled
+                type="text"
+                id="queueCommand"
+                data-default="!queue"
+                value="!queue"
+                aria-label="Queue command"
+                placeholder="command"
+                class="form-control"
+                onchange="saveSettings()"
+              />
+              <input
+                disabled
+                type="text"
+                id="queueCommandAlias"
+                data-default="!q"
+                value="!q"
+                aria-label="Queue command alias"
+                placeholder="alias"
+                class="form-control"
+                onchange="saveSettings()"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-header"><i class="material-icons notranslate">group</i>Who can send requests</div>
+          <div class="card-body">
+            <p id="whoCanRequest">Everyone will be able to request.<br />Everyone will get 1 request.</p>
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">Role</th>
+                  <th
+                    scope="col"
+                    data-bs-toggle="tooltip"
+                    data-bs-delay="200"
+                    data-bs-placement="top"
+                    data-bs-title="How many requests each user can make based on the highest role limit they have"
+                  >
+                    Request limit
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="table-group-divider">
+                <tr>
+                  <th scope="row">
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowPlebs" onchange="saveSettings()" checked />
+                      <label class="form-check-label" for="allowPlebs">Non subscriber</label>
+                    </div>
+                  </th>
+                  <td>
+                    <input type="number" class="form-control request-limit" id="plebLimit" onchange="saveSettings()" value="1" min="1" placeholder="Unlimited" />
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowSubs" onchange="saveSettings()" checked />
+                      <label class="form-check-label" for="allowSubs">Subscriber</label>
+                    </div>
+                  </th>
+                  <td>
+                    <input type="number" class="form-control request-limit" id="subLimit" onchange="saveSettings()" value="1" min="1" placeholder="Unlimited" />
+                  </td>
+                </tr>
+
+                <tr>
+                  <th scope="row">
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowMods" onchange="saveSettings()" checked />
+                      <label class="form-check-label" for="allowMods">Mod</label>
+                    </div>
+                  </th>
+                  <td>
+                    <input type="number" class="form-control request-limit" id="modLimit" onchange="saveSettings()" value="1" min="1" placeholder="Unlimited" />
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowVips" onchange="saveSettings()" checked />
+                      <label class="form-check-label" for="allowVips">VIP</label>
+                    </div>
+                  </th>
+                  <td>
+                    <input type="number" class="form-control request-limit" id="vipLimit" onchange="saveSettings()" value="1" min="1" placeholder="Unlimited" />
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowFirstTimeChatters" onchange="saveSettings()" checked />
+                      <label class="form-check-label" for="allowFirstTimeChatters">First time chatter</label>
+                    </div>
+                  </th>
+                  <td>
+                    <input type="number" class="form-control request-limit" id="firstTimeChatterLimit" onchange="saveSettings()" value="1" min="1" placeholder="Unlimited" />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="btn-group mb-3" role="group" aria-label="Check all/Uncheck all">
+              <button type="button" id="selectAll" class="btn btn-sm btn-success">Select all</button>
+              <button type="button" id="unselectAll" class="btn btn-sm btn-danger">Unselect all</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-header"><i class="material-icons notranslate">shield</i>Moderation Settings</div>
+          <div class="card-body">
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" role="switch" id="approvalQueue" />
+              <label class="form-check-label" for="approvalQueue"><i class="material-icons notranslate">rule</i>Approval queue</label>
+              <br /><small class="form-text text-body-secondary">Requests will have to be manually approved by you before they get added to the queue</small>
+            </div>
+
+            <div class="input-group mb-1">
+              <span class="input-group-text">Skip current video/song</span>
+              <input type="text" id="skipCommand" data-default="!skip" value="!skip" aria-label="Skip command" placeholder="command" class="form-control" onchange="saveSettings()" />
+            </div>
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" role="switch" id="modSkip" onchange="saveSettings()" />
+              <label class="form-check-label" for="modSkip"><i class="material-icons notranslate">verified_user</i>Allow mods to skip</label>
+            </div>
+
+            <div class="input-group mt-3">
+              <span class="input-group-text">Minimum view count</span>
+              <input type="number" aria-label="Max queue length" id="minViewCount" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
+            </div>
+            <small class="form-text text-body-secondary">Videos/songs that have less views than this will be blocked</small>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#resetSettingsModal">
+            <i class="material-icons notranslate">restart_alt</i>Reset settings
+          </button>
         </div>
       </div>
     </div>
@@ -626,7 +622,7 @@
     </div>
 
     <div class="container-fluid">
-      <div class="row">
+      <div class="row" id="mainRow">
         <div class="col p-0 m-2">
           <div class="card" id="playersCard">
             <div class="card-body p-0">
@@ -642,29 +638,41 @@
             </div>
           </div>
         </div>
+
         <div class="col-xl-3 p-0 m-2">
           <div class="card">
-            <div class="card-body">
-              <h4 class="mb-3" id="commandHint">
+            <div class="card-body p-2">
+              <h4 class="mb-2" id="commandHint">
                 Add songs or videos to the queue using <kbd class="notranslate text-success cursor-pointer">!request</kbd> or <kbd class="notranslate text-success cursor-pointer">!r</kbd>
               </h4>
-
-              <button type="button" class="btn btn-success">Open queue</button>
-              <button type="button" class="btn btn-warning">Reset queue</button>
-
-              <label for="link" class="form-label mt-3">Add songs or videos to the queue:</label>
-              <div class="input-group mb-3">
-                <input type="text" id="link" class="form-control" placeholder="Link" aria-label="Add link input text field" aria-describedby="addLink" />
-                <button class="btn btn-secondary" type="button" id="addLink" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="top" data-bs-title="or just press enter :)">
-                  Add
-                </button>
+              <div class="hstack gap-1 align-items-end">
+                <div class="p-1">
+                  <input id="toggleQueue" type="checkbox" class="btn-check" autocomplete="off" />
+                  <label id="toggleQueueLabel" class="btn btn-lg btn-success" for="toggleQueue">
+                    Open<br />
+                    Queue
+                  </label>
+                  <br />
+                </div>
+                <div class="p-1 w-100">
+                  <label for="link" class="form-label mt-3">Add songs or videos to the queue:</label>
+                  <div class="input-group">
+                    <input type="text" id="link" class="form-control" placeholder="Link" aria-label="Add link input text field" aria-describedby="addLink" />
+                    <button class="btn btn-secondary" type="button" id="addLink" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="top" data-bs-title="or just press enter :)">
+                      Add
+                    </button>
+                  </div>
+                </div>
+                <div class="p-1">
+                  <button id="resetQueue" type="button" class="btn btn-sm btn-warning mt-1">Reset<br />Queue</button>
+                </div>
               </div>
             </div>
           </div>
 
           <div class="card mt-3" id="queue">
             <div class="card-body" id="queueCard">
-              <ul class="nav nav-tabs bg-body-tertiary" id="queueTabs" role="tablist" style="display: none">
+              <ul class="nav nav-tabs bg-body-tertiary" id="queueTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                   <button
                     class="nav-link active"
@@ -676,10 +684,10 @@
                     aria-controls="queue-tab-pane"
                     aria-selected="true"
                   >
-                    Queue
+                    <i class="material-icons notranslate">format_list_numbered</i>Queue
                   </button>
                 </li>
-                <li class="nav-item" role="presentation">
+                <li class="nav-item" role="presentation" id="approvalTabButton" style="display: none">
                   <button
                     class="nav-link"
                     id="approvalTab"
@@ -690,7 +698,21 @@
                     aria-controls="approval-tab-pane"
                     aria-selected="false"
                   >
-                    Approval queue
+                    <i class="material-icons notranslate">rule</i>Approval queue
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link"
+                    id="historyTab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#history-tab-pane"
+                    type="button"
+                    role="tab"
+                    aria-controls="history-tab-pane"
+                    aria-selected="false"
+                  >
+                    <i class="material-icons notranslate">history</i>History
                   </button>
                 </li>
               </ul>
@@ -731,6 +753,40 @@
                 </div>
                 <div class="tab-pane fade" id="approval-tab-pane" role="tabpanel" aria-labelledby="approvalTab" tabindex="0">
                   <ul class="list-group mt-1" id="approvalList">
+                    <li class="list-group-item">An item</li>
+                    <li class="list-group-item">A second item</li>
+                    <li class="list-group-item">A third item</li>
+                    <li class="list-group-item">A fourth item</li>
+                    <li class="list-group-item">And a fifth one</li>
+                    <li class="list-group-item">An item</li>
+                    <li class="list-group-item">A second item</li>
+                    <li class="list-group-item">A third item</li>
+                    <li class="list-group-item">A fourth item</li>
+                    <li class="list-group-item">And a fifth one</li>
+                    <li class="list-group-item">An item</li>
+                    <li class="list-group-item">A second item</li>
+                    <li class="list-group-item">A third item</li>
+                    <li class="list-group-item">A fourth item</li>
+                    <li class="list-group-item">And a fifth one</li>
+                    <li class="list-group-item">An item</li>
+                    <li class="list-group-item">A second item</li>
+                    <li class="list-group-item">A third item</li>
+                    <li class="list-group-item">A fourth item</li>
+                    <li class="list-group-item">And a fifth one</li>
+                    <li class="list-group-item">An item</li>
+                    <li class="list-group-item">A second item</li>
+                    <li class="list-group-item">A third item</li>
+                    <li class="list-group-item">A fourth item</li>
+                    <li class="list-group-item">And a fifth one</li>
+                    <li class="list-group-item">An item</li>
+                    <li class="list-group-item">A second item</li>
+                    <li class="list-group-item">A third item</li>
+                    <li class="list-group-item">A fourth item</li>
+                    <li class="list-group-item">And a fifth one</li>
+                  </ul>
+                </div>
+                <div class="tab-pane fade" id="history-tab-pane" role="tabpanel" aria-labelledby="historyTab" tabindex="0">
+                  <ul class="list-group mt-1" id="historyList">
                     <li class="list-group-item">An item</li>
                     <li class="list-group-item">A second item</li>
                     <li class="list-group-item">A third item</li>

@@ -51,7 +51,11 @@
 }
 
 #settingsOffcanvas {
-  width: 55vw;
+  width: 30vw;
+}
+
+#commandHint {
+  height: 57px;
 }
 
 .custom-popover {
@@ -117,21 +121,14 @@ iframe {
   height: 85vh;
 }
 
-#volumeSlider {
-  width: 10vw;
-}
-
-#volumeSliderValue {
-  width: 50px;
-}
-
 #queue {
-  height: 57.3vh;
+  height: 64.7vh;
 }
 
 #queueList,
-#approvalList {
-  height: 51vh;
+#approvalList,
+#historyList {
+  height: 59vh;
   overflow-x: hidden;
   overflow-y: auto;
   text-align: start;
@@ -143,4 +140,12 @@ iframe {
   margin-top: -17px;
   border-top-right-radius: 6px;
   border-top-left-radius: 6px;
+}
+
+#volumeSlider {
+  width: 10vw;
+}
+
+#volumeSliderValue {
+  width: 50px;
 }
