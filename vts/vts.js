@@ -1494,7 +1494,7 @@ async function refreshYTtoken() {
   });
   let requestOptions = { method: "POST", headers: myHeaders, body: raw, redirect: "follow" };
   try {
-    let response = await fetch(`https://helper.pepega.workers.dev/youtube/refresh`, requestOptions);
+    let response = await fetch(`https://helper.donk.workers.dev/youtube/refresh`, requestOptions);
     let result = await response.json();
     if (result.error) {
       elements.youtubeModalTitle.innerHTML = "API error";

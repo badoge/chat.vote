@@ -1032,7 +1032,7 @@ async function addOption() {
         method: "GET",
         redirect: "follow",
       };
-      let response = await fetch(`https://helper.pepega.workers.dev/cors/?${extraoption.split(" ")[0]}`, requestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/cors/?${extraoption.split(" ")[0]}`, requestOptions);
       if (response.headers.get("Content-Type").startsWith("image")) {
         extraoption = `<div class='resizable'><img src="${extraoption.split(" ")[0]}"></div> ${extraoption.split(" ").slice(1).join("")}`;
       }
@@ -1081,7 +1081,7 @@ async function addOptionBulk() {
           method: "GET",
           redirect: "follow",
         };
-        let response = await fetch(`https://helper.pepega.workers.dev/cors/?${f1[i].split(" ")[0]}`, requestOptions);
+        let response = await fetch(`https://helper.donk.workers.dev/cors/?${f1[i].split(" ")[0]}`, requestOptions);
         if (response.headers.get("Content-Type").startsWith("image")) {
           f2[i] = `<div class='resizable'><img src="${f1[i].split(" ")[0]}"></div> ${f1[i].split(" ").slice(1).join("")}`;
         }

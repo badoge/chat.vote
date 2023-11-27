@@ -26,7 +26,7 @@ async function approve(id) {
     redirect: "follow",
   };
   try {
-    let response = await fetch(`https://brackets.pepega.workers.dev/approve`, requestOptions);
+    let response = await fetch(`https://brackets.donk.workers.dev/approve`, requestOptions);
     let result = await response.json();
     showToast(result.message, "info", 3000);
     loadUnapproved();
@@ -52,7 +52,7 @@ async function unreject(id) {
     redirect: "follow",
   };
   try {
-    let response = await fetch(`https://brackets.pepega.workers.dev/unreject`, requestOptions);
+    let response = await fetch(`https://brackets.donk.workers.dev/unreject`, requestOptions);
     let result = await response.json();
     showToast(result.message, "info", 3000);
     loadUnapproved();
@@ -85,7 +85,7 @@ async function rejectSubmit() {
     redirect: "follow",
   };
   try {
-    let response = await fetch(`https://brackets.pepega.workers.dev/reject`, requestOptions);
+    let response = await fetch(`https://brackets.donk.workers.dev/reject`, requestOptions);
     let result = await response.json();
     showToast(result.message, "info", 3000);
     rejectModal.hide();
@@ -119,7 +119,7 @@ async function unapproveSubmit() {
     redirect: "follow",
   };
   try {
-    let response = await fetch(`https://brackets.pepega.workers.dev/unapprove`, requestOptions);
+    let response = await fetch(`https://brackets.donk.workers.dev/unapprove`, requestOptions);
     let result = await response.json();
     showToast(result.message, "info", 3000);
     unapproveModal.hide();
@@ -143,7 +143,7 @@ async function loadUnapproved() {
     redirect: "follow",
   };
   try {
-    let response = await fetch(`https://brackets.pepega.workers.dev/unapproved`, requestOptions);
+    let response = await fetch(`https://brackets.donk.workers.dev/unapproved`, requestOptions);
     let result = await response.json();
     if (result.length == 0) {
       elements.unapproved.innerHTML = "No brackets in queue :)";
@@ -189,7 +189,7 @@ async function loadApproved() {
     redirect: "follow",
   };
   try {
-    let response = await fetch(`https://brackets.pepega.workers.dev/approved`, requestOptions);
+    let response = await fetch(`https://brackets.donk.workers.dev/approved`, requestOptions);
     let result = await response.json();
     if (result.length == 0) {
       elements.approved.innerHTML = "No approved brackets found :(";
@@ -232,7 +232,7 @@ async function loadRejected() {
     redirect: "follow",
   };
   try {
-    let response = await fetch(`https://brackets.pepega.workers.dev/rejected`, requestOptions);
+    let response = await fetch(`https://brackets.donk.workers.dev/rejected`, requestOptions);
     let result = await response.json();
     if (result.length == 0) {
       elements.rejected.innerHTML = "No rejected brackets found :)";
@@ -274,7 +274,7 @@ window.onload = async function () {
     redirect: "follow",
   };
   try {
-    let response = await fetch(`https://brackets.pepega.workers.dev/check`, requestOptions);
+    let response = await fetch(`https://brackets.donk.workers.dev/check`, requestOptions);
     let result = await response.json();
     if (response.status !== 200 || result.message !== "OK") {
       alert("You don't have permission to view this page");

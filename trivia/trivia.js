@@ -282,7 +282,7 @@ async function handleInput(event) {
         redirect: "follow",
       };
       try {
-        let response = await fetch(`https://helper.pepega.workers.dev/cors/?${input.split(" ")[0]}`, requestOptions);
+        let response = await fetch(`https://helper.donk.workers.dev/cors/?${input.split(" ")[0]}`, requestOptions);
         if (response.headers.get("Content-Type").startsWith("image")) {
           let imageSpans = [...document.querySelectorAll(".poll-image")];
           let pollOptions = [...document.querySelectorAll(".questions")];

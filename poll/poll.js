@@ -234,7 +234,7 @@ async function addOptionBulk() {
         redirect: "follow",
       };
       try {
-        let response = await fetch(`https://helper.pepega.workers.dev/cors/?${text.split(" ")[0]}`, requestOptions);
+        let response = await fetch(`https://helper.donk.workers.dev/cors/?${text.split(" ")[0]}`, requestOptions);
         if (response.headers.get("Content-Type").startsWith("image")) {
           imageSpans[i].innerHTML = `<div class="resizable"><img src="${text.split(" ")[0]}"></div>`;
           imageSpans[i].dataset.imageUrl = text.split(" ")[0];
@@ -382,7 +382,7 @@ async function createPoll() {
         multianswer: multianswer,
       }),
     };
-    let response = await fetch(`https://polls.pepega.workers.dev/createpoll`, requestOptions);
+    let response = await fetch(`https://polls.donk.workers.dev/createpoll`, requestOptions);
     //let response = await fetch(`http://127.0.0.1:8787/createpoll`, requestOptions);
 
     let result = await response.json();
@@ -503,7 +503,7 @@ async function handleInput(event) {
         redirect: "follow",
       };
       try {
-        let response = await fetch(`https://helper.pepega.workers.dev/cors/?${input.split(" ")[0]}`, requestOptions);
+        let response = await fetch(`https://helper.donk.workers.dev/cors/?${input.split(" ")[0]}`, requestOptions);
         if (response.headers.get("Content-Type").startsWith("image")) {
           let imageSpans = [...document.querySelectorAll(".poll-image")];
           let pollOptions = [...document.querySelectorAll(".poll-option")];

@@ -598,7 +598,7 @@ function previewOption(id) {
     elements.previewModalBody.innerHTML = `
     <div class="card">
     <div class="card-body">
-    <img src="https://proxy.pepega.workers.dev/?url=${encodeURI(option.value)}" alt="${name.value}" title="${name.value}" class="option-image">
+    <img src="https://proxy.donk.workers.dev/?url=${encodeURI(option.value)}" alt="${name.value}" title="${name.value}" class="option-image">
     </div>
     </div>`;
     previewModal.show();
@@ -839,7 +839,7 @@ function startTierlist(bracket) {
       elements.upcoming_thumbnails.insertAdjacentHTML("beforeend", `<div class="border rounded tierlist-item me-1">${bracket.options[index].value}</div>`);
       continue;
     }
-    let link = bracket.options[index].thumbnail ? `https://proxy.pepega.workers.dev/?url=${encodeURI(bracket.options[index].thumbnail)}` : "/pics/nothumbnail.png";
+    let link = bracket.options[index].thumbnail ? `https://proxy.donk.workers.dev/?url=${encodeURI(bracket.options[index].thumbnail)}` : "/pics/nothumbnail.png";
 
     elements.upcoming_thumbnails.insertAdjacentHTML(
       "beforeend",
@@ -1017,7 +1017,7 @@ function nextTierlistItem() {
       elements.currentTierlistItem.innerHTML = `Invalid image URL`;
       return;
     }
-    elements.currentTierlistItem.innerHTML = `<img src="https://proxy.pepega.workers.dev/?url=${encodeURI(item.value)}" alt="${item.name}" title="${item.name}" class="tierlist-image">`;
+    elements.currentTierlistItem.innerHTML = `<img src="https://proxy.donk.workers.dev/?url=${encodeURI(item.value)}" alt="${item.name}" title="${item.name}" class="tierlist-image">`;
   } //image
 
   if (item.type == "youtube") {
@@ -1218,7 +1218,7 @@ function promoteOption(option, position = null) {
 
 function placeTierlistItem(tier) {
   let id = `item${Date.now()}`;
-  let link = currentTierlistItem.thumbnail ? `https://proxy.pepega.workers.dev/?url=${encodeURI(currentTierlistItem.thumbnail)}` : "/pics/nothumbnail.png";
+  let link = currentTierlistItem.thumbnail ? `https://proxy.donk.workers.dev/?url=${encodeURI(currentTierlistItem.thumbnail)}` : "/pics/nothumbnail.png";
   let card = document.querySelector(`[data-tier="${tier.command}"]`);
   card.innerHTML += `<img id="${id}" class="border rounded tierlist-item me-1" alt="${elements.currentTierlistItemName.innerHTML}" title="${elements.currentTierlistItemName.innerHTML}" src="${link}">`;
   let start = elements.currentTierlistItem.getBoundingClientRect();
@@ -1249,7 +1249,7 @@ function showOption(position, option) {
       elements[`${position}_value`].innerHTML = `Invalid image URL`;
       return;
     }
-    elements[`${position}_value`].innerHTML = `<img src="https://proxy.pepega.workers.dev/?url=${encodeURI(option.value)}" alt="${option.name}" title="${option.name}" class="option-image">`;
+    elements[`${position}_value`].innerHTML = `<img src="https://proxy.donk.workers.dev/?url=${encodeURI(option.value)}" alt="${option.name}" title="${option.name}" class="option-image">`;
   } //image
 
   if (option.type == "youtube") {
@@ -1537,7 +1537,7 @@ async function previewSpotifyPlaylist() {
       },
       redirect: "follow",
     };
-    let response = await fetch(`https://brackets.pepega.workers.dev/spotifyplaylist?id=${playlist[2]}`, requestOptions);
+    let response = await fetch(`https://brackets.donk.workers.dev/spotifyplaylist?id=${playlist[2]}`, requestOptions);
     let result = await response.json();
     let tracks = [...result[0].tracks.items];
     for (let index = 1; index < result.length; index++) {
@@ -1594,7 +1594,7 @@ async function previewTiermaker() {
       },
       redirect: "follow",
     };
-    let response = await fetch(`https://brackets.pepega.workers.dev/tiermaker?id=${id}`, requestOptions);
+    let response = await fetch(`https://brackets.donk.workers.dev/tiermaker?id=${id}`, requestOptions);
     let result = await response.json();
     previewedBracketTitle = `Generated TierMaker bracket`;
     previewedBracketDescription = `Generated from ${link}`;
@@ -1623,7 +1623,7 @@ async function previewTiermaker() {
 
       html += `
         <li class="list-group-item">
-        <a target="_blank" rel="noopener noreferrer" href="https://proxy.pepega.workers.dev/?url=${encodeURI(link)}">
+        <a target="_blank" rel="noopener noreferrer" href="https://proxy.donk.workers.dev/?url=${encodeURI(link)}">
         ${name || "Untitled option"}
         </a>
         </li>`;
@@ -1655,7 +1655,7 @@ async function previewClips() {
       },
       redirect: "follow",
     };
-    let response = await fetch(`https://helper.pepega.workers.dev/twitch/clips?broadcaster_id=${id}`, requestOptions);
+    let response = await fetch(`https://helper.donk.workers.dev/twitch/clips?broadcaster_id=${id}`, requestOptions);
     let result = await response.json();
     let clips = result.data;
     if (clips == 0) {
@@ -1749,7 +1749,7 @@ async function previewUwufufu() {
       },
       redirect: "follow",
     };
-    let response = await fetch(`https://brackets.pepega.workers.dev/uwufufu?id=${id}`, requestOptions);
+    let response = await fetch(`https://brackets.donk.workers.dev/uwufufu?id=${id}`, requestOptions);
     let result = await response.json();
     previewedBracketTitle = result.title || `Generated UwUFUFU bracket`;
     previewedBracketDescription = `Generated from ${link}`;
@@ -1780,7 +1780,7 @@ async function previewUwufufu() {
       } else {
         html += `
         <li class="list-group-item">
-        <a target="_blank" rel="noopener noreferrer" href="https://proxy.pepega.workers.dev/?url=${encodeURI(previewedBracket[index].value)}">
+        <a target="_blank" rel="noopener noreferrer" href="https://proxy.donk.workers.dev/?url=${encodeURI(previewedBracket[index].value)}">
         ${previewedBracket[index].name || "Untitled option"}
         </a>
         </li>`;
@@ -1950,7 +1950,7 @@ async function publishBracket(id, e) {
     redirect: "follow",
   };
   try {
-    let response = await fetch(`https://brackets.pepega.workers.dev/publish`, requestOptions);
+    let response = await fetch(`https://brackets.donk.workers.dev/publish`, requestOptions);
     let result = await response.json();
     showToast(result.message, "info", 3000);
     e.innerHTML = `<i class="material-icons notranslate">cloud_upload</i>`;
@@ -1975,7 +1975,7 @@ async function loadApproved() {
     redirect: "follow",
   };
   try {
-    let response = await fetch(`https://brackets.pepega.workers.dev/approved`, requestOptions);
+    let response = await fetch(`https://brackets.donk.workers.dev/approved`, requestOptions);
     let result = await response.json();
     approvedBrackets = result;
     console.log(result);
@@ -2237,7 +2237,7 @@ function dragElement() {
 
 async function testImage(url, format) {
   try {
-    const res = await fetch(`https://helper.pepega.workers.dev/cors/?${url}`);
+    const res = await fetch(`https://helper.donk.workers.dev/cors/?${url}`);
     const buff = await res.blob();
     if (buff.type.startsWith("image/")) {
       return format;

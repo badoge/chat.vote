@@ -348,7 +348,7 @@ async function checkTags(userID, access_token) {
 
 async function getUserID(username) {
   try {
-    let response = await fetch(`https://helper.pepega.workers.dev/twitch/users?login=${username}`, GETrequestOptions);
+    let response = await fetch(`https://helper.donk.workers.dev/twitch/users?login=${username}`, GETrequestOptions);
     let result = await response.json();
     return result?.data[0]?.id || "";
   } catch (error) {
@@ -358,7 +358,7 @@ async function getUserID(username) {
 
 async function getStreamerColor(channelId) {
   try {
-    let response = await fetch(`https://helper.pepega.workers.dev/twitch/chat/color?user_id=${channelId}`, GETrequestOptions);
+    let response = await fetch(`https://helper.donk.workers.dev/twitch/chat/color?user_id=${channelId}`, GETrequestOptions);
     let result = await response.json();
     return result?.data[0]?.color || "#FFFFFF";
   } catch (error) {
@@ -379,7 +379,7 @@ async function sendUsername(site, channel, platform, stream = null) {
     redirect: "follow",
   };
   try {
-    let response = await fetch(`https://helper.pepega.workers.dev/log/username`, requestOptions);
+    let response = await fetch(`https://helper.donk.workers.dev/log/username`, requestOptions);
     console.log("sendUsername response", response.status);
   } catch (error) {
     console.log("sendUsername error", error);
@@ -407,7 +407,7 @@ async function sendData(site, channel, platform, data, stream = null) {
     redirect: "follow",
   };
   try {
-    let response = await fetch(`https://helper.pepega.workers.dev/log/data`, requestOptions);
+    let response = await fetch(`https://helper.donk.workers.dev/log/data`, requestOptions);
     console.log("sendData response", response.status);
   } catch (error) {
     console.log("sendData error", error);
@@ -513,7 +513,7 @@ async function getGlobalBadges() {
 async function getCustomBadges() {
   return new Promise(async function (resolve, reject) {
     try {
-      let response = await fetch(`https://badges.pepega.workers.dev`, GETrequestOptions);
+      let response = await fetch(`https://badges.donk.workers.dev`, GETrequestOptions);
       let result = await response.json();
       if (!result || result.length == 0) {
         resolve([]);
@@ -647,7 +647,7 @@ async function getLinkInfo(element, allowThumbnails) {
     url = `LINKPREVIEW${encodeURIComponent(url)}`;
     let tooltip = bootstrap.Tooltip.getInstance(element);
     try {
-      let response = await fetch(`https://helper.pepega.workers.dev/cors/?${url}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/cors/?${url}`, GETrequestOptions);
       let result = await response.json();
       if (result?.status != 200 && result?.message) {
         element.setAttribute("data-bs-title", result.message);

@@ -101,7 +101,7 @@ async function report(id) {
         captchatoken: token,
       }),
     };
-    let response = await fetch(`https://polls.pepega.workers.dev/report`, requestOptions);
+    let response = await fetch(`https://polls.donk.workers.dev/report`, requestOptions);
     //let response = await fetch(`http://127.0.0.1:8787/report`, requestOptions);
 
     let result = await response.json();
@@ -170,7 +170,7 @@ async function vote() {
         captchatoken: token,
       }),
     };
-    let response = await fetch(`https://polls.pepega.workers.dev/vote`, requestOptions);
+    let response = await fetch(`https://polls.donk.workers.dev/vote`, requestOptions);
     //let response = await fetch(`http://127.0.0.1:8787/vote`, requestOptions);
 
     let result = await response.json();
@@ -292,7 +292,7 @@ async function refresh() {
       "Content-Type": "application/json",
     };
     let url = `id=${encodeURI(pollID)}&captchatoken=${token}`;
-    let response = await fetch(`https://polls.pepega.workers.dev/results/?${url}`, requestOptions);
+    let response = await fetch(`https://polls.donk.workers.dev/results/?${url}`, requestOptions);
     //let response = await fetch(`http://127.0.0.1:8787/results/?${url}`, requestOptions);
 
     let result = await response.json();

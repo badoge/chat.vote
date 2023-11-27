@@ -68,7 +68,7 @@
             myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
             let requestOptions = { method: "POST", headers: myHeaders, redirect: "follow" };
             try {
-              let response2 = await fetch(`https://helper.pepega.workers.dev/youtube/auth?code=${response.code}`, requestOptions);
+              let response2 = await fetch(`https://helper.donk.workers.dev/youtube/auth?code=${response.code}`, requestOptions);
               let result = await response2.json();
               let VTS = {
                 userID: "",
