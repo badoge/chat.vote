@@ -1537,7 +1537,7 @@ async function previewSpotifyPlaylist() {
       },
       redirect: "follow",
     };
-    let response = await fetch(`https://brackets.donk.workers.dev/spotifyplaylist?id=${playlist[2]}`, requestOptions);
+    let response = await fetch(`https://helper.donk.workers.dev/spotify/playlist?id=${playlist[2]}`, requestOptions);
     let result = await response.json();
     let tracks = [...result[0].tracks.items];
     for (let index = 1; index < result.length; index++) {
@@ -1594,7 +1594,7 @@ async function previewTiermaker() {
       },
       redirect: "follow",
     };
-    let response = await fetch(`https://brackets.donk.workers.dev/tiermaker?id=${id}`, requestOptions);
+    let response = await fetch(`https://helper.donk.workers.dev/tiermaker?id=${id}`, requestOptions);
     let result = await response.json();
     previewedBracketTitle = `Generated TierMaker bracket`;
     previewedBracketDescription = `Generated from ${link}`;
@@ -1749,7 +1749,7 @@ async function previewUwufufu() {
       },
       redirect: "follow",
     };
-    let response = await fetch(`https://brackets.donk.workers.dev/uwufufu?id=${id}`, requestOptions);
+    let response = await fetch(`https://helper.donk.workers.dev/uwufufu?id=${id}`, requestOptions);
     let result = await response.json();
     previewedBracketTitle = result.title || `Generated UwUFUFU bracket`;
     previewedBracketDescription = `Generated from ${link}`;
