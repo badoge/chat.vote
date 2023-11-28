@@ -418,7 +418,7 @@ function connect() {
     console.log(`Connected to ${address}:${port}`);
     elements.status.innerHTML = `<h4><span class="badge bg-success">Connected :)</span></h4>`;
     saveSettings();
-    sendUsername(`chat.vote/queue`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
+    sendUsername(`chat.vote/playlist`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
     if (await checkTags(USER.userID, USER.access_token)) {
       elements.vtsLink.style.display = "";
     }
@@ -570,12 +570,12 @@ async function loadAndConnect() {
   }
   if (USER.channel) {
     connect();
-    elements.profileLink.value = `https://queue.chat.vote/${USER.channel || ""}`;
+    elements.profileLink.value = `https://playlist.chat.vote/${USER.channel || ""}`;
   }
 } //loadAndConnect
 
 function copyLink() {
-  navigator.clipboard.writeText(`https://queue.chat.vote/${USER.channel || ""}`);
+  navigator.clipboard.writeText(`https://playlist.chat.vote/${USER.channel || ""}`);
   copyLinkButton.show();
   setTimeout(() => {
     copyLinkButton.hide();
