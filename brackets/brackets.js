@@ -2108,44 +2108,34 @@ const rgba2hex = (rgba) =>
     .join("")}`;
 
 async function getYTPlaylist(id) {
-  let parts = [];
-  parts.push(await getYTPlaylistPart(id));
-  while (parts[parts.length - 1].nextPageToken) {
-    parts.push(await getYTPlaylistPart(id, parts[parts.length - 1].nextPageToken));
-  }
-  return parts;
-} //getYTPlaylist
-
-async function getYTChannelVideos(id, length = 1) {
-  let parts = [];
-  parts.push(await getYTChannelVideosPart(id));
-  for (let index = 1; index < length; index++) {
-    console.log("asd");
-    parts.push(await getYTChannelVideosPart(id, parts[parts.length - 1].nextPageToken));
-  }
-
-  return parts;
-} //getYTChannelVideos
-
-async function getYTPlaylistPart(id, nextPageToken = null) {
   let requestOptions = {
     method: "GET",
     redirect: "follow",
   };
   try {
-    let response = await fetch(
-      `https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&key=${API_KEY_YT}&playlistId=${encodeURIComponent(id)}${
-        nextPageToken ? `&pageToken=${nextPageToken}` : ""
-      }`,
-      requestOptions
-    );
+    let response = await fetch(`https://helper.donk.workers.dev/youtube/playlist?id=${encodeURIComponent(id)}`, requestOptions);
     let result = await response.json();
     return result;
   } catch (error) {
-    console.log("getYTPlaylistPart error", error);
+    console.log("getYTPlaylist error", error);
     return false;
   }
-} //getYTPlaylistPart
+} //getYTPlaylist
+
+async function getYTChannelVideos(id, length = 1) {
+  let requestOptions = {
+    method: "GET",
+    redirect: "follow",
+  };
+  try {
+    let response = await fetch(`https://helper.donk.workers.dev/youtube/channelvideos?id=${encodeURIComponent(id)}&length=${length}`, requestOptions);
+    let result = await response.json();
+    return result;
+  } catch (error) {
+    console.log("getYTChannelVideos error", error);
+    return false;
+  }
+} //getYTChannelVideos
 
 async function getYTPlaylistInfo(id) {
   let requestOptions = {
@@ -2153,7 +2143,7 @@ async function getYTPlaylistInfo(id) {
     redirect: "follow",
   };
   try {
-    let response = await fetch(`https://youtube.googleapis.com/youtube/v3/playlists?part=snippet&maxResults=50&key=${API_KEY_YT}&id=${encodeURIComponent(id)}`, requestOptions);
+    let response = await fetch(`https://helper.donk.workers.dev/youtube/playlistinfo?id=${encodeURIComponent(id)}`, requestOptions);
     let result = await response.json();
     return result;
   } catch (error) {
@@ -2162,33 +2152,13 @@ async function getYTPlaylistInfo(id) {
   }
 } //getYTPlaylistInfo
 
-async function getYTChannelVideosPart(id, nextPageToken = null) {
-  let requestOptions = {
-    method: "GET",
-    redirect: "follow",
-  };
-  try {
-    let response = await fetch(
-      `https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&order=viewCount&safeSearch=none&type=video&videoEmbeddable=true&key=${API_KEY_YT}&channelId=${encodeURIComponent(
-        id
-      )}${nextPageToken ? `&pageToken=${nextPageToken}` : ""}`,
-      requestOptions
-    );
-    let result = await response.json();
-    return result;
-  } catch (error) {
-    console.log("getYTChannelVideosPart error", error);
-    return false;
-  }
-} //getYTChannelVideosPart
-
 async function getYTChannelID(handle) {
   let requestOptions = {
     method: "GET",
     redirect: "follow",
   };
   try {
-    let response = await fetch(`https://youtube.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(handle)}&type=channel&maxResults=1&key=${API_KEY_YT}`, requestOptions);
+    let response = await fetch(`https://helper.donk.workers.dev/youtube/id?handle=${encodeURIComponent(handle)}`, requestOptions);
     let result = await response.json();
     return result;
   } catch (error) {
