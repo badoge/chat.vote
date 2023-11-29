@@ -137,11 +137,11 @@
         </div>
 
         <div class="card mb-3">
-          <div class="card-header"><i class="material-icons notranslate">settings</i>Queue Settings</div>
+          <div class="card-header"><i class="material-icons notranslate">settings</i>Playlist Settings</div>
           <div class="card-body">
-            <h6>Max queue duration</h6>
+            <h6>Max playlist duration</h6>
             <div class="input-group">
-              <input type="number" aria-label="Max queue duration" id="maxDuration" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
+              <input type="number" aria-label="Max playlist duration" id="maxDuration" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
               <select class="form-select" id="maxDurationUnit" onchange="saveSettings()">
                 <option selected value="m">Minutes</option>
                 <option value="h">Hours</option>
@@ -157,10 +157,10 @@
             <small class="form-text text-body-secondary">How long a single video/song can be</small>
 
             <div class="input-group mt-3">
-              <span class="input-group-text">Max queue size</span>
-              <input type="number" aria-label="Max queue length" id="maxSize" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
+              <span class="input-group-text">Max playlist size</span>
+              <input type="number" aria-label="Max playlist length" id="maxSize" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
             </div>
-            <small class="form-text text-body-secondary">How many videos/songs are allowed to be in the queue</small>
+            <small class="form-text text-body-secondary">How many videos/songs are allowed to be in the playlist</small>
           </div>
         </div>
 
@@ -169,7 +169,7 @@
           <div class="card-body">
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" role="switch" id="noCommand" onchange="saveSettings()" />
-              <label class="form-check-label" for="noCommand"><i class="material-icons notranslate">link</i>Add any link in chat to the queue</label>
+              <label class="form-check-label" for="noCommand"><i class="material-icons notranslate">link</i>Add any link in chat to the playlist</label>
             </div>
             <div class="input-group mb-3">
               <span class="input-group-text">Request</span>
@@ -267,14 +267,14 @@
               />
             </div>
             <div class="input-group mb-3">
-              <span class="input-group-text">Queue</span>
+              <span class="input-group-text">Playlist</span>
               <input
                 disabled
                 type="text"
-                id="queueCommand"
-                data-default="!queue"
-                value="!queue"
-                aria-label="Queue command"
+                id="playlistCommand"
+                data-default="!playlist"
+                value="!playlist"
+                aria-label="Playlist command"
                 placeholder="command"
                 class="form-control"
                 onchange="saveSettings()"
@@ -282,10 +282,10 @@
               <input
                 disabled
                 type="text"
-                id="queueCommandAlias"
-                data-default="!q"
-                value="!q"
-                aria-label="Queue command alias"
+                id="playlistCommandAlias"
+                data-default="!pl"
+                value="!pl"
+                aria-label="Playlist command alias"
                 placeholder="alias"
                 class="form-control"
                 onchange="saveSettings()"
@@ -385,7 +385,7 @@
             <div class="form-check form-switch mb-3">
               <input class="form-check-input" type="checkbox" role="switch" id="approvalQueue" />
               <label class="form-check-label" for="approvalQueue"><i class="material-icons notranslate">rule</i>Approval queue</label>
-              <br /><small class="form-text text-body-secondary">Requests will have to be manually approved by you before they get added to the queue</small>
+              <br /><small class="form-text text-body-secondary">Requests will have to be manually approved by you before they get added to the playlist</small>
             </div>
 
             <div class="input-group mb-1">
@@ -399,7 +399,7 @@
 
             <div class="input-group mt-3">
               <span class="input-group-text">Minimum view count</span>
-              <input type="number" aria-label="Max queue length" id="minViewCount" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
+              <input type="number" aria-label="Minimum view count" id="minViewCount" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
             </div>
             <small class="form-text text-body-secondary">Videos/songs that have less views than this will be blocked</small>
           </div>
@@ -643,19 +643,19 @@
           <div class="card">
             <div class="card-body p-2">
               <h4 class="mb-2" id="commandHint">
-                Add songs or videos to the queue using <kbd class="notranslate text-success cursor-pointer">!request</kbd> or <kbd class="notranslate text-success cursor-pointer">!r</kbd>
+                Add songs or videos to the playlist using <kbd class="notranslate text-success cursor-pointer">!request</kbd> or <kbd class="notranslate text-success cursor-pointer">!r</kbd>
               </h4>
               <div class="hstack gap-1 align-items-end">
                 <div class="p-1">
-                  <input id="toggleQueue" type="checkbox" class="btn-check" autocomplete="off" />
-                  <label id="toggleQueueLabel" class="btn btn-lg btn-success" for="toggleQueue">
+                  <input id="togglePlaylist" type="checkbox" class="btn-check" autocomplete="off" />
+                  <label id="togglePlaylistLabel" class="btn btn-lg btn-success" for="togglePlaylist">
                     Open<br />
-                    Queue
+                    Playlist
                   </label>
                   <br />
                 </div>
                 <div class="p-1 w-100">
-                  <label for="link" class="form-label mt-3">Add songs or videos to the queue:</label>
+                  <label for="link" class="form-label mt-3">Add songs or videos to the playlist:</label>
                   <div class="input-group">
                     <input type="text" id="link" class="form-control" placeholder="Link" aria-label="Add link input text field" aria-describedby="addLink" />
                     <button class="btn btn-secondary" type="button" id="addLink" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="top" data-bs-title="or just press enter :)">
@@ -664,27 +664,27 @@
                   </div>
                 </div>
                 <div class="p-1">
-                  <button id="resetQueue" type="button" class="btn btn-sm btn-warning mt-1">Reset<br />Queue</button>
+                  <button id="resetPlaylist" type="button" class="btn btn-sm btn-warning mt-1">Reset<br />Playlist</button>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="card mt-3" id="queue">
-            <div class="card-body" id="queueCard">
-              <ul class="nav nav-tabs bg-body-tertiary" id="queueTabs" role="tablist">
+          <div class="card mt-3" id="playlist">
+            <div class="card-body">
+              <ul class="nav nav-tabs bg-body-tertiary" id="playlistTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                   <button
                     class="nav-link active"
-                    id="queueTab"
+                    id="playlistTab"
                     data-bs-toggle="tab"
-                    data-bs-target="#queue-tab-pane"
+                    data-bs-target="#playlist-tab-pane"
                     type="button"
                     role="tab"
-                    aria-controls="queue-tab-pane"
+                    aria-controls="playlist-tab-pane"
                     aria-selected="true"
                   >
-                    <i class="material-icons notranslate">format_list_numbered</i>Queue
+                    <i class="material-icons notranslate">format_list_numbered</i>Playlist
                   </button>
                 </li>
                 <li class="nav-item" role="presentation" id="approvalTabButton" style="display: none">
@@ -717,8 +717,8 @@
                 </li>
               </ul>
               <div class="tab-content">
-                <div class="tab-pane fade show active" id="queue-tab-pane" role="tabpanel" aria-labelledby="queueTab" tabindex="0">
-                  <ul class="list-group mt-1" id="queueList">
+                <div class="tab-pane fade show active" id="playlist-tab-pane" role="tabpanel" aria-labelledby="playlistTab" tabindex="0">
+                  <ul class="list-group mt-1" id="mainList">
                     <li class="list-group-item">An item</li>
                     <li class="list-group-item">A second item</li>
                     <li class="list-group-item">A third item</li>

@@ -48,8 +48,8 @@ let elements = {
   botCooldown: document.getElementById("botCooldown"),
   songCommand: document.getElementById("songCommand"),
   songCommandAlias: document.getElementById("songCommandAlias"),
-  queueCommand: document.getElementById("queueCommand"),
-  queueCommandAlias: document.getElementById("queueCommandAlias"),
+  playlistCommand: document.getElementById("playlistCommand"),
+  playlistCommandAlias: document.getElementById("playlistCommandAlias"),
   approvalQueue: document.getElementById("approvalQueue"),
   skipCommand: document.getElementById("skipCommand"),
   modSkip: document.getElementById("modSkip"),
@@ -59,18 +59,17 @@ let elements = {
   toastContainer: document.getElementById("toastContainer"),
   playersCard: document.getElementById("playersCard"),
   commandHint: document.getElementById("commandHint"),
-  toggleQueue: document.getElementById("toggleQueue"),
-  toggleQueueLabel: document.getElementById("toggleQueueLabel"),
-  resetQueue: document.getElementById("resetQueue"),
+  togglePlaylist: document.getElementById("togglePlaylist"),
+  togglePlaylistLabel: document.getElementById("togglePlaylistLabel"),
+  resetPlaylist: document.getElementById("resetPlaylist"),
   link: document.getElementById("link"),
   addLink: document.getElementById("addLink"),
 
-  //queue
-  queue: document.getElementById("queue"),
-  queueTab: document.getElementById("queueTab"),
+  //playlist
+  playlistTab: document.getElementById("playlistTab"),
   approvalTabButton: document.getElementById("approvalTabButton"),
   approvalTab: document.getElementById("approvalTab"),
-  queueList: document.getElementById("queueList"),
+  mainList: document.getElementById("mainList"),
   approvalList: document.getElementById("approvalList"),
   historyTab: document.getElementById("historyTab"),
   historyList: document.getElementById("historyList"),
@@ -90,8 +89,8 @@ let loginButton;
 let settingsOffcanvas;
 let loginExpiredModal, resetSettingsModal;
 let copyLinkButton;
-let queueTab, approvalTab, historyTab;
-let queue_open = false;
+let playlistTab, approvalTab, historyTab;
+let playlist_open = false;
 
 let USER = {
   channel: "",
@@ -101,7 +100,7 @@ let USER = {
   platform: "",
 };
 
-let QUEUE = {
+let PLAYLIST = {
   allowSpotifySongs: true,
   allowTwitchClips: true,
   allowTwitchStreams: true,
@@ -134,8 +133,8 @@ let QUEUE = {
   botCooldown: 1,
   songCommand: "!song",
   songCommandAlias: "!s",
-  queueCommand: "!queue",
-  queueCommandAlias: "!q",
+  playlistCommand: "!playlist",
+  playlistCommandAlias: "!pl",
   approvalQueue: false,
   skipCommand: "!skip",
   modSkip: false,
@@ -152,62 +151,62 @@ async function refreshData() {
     USER.userID = await getUserID(USER.channel);
   }
 
-  QUEUE.allowSpotifySongs = elements.allowSpotifySongs.checked;
-  QUEUE.allowTwitchClips = elements.allowTwitchClips.checked;
-  QUEUE.allowTwitchStreams = elements.allowTwitchStreams.checked;
-  QUEUE.allowTwitchVODs = elements.allowTwitchVODs.checked;
-  QUEUE.allowYTStreams = elements.allowYTStreams.checked;
-  QUEUE.allowYTShorts = elements.allowYTShorts.checked;
-  QUEUE.allowYTVideos = elements.allowYTVideos.checked;
-  QUEUE.maxDuration = parseInt(elements.maxDuration.value, 10) || "";
-  QUEUE.maxDurationUnit = elements.maxDurationUnit.value || "m";
-  QUEUE.maxLength = parseInt(elements.maxLength.value, 10) || "";
-  QUEUE.maxSize = parseInt(elements.maxSize.value, 10) || "";
-  QUEUE.allowPlebs = elements.allowPlebs.checked;
-  QUEUE.allowSubs = elements.allowSubs.checked;
-  QUEUE.allowMods = elements.allowMods.checked;
-  QUEUE.allowVips = elements.allowVips.checked;
-  QUEUE.allowFirstTimeChatters = elements.allowFirstTimeChatters.checked;
-  QUEUE.plebLimit = parseInt(elements.plebLimit.value, 10) || 1;
-  QUEUE.subLimit = parseInt(elements.subLimit.value, 10) || 1;
-  QUEUE.modLimit = parseInt(elements.modLimit.value, 10) || 1;
-  QUEUE.vipLimit = parseInt(elements.vipLimit.value, 10) || 1;
-  QUEUE.firstTimeChatterLimit = parseInt(elements.firstTimeChatterLimit.value, 10) || 1;
-  QUEUE.noCommand = elements.noCommand.checked;
-  QUEUE.requestCommand = elements.requestCommand.value.replace(/\s+/g, "").toLowerCase() || "!request";
-  QUEUE.requestCommandAlias = elements.requestCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!r";
-  QUEUE.allowVoteSkip = elements.allowVoteSkip.checked;
-  QUEUE.voteskipCommand = elements.voteskipCommand.value.replace(/\s+/g, "").toLowerCase() || "!voteskip";
-  QUEUE.voteskipCommandAlias = elements.voteskipCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!vs";
-  QUEUE.voteskipCount = parseInt(elements.voteskipCount.value, 10) || 1;
-  QUEUE.enableBot = elements.enableBot.checked;
-  QUEUE.botCooldown = parseInt(elements.botCooldown.value, 10) || 1;
-  QUEUE.songCommand = elements.songCommand.value.replace(/\s+/g, "").toLowerCase() || "!song";
-  QUEUE.songCommandAlias = elements.songCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!s";
-  QUEUE.queueCommand = elements.queueCommand.value.replace(/\s+/g, "").toLowerCase() || "!queue";
-  QUEUE.queueCommandAlias = elements.queueCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!q";
-  QUEUE.approvalQueue = elements.approvalQueue.checked;
-  QUEUE.skipCommand = elements.skipCommand.value.replace(/\s+/g, "").toLowerCase() || "!skip";
-  QUEUE.modSkip = elements.modSkip.checked;
-  QUEUE.minViewCount = parseInt(elements.minViewCount.value, 10) || "";
+  PLAYLIST.allowSpotifySongs = elements.allowSpotifySongs.checked;
+  PLAYLIST.allowTwitchClips = elements.allowTwitchClips.checked;
+  PLAYLIST.allowTwitchStreams = elements.allowTwitchStreams.checked;
+  PLAYLIST.allowTwitchVODs = elements.allowTwitchVODs.checked;
+  PLAYLIST.allowYTStreams = elements.allowYTStreams.checked;
+  PLAYLIST.allowYTShorts = elements.allowYTShorts.checked;
+  PLAYLIST.allowYTVideos = elements.allowYTVideos.checked;
+  PLAYLIST.maxDuration = parseInt(elements.maxDuration.value, 10) || "";
+  PLAYLIST.maxDurationUnit = elements.maxDurationUnit.value || "m";
+  PLAYLIST.maxLength = parseInt(elements.maxLength.value, 10) || "";
+  PLAYLIST.maxSize = parseInt(elements.maxSize.value, 10) || "";
+  PLAYLIST.allowPlebs = elements.allowPlebs.checked;
+  PLAYLIST.allowSubs = elements.allowSubs.checked;
+  PLAYLIST.allowMods = elements.allowMods.checked;
+  PLAYLIST.allowVips = elements.allowVips.checked;
+  PLAYLIST.allowFirstTimeChatters = elements.allowFirstTimeChatters.checked;
+  PLAYLIST.plebLimit = parseInt(elements.plebLimit.value, 10) || 1;
+  PLAYLIST.subLimit = parseInt(elements.subLimit.value, 10) || 1;
+  PLAYLIST.modLimit = parseInt(elements.modLimit.value, 10) || 1;
+  PLAYLIST.vipLimit = parseInt(elements.vipLimit.value, 10) || 1;
+  PLAYLIST.firstTimeChatterLimit = parseInt(elements.firstTimeChatterLimit.value, 10) || 1;
+  PLAYLIST.noCommand = elements.noCommand.checked;
+  PLAYLIST.requestCommand = elements.requestCommand.value.replace(/\s+/g, "").toLowerCase() || "!request";
+  PLAYLIST.requestCommandAlias = elements.requestCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!r";
+  PLAYLIST.allowVoteSkip = elements.allowVoteSkip.checked;
+  PLAYLIST.voteskipCommand = elements.voteskipCommand.value.replace(/\s+/g, "").toLowerCase() || "!voteskip";
+  PLAYLIST.voteskipCommandAlias = elements.voteskipCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!vs";
+  PLAYLIST.voteskipCount = parseInt(elements.voteskipCount.value, 10) || 1;
+  PLAYLIST.enableBot = elements.enableBot.checked;
+  PLAYLIST.botCooldown = parseInt(elements.botCooldown.value, 10) || 1;
+  PLAYLIST.songCommand = elements.songCommand.value.replace(/\s+/g, "").toLowerCase() || "!song";
+  PLAYLIST.songCommandAlias = elements.songCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!s";
+  PLAYLIST.playlistCommand = elements.playlistCommand.value.replace(/\s+/g, "").toLowerCase() || "!playlist";
+  PLAYLIST.playlistCommandAlias = elements.playlistCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!pl";
+  PLAYLIST.approvalQueue = elements.approvalQueue.checked;
+  PLAYLIST.skipCommand = elements.skipCommand.value.replace(/\s+/g, "").toLowerCase() || "!skip";
+  PLAYLIST.modSkip = elements.modSkip.checked;
+  PLAYLIST.minViewCount = parseInt(elements.minViewCount.value, 10) || "";
 
-  elements.voteskipCommand.disabled = !QUEUE.allowVoteSkip;
-  elements.voteskipCommandAlias.disabled = !QUEUE.allowVoteSkip;
-  elements.voteskipCount.disabled = !QUEUE.allowVoteSkip;
-  elements.botCooldown.disabled = !QUEUE.enableBot;
-  elements.songCommand.disabled = !QUEUE.enableBot;
-  elements.songCommandAlias.disabled = !QUEUE.enableBot;
-  elements.queueCommand.disabled = !QUEUE.enableBot;
-  elements.queueCommandAlias.disabled = !QUEUE.enableBot;
+  elements.voteskipCommand.disabled = !PLAYLIST.allowVoteSkip;
+  elements.voteskipCommandAlias.disabled = !PLAYLIST.allowVoteSkip;
+  elements.voteskipCount.disabled = !PLAYLIST.allowVoteSkip;
+  elements.botCooldown.disabled = !PLAYLIST.enableBot;
+  elements.songCommand.disabled = !PLAYLIST.enableBot;
+  elements.songCommandAlias.disabled = !PLAYLIST.enableBot;
+  elements.playlistCommand.disabled = !PLAYLIST.enableBot;
+  elements.playlistCommandAlias.disabled = !PLAYLIST.enableBot;
 
-  elements.approvalTabButton.style.display = QUEUE.approvalQueue ? "" : "none";
+  elements.approvalTabButton.style.display = PLAYLIST.approvalQueue ? "" : "none";
 
-  if (QUEUE.noCommand) {
-    elements.commandHint.innerHTML = `Add songs or videos to the queue by posting a link in chat`;
+  if (PLAYLIST.noCommand) {
+    elements.commandHint.innerHTML = `Add songs or videos to the playlist by posting a link in chat`;
   } else {
-    elements.commandHint.innerHTML = `Add songs or videos to the queue using 
-    <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">${QUEUE.requestCommand}</kbd> or 
-    <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">${QUEUE.requestCommandAlias}</kbd>`;
+    elements.commandHint.innerHTML = `Add songs or videos to the playlist using 
+    <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">${PLAYLIST.requestCommand}</kbd> or 
+    <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">${PLAYLIST.requestCommandAlias}</kbd>`;
   }
 
   updateWhoCanRequest();
@@ -217,7 +216,7 @@ async function refreshData() {
 function saveSettings() {
   refreshData();
   localStorage.setItem("USER", JSON.stringify(USER));
-  localStorage.setItem("QUEUE", JSON.stringify(QUEUE));
+  localStorage.setItem("PLAYLIST", JSON.stringify(PLAYLIST));
   localStorage.setItem("darkTheme", darkTheme);
 } //saveSettings
 
@@ -229,67 +228,67 @@ function load_localStorage() {
     elements.channelName.value = USER.channel;
   }
 
-  if (!localStorage.getItem("QUEUE")) {
+  if (!localStorage.getItem("PLAYLIST")) {
     console.log("localStorage settings not found");
   } else {
-    QUEUE = JSON.parse(localStorage.getItem("QUEUE"));
+    PLAYLIST = JSON.parse(localStorage.getItem("PLAYLIST"));
 
-    elements.allowSpotifySongs.checked = QUEUE.allowSpotifySongs ?? true;
-    elements.allowTwitchClips.checked = QUEUE.allowTwitchClips ?? true;
-    elements.allowTwitchStreams.checked = QUEUE.allowTwitchStreams ?? true;
-    elements.allowTwitchVODs.checked = QUEUE.allowTwitchVODs ?? true;
-    elements.allowYTStreams.checked = QUEUE.allowYTStreams ?? true;
-    elements.allowYTShorts.checked = QUEUE.allowYTShorts ?? true;
-    elements.allowYTVideos.checked = QUEUE.allowYTVideos ?? true;
-    elements.maxDuration.value = QUEUE.maxDuration || "";
-    elements.maxDurationUnit.value = QUEUE.maxDurationUnit || "m";
-    elements.maxLength.value = QUEUE.maxLength || "";
-    elements.maxSize.value = QUEUE.maxSize || "";
-    elements.allowPlebs.checked = QUEUE.allowPlebs ?? true;
-    elements.allowSubs.checked = QUEUE.allowSubs ?? true;
-    elements.allowMods.checked = QUEUE.allowMods ?? true;
-    elements.allowVips.checked = QUEUE.allowVips ?? true;
-    elements.allowFirstTimeChatters.checked = QUEUE.allowFirstTimeChatters ?? true;
-    elements.plebLimit.value = QUEUE.plebLimit || 1;
-    elements.subLimit.value = QUEUE.subLimit || 1;
-    elements.modLimit.value = QUEUE.modLimit || 1;
-    elements.vipLimit.value = QUEUE.vipLimit || 1;
-    elements.firstTimeChatterLimit.value = QUEUE.firstTimeChatterLimit || 1;
-    elements.noCommand.checked = QUEUE.noCommand ?? false;
-    elements.requestCommand.value = QUEUE.requestCommand || "!request";
-    elements.requestCommandAlias.value = QUEUE.requestCommandAlias || "!r";
-    elements.allowVoteSkip.checked = QUEUE.allowVoteSkip ?? false;
-    elements.voteskipCommand.value = QUEUE.voteskipCommand || "!voteskip";
-    elements.voteskipCommandAlias.value = QUEUE.voteskipCommandAlias || "!vs";
-    elements.voteskipCount.value = QUEUE.voteskipCount || 1;
-    elements.enableBot.checked = QUEUE.enableBot ?? false;
-    elements.botCooldown.value = QUEUE.botCooldown || 1;
-    elements.songCommand.value = QUEUE.songCommand || "!song";
-    elements.songCommandAlias.value = QUEUE.songCommandAlias || "!s";
-    elements.queueCommand.value = QUEUE.queueCommand || "!queue";
-    elements.queueCommandAlias.value = QUEUE.queueCommandAlias || "!q";
-    elements.approvalQueue.checked = QUEUE.approvalQueue ?? false;
-    elements.skipCommand.value = QUEUE.skipCommand || "!skip";
-    elements.modSkip.checked = QUEUE.modSkip ?? false;
-    elements.minViewCount.value = QUEUE.minViewCount || "";
+    elements.allowSpotifySongs.checked = PLAYLIST.allowSpotifySongs ?? true;
+    elements.allowTwitchClips.checked = PLAYLIST.allowTwitchClips ?? true;
+    elements.allowTwitchStreams.checked = PLAYLIST.allowTwitchStreams ?? true;
+    elements.allowTwitchVODs.checked = PLAYLIST.allowTwitchVODs ?? true;
+    elements.allowYTStreams.checked = PLAYLIST.allowYTStreams ?? true;
+    elements.allowYTShorts.checked = PLAYLIST.allowYTShorts ?? true;
+    elements.allowYTVideos.checked = PLAYLIST.allowYTVideos ?? true;
+    elements.maxDuration.value = PLAYLIST.maxDuration || "";
+    elements.maxDurationUnit.value = PLAYLIST.maxDurationUnit || "m";
+    elements.maxLength.value = PLAYLIST.maxLength || "";
+    elements.maxSize.value = PLAYLIST.maxSize || "";
+    elements.allowPlebs.checked = PLAYLIST.allowPlebs ?? true;
+    elements.allowSubs.checked = PLAYLIST.allowSubs ?? true;
+    elements.allowMods.checked = PLAYLIST.allowMods ?? true;
+    elements.allowVips.checked = PLAYLIST.allowVips ?? true;
+    elements.allowFirstTimeChatters.checked = PLAYLIST.allowFirstTimeChatters ?? true;
+    elements.plebLimit.value = PLAYLIST.plebLimit || 1;
+    elements.subLimit.value = PLAYLIST.subLimit || 1;
+    elements.modLimit.value = PLAYLIST.modLimit || 1;
+    elements.vipLimit.value = PLAYLIST.vipLimit || 1;
+    elements.firstTimeChatterLimit.value = PLAYLIST.firstTimeChatterLimit || 1;
+    elements.noCommand.checked = PLAYLIST.noCommand ?? false;
+    elements.requestCommand.value = PLAYLIST.requestCommand || "!request";
+    elements.requestCommandAlias.value = PLAYLIST.requestCommandAlias || "!r";
+    elements.allowVoteSkip.checked = PLAYLIST.allowVoteSkip ?? false;
+    elements.voteskipCommand.value = PLAYLIST.voteskipCommand || "!voteskip";
+    elements.voteskipCommandAlias.value = PLAYLIST.voteskipCommandAlias || "!vs";
+    elements.voteskipCount.value = PLAYLIST.voteskipCount || 1;
+    elements.enableBot.checked = PLAYLIST.enableBot ?? false;
+    elements.botCooldown.value = PLAYLIST.botCooldown || 1;
+    elements.songCommand.value = PLAYLIST.songCommand || "!song";
+    elements.songCommandAlias.value = PLAYLIST.songCommandAlias || "!s";
+    elements.playlistCommand.value = PLAYLIST.playlistCommand || "!playlist";
+    elements.playlistCommandAlias.value = PLAYLIST.playlistCommandAlias || "!pl";
+    elements.approvalQueue.checked = PLAYLIST.approvalQueue ?? false;
+    elements.skipCommand.value = PLAYLIST.skipCommand || "!skip";
+    elements.modSkip.checked = PLAYLIST.modSkip ?? false;
+    elements.minViewCount.value = PLAYLIST.minViewCount || "";
 
-    elements.voteskipCommand.disabled = !QUEUE.allowVoteSkip;
-    elements.voteskipCommandAlias.disabled = !QUEUE.allowVoteSkip;
-    elements.voteskipCount.disabled = !QUEUE.allowVoteSkip;
-    elements.botCooldown.disabled = !QUEUE.enableBot;
-    elements.songCommand.disabled = !QUEUE.enableBot;
-    elements.songCommandAlias.disabled = !QUEUE.enableBot;
-    elements.queueCommand.disabled = !QUEUE.enableBot;
-    elements.queueCommandAlias.disabled = !QUEUE.enableBot;
+    elements.voteskipCommand.disabled = !PLAYLIST.allowVoteSkip;
+    elements.voteskipCommandAlias.disabled = !PLAYLIST.allowVoteSkip;
+    elements.voteskipCount.disabled = !PLAYLIST.allowVoteSkip;
+    elements.botCooldown.disabled = !PLAYLIST.enableBot;
+    elements.songCommand.disabled = !PLAYLIST.enableBot;
+    elements.songCommandAlias.disabled = !PLAYLIST.enableBot;
+    elements.playlistCommand.disabled = !PLAYLIST.enableBot;
+    elements.playlistCommandAlias.disabled = !PLAYLIST.enableBot;
 
-    elements.approvalTabButton.style.display = QUEUE.approvalQueue ? "" : "none";
+    elements.approvalTabButton.style.display = PLAYLIST.approvalQueue ? "" : "none";
 
-    if (QUEUE.noCommand) {
-      elements.commandHint.innerHTML = `Add songs or videos to the queue by posting a link in chat`;
+    if (PLAYLIST.noCommand) {
+      elements.commandHint.innerHTML = `Add songs or videos to the playlist by posting a link in chat`;
     } else {
-      elements.commandHint.innerHTML = `Add songs or videos to the queue using 
-      <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">${QUEUE.requestCommand}</kbd> or 
-      <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">${QUEUE.requestCommandAlias}</kbd>`;
+      elements.commandHint.innerHTML = `Add songs or videos to the playlist using 
+      <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">${PLAYLIST.requestCommand}</kbd> or 
+      <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">${PLAYLIST.requestCommandAlias}</kbd>`;
     }
 
     updateWhoCanRequest();
@@ -311,7 +310,7 @@ function resetSettings(logout = false) {
     );
   }
   localStorage.setItem(
-    "QUEUE",
+    "PLAYLIST",
     JSON.stringify({
       allowSpotifySongs: true,
       allowTwitchClips: true,
@@ -345,8 +344,8 @@ function resetSettings(logout = false) {
       botCooldown: 1,
       songCommand: "!song",
       songCommandAlias: "!s",
-      queueCommand: "!queue",
-      queueCommandAlias: "!q",
+      playlistCommand: "!playlist",
+      playlistCommandAlias: "!pl",
       approvalQueue: false,
       skipCommand: "!skip",
       modSkip: false,
@@ -603,11 +602,11 @@ function toggleEveryone(allow) {
 
 function updateWhoCanRequest() {
   let roles = {
-    "Non subscribers": { allowed: QUEUE.allowPlebs, limit: QUEUE.plebLimit },
-    Subscribers: { allowed: QUEUE.allowSubs, limit: QUEUE.subLimit },
-    Mods: { allowed: QUEUE.allowMods, limit: QUEUE.modLimit },
-    VIPs: { allowed: QUEUE.allowVips, limit: QUEUE.vipLimit },
-    "First time chatters": { allowed: QUEUE.allowFirstTimeChatters, limit: QUEUE.firstTimeChatterLimit },
+    "Non subscribers": { allowed: PLAYLIST.allowPlebs, limit: PLAYLIST.plebLimit },
+    Subscribers: { allowed: PLAYLIST.allowSubs, limit: PLAYLIST.subLimit },
+    Mods: { allowed: PLAYLIST.allowMods, limit: PLAYLIST.modLimit },
+    VIPs: { allowed: PLAYLIST.allowVips, limit: PLAYLIST.vipLimit },
+    "First time chatters": { allowed: PLAYLIST.allowFirstTimeChatters, limit: PLAYLIST.firstTimeChatterLimit },
   };
 
   let allowed = [];
@@ -637,8 +636,8 @@ function checkCommands() {
     elements.voteskipCommandAlias,
     elements.songCommand,
     elements.songCommandAlias,
-    elements.queueCommand,
-    elements.queueCommandAlias,
+    elements.playlistCommand,
+    elements.playlistCommandAlias,
     elements.skipCommand,
   ];
 
@@ -650,7 +649,7 @@ function checkCommands() {
 
   for (let index = 0; index < duplicateElements.length; index++) {
     duplicateElements[index].value = duplicateElements[index].dataset.default;
-    QUEUE[duplicateElements[index].id] = duplicateElements[index].dataset.default;
+    PLAYLIST[duplicateElements[index].id] = duplicateElements[index].dataset.default;
     warn = true;
   }
 
@@ -720,7 +719,7 @@ window.onload = function () {
   settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
   copyLinkButton = new bootstrap.Popover(elements.copyLinkButton);
 
-  queueTab = new bootstrap.Tab(elements.queueTab);
+  playlistTab = new bootstrap.Tab(elements.playlistTab);
   approvalTab = new bootstrap.Tab(elements.approvalTab);
   historyTab = new bootstrap.Tab(elements.historyTab);
 
@@ -736,18 +735,18 @@ window.onload = function () {
   elements.approvalQueue.onchange = function () {
     saveSettings();
     if (elements.approvalTab.classList.contains("active")) {
-      queueTab.show();
+      playlistTab.show();
     }
   };
 
-  elements.toggleQueue.onchange = function () {
-    queue_open = this.checked;
+  elements.togglePlaylist.onchange = function () {
+    playlist_open = this.checked;
     if (this.checked) {
-      elements.toggleQueueLabel.classList = "btn btn-lg btn-danger";
-      elements.toggleQueueLabel.innerHTML = `Close<br>Queue`;
+      elements.togglePlaylistLabel.classList = "btn btn-lg btn-danger";
+      elements.togglePlaylistLabel.innerHTML = `Close<br>Playlist`;
     } else {
-      elements.toggleQueueLabel.classList = "btn btn-lg btn-success";
-      elements.toggleQueueLabel.innerHTML = `Open<br>Queue`;
+      elements.togglePlaylistLabel.classList = "btn btn-lg btn-success";
+      elements.togglePlaylistLabel.innerHTML = `Open<br>Playlist`;
     }
   };
 
