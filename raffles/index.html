@@ -384,32 +384,37 @@
         <div class="col-xxl-4 col-lg-5 order-3">
           <h2 class="text-center">
             Type <span style="color: #00bc8c; cursor: pointer" id="raffleCommandText" onclick="changeRaffleCommand()" class="notranslate">!join</span> in chat to join
-
-            <div class="role-badge" id="plebBadge">
-              <img src="/pics/pleb.png" alt="Non subscriber" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Non subscriber" style="height: 24px; width: 24px" />
-              <div class="role-allowed"></div>
-            </div>
-
-            <div class="role-badge" id="subBadge">
-              <img src="/pics/sub.png" alt="Subscriber" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Subscriber" style="height: 24px; width: 24px" />
-              <div class="role-allowed"></div>
-            </div>
-
-            <div class="role-badge" id="modBadge">
-              <img src="/pics/mod.png" alt="Moderator" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Moderator" style="height: 24px; width: 24px" />
-              <div class="role-allowed"></div>
-            </div>
-
-            <div class="role-badge" id="vipBadge">
-              <img src="/pics/vip.png" alt="VIP" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="VIP" style="height: 24px; width: 24px" />
-              <div class="role-allowed"></div>
-            </div>
-
-            <div class="role-badge" id="firstmsgBadge">
-              <img src="/pics/firstmsg.png" alt="First time chatter" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="First time chatter" style="height: 24px; width: 24px" />
-              <div class="role-allowed"></div>
-            </div>
+            <span class="d-inline-block">
+              <div class="role-badge" id="plebBadge">
+                <img src="/pics/pleb.png" alt="Non subscriber" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Non subscriber" style="height: 24px; width: 24px" />
+                <div class="role-allowed"></div>
+              </div>
+              <div class="role-badge" id="subBadge">
+                <img src="/pics/sub.png" alt="Subscriber" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Subscriber" style="height: 24px; width: 24px" />
+                <div class="role-allowed"></div>
+              </div>
+              <div class="role-badge" id="modBadge">
+                <img src="/pics/mod.png" alt="Moderator" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Moderator" style="height: 24px; width: 24px" />
+                <div class="role-allowed"></div>
+              </div>
+              <div class="role-badge" id="vipBadge">
+                <img src="/pics/vip.png" alt="VIP" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="VIP" style="height: 24px; width: 24px" />
+                <div class="role-allowed"></div>
+              </div>
+              <div class="role-badge" id="firstmsgBadge">
+                <img
+                  src="/pics/firstmsg.png"
+                  alt="First time chatter"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  data-bs-title="First time chatter"
+                  style="height: 24px; width: 24px"
+                />
+                <div class="role-allowed"></div>
+              </div>
+            </span>
           </h2>
+
           <h5 id="entrants" class="text-body-secondary">Entrants: 0</h5>
           <div id="raffleUsersDiv">
             <ul class="list-group" id="raffleUsers"></ul>

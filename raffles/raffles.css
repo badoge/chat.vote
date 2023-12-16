@@ -197,6 +197,10 @@ section {
   min-width: 95%;
 }
 
+.popover {
+  z-index: 2;
+}
+
 .role-badge {
   position: relative;
   display: inline;
