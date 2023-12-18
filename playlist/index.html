@@ -547,7 +547,6 @@
               class="btn btn-twitch"
               tabindex="0"
               data-bs-container="body"
-              data-bs-custom-class="custom-popover"
               data-bs-placement="bottom"
               data-bs-trigger="manual"
               data-bs-toggle="popover"
@@ -643,12 +642,23 @@
           <div class="card">
             <div class="card-body p-2">
               <h4 class="mb-2" id="commandHint">
-                Add songs or videos to the playlist using <kbd class="notranslate text-success cursor-pointer">!request</kbd> or <kbd class="notranslate text-success cursor-pointer">!r</kbd>
+                Add songs or videos to the playlist using <kbd class="notranslate text-success cursor-pointer">!request [link]</kbd> or
+                <kbd class="notranslate text-success cursor-pointer">!r [link]</kbd>
               </h4>
               <div class="hstack gap-1 align-items-end">
                 <div class="p-1">
                   <input id="togglePlaylist" type="checkbox" class="btn-check" autocomplete="off" />
-                  <label id="togglePlaylistLabel" class="btn btn-lg btn-success" for="togglePlaylist">
+                  <label
+                    id="togglePlaylistLabel"
+                    class="btn btn-lg btn-success"
+                    for="togglePlaylist"
+                    data-bs-container="body"
+                    data-bs-trigger="manual"
+                    data-bs-placement="left"
+                    data-bs-toggle="popover"
+                    data-bs-title="Playlist closed"
+                    data-bs-content="A viewer is trying to request something but the playlist is closed"
+                  >
                     Open<br />
                     Playlist
                   </label>
@@ -718,38 +728,7 @@
               </ul>
               <div class="tab-content">
                 <div class="tab-pane fade show active" id="playlist-tab-pane" role="tabpanel" aria-labelledby="playlistTab" tabindex="0">
-                  <ul class="list-group mt-1" id="mainList">
-                    <li class="list-group-item">An item</li>
-                    <li class="list-group-item">A second item</li>
-                    <li class="list-group-item">A third item</li>
-                    <li class="list-group-item">A fourth item</li>
-                    <li class="list-group-item">And a fifth one</li>
-                    <li class="list-group-item">An item</li>
-                    <li class="list-group-item">A second item</li>
-                    <li class="list-group-item">A third item</li>
-                    <li class="list-group-item">A fourth item</li>
-                    <li class="list-group-item">And a fifth one</li>
-                    <li class="list-group-item">An item</li>
-                    <li class="list-group-item">A second item</li>
-                    <li class="list-group-item">A third item</li>
-                    <li class="list-group-item">A fourth item</li>
-                    <li class="list-group-item">And a fifth one</li>
-                    <li class="list-group-item">An item</li>
-                    <li class="list-group-item">A second item</li>
-                    <li class="list-group-item">A third item</li>
-                    <li class="list-group-item">A fourth item</li>
-                    <li class="list-group-item">And a fifth one</li>
-                    <li class="list-group-item">An item</li>
-                    <li class="list-group-item">A second item</li>
-                    <li class="list-group-item">A third item</li>
-                    <li class="list-group-item">A fourth item</li>
-                    <li class="list-group-item">And a fifth one</li>
-                    <li class="list-group-item">An item</li>
-                    <li class="list-group-item">A second item</li>
-                    <li class="list-group-item">A third item</li>
-                    <li class="list-group-item">A fourth item</li>
-                    <li class="list-group-item">And a fifth one</li>
-                  </ul>
+                  <div class="mt-2" id="mainList"></div>
                 </div>
                 <div class="tab-pane fade" id="approval-tab-pane" role="tabpanel" aria-labelledby="approvalTab" tabindex="0">
                   <ul class="list-group mt-1" id="approvalList">
@@ -840,10 +819,9 @@
                   type="button"
                   id="copyLinkButton"
                   class="btn btn-outline-secondary"
-                  data-bs-toggle="tooltip"
-                  data-bs-delay="200"
+                  data-bs-toggle="popover"
                   data-bs-trigger="manual"
-                  data-bs-placement="bottom"
+                  data-bs-placement="top"
                   data-bs-title="Link copied :)"
                   onclick="copyLink()"
                 >

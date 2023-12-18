@@ -125,6 +125,32 @@ iframe {
   height: 64.7vh;
 }
 
+.delete-request {
+  cursor: pointer;
+  float: inline-end;
+}
+
+.delete-request:hover {
+  opacity: 80%;
+}
+
+.delete-request:active {
+  opacity: 50%;
+}
+
+.duration-label {
+  position: absolute;
+  right: 8px;
+  margin-top: -10%;
+  text-shadow: 1px 1px 8px #000000;
+  font-weight: 500;
+}
+
+.request-thumbnail > img {
+  max-height: 100px;
+  width: auto;
+}
+
 #mainList,
 #approvalList,
 #historyList {

@@ -91,6 +91,11 @@ let loginExpiredModal, resetSettingsModal;
 let copyLinkButton;
 let playlistTab, approvalTab, historyTab;
 let playlist_open = false;
+let togglePlaylistPopover;
+
+let users = [];
+let requests = [];
+let firstTimeChatters = [];
 
 let USER = {
   channel: "",
@@ -205,8 +210,8 @@ async function refreshData() {
     elements.commandHint.innerHTML = `Add songs or videos to the playlist by posting a link in chat`;
   } else {
     elements.commandHint.innerHTML = `Add songs or videos to the playlist using 
-    <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">${PLAYLIST.requestCommand}</kbd> or 
-    <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">${PLAYLIST.requestCommandAlias}</kbd>`;
+    <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">${PLAYLIST.requestCommand} [link]</kbd> or 
+    <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">${PLAYLIST.requestCommandAlias} [link]</kbd>`;
   }
 
   updateWhoCanRequest();
@@ -406,9 +411,62 @@ function connect() {
   client = new tmi.client(options);
 
   client.on("message", async (target, context, msg, self) => {
+    if (context["first-msg"]) {
+      firstTimeChatters.push(context.username);
+    }
     let input = msg.split(" ").filter(Boolean);
+
+    if (PLAYLIST.noCommand && playlist_open) {
+      let link = parseLink(input[0]);
+      if (!link || !linkTypeAllowed(link.type)) {
+        return;
+      }
+      addRequest(context, link);
+      updatePlaylist();
+      getRequestsInfo();
+      return;
+    }
+
     let command = input[0].toLowerCase();
-    let args = input.slice(1);
+
+    switch (command) {
+      case PLAYLIST.requestCommand:
+      case PLAYLIST.requestCommandAlias:
+        if (!input[1]) {
+          return;
+        }
+
+        if (!playlist_open && (Date.now() - currentTime) / 1000 > 10) {
+          currentTime = Date.now();
+          togglePlaylistPopover.show();
+          setTimeout(function () {
+            togglePlaylistPopover.hide();
+          }, 2000);
+          return;
+        } //playlist closed popover
+
+        let link = parseLink(input[1]);
+        if (!link || !linkTypeAllowed(link.type)) {
+          return;
+        }
+        addRequest(context, link);
+        updatePlaylist();
+        getRequestsInfo();
+        break;
+      case PLAYLIST.voteskipCommand:
+      case PLAYLIST.voteskipCommandAlias:
+        break;
+      case PLAYLIST.songCommand:
+      case PLAYLIST.songCommandAlias:
+        break;
+      case PLAYLIST.playlistCommand:
+      case PLAYLIST.playlistCommandAlias:
+        break;
+      case PLAYLIST.skipCommand:
+        break;
+      default:
+        break;
+    }
   }); //message
 
   client.on("timeout", (channel, username, reason, duration, userstate) => {}); //timeout
@@ -434,6 +492,337 @@ function connect() {
 
   client.connect().catch(console.error);
 } //connect
+
+/**
+ * @description get the index of a user from the users array - if the user is not already in then they will be added
+ * @param {Object} context the context object from the chat message event
+ * @returns {number} the user's index in the users array
+ */
+function getUser(context) {
+  const userIndex = users.findIndex((u) => u.id === context["user-id"]);
+  if (userIndex == -1) {
+    users.push({
+      id: context["user-id"],
+      username: context.username,
+      mod: context?.mod || false,
+      sub: context?.subscriber || false,
+      vip: context?.vip || false,
+      firstTimeChatter: firstTimeChatters.includes(context.username),
+      requestsCount: 0,
+      requestsDuration: 0,
+      requests: [],
+    });
+    return users.length - 1;
+  } else {
+    return userIndex;
+  }
+} //getUser
+
+/**
+ * @description checks if the user is allowed to request and returns their request limit
+ * @param {number} userIndex
+ * @returns {number} if the user is not allowed to request then the return value will be 0
+ */
+function checkRequestLimit(userIndex) {
+  let limit = 0;
+  if (!users[userIndex].sub && PLAYLIST.allowPlebs) {
+    limit = Math.max(limit, PLAYLIST.plebLimit);
+  }
+  if (users[userIndex].sub && PLAYLIST.allowSubs) {
+    limit = Math.max(limit, PLAYLIST.subLimit);
+  }
+  if (users[userIndex].mod && PLAYLIST.allowMods) {
+    limit = Math.max(limit, PLAYLIST.modLimit);
+  }
+  if (users[userIndex].vip && PLAYLIST.allowVips) {
+    limit = Math.max(limit, PLAYLIST.vipLimit);
+  }
+  if (users[userIndex].firstTimeChatter && PLAYLIST.allowFirstTimeChatters) {
+    limit = Math.max(limit, PLAYLIST.firstTimeChatterLimit);
+  }
+  return limit;
+} //checkRequestLimit
+
+function addRequest(context, link) {
+  const userIndex = getUser(context);
+  const limit = checkRequestLimit(userIndex);
+
+  //if limit is 0 then the user does not have a role that is allowed to request
+  if (!limit || users[userIndex].requestsCount >= limit) {
+    return;
+  }
+
+  //check if user already requested this link value
+  if (users[userIndex].requests.some((r) => r.value === link.value)) {
+    return;
+  }
+
+  users[userIndex].requestsCount++;
+  users[userIndex].requests.push(link);
+
+  //check if other users already requested this link value
+  const requestIndex = requests.findIndex((r) => r.link.value === link.value);
+  if (requestIndex > -1) {
+    requests[requestIndex].by.push(context.username);
+  } else {
+    requests.push({
+      link: link,
+      approved: PLAYLIST.approvalQueue ? false : true,
+      title: "",
+      duration: 0,
+      views: 0,
+      thumbnail: "",
+      time: Date.now(),
+      by: [context.username],
+    });
+  }
+} //addRequest
+
+function updatePlaylist() {
+  elements.mainList.innerHTML = "";
+  for (let index = 0; index < requests.length; index++) {
+    if (requests[index].thumbnail && requests[index].title) {
+      elements.mainList.insertAdjacentHTML(
+        "beforeend",
+        `<div class="container-fluid p-0 mb-1" id="${requests[index].link.value}">
+        <div class="row g-1">
+          <div class="col position-relative">
+            <div class="request-thumbnail ratio ${requests[index].link.type == "spotify" ? "ratio-1x1" : "ratio-16x9"}">
+             <img src="${requests[index].thumbnail}" alt="thumbnail" class="rounded" />
+            </div>
+            <small class="duration-label">${requests[index].duration}</small>
+          </div>
+          <div class="col-7">
+            <div class="vstack gap-3">
+              <div class="request-title">
+              ${requests[index].title}
+              </div>
+              <div><small class="requested-by text-body-secondary">Requested by: ${requests[index].by.join(" & ")}</small></div>
+            </div>
+          </div>
+          <div class="col-1" style="align-self: center"><i class="material-icons notranslate delete-request">delete</i></div>
+        </div>
+      </div>`
+      );
+    } else {
+      elements.mainList.insertAdjacentHTML(
+        "beforeend",
+        `<div class="container-fluid p-0 mb-1" id="${requests[index].link.value}">
+        <div class="row g-1">
+          <div class="col position-relative">
+            <div class="request-thumbnail ratio ratio-16x9">
+              <p class="placeholder-glow">
+                <span class="placeholder col-12 rounded" style="height: 100%"></span>
+              </p>
+            </div>
+            <small class="duration-label">00:00</small>
+          </div>
+          <div class="col-7">
+            <div class="vstack gap-3">
+              <div class="request-title">
+                <span class="placeholder-glow">
+                  <span class="placeholder col-12"></span>
+                </span>
+              </div>
+              <div><small class="requested-by text-body-secondary">Requested by: ${requests[index].by.join(" & ")}</small></div>
+            </div>
+          </div>
+          <div class="col-1" style="align-self: center"><i class="material-icons notranslate delete-request">delete</i></div>
+        </div>
+      </div>`
+      );
+    }
+  }
+} //updatePlaylist
+
+async function getRequestsInfo() {
+  for (let index = 0; index < requests.length; index++) {
+    if (requests[index].title) {
+      continue;
+    }
+
+    if (requests[index].link.type == "twitch clip") {
+      try {
+        let requestOptions = {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          redirect: "follow",
+        };
+        let response = await fetch(`https://helper.donk.workers.dev/twitch/clips?id=${requests[index].link.value}`, requestOptions);
+        let result = await response.json();
+        console.log(result);
+        requests[index].title = `${result.data[0].title} - ${result.data[0].broadcaster_name}` || "(untitled)";
+        requests[index].thumbnail = result.data[0].thumbnail_url;
+        requests[index].duration = result.data[0].duration;
+      } catch (error) {
+        console.log("getRequestsInfo twitch clip error", error);
+      }
+    }
+
+    if (requests[index].link.type == "twitch vod") {
+      try {
+        let requestOptions = {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          redirect: "follow",
+        };
+        let response = await fetch(`https://helper.donk.workers.dev/twitch/videos?id=${requests[index].link.value}`, requestOptions);
+        let result = await response.json();
+        console.log(result);
+        requests[index].title = `${result.data[0].title} - ${result.data[0].user_login}` || "(untitled)";
+        requests[index].thumbnail = result.data[0].thumbnail_url.replace("%{width}", "320").replace("%{height}", "180");
+        requests[index].duration = result.data[0].duration;
+      } catch (error) {
+        console.log("getRequestsInfo twitch vod error", error);
+      }
+    }
+
+    if (requests[index].link.type == "twitch stream") {
+      try {
+        let requestOptions = {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          redirect: "follow",
+        };
+        let response = await fetch(`https://helper.donk.workers.dev/twitch/streams?user_login=${requests[index].link.value}`, requestOptions);
+        let result = await response.json();
+        console.log(result);
+        requests[index].title = `${result.data[0].title} - ${result.data[0].user_name}` || "(untitled)";
+        requests[index].thumbnail = result.data[0].thumbnail_url.replace("{width}", "320").replace("{height}", "180");
+        requests[index].duration = result.data[0].started_at;
+      } catch (error) {
+        console.log("getRequestsInfo twitch stream error", error);
+      }
+    }
+
+    if (requests[index].link.type == "spotify") {
+      try {
+        let requestOptions = {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          redirect: "follow",
+        };
+        let response = await fetch(`https://helper.donk.workers.dev/spotify/tracks?ids=${requests[index].link.value}`, requestOptions);
+        let result = await response.json();
+        console.log(result);
+        requests[index].title = `${result.tracks[0].name} - ${result.tracks[0].artists[0].name}` || "(untitled)";
+        requests[index].thumbnail = result.tracks[0].album.images[0].url;
+        requests[index].duration = result.tracks[0].duration_ms / 1000;
+      } catch (error) {
+        console.log("getRequestsInfo spotify error", error);
+      }
+    }
+
+    if (requests[index].link.type == "youtube") {
+      try {
+        let requestOptions = {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          redirect: "follow",
+        };
+        let response = await fetch(`https://helper.donk.workers.dev/youtube/videos?id=${requests[index].link.value}`, requestOptions);
+        let result = await response.json();
+        console.log(result);
+        requests[index].title = `${result.items[0].snippet.title} - ${result.items[0].snippet.channelTitle}` || "(untitled)";
+        requests[index].thumbnail = result.items[0].snippet.thumbnails.medium.url;
+        requests[index].duration = result.items[0].contentDetails.duration;
+        requests[index].views = result.items[0].statistics.viewCount;
+      } catch (error) {
+        console.log("getRequestsInfo youtube error", error);
+      }
+    }
+  }
+
+  updatePlaylist();
+} //getRequestsInfo
+
+/**
+ * @description gets the video/track/clip/vod id or stream username from a url string
+ * @param {string} link
+ * @returns {Object}
+ */
+function parseLink(link) {
+  if (link.includes("twitch.tv")) {
+    if (link.includes("/clip/") || link.includes("clips.twitch.tv")) {
+      let clipURL = new URL(link);
+      let clipID =
+        clipURL.hostname === "clips.twitch.tv"
+          ? /^\/(\w+(?:\/[A-Z]\w+)?(?:[\-\w]*))(?:\/|$)/.exec(clipURL.pathname)
+          : /^\/\w+\/clip\/(\w+(?:\/[A-Z]\w+)?(?:[\-\w]*))(?:\/|$)/.exec(clipURL.pathname);
+      if (!clipID || !clipID[1]) {
+        return null;
+      }
+      return { type: "twitch clip", value: clipID[1] };
+    } //clips
+
+    if (link.includes("/videos/")) {
+      const vodID = link.match(/\/videos\/(\d+)/);
+      if (!vodID || !parseInt(vodID[1])) {
+        return null;
+      }
+      return { type: "twitch vod", value: vodID[1] };
+    } //vods
+
+    const username = link.match(/\/([a-zA-Z0-9_]{1,25})$/);
+    if (!username) {
+      return null;
+    }
+    return { type: "twitch stream", value: username[1] };
+  } //twitch
+
+  if (link.includes("youtube.com") || link.includes("youtu.be")) {
+    const youtubeURLRegex = /(youtu.*be.*)\/(watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$))/gm;
+    const videoID = youtubeURLRegex.exec(link) || null;
+    if (videoID[3]?.length != 11) {
+      return null;
+    }
+    return { type: "youtube", value: videoID[3] };
+  } //youtube
+
+  if (link.includes("spotify.com")) {
+    const spotifyURLRegex = /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:(album|track|playlist)\/|\?uri=spotify:track:)((\w|-){22})/;
+    let id = link.match(spotifyURLRegex);
+    if (!id[2] || id[1] !== "track") {
+      return null;
+    }
+    return { type: "spotify", value: id[2] };
+  } //spotify
+  return null;
+} //parseLink
+
+function linkTypeAllowed(type) {
+  if (type == "twitch clip" && !PLAYLIST.allowTwitchClips) {
+    return false;
+  }
+  if (type == "twitch vod" && !PLAYLIST.allowTwitchVODs) {
+    return false;
+  }
+  if (type == "twitch stream" && !PLAYLIST.allowTwitchStreams) {
+    return false;
+  }
+  if (type == "spotify" && !PLAYLIST.allowSpotifySongs) {
+    return false;
+  }
+  if (type == "youtube" && !PLAYLIST.allowYTShorts && !PLAYLIST.allowYTStreams && !PLAYLIST.allowYTVideos) {
+    return false;
+  }
+  return true;
+} //linkTypeAllowed
 
 async function loadPFP() {
   if (!USER.channel) {
@@ -718,6 +1107,7 @@ window.onload = function () {
   resetSettingsModal = new bootstrap.Modal(elements.resetSettingsModal);
   settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
   copyLinkButton = new bootstrap.Popover(elements.copyLinkButton);
+  togglePlaylistPopover = new bootstrap.Popover(elements.togglePlaylistLabel);
 
   playlistTab = new bootstrap.Tab(elements.playlistTab);
   approvalTab = new bootstrap.Tab(elements.approvalTab);
@@ -760,5 +1150,4 @@ window.onload = function () {
   });
 
   enableTooltips();
-  enablePopovers();
 }; //onload
