@@ -849,3 +849,38 @@ function spamTest(type, count, delay = 100, votes = null) {
 function uuidv4() {
   return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) => (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16));
 } //uuidv4
+
+function ISO8601ToSeconds(iso8601Duration) {
+  let matches = iso8601Duration.match(/(-)?P(?:([.,\d]+)Y)?(?:([.,\d]+)M)?(?:([.,\d]+)W)?(?:([.,\d]+)D)?T(?:([.,\d]+)H)?(?:([.,\d]+)M)?(?:([.,\d]+)S)?/);
+  let values = {
+    sign: matches[1] === undefined ? "+" : "-",
+    years: matches[2] === undefined ? 0 : matches[2] * 31536000,
+    months: matches[3] === undefined ? 0 : matches[3] * 2592000,
+    weeks: matches[4] === undefined ? 0 : matches[4] * 604800,
+    days: matches[5] === undefined ? 0 : matches[5] * 86400,
+    hours: matches[6] === undefined ? 0 : matches[6] * 3600,
+    minutes: matches[7] === undefined ? 0 : matches[7] * 60,
+    seconds: matches[8] === undefined ? 0 : parseFloat(matches[8]),
+  };
+  return values.years + values.months + values.weeks + values.days + values.hours + values.minutes + values.seconds;
+} //ISO8601ToSeconds
+
+function convertTwitchVODDuration(duration) {
+  const durationRegex = /(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?/;
+  const match = durationRegex.exec(duration);
+  if (!match) {
+    throw new Error("Invalid duration format");
+  }
+  const [, hours, minutes, seconds] = match;
+  let totalSeconds = 0;
+  if (hours) {
+    totalSeconds += parseInt(hours) * 60 * 60;
+  }
+  if (minutes) {
+    totalSeconds += parseInt(minutes) * 60;
+  }
+  if (seconds) {
+    totalSeconds += parseInt(seconds);
+  }
+  return totalSeconds;
+} //convertTwitchVODDuration

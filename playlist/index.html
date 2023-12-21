@@ -100,12 +100,20 @@
                     <input class="form-check-input" type="checkbox" role="switch" id="allowSpotifySongs" onchange="saveSettings()" checked />
                     <label class="form-check-label" for="allowSpotifySongs">Songs</label>
                   </div>
+                  <h6>Streamable</h6>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" role="switch" id="allowStreamable" onchange="saveSettings()" checked />
+                    <label class="form-check-label" for="allowStreamable">Videos</label>
+                  </div>
                 </div>
                 <div class="col-xl-4">
                   <h6>Twitch</h6>
                   <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchClips" onchange="saveSettings()" checked />
-                    <label class="form-check-label" for="allowTwitchClips">Clips</label>
+                    <label class="form-check-label" for="allowTwitchClips"
+                      >Clips
+                      <i class="material-icons notranslate text-warning" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="top" data-bs-title=":)">warning</i>
+                    </label>
                   </div>
                   <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchStreams" onchange="saveSettings()" checked />
@@ -625,15 +633,11 @@
         <div class="col p-0 m-2">
           <div class="card" id="playersCard">
             <div class="card-body p-0">
-              <iframe
-                width="100%"
-                height="100%"
-                src="https://www.youtube-nocookie.com/embed/oyJf72je2U0"
-                title="YouTube video player"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              ></iframe>
+              <div id="youtubeEmbedContainer" style="display: none"><div id="youtubeEmbed"></div></div>
+              <div id="spotifyEmbedContainer" style="display: none"><div id="spotifyEmbed"></div></div>
+              <div id="twitchEmbed" style="display: none"></div>
+              <div id="twitchClipsEmbed" style="display: none"></div>
+              <video id="streamableEmbed" style="display: none" controls autoplay></video>
             </div>
           </div>
         </div>
@@ -668,7 +672,16 @@
                   <label for="link" class="form-label mt-3">Add songs or videos to the playlist:</label>
                   <div class="input-group">
                     <input type="text" id="link" class="form-control" placeholder="Link" aria-label="Add link input text field" aria-describedby="addLink" />
-                    <button class="btn btn-secondary" type="button" id="addLink" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="top" data-bs-title="or just press enter :)">
+                    <button
+                      class="btn btn-secondary"
+                      type="button"
+                      id="addLink"
+                      onclick="addLink()"
+                      data-bs-toggle="tooltip"
+                      data-bs-delay="200"
+                      data-bs-placement="top"
+                      data-bs-title="or just press enter :)"
+                    >
                       Add
                     </button>
                   </div>
@@ -831,9 +844,9 @@
             </div>
             <div class="p-2 mx-auto">
               <div class="btn-group" role="group" aria-label="Playback controls">
-                <button type="button" class="btn btn-secondary"><i class="material-icons notranslate">skip_previous</i></button>
-                <button type="button" class="btn btn-secondary"><i class="material-icons notranslate">play_arrow</i></button>
-                <button type="button" class="btn btn-secondary"><i class="material-icons notranslate">skip_next</i></button>
+                <button type="button" class="btn btn-secondary" onclick="previousItem()"><i class="material-icons notranslate">skip_previous</i></button>
+                <button type="button" class="btn btn-secondary" onclick="togglePlay()"><i class="material-icons notranslate">play_arrow</i></button>
+                <button type="button" class="btn btn-secondary" onclick="nextItem()"><i class="material-icons notranslate">skip_next</i></button>
               </div>
             </div>
             <div class="p-2">
@@ -857,6 +870,9 @@
     <script src="/js/bootstrap.bundle.min.js"></script>
     <script src="/js/functions.min.js"></script>
     <script src="/playlist/playlist.js"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
+    <script src="https://player.twitch.tv/js/embed/v1.js"></script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-H43YN7FSSP"></script>
     <script>
