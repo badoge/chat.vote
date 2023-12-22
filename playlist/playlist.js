@@ -448,11 +448,10 @@ function connect() {
 
     if (PLAYLIST.noCommand && playlist_open) {
       let link = parseLink(input[0]);
-      if (!link || !linkTypeAllowed(link.type)) {
+      if (link && linkTypeAllowed(link.type)) {
+        addRequest(context, link);
         return;
       }
-      addRequest(context, link);
-      return;
     }
 
     let command = input[0].toLowerCase();
@@ -489,6 +488,9 @@ function connect() {
       case PLAYLIST.playlistCommandAlias:
         break;
       case PLAYLIST.skipCommand:
+        if (context.username == USER.channel || (PLAYLIST.modSkip && context.mod)) {
+          nextItem();
+        }
         break;
       default:
         break;
