@@ -118,7 +118,7 @@
                     <input class="form-check-input" type="checkbox" role="switch" id="allowSpotifySongs" onchange="saveSettings()" checked />
                     <label class="form-check-label" for="allowSpotifySongs">Songs</label>
                     <i
-                      class="material-icons notranslate text-warning"
+                      class="material-icons notranslate text-warning cursor-pointer"
                       data-bs-toggle="tooltip"
                       data-bs-delay="200"
                       data-bs-placement="top"
@@ -138,7 +138,7 @@
                     <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchClips" onchange="saveSettings()" checked />
                     <label class="form-check-label" for="allowTwitchClips">Clips </label>
                     <i
-                      class="material-icons notranslate text-warning"
+                      class="material-icons notranslate text-warning cursor-pointer"
                       data-bs-toggle="tooltip"
                       data-bs-delay="200"
                       data-bs-placement="top"
@@ -235,7 +235,7 @@
             </div>
 
             <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" role="switch" id="allowVoteSkip" onchange="saveSettings()" />
+              <input disabled class="form-check-input" type="checkbox" role="switch" id="allowVoteSkip" onchange="saveSettings()" />
               <label class="form-check-label" for="allowVoteSkip"><i class="material-icons notranslate">how_to_vote</i>Allow viewers to vote skip</label>
             </div>
             <div class="input-group mb-1">
@@ -270,7 +270,7 @@
             </div>
 
             <div class="form-check form-switch mb-3">
-              <input class="form-check-input" type="checkbox" role="switch" id="enableBot" onchange="saveSettings()" />
+              <input disabled class="form-check-input" type="checkbox" role="switch" id="enableBot" onchange="saveSettings()" />
               <label class="form-check-label" for="enableBot"><i class="material-icons notranslate">smart_toy</i>Enable chat bot</label>
               <br /><small class="text-body-secondary">Enables the bot commands below and adds confirmation replies for some commands</small>
             </div>
@@ -422,7 +422,7 @@
           <div class="card-header"><i class="material-icons notranslate">shield</i>Moderation Settings</div>
           <div class="card-body">
             <div class="form-check form-switch mb-3">
-              <input class="form-check-input" type="checkbox" role="switch" id="approvalQueue" />
+              <input disabled class="form-check-input" type="checkbox" role="switch" id="approvalQueue" />
               <label class="form-check-label" for="approvalQueue"><i class="material-icons notranslate">rule</i>Approval queue</label>
               <br /><small class="form-text text-body-secondary">Requests will have to be manually approved by you before they get added to the playlist</small>
             </div>
@@ -440,7 +440,8 @@
               <span class="input-group-text">Minimum view count</span>
               <input type="number" aria-label="Minimum view count" id="minViewCount" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
             </div>
-            <small class="form-text text-body-secondary">Videos/songs that have less views than this will be blocked</small>
+            <small class="form-text text-body-secondary">Videos/songs that have a view count lower than the limit will be blocked</small><br />
+            <small class="form-text text-warning">Does not apply to Streamable, Spotify, and live streams</small>
           </div>
         </div>
 
@@ -867,7 +868,7 @@
                 <i class="material-icons notranslate">settings</i> Settings
               </button>
             </div>
-            <div class="p-2">
+            <div class="p-2" style="display: none">
               <div class="input-group">
                 <input disabled type="text" class="form-control" id="profileLink" onclick="copyLink()" value="https://playlist.chat.vote/username" />
                 <button
@@ -886,15 +887,16 @@
             </div>
             <div class="p-2 mx-auto">
               <div class="btn-group" role="group" aria-label="Playback controls">
-                <button type="button" class="btn btn-secondary" id="previousItem" onclick="previousItem()"><i class="material-icons notranslate">skip_previous</i></button>
-                <button type="button" class="btn btn-secondary" id="togglePlay" onclick="togglePlay()"><i class="material-icons notranslate">play_arrow</i></button>
+                <button disabled type="button" class="btn btn-secondary" id="previousItem" onclick="previousItem()"><i class="material-icons notranslate">skip_previous</i></button>
+                <button disabled type="button" class="btn btn-secondary" id="togglePlay" onclick="togglePlay()"><i class="material-icons notranslate">play_arrow</i></button>
                 <button type="button" class="btn btn-secondary" id="nextItem" onclick="nextItem()"><i class="material-icons notranslate">skip_next</i></button>
               </div>
             </div>
             <div class="p-2">
               <div class="hstack gap-1">
-                <i class="material-icons notranslate cursor-pointer" id="volumeSliderIcon" onclick="toggleMute()">volume_up</i>
-                <input type="range" class="form-range" min="0" value="50" max="100" id="volumeSlider" oninput="changeVolume(this)" />
+                <!-- <i class="material-icons notranslate cursor-pointer" id="volumeSliderIcon" onclick="toggleMute()">volume_up</i> -->
+                <i class="material-icons notranslate" id="volumeSliderIcon">volume_up</i>
+                <input disabled type="range" class="form-range" min="0" value="50" max="100" id="volumeSlider" oninput="changeVolume(this)" />
                 <span id="volumeSliderValue">50</span>
               </div>
             </div>

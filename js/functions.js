@@ -851,7 +851,7 @@ function uuidv4() {
 } //uuidv4
 
 function ISO8601ToSeconds(iso8601Duration) {
-  let matches = iso8601Duration.match(/(-)?P(?:([.,\d]+)Y)?(?:([.,\d]+)M)?(?:([.,\d]+)W)?(?:([.,\d]+)D)?T(?:([.,\d]+)H)?(?:([.,\d]+)M)?(?:([.,\d]+)S)?/);
+  let matches = iso8601Duration.match(/(-)?P(?:([.,\d]+)Y)?(?:([.,\d]+)M)?(?:([.,\d]+)W)?(?:([.,\d]+)D)?(?:T(?:([.,\d]+)H)?(?:([.,\d]+)M)?(?:([.,\d]+)S)?)?/);
   let values = {
     sign: matches[1] === undefined ? "+" : "-",
     years: matches[2] === undefined ? 0 : matches[2] * 31536000,

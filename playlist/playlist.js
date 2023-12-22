@@ -707,7 +707,9 @@ async function getRequestInfo(index) {
       requests[index].thumbnail = result.data[0].thumbnail_url;
       requests[index].duration = result.data[0].duration;
     } catch (error) {
+      deleteRequest(requests[index].id);
       console.log("getRequestInfo twitch clip error", error);
+      return;
     }
   }
 
@@ -720,7 +722,9 @@ async function getRequestInfo(index) {
       requests[index].thumbnail = result.data[0].thumbnail_url.replace("%{width}", "320").replace("%{height}", "180");
       requests[index].duration = convertTwitchVODDuration(result.data[0].duration);
     } catch (error) {
+      deleteRequest(requests[index].id);
       console.log("getRequestInfo twitch vod error", error);
+      return;
     }
   }
 
@@ -733,7 +737,9 @@ async function getRequestInfo(index) {
       requests[index].thumbnail = result.data[0].thumbnail_url.replace("{width}", "320").replace("{height}", "180");
       requests[index].duration = -1;
     } catch (error) {
+      deleteRequest(requests[index].id);
       console.log("getRequestInfo twitch stream error", error);
+      return;
     }
   }
 
@@ -746,12 +752,18 @@ async function getRequestInfo(index) {
       requests[index].thumbnail = result.tracks[0].album.images[0].url;
       requests[index].duration = result.tracks[0].duration_ms / 1000;
       requests[index].uri = result.tracks[0].uri;
+      if (!result.tracks[0].is_playable) {
+        deleteRequest(requests[index].id);
+        return;
+      }
     } catch (error) {
+      deleteRequest(requests[index].id);
       console.log("getRequestInfo spotify error", error);
+      return;
     }
   }
 
-  if (requests[index].type == "youtube") {
+  if (requests[index].type == "youtube" || requests[index].type == "youtube short") {
     try {
       let response = await fetch(`https://helper.donk.workers.dev/youtube/videos?id=${requests[index].id}`, GETrequestOptions);
       let result = await response.json();
@@ -760,8 +772,25 @@ async function getRequestInfo(index) {
       requests[index].thumbnail = result.items[0].snippet.thumbnails.medium.url;
       requests[index].duration = ISO8601ToSeconds(result.items[0].contentDetails.duration);
       requests[index].views = result.items[0].statistics.viewCount;
+
+      if (Object.hasOwn(result.items[0], "liveStreamingDetails")) {
+        if (requests[index].duration == 0) {
+          requests[index].duration = -1;
+        }
+        if (!PLAYLIST.allowYTStreams) {
+          deleteRequest(requests[index].id);
+          return;
+        }
+      }
+
+      if (result.items[0].contentDetails?.contentRating?.ytRating == "ytAgeRestricted" || !result.items[0].status?.embeddable) {
+        deleteRequest(requests[index].id);
+        return;
+      }
     } catch (error) {
+      deleteRequest(requests[index].id);
       console.log("getRequestInfo youtube error", error);
+      return;
     }
   }
 
@@ -775,7 +804,9 @@ async function getRequestInfo(index) {
       requests[index].duration = result.files.mp4.duration;
       requests[index].video = result.files.mp4.url;
     } catch (error) {
+      deleteRequest(requests[index].id);
       console.log("getRequestInfo streamable error", error);
+      return;
     }
   }
 
@@ -823,7 +854,7 @@ function parseLink(link) {
     if (videoID[3]?.length != 11) {
       return null;
     }
-    return { type: "youtube", id: videoID[3] };
+    return { type: link.includes("/shorts/") ? "youtube short" : "youtube", id: videoID[3] };
   } //youtube
 
   if (link.includes("spotify.com")) {
@@ -862,18 +893,23 @@ function linkTypeAllowed(type) {
   if (type == "streamable" && !PLAYLIST.allowStreamable) {
     return false;
   }
-  if (type == "youtube" && !PLAYLIST.allowYTShorts && !PLAYLIST.allowYTStreams && !PLAYLIST.allowYTVideos) {
+  if (type == "youtube" && !PLAYLIST.allowYTStreams && !PLAYLIST.allowYTVideos) {
     return false;
   }
+  if (type == "youtube short" && !PLAYLIST.allowYTShorts) {
+    return false;
+  }
+
   return true;
 } //linkTypeAllowed
 
 function addLink() {
   let link = parseLink(elements.link.value.replace(/\s+/g, ""));
   if (!link || !linkTypeAllowed(link.type)) {
+    showToast("Could not parse the provided link", "warning", 3000);
+    elements.link.value = "";
     return;
   }
-
   addRequest(
     {
       "user-id": USER.userID,
@@ -920,6 +956,7 @@ function nextItem() {
 function playItem(item) {
   switch (item.type) {
     case "youtube":
+    case "youtube short":
       elements.youtubeEmbedContainer.style.display = "";
       youtubePlayer.loadVideoById(item.id);
       break;
