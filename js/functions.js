@@ -892,16 +892,16 @@ function secondsToTimeString(seconds) {
   const minutes = Math.floor(seconds / 60);
   const sec = seconds % 60;
   if (hours) {
-    string += hours + ":";
+    string += (hours < 10 ? "0" : "") + hours + ":";
   }
   if (minutes) {
-    string += minutes + ":";
+    string += (minutes < 10 ? "0" : "") + minutes + ":";
   }
   if (sec && !minutes) {
     string += "00:";
   }
   if (sec) {
-    string += sec;
+    string += (minutes < 10 ? "0" : "") + sec;
   }
   return string;
 } //secondsToTimeString

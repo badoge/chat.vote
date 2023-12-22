@@ -108,6 +108,7 @@ let copyLinkButton;
 let playlistTab, approvalTab, historyTab;
 let playlist_open = false;
 let playlist_playing = false;
+let total_duration = 0;
 let togglePlaylistPopover;
 
 let users = [];
@@ -600,7 +601,7 @@ function addRequest(context, link) {
       approved: PLAYLIST.approvalQueue ? false : true,
       title: "",
       duration: 0,
-      views: 0,
+      views: -1,
       thumbnail: "",
       time: Date.now(),
       by: [context.username],
@@ -633,6 +634,7 @@ function deleteRequest(id, refund = true) {
 
 function clearPlaylist() {
   playlist_playing = false;
+  total_duration = 0;
   users = [];
   requests = [];
   history = [];
@@ -708,6 +710,7 @@ async function getRequestInfo(index) {
       requests[index].title = `${result.data[0].title} - ${result.data[0].broadcaster_name}` || "(untitled)";
       requests[index].thumbnail = result.data[0].thumbnail_url;
       requests[index].duration = result.data[0].duration;
+      requests[index].views = result.data[0].view_count;
     } catch (error) {
       deleteRequest(requests[index].id);
       console.log("getRequestInfo twitch clip error", error);
@@ -723,6 +726,7 @@ async function getRequestInfo(index) {
       requests[index].title = `${result.data[0].title} - ${result.data[0].user_login}` || "(untitled)";
       requests[index].thumbnail = result.data[0].thumbnail_url.replace("%{width}", "320").replace("%{height}", "180");
       requests[index].duration = convertTwitchVODDuration(result.data[0].duration);
+      requests[index].views = result.data[0].view_count;
     } catch (error) {
       deleteRequest(requests[index].id);
       console.log("getRequestInfo twitch vod error", error);
@@ -810,6 +814,33 @@ async function getRequestInfo(index) {
       console.log("getRequestInfo streamable error", error);
       return;
     }
+  }
+
+  // if (PLAYLIST.maxDuration !== "" && requests[index].duration !== -1 && total_duration + requests[index].duration > (PLAYLIST.maxDuration * PLAYLIST.maxDurationUnit == "m" ? 60 : 3600)) {
+  //   deleteRequest(requests[index].id);
+  //   return;
+  // }
+
+  if (PLAYLIST.maxLength !== "" && requests[index].duration !== -1 && requests[index].duration > PLAYLIST.maxLength * 60) {
+    deleteRequest(requests[index].id);
+    return;
+  }
+
+  if (PLAYLIST.maxSize !== "" && requests.length > PLAYLIST.maxSize) {
+    if (playlist_open) {
+      elements.togglePlaylist.click();
+    }
+    deleteRequest(requests[index].id);
+    return;
+  }
+
+  if (PLAYLIST.minViewCount !== "" && requests[index].views !== -1 && requests[index].views < PLAYLIST.minViewCount) {
+    deleteRequest(requests[index].id);
+    return;
+  }
+
+  if (requests[index].duration !== -1) {
+    total_duration += requests[index].duration;
   }
 
   updatePlaylist(index);
