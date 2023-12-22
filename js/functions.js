@@ -884,3 +884,24 @@ function convertTwitchVODDuration(duration) {
   }
   return totalSeconds;
 } //convertTwitchVODDuration
+
+function secondsToTimeString(seconds) {
+  let string = "";
+  const hours = Math.floor(seconds / 3600);
+  seconds %= 3600;
+  const minutes = Math.floor(seconds / 60);
+  const sec = seconds % 60;
+  if (hours) {
+    string += hours + ":";
+  }
+  if (minutes) {
+    string += minutes + ":";
+  }
+  if (sec && !minutes) {
+    string += "00:";
+  }
+  if (sec) {
+    string += sec;
+  }
+  return string;
+} //secondsToTimeString

@@ -33,7 +33,7 @@
   <body>
     <noscript><div class="alert alert-danger" role="alert">WARNING! JavaScript is disabled. This site will not work properly without it.</div></noscript>
 
-    <div class="modal" id="loginExpiredModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="loginExpiredModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
@@ -65,7 +65,7 @@
       </div>
     </div>
 
-    <div class="modal" id="resetSettingsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="resetSettingsModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
@@ -78,6 +78,24 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
             <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="resetSettings()">Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="clearPlaylistModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Are you sure?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>All videos/songs will be removed from the playlist including the current playing video</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="clearPlaylist()"><i class="material-icons notranslate">delete_forever</i>Clear</button>
           </div>
         </div>
       </div>
@@ -99,6 +117,14 @@
                   <div class="form-check form-switch mb-3">
                     <input class="form-check-input" type="checkbox" role="switch" id="allowSpotifySongs" onchange="saveSettings()" checked />
                     <label class="form-check-label" for="allowSpotifySongs">Songs</label>
+                    <i
+                      class="material-icons notranslate text-warning"
+                      data-bs-toggle="tooltip"
+                      data-bs-delay="200"
+                      data-bs-placement="top"
+                      data-bs-title="Autoplay is disabled because Spotify embeds break if you skip too quickly"
+                      >warning
+                    </i>
                   </div>
                   <h6>Streamable</h6>
                   <div class="form-check form-switch mb-3">
@@ -110,10 +136,15 @@
                   <h6>Twitch</h6>
                   <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchClips" onchange="saveSettings()" checked />
-                    <label class="form-check-label" for="allowTwitchClips"
-                      >Clips
-                      <i class="material-icons notranslate text-warning" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="top" data-bs-title=":)">warning</i>
-                    </label>
+                    <label class="form-check-label" for="allowTwitchClips">Clips </label>
+                    <i
+                      class="material-icons notranslate text-warning"
+                      data-bs-toggle="tooltip"
+                      data-bs-delay="200"
+                      data-bs-placement="top"
+                      data-bs-title="Twitch clip embeds don't notify the site when they are done so you will have to manually skip to next item"
+                      >warning
+                    </i>
                   </div>
                   <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchStreams" onchange="saveSettings()" checked />
@@ -633,10 +664,17 @@
         <div class="col p-0 m-2">
           <div class="card" id="playersCard">
             <div class="card-body p-0">
+              <h1 id="placeholder" class="display-1">
+                Nothing here :)<br />
+                <span id="commandHint2">
+                  Request something using <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">!request [link]</kbd> or
+                  <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">!r [link]</kbd>
+                </span>
+              </h1>
               <div id="youtubeEmbedContainer" style="display: none"><div id="youtubeEmbed"></div></div>
               <div id="spotifyEmbedContainer" style="display: none"><div id="spotifyEmbed"></div></div>
               <div id="twitchEmbed" style="display: none"></div>
-              <div id="twitchClipsEmbed" style="display: none"></div>
+              <iframe id="twitchClipsEmbed" style="display: none" height="100%" width="100%" preload="auto"> </iframe>
               <video id="streamableEmbed" style="display: none" controls autoplay></video>
             </div>
           </div>
@@ -685,9 +723,6 @@
                       Add
                     </button>
                   </div>
-                </div>
-                <div class="p-1">
-                  <button id="resetPlaylist" type="button" class="btn btn-sm btn-warning mt-1">Reset<br />Playlist</button>
                 </div>
               </div>
             </div>
@@ -741,6 +776,13 @@
               </ul>
               <div class="tab-content">
                 <div class="tab-pane fade show active" id="playlist-tab-pane" role="tabpanel" aria-labelledby="playlistTab" tabindex="0">
+                  <div class="input-group mt-2">
+                    <span class="input-group-text">Playlist length</span>
+                    <span class="input-group-text" id="playlistLength">00:00 (0 items)</span>
+                    <button id="resetPlaylist" class="btn btn-outline-warning" type="button" data-bs-toggle="modal" data-bs-target="#clearPlaylistModal">
+                      <i class="material-icons notranslate">delete_forever</i>Clear playlist
+                    </button>
+                  </div>
                   <div class="mt-2" id="mainList"></div>
                 </div>
                 <div class="tab-pane fade" id="approval-tab-pane" role="tabpanel" aria-labelledby="approvalTab" tabindex="0">
@@ -844,9 +886,9 @@
             </div>
             <div class="p-2 mx-auto">
               <div class="btn-group" role="group" aria-label="Playback controls">
-                <button type="button" class="btn btn-secondary" onclick="previousItem()"><i class="material-icons notranslate">skip_previous</i></button>
-                <button type="button" class="btn btn-secondary" onclick="togglePlay()"><i class="material-icons notranslate">play_arrow</i></button>
-                <button type="button" class="btn btn-secondary" onclick="nextItem()"><i class="material-icons notranslate">skip_next</i></button>
+                <button type="button" class="btn btn-secondary" id="previousItem" onclick="previousItem()"><i class="material-icons notranslate">skip_previous</i></button>
+                <button type="button" class="btn btn-secondary" id="togglePlay" onclick="togglePlay()"><i class="material-icons notranslate">play_arrow</i></button>
+                <button type="button" class="btn btn-secondary" id="nextItem" onclick="nextItem()"><i class="material-icons notranslate">skip_next</i></button>
               </div>
             </div>
             <div class="p-2">

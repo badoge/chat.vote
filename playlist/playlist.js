@@ -2,6 +2,7 @@ let elements = {
   //modals
   loginExpiredModal: document.getElementById("loginExpiredModal"),
   resetSettingsModal: document.getElementById("resetSettingsModal"),
+  clearPlaylistModal: document.getElementById("clearPlaylistModal"),
 
   //navbar
   vtsLink: document.getElementById("vtsLink"),
@@ -59,6 +60,7 @@ let elements = {
   //main
   toastContainer: document.getElementById("toastContainer"),
   playersCard: document.getElementById("playersCard"),
+  placeholder: document.getElementById("placeholder"),
   youtubeEmbedContainer: document.getElementById("youtubeEmbedContainer"),
   youtubeEmbed: document.getElementById("youtubeEmbed"),
   spotifyEmbedContainer: document.getElementById("spotifyEmbedContainer"),
@@ -68,8 +70,10 @@ let elements = {
   streamableEmbed: document.getElementById("streamableEmbed"),
 
   commandHint: document.getElementById("commandHint"),
+  commandHint2: document.getElementById("commandHint2"),
   togglePlaylist: document.getElementById("togglePlaylist"),
   togglePlaylistLabel: document.getElementById("togglePlaylistLabel"),
+  playlistLength: document.getElementById("playlistLength"),
   resetPlaylist: document.getElementById("resetPlaylist"),
   link: document.getElementById("link"),
   addLink: document.getElementById("addLink"),
@@ -86,6 +90,9 @@ let elements = {
   //bottom row
   profileLink: document.getElementById("profileLink"),
   copyLinkButton: document.getElementById("copyLinkButton"),
+  previousItem: document.getElementById("previousItem"),
+  togglePlay: document.getElementById("togglePlay"),
+  nextItem: document.getElementById("nextItem"),
   volumeSliderIcon: document.getElementById("volumeSliderIcon"),
   volumeSlider: document.getElementById("volumeSlider"),
   volumeSliderValue: document.getElementById("volumeSliderValue"),
@@ -96,7 +103,7 @@ let color = "";
 let currentTime = 0;
 let loginButton;
 let settingsOffcanvas;
-let loginExpiredModal, resetSettingsModal;
+let loginExpiredModal, resetSettingsModal, clearPlaylistModal;
 let copyLinkButton;
 let playlistTab, approvalTab, historyTab;
 let playlist_open = false;
@@ -105,6 +112,7 @@ let togglePlaylistPopover;
 
 let users = [];
 let requests = [];
+let history = [];
 let firstTimeChatters = [];
 
 let USER = {
@@ -220,8 +228,12 @@ async function refreshData() {
 
   if (PLAYLIST.noCommand) {
     elements.commandHint.innerHTML = `Add songs or videos to the playlist by posting a link in chat`;
+    elements.commandHint2.innerHTML = `Request something by posting a link in chat`;
   } else {
     elements.commandHint.innerHTML = `Add songs or videos to the playlist using 
+    <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">${PLAYLIST.requestCommand} [link]</kbd> or 
+    <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">${PLAYLIST.requestCommandAlias} [link]</kbd>`;
+    elements.commandHint2.innerHTML = `Request something using 
     <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">${PLAYLIST.requestCommand} [link]</kbd> or 
     <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">${PLAYLIST.requestCommandAlias} [link]</kbd>`;
   }
@@ -303,10 +315,14 @@ function load_localStorage() {
 
     if (PLAYLIST.noCommand) {
       elements.commandHint.innerHTML = `Add songs or videos to the playlist by posting a link in chat`;
+      elements.commandHint2.innerHTML = `Request something by posting a link in chat`;
     } else {
       elements.commandHint.innerHTML = `Add songs or videos to the playlist using 
       <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">${PLAYLIST.requestCommand}</kbd> or 
       <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">${PLAYLIST.requestCommandAlias}</kbd>`;
+      elements.commandHint2.innerHTML = `Request something using 
+      <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">${PLAYLIST.requestCommand} [link]</kbd> or 
+      <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">${PLAYLIST.requestCommandAlias} [link]</kbd>`;
     }
 
     updateWhoCanRequest();
@@ -591,6 +607,7 @@ function addRequest(context, link) {
     addToPlaylist(index);
     getRequestInfo(index);
   }
+  updateLength();
 } //addRequest
 
 function deleteRequest(id, refund = true) {
@@ -609,7 +626,27 @@ function deleteRequest(id, refund = true) {
     requests.splice(requestIndex, 1);
   }
   document.getElementById(`id${id}`).remove();
+  updateLength();
 } //deleteRequest
+
+function clearPlaylist() {
+  playlist_playing = false;
+  users = [];
+  requests = [];
+  history = [];
+  resetPlayers();
+  elements.mainList.innerHTML = "";
+  elements.placeholder.style.display = "";
+  updateLength();
+} //clearPlaylist
+
+function updateLength() {
+  const count = requests.length;
+  const duration = requests.reduce((sum, request) => {
+    return request.duration == -1 ? sum : sum + request.duration;
+  }, 0);
+  elements.playlistLength.innerHTML = `${secondsToTimeString(Math.round(duration)) || "00:00"} (${count} ${count == 1 ? "item" : "items"})`;
+} //updateLength
 
 function addToPlaylist(requestIndex, position = "beforeend") {
   elements.mainList.insertAdjacentHTML(
@@ -644,7 +681,7 @@ function updatePlaylist(index) {
   if (requests[index].thumbnail && requests[index].title) {
     document.getElementById(`id${requests[index].id}_thumbnail`).innerHTML = `<img src="${requests[index].thumbnail}" alt="thumbnail" class="rounded" />`;
     document.getElementById(`id${requests[index].id}_title`).innerText = requests[index].title;
-    document.getElementById(`id${requests[index].id}_duration`).innerText = requests[index].duration == -1 ? "🔴live" : requests[index].duration;
+    document.getElementById(`id${requests[index].id}_duration`).innerText = requests[index].duration == -1 ? "🔴live" : secondsToTimeString(Math.round(requests[index].duration));
     document.getElementById(`id${requests[index].id}_by`).innerText = `Requested by: ${requests[index].by.join(" & ")}`;
     if (!playlist_playing) {
       playlist_playing = true;
@@ -736,13 +773,14 @@ async function getRequestInfo(index) {
       requests[index].title = result.title || "(untitled)";
       requests[index].thumbnail = result.thumbnail_url;
       requests[index].duration = result.files.mp4.duration;
-      requests[index].src = result.files.mp4.url;
+      requests[index].video = result.files.mp4.url;
     } catch (error) {
       console.log("getRequestInfo streamable error", error);
     }
   }
 
   updatePlaylist(index);
+  updateLength();
 } //getRequestInfo
 
 /**
@@ -854,15 +892,29 @@ function previousItem() {} //previousItem
 
 function togglePlay() {} //togglePlay
 
+let playlistCooldown = false;
+let currentItem;
 function nextItem() {
-  let item = requests.shift();
-  console.log(item);
-  if (!item) {
+  if (playlistCooldown) {
     return;
   }
+  playlistCooldown = true;
+  elements.nextItem.disabled = true;
+  setTimeout(() => {
+    playlistCooldown = false;
+    elements.nextItem.disabled = false;
+  }, 1000);
+  currentItem = requests.shift();
+  console.log(currentItem);
+  history.push(currentItem);
   resetPlayers();
-  deleteRequest(item.id, false);
-  playItem(item);
+  if (!currentItem) {
+    elements.placeholder.style.display = "";
+    playlist_playing = false;
+    return;
+  }
+  deleteRequest(currentItem.id, false);
+  playItem(currentItem);
 } //nextItem
 
 function playItem(item) {
@@ -885,18 +937,11 @@ function playItem(item) {
       break;
     case "twitch clip":
       elements.twitchClipsEmbed.style.display = "";
-      elements.twitchClipsEmbed.innerHTML = `
-      <iframe 
-      src="https://clips.twitch.tv/embed?clip=${item.id}&parent=chat.vote&autoplay=true" 
-      height="100%" 
-      width="100%" 
-      preload="auto" 
-      >
-      </iframe>`;
+      elements.twitchClipsEmbed.src = `https://clips.twitch.tv/embed?clip=${item.id}&parent=${window.location.hostname}&autoplay=true`;
       break;
     case "streamable":
       elements.streamableEmbed.style.display = "";
-      elements.streamableEmbed.src = item.src;
+      elements.streamableEmbed.src = item.video;
       break;
     default:
       break;
@@ -904,6 +949,7 @@ function playItem(item) {
 } //playItem
 
 function resetPlayers() {
+  elements.placeholder.style.display = "none";
   elements.youtubeEmbedContainer.style.display = "none";
   elements.spotifyEmbedContainer.style.display = "none";
   elements.twitchEmbed.style.display = "none";
@@ -919,7 +965,7 @@ function resetPlayers() {
 
 async function loadPFP() {
   if (!USER.channel) {
-    elements.topRight.innerHTML = ` <div class="btn-group" role="group" aria-label="login options">
+    elements.topRight.innerHTML = `<div class="btn-group" role="group" aria-label="login options">
     <a
       role="button"
       id="loginButton"
@@ -1198,6 +1244,7 @@ window.onload = function () {
 
   loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
   resetSettingsModal = new bootstrap.Modal(elements.resetSettingsModal);
+  clearPlaylistModal = new bootstrap.Modal(elements.clearPlaylistModal);
   settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
   copyLinkButton = new bootstrap.Popover(elements.copyLinkButton);
   togglePlaylistPopover = new bootstrap.Popover(elements.togglePlaylistLabel);
@@ -1251,6 +1298,7 @@ window.onload = function () {
   enableTooltips();
   enableTwitchEmbed();
   streamableEmbedEventListeners();
+  elements.twitchClipsEmbed.src = `https://clips.twitch.tv/embed?parent=${window.location.hostname}&autoplay=true`;
 }; //onload
 
 let youtubePlayer;
@@ -1291,6 +1339,7 @@ function onYouTubeIframeAPIReady() {
 function youtubePlayerOnStateChange(event) {
   console.log(event);
   if (event.data == YT.PlayerState.ENDED) {
+    nextItem();
   }
 } //youtubePlayerOnStateChange
 
@@ -1312,14 +1361,13 @@ window.onSpotifyIframeApiReady = (IFrameAPI) => {
 
   const callback = (EmbedController) => {
     spotifyPlayer = EmbedController;
-    EmbedController.addListener("ready", () => {
-      console.log("The Embed has initialized");
-      EmbedController.play();
-    });
+    //breaks if user skips too fast and keeps playing after the embed gets hidden
+    // EmbedController.addListener("ready", () => {
+    //   EmbedController.play();
+    // });
     EmbedController.addListener("playback_update", (event) => {
       if (event.data.position == event.data.duration && event.data.duration > 0) {
-        console.log(event);
-        console.log("dank");
+        nextItem();
       }
     });
   };
@@ -1343,21 +1391,19 @@ function enableTwitchEmbed() {
   };
   twitchPlayer = new Twitch.Player("twitchEmbed", options);
 
-  twitchPlayer.addEventListener(Twitch.Player.ENDED, dank);
-  twitchPlayer.addEventListener(Twitch.Player.PAUSE, dank2);
+  twitchPlayer.addEventListener(Twitch.Player.ENDED, twitchPlayerEnded);
+  twitchPlayer.addEventListener(Twitch.Player.PAUSE, twitchPlayerPaused);
 
-  function dank(event) {
-    console.log(event);
-    console.log("dank");
+  function twitchPlayerEnded(event) {
+    nextItem();
   }
-  function dank2(event) {
+  function twitchPlayerPaused(event) {
     console.log(event);
-    console.log("dank2");
   }
 } //enableTwitchEmbed
 
 function streamableEmbedEventListeners() {
   elements.streamableEmbed.addEventListener("ended", (event) => {
-    console.log(event);
+    nextItem();
   });
 }
