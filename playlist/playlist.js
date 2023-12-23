@@ -71,10 +71,6 @@ let elements = {
 
   commandHint: document.getElementById("commandHint"),
   commandHint2: document.getElementById("commandHint2"),
-  togglePlaylist: document.getElementById("togglePlaylist"),
-  togglePlaylistLabel: document.getElementById("togglePlaylistLabel"),
-  playlistLength: document.getElementById("playlistLength"),
-  resetPlaylist: document.getElementById("resetPlaylist"),
   link: document.getElementById("link"),
   addLink: document.getElementById("addLink"),
 
@@ -90,6 +86,11 @@ let elements = {
   //bottom row
   profileLink: document.getElementById("profileLink"),
   copyLinkButton: document.getElementById("copyLinkButton"),
+  nowPlaying: document.getElementById("nowPlaying"),
+  playlistLength: document.getElementById("playlistLength"),
+  resetPlaylist: document.getElementById("resetPlaylist"),
+  togglePlaylist: document.getElementById("togglePlaylist"),
+  togglePlaylistLabel: document.getElementById("togglePlaylistLabel"),
   previousItem: document.getElementById("previousItem"),
   togglePlay: document.getElementById("togglePlay"),
   nextItem: document.getElementById("nextItem"),
@@ -641,6 +642,7 @@ function clearPlaylist() {
   resetPlayers();
   elements.mainList.innerHTML = "";
   elements.placeholder.style.display = "";
+  elements.nowPlaying.innerHTML = `<span class="text-body-secondary">Nothing :)</span>`;
   updateLength();
 } //clearPlaylist
 
@@ -980,6 +982,7 @@ function nextItem() {
   if (!currentItem) {
     elements.placeholder.style.display = "";
     playlist_playing = false;
+    elements.nowPlaying.innerHTML = `<span class="text-body-secondary">Nothing :)</span>`;
     return;
   }
   deleteRequest(currentItem.id, false);
@@ -1016,6 +1019,8 @@ function playItem(item) {
     default:
       break;
   }
+
+  elements.nowPlaying.innerText = truncateString(currentItem.title, 50);
 } //playItem
 
 function resetPlayers() {
@@ -1342,11 +1347,11 @@ window.onload = function () {
   elements.togglePlaylist.onchange = function () {
     playlist_open = this.checked;
     if (this.checked) {
-      elements.togglePlaylistLabel.classList = "btn btn-lg btn-danger";
-      elements.togglePlaylistLabel.innerHTML = `Close<br>Playlist`;
+      elements.togglePlaylistLabel.classList = "btn btn-danger";
+      elements.togglePlaylistLabel.innerHTML = "Close Playlist";
     } else {
-      elements.togglePlaylistLabel.classList = "btn btn-lg btn-success";
-      elements.togglePlaylistLabel.innerHTML = `Open<br>Playlist`;
+      elements.togglePlaylistLabel.classList = "btn btn-success";
+      elements.togglePlaylistLabel.innerHTML = "Open Playlist";
     }
   };
 

@@ -195,3 +195,13 @@ video {
 #placeholder {
   text-align: center;
 }
+
+.bottomBarLabel {
+  user-select: none;
+  font-size: 14px;
+}
+
+#playlistLength {
+  display: inline-block;
+  min-width: 120px;
+}
