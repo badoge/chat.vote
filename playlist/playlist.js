@@ -1089,7 +1089,7 @@ function resetPlayers() {
   youtubePlayer.loadVideoById("");
   spotifyPlayer.pause();
   twitchPlayer.setChannel("");
-  elements.twitchClipsEmbed.innerHTML = "";
+  elements.twitchClipsEmbed.src = "";
   elements.streamableEmbed.src = "";
 } //resetPlayers
 
