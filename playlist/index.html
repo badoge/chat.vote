@@ -101,6 +101,14 @@
       </div>
     </div>
 
+    <div id="voteSkipDiv" class="bg-body-tertiary" style="display: none">
+      <small class="text-body-secondary">
+        Vote skip using <span id="voteSkipHint"><kbd>!voteskip</kbd> or <kbd>!vs</kbd></span>
+      </small>
+      <br />
+      <span id="voteSkipVotes">100 votes needed to skip</span>
+    </div>
+
     <div class="offcanvas offcanvas-start" tabindex="-1" id="settingsOffcanvas" aria-labelledby="settingsOffcanvasLabel">
       <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="settingsOffcanvasLabel"><i class="material-icons notranslate">settings</i>Settings</h5>
@@ -180,8 +188,8 @@
           <div class="card-body">
             <h6>Max playlist duration</h6>
             <div class="input-group">
-              <input disabled type="number" aria-label="Max playlist duration" id="maxDuration" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
-              <select disabled class="form-select" id="maxDurationUnit" onchange="saveSettings()">
+              <input type="number" aria-label="Max playlist duration" id="maxDuration" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
+              <select class="form-select" id="maxDurationUnit" onchange="saveSettings()">
                 <option selected value="m">Minutes</option>
                 <option value="h">Hours</option>
               </select>
@@ -235,13 +243,12 @@
             </div>
 
             <div class="form-check form-switch">
-              <input disabled class="form-check-input" type="checkbox" role="switch" id="allowVoteSkip" onchange="saveSettings()" />
+              <input class="form-check-input" type="checkbox" role="switch" id="allowVoteSkip" onchange="saveSettings()" />
               <label class="form-check-label" for="allowVoteSkip"><i class="material-icons notranslate">how_to_vote</i>Allow viewers to vote skip</label>
             </div>
             <div class="input-group mb-1">
               <span class="input-group-text">Vote Skip</span>
               <input
-                disabled
                 type="text"
                 id="voteskipCommand"
                 data-default="!voteskip"
@@ -252,7 +259,6 @@
                 onchange="saveSettings()"
               />
               <input
-                disabled
                 type="text"
                 id="voteskipCommandAlias"
                 data-default="!vs"
@@ -265,14 +271,18 @@
             </div>
             <div class="input-group mb-5">
               <span class="input-group-text">Skip after</span>
-              <input disabled type="number" aria-label="vote skip votes needed" id="voteskipCount" placeholder="1" value="1" min="1" class="form-control" onchange="saveSettings()" />
+              <input type="number" aria-label="vote skip votes needed" id="voteskipCount" placeholder="100" value="100" min="1" class="form-control" onchange="saveSettings()" />
               <span class="input-group-text">votes</span>
             </div>
 
             <div class="form-check form-switch mb-3">
               <input disabled class="form-check-input" type="checkbox" role="switch" id="enableBot" onchange="saveSettings()" />
               <label class="form-check-label" for="enableBot"><i class="material-icons notranslate">smart_toy</i>Enable chat bot</label>
-              <br /><small class="text-body-secondary">Enables the bot commands below and adds confirmation replies for some commands</small>
+              <br />
+              <small class="text-body-secondary">
+                Enables the bot commands below and adds confirmation replies for some commands - Make sure to mod the bot (@chatvote) so that it can post links & doesn't get timed out by
+                other bots
+              </small>
             </div>
             <div class="input-group mb-3">
               <span class="input-group-text">Bot commands cooldown</span>
@@ -906,11 +916,10 @@
                 <button type="button" class="btn btn-secondary" id="nextItem" onclick="nextItem()"><i class="material-icons notranslate">skip_next</i></button>
               </div>
             </div>
-            <div class="p-1">
+            <div class="p-1" style="display: none">
               <div class="hstack gap-1">
-                <!-- <i class="material-icons notranslate cursor-pointer" id="volumeSliderIcon" onclick="toggleMute()">volume_up</i> -->
-                <i class="material-icons notranslate" id="volumeSliderIcon">volume_up</i>
-                <input disabled type="range" class="form-range" min="0" value="50" max="100" id="volumeSlider" oninput="changeVolume(this)" />
+                <i class="material-icons notranslate cursor-pointer" id="volumeSliderIcon" onclick="toggleMute()">volume_up</i>
+                <input type="range" class="form-range" min="0" value="50" max="100" id="volumeSlider" oninput="changeVolume(this)" />
                 <span id="volumeSliderValue">50</span>
               </div>
             </div>
@@ -925,6 +934,7 @@
     <script src="/js/linkify.min.js"></script>
     <script src="/js/linkify-element.min.js"></script>
     <script src="/js/linkify-plugin-mention.min.js"></script>
+    <script src="/js/anime.min.js"></script>
     <script src="/js/bootstrap.bundle.min.js"></script>
     <script src="/js/functions.min.js"></script>
     <script src="/playlist/playlist.js"></script>

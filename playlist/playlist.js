@@ -4,6 +4,10 @@ let elements = {
   resetSettingsModal: document.getElementById("resetSettingsModal"),
   clearPlaylistModal: document.getElementById("clearPlaylistModal"),
 
+  voteSkipDiv: document.getElementById("voteSkipDiv"),
+  voteSkipHint: document.getElementById("voteSkipHint"),
+  voteSkipVotes: document.getElementById("voteSkipVotes"),
+
   //navbar
   vtsLink: document.getElementById("vtsLink"),
   status: document.getElementById("status"),
@@ -116,6 +120,7 @@ let users = [];
 let requests = [];
 let history = [];
 let firstTimeChatters = [];
+let skippers = [];
 
 let USER = {
   channel: "",
@@ -154,7 +159,7 @@ let PLAYLIST = {
   allowVoteSkip: false,
   voteskipCommand: "!voteskip",
   voteskipCommandAlias: "!vs",
-  voteskipCount: 1,
+  voteskipCount: 100,
   enableBot: false,
   botCooldown: 1,
   songCommand: "!song",
@@ -205,7 +210,7 @@ async function refreshData() {
   PLAYLIST.allowVoteSkip = elements.allowVoteSkip.checked;
   PLAYLIST.voteskipCommand = elements.voteskipCommand.value.replace(/\s+/g, "").toLowerCase() || "!voteskip";
   PLAYLIST.voteskipCommandAlias = elements.voteskipCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!vs";
-  PLAYLIST.voteskipCount = parseInt(elements.voteskipCount.value, 10) || 1;
+  PLAYLIST.voteskipCount = parseInt(elements.voteskipCount.value, 10) || 100;
   PLAYLIST.enableBot = elements.enableBot.checked;
   PLAYLIST.botCooldown = parseInt(elements.botCooldown.value, 10) || 1;
   PLAYLIST.songCommand = elements.songCommand.value.replace(/\s+/g, "").toLowerCase() || "!song";
@@ -227,6 +232,8 @@ async function refreshData() {
   elements.playlistCommandAlias.disabled = !PLAYLIST.enableBot;
 
   elements.approvalTabButton.style.display = PLAYLIST.approvalQueue ? "" : "none";
+
+  elements.voteSkipHint.innerHTML = `<kbd>${PLAYLIST.voteskipCommand}</kbd> or <kbd>${PLAYLIST.voteskipCommandAlias}</kbd>`;
 
   if (PLAYLIST.noCommand) {
     elements.commandHint.innerHTML = `Add songs or videos to the playlist by posting a link in chat`;
@@ -292,7 +299,7 @@ function load_localStorage() {
     elements.allowVoteSkip.checked = PLAYLIST.allowVoteSkip ?? false;
     elements.voteskipCommand.value = PLAYLIST.voteskipCommand || "!voteskip";
     elements.voteskipCommandAlias.value = PLAYLIST.voteskipCommandAlias || "!vs";
-    elements.voteskipCount.value = PLAYLIST.voteskipCount || 1;
+    elements.voteskipCount.value = PLAYLIST.voteskipCount || 100;
     elements.enableBot.checked = PLAYLIST.enableBot ?? false;
     elements.botCooldown.value = PLAYLIST.botCooldown || 1;
     elements.songCommand.value = PLAYLIST.songCommand || "!song";
@@ -314,6 +321,8 @@ function load_localStorage() {
     elements.playlistCommandAlias.disabled = !PLAYLIST.enableBot;
 
     elements.approvalTabButton.style.display = PLAYLIST.approvalQueue ? "" : "none";
+
+    elements.voteSkipHint.innerHTML = `<kbd>${PLAYLIST.voteskipCommand}</kbd> or <kbd>${PLAYLIST.voteskipCommandAlias}</kbd>`;
 
     if (PLAYLIST.noCommand) {
       elements.commandHint.innerHTML = `Add songs or videos to the playlist by posting a link in chat`;
@@ -376,7 +385,7 @@ function resetSettings(logout = false) {
       allowVoteSkip: false,
       voteskipCommand: "!voteskip",
       voteskipCommandAlias: "!vs",
-      voteskipCount: 1,
+      voteskipCount: 100,
       enableBot: false,
       botCooldown: 1,
       songCommand: "!song",
@@ -464,7 +473,6 @@ function connect() {
         if (!input[1]) {
           return;
         }
-
         if (!playlist_open && (Date.now() - currentTime) / 1000 > 10) {
           currentTime = Date.now();
           togglePlaylistPopover.show();
@@ -473,15 +481,16 @@ function connect() {
           }, 2000);
           return;
         } //playlist closed popover
-
         let link = parseLink(input[1]);
         if (!link || !linkTypeAllowed(link.type)) {
           return;
         }
         addRequest(context, link);
         break;
+
       case PLAYLIST.voteskipCommand:
       case PLAYLIST.voteskipCommandAlias:
+        voteSkip(context["user-id"]);
         break;
       case PLAYLIST.songCommand:
       case PLAYLIST.songCommandAlias:
@@ -639,6 +648,7 @@ function clearPlaylist() {
   users = [];
   requests = [];
   history = [];
+  resetVoteSkip();
   resetPlayers();
   elements.mainList.innerHTML = "";
   elements.placeholder.style.display = "";
@@ -818,10 +828,10 @@ async function getRequestInfo(index) {
     }
   }
 
-  // if (PLAYLIST.maxDuration !== "" && requests[index].duration !== -1 && total_duration + requests[index].duration > (PLAYLIST.maxDuration * PLAYLIST.maxDurationUnit == "m" ? 60 : 3600)) {
-  //   deleteRequest(requests[index].id);
-  //   return;
-  // }
+  if (PLAYLIST.maxDuration !== "" && requests[index].duration !== -1 && total_duration + requests[index].duration > PLAYLIST.maxDuration * (PLAYLIST.maxDurationUnit == "m" ? 60 : 3600)) {
+    deleteRequest(requests[index].id);
+    return;
+  }
 
   if (PLAYLIST.maxLength !== "" && requests[index].duration !== -1 && requests[index].duration > PLAYLIST.maxLength * 60) {
     deleteRequest(requests[index].id);
@@ -979,6 +989,7 @@ function nextItem() {
   console.log(currentItem);
   history.push(currentItem);
   resetPlayers();
+  resetVoteSkip();
   if (!currentItem) {
     elements.placeholder.style.display = "";
     playlist_playing = false;
@@ -1020,7 +1031,11 @@ function playItem(item) {
       break;
   }
 
-  elements.nowPlaying.innerText = truncateString(currentItem.title, 50);
+  if (currentItem.duration !== -1) {
+    total_duration -= currentItem.duration;
+  }
+
+  elements.nowPlaying.innerText = truncateString(currentItem.title, 80);
 } //playItem
 
 function resetPlayers() {
@@ -1037,6 +1052,46 @@ function resetPlayers() {
   elements.twitchClipsEmbed.innerHTML = "";
   elements.streamableEmbed.src = "";
 } //resetPlayers
+
+function voteSkip(userid) {
+  if (!playlist_playing || !PLAYLIST.allowVoteSkip) {
+    return;
+  }
+
+  if (!skippers.length) {
+    elements.voteSkipDiv.style.display = "";
+    anime({
+      targets: `#voteSkipDiv`,
+      easing: "easeOutElastic",
+      translateY: ["100%", 0],
+    });
+  }
+
+  if (skippers.includes(userid)) {
+    return;
+  }
+
+  skippers.push(userid);
+  let remaining = PLAYLIST.voteskipCount - skippers.length;
+  elements.voteSkipVotes.innerHTML = `${remaining} ${remaining == 1 ? "vote" : "votes"}  needed to skip`;
+
+  if (remaining <= 0) {
+    nextItem();
+    resetVoteSkip();
+  }
+} //voteSkip
+
+function resetVoteSkip() {
+  skippers = [];
+  anime({
+    targets: `#voteSkipDiv`,
+    easing: "easeOutBounce",
+    translateY: [0, "100%"],
+    complete: function (anim) {
+      elements.voteSkipDiv.style.display = "none";
+    },
+  });
+} //resetVoteSkip
 
 async function loadPFP() {
   if (!USER.channel) {

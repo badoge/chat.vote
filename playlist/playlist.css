@@ -7,7 +7,6 @@
   margin: 0px;
 }
 
-.card-header,
 .cursorPointer {
   cursor: pointer;
 }
@@ -36,6 +35,29 @@
 
 .previewThumbnail {
   max-width: 100%;
+}
+
+#voteSkipDiv {
+  pointer-events: none;
+  border-color: var(--bs-warning);
+  border-width: 2px 2px 0px 2px;
+  border-style: solid;
+  position: fixed;
+  right: 40%;
+  bottom: -20px;
+  padding-bottom: 20px;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  width: 360px;
+  z-index: 2000;
+}
+
+#voteSkipDiv > span {
+  margin-left: 10px;
+  font-size: 1.8rem;
+}
+#voteSkipDiv > small {
+  margin-left: 10px;
 }
 
 #toastContainer {
