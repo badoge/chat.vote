@@ -459,10 +459,15 @@ function connect() {
 
     if (PLAYLIST.noCommand && playlist_open) {
       let link = parseLink(input[0]);
-      if (link && linkTypeAllowed(link.type)) {
-        addRequest(context, link);
+      if (!link) {
         return;
       }
+      if (!linkTypeAllowed(link.type)) {
+        botReply("⛔ That platform is not enabled", context.id, false);
+        return;
+      }
+      addRequest(context, link);
+      return;
     }
 
     let command = input[0].toLowerCase();
@@ -482,7 +487,11 @@ function connect() {
           return;
         } //playlist closed popover
         let link = parseLink(input[1]);
-        if (!link || !linkTypeAllowed(link.type)) {
+        if (!link) {
+          return;
+        }
+        if (!linkTypeAllowed(link.type)) {
+          botReply("⛔ That platform is not enabled", context.id, false);
           return;
         }
         addRequest(context, link);
@@ -494,9 +503,19 @@ function connect() {
         break;
       case PLAYLIST.songCommand:
       case PLAYLIST.songCommandAlias:
+        if (currentItem) {
+          botReply(
+            `Current song/video: ${currentItem.title} | Requested by @${currentItem.by[0]} ${
+              currentItem.by.length > 1 ? `and ${currentItem.by.length - 1} other ${currentItem.by.length - 1 == 1 ? "user" : "users"}` : ""
+            }`,
+            context.id,
+            true
+          );
+        }
         break;
       case PLAYLIST.playlistCommand:
       case PLAYLIST.playlistCommandAlias:
+        //botReply("", context.id,true);
         break;
       case PLAYLIST.skipCommand:
         if (context.username == USER.channel || (PLAYLIST.modSkip && context.mod)) {
@@ -588,11 +607,13 @@ function addRequest(context, link) {
 
   //if limit is 0 then the user does not have a role that is allowed to request
   if (!limit || users[userIndex].requestsCount >= limit) {
+    botReply("🚫 You are not allowed to send requests", context.id, false);
     return;
   }
 
   //check if user already requested this link id
   if (users[userIndex].requests.some((id) => id === link.id)) {
+    botReply("🚫 You already requested this", context.id, false);
     return;
   }
 
@@ -604,6 +625,7 @@ function addRequest(context, link) {
   if (requestIndex > -1) {
     requests[requestIndex].by.push(context.username);
     updatePlaylist(requestIndex);
+    botReply("✅ Your request is already in the playlist (someone else already requested it)", context.id, false);
   } else {
     requests.push({
       id: link.id,
@@ -618,7 +640,8 @@ function addRequest(context, link) {
     });
     let index = requests.length - 1;
     addToPlaylist(index);
-    getRequestInfo(index);
+    getRequestInfo(index, context.id);
+    updatePlaylist(index);
   }
   updateLength();
 } //addRequest
@@ -709,11 +732,11 @@ function updatePlaylist(index) {
   }
 } //updatePlaylist
 
-async function getRequestInfo(index) {
+async function getRequestInfo(index, id) {
+  //skip if request already has info
   if (requests[index].title) {
     return;
   }
-
   if (requests[index].type == "twitch clip") {
     try {
       let response = await fetch(`https://helper.donk.workers.dev/twitch/clips?id=${requests[index].id}`, GETrequestOptions);
@@ -725,6 +748,7 @@ async function getRequestInfo(index) {
       requests[index].views = result.data[0].view_count;
     } catch (error) {
       deleteRequest(requests[index].id);
+      botReply("⚠ Your clip was removed because I could not find its info", id, false);
       console.log("getRequestInfo twitch clip error", error);
       return;
     }
@@ -741,6 +765,7 @@ async function getRequestInfo(index) {
       requests[index].views = result.data[0].view_count;
     } catch (error) {
       deleteRequest(requests[index].id);
+      botReply("⚠ Your video was removed because I could not find its info", id, false);
       console.log("getRequestInfo twitch vod error", error);
       return;
     }
@@ -756,6 +781,7 @@ async function getRequestInfo(index) {
       requests[index].duration = -1;
     } catch (error) {
       deleteRequest(requests[index].id);
+      botReply("⚠ Your request was removed because I could not find its info", id, false);
       console.log("getRequestInfo twitch stream error", error);
       return;
     }
@@ -772,10 +798,12 @@ async function getRequestInfo(index) {
       requests[index].uri = result.tracks[0].uri;
       if (!result.tracks[0].is_playable) {
         deleteRequest(requests[index].id);
+        botReply("⛔ Your request was removed because it is not playable", id, false);
         return;
       }
     } catch (error) {
       deleteRequest(requests[index].id);
+      botReply("⚠ Your request was removed because I could not find its info", id, false);
       console.log("getRequestInfo spotify error", error);
       return;
     }
@@ -797,16 +825,19 @@ async function getRequestInfo(index) {
         }
         if (!PLAYLIST.allowYTStreams) {
           deleteRequest(requests[index].id);
+          botReply("⛔ YouTube streams are not allowed", id, false);
           return;
         }
       }
 
       if (result.items[0].contentDetails?.contentRating?.ytRating == "ytAgeRestricted" || !result.items[0].status?.embeddable) {
         deleteRequest(requests[index].id);
+        botReply("⛔ Your video was removed because it is age restricted or not embeddable", id, false);
         return;
       }
     } catch (error) {
       deleteRequest(requests[index].id);
+      botReply("⚠ Your video was removed because I could not find its info", id, false);
       console.log("getRequestInfo youtube error", error);
       return;
     }
@@ -823,18 +854,24 @@ async function getRequestInfo(index) {
       requests[index].video = result.files.mp4.url;
     } catch (error) {
       deleteRequest(requests[index].id);
+      botReply("⚠ Your video was removed because I could not find its info", id, false);
       console.log("getRequestInfo streamable error", error);
       return;
     }
   }
 
   if (PLAYLIST.maxDuration !== "" && requests[index].duration !== -1 && total_duration + requests[index].duration > PLAYLIST.maxDuration * (PLAYLIST.maxDurationUnit == "m" ? 60 : 3600)) {
+    if (playlist_open) {
+      elements.togglePlaylist.click();
+    }
     deleteRequest(requests[index].id);
+    botReply("⛔ Your request was removed because the playlist's duration limit was reached", id, false);
     return;
   }
 
   if (PLAYLIST.maxLength !== "" && requests[index].duration !== -1 && requests[index].duration > PLAYLIST.maxLength * 60) {
     deleteRequest(requests[index].id);
+    botReply(`⛔ Your request was removed because it's too long (${PLAYLIST.maxLength}m max)`, id, false);
     return;
   }
 
@@ -843,20 +880,22 @@ async function getRequestInfo(index) {
       elements.togglePlaylist.click();
     }
     deleteRequest(requests[index].id);
+    botReply("⛔ Your request was removed because the playlist's size limit was reached", id, false);
     return;
   }
 
   if (PLAYLIST.minViewCount !== "" && requests[index].views !== -1 && requests[index].views < PLAYLIST.minViewCount) {
     deleteRequest(requests[index].id);
+    botReply(`⛔ Your request was removed because it does not meet the minimum view count (${PLAYLIST.minViewCount.toLocaleString()})`, id, false);
     return;
   }
 
   if (requests[index].duration !== -1) {
     total_duration += requests[index].duration;
   }
-
   updatePlaylist(index);
   updateLength();
+  botReply("✅ Your request has been added to the playlist", id, false);
 } //getRequestInfo
 
 /**
@@ -957,6 +996,7 @@ function addLink() {
   }
   addRequest(
     {
+      id: null,
       "user-id": USER.userID,
       username: USER.channel,
       mod: true,
@@ -1230,6 +1270,40 @@ async function loadAndConnect() {
     elements.profileLink.value = `https://playlist.chat.vote/${USER.channel || ""}`;
   }
 } //loadAndConnect
+
+let botCooldown = 0;
+async function botReply(msg, id, followCooldown) {
+  if (!USER.access_token || !PLAYLIST.enableBot || !id) {
+    return;
+  }
+
+  if ((Date.now() - botCooldown) / 1000 < PLAYLIST.botCooldown && followCooldown) {
+    return;
+  }
+  botCooldown = Date.now();
+
+  let body = JSON.stringify({
+    channel: USER.channel,
+    id: id,
+    msg: msg,
+    access_token: USER.access_token,
+  });
+  let requestOptions = {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: body,
+    redirect: "follow",
+  };
+  try {
+    let response = await fetch(`https://api.chat.vote/reply`, requestOptions);
+    console.log(`botReply response: ${response.status}`);
+  } catch (error) {
+    console.log("botReply error", error);
+  }
+} //botReply
 
 function copyLink() {
   navigator.clipboard.writeText(`https://playlist.chat.vote/${USER.channel || ""}`);

@@ -276,7 +276,7 @@
             </div>
 
             <div class="form-check form-switch mb-3">
-              <input disabled class="form-check-input" type="checkbox" role="switch" id="enableBot" onchange="saveSettings()" />
+              <input class="form-check-input" type="checkbox" role="switch" id="enableBot" onchange="saveSettings()" />
               <label class="form-check-label" for="enableBot"><i class="material-icons notranslate">smart_toy</i>Enable chat bot</label>
               <br />
               <small class="text-body-secondary">
@@ -286,39 +286,18 @@
             </div>
             <div class="input-group mb-3">
               <span class="input-group-text">Bot commands cooldown</span>
-              <input disabled type="number" aria-label="Bot commands cooldown" id="botCooldown" placeholder="1" value="1" min="1" class="form-control" onchange="saveSettings()" />
+              <input type="number" aria-label="Bot commands cooldown" id="botCooldown" placeholder="1" value="1" min="1" class="form-control" onchange="saveSettings()" />
               <span class="input-group-text">seconds</span>
             </div>
             <h6>Bot Commands</h6>
             <div class="input-group mb-3">
               <span class="input-group-text">Song name</span>
-              <input
-                disabled
-                type="text"
-                id="songCommand"
-                data-default="!song"
-                value="!song"
-                aria-label="Song name command"
-                placeholder="command"
-                class="form-control"
-                onchange="saveSettings()"
-              />
-              <input
-                disabled
-                type="text"
-                id="songCommandAlias"
-                data-default="!s"
-                value="!s"
-                aria-label="Song name command alias"
-                placeholder="alias"
-                class="form-control"
-                onchange="saveSettings()"
-              />
+              <input type="text" id="songCommand" data-default="!song" value="!song" aria-label="Song name command" placeholder="command" class="form-control" onchange="saveSettings()" />
+              <input type="text" id="songCommandAlias" data-default="!s" value="!s" aria-label="Song name command alias" placeholder="alias" class="form-control" onchange="saveSettings()" />
             </div>
             <div class="input-group mb-3">
               <span class="input-group-text">Playlist</span>
               <input
-                disabled
                 type="text"
                 id="playlistCommand"
                 data-default="!playlist"
@@ -329,7 +308,6 @@
                 onchange="saveSettings()"
               />
               <input
-                disabled
                 type="text"
                 id="playlistCommandAlias"
                 data-default="!pl"
