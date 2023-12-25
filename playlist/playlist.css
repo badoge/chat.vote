@@ -141,12 +141,21 @@ video {
 }
 
 #playersCard {
-  height: 85vh;
+  height: 100%;
   border-color: transparent;
 }
 
 #playlist {
-  height: 64.7vh;
+  height: 68vh;
+}
+
+#mainList,
+#approvalList,
+#historyList {
+  height: 60vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  text-align: start;
 }
 
 .delete-request {
@@ -179,15 +188,6 @@ video {
 .thumbnail-div {
   position: relative;
   height: min-content;
-}
-
-#mainList,
-#approvalList,
-#historyList {
-  height: 59vh;
-  overflow-x: hidden;
-  overflow-y: auto;
-  text-align: start;
 }
 
 #playlistTabs {
