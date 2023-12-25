@@ -720,13 +720,13 @@ function addToPlaylist(requestIndex, position = "beforeend") {
             <span class="badge text-bg-dark duration-label" id="id${requests[requestIndex].id}_duration">00:00</span>
           </div>
           <div class="col">
-            <div class="vstack gap-3">
-              <div class="request-title" id="id${requests[requestIndex].id}_title" >
+            <div class="vstack gap-3 h-100">
+              <div class="request-title mb-auto" id="id${requests[requestIndex].id}_title" >
                 <span class="placeholder-glow">
                   <span class="placeholder col-12"></span>
                 </span>
               </div>
-              <div><small class="requested-by text-body-secondary" id="id${requests[requestIndex].id}_by" >Requested by: ${requests[requestIndex].by.join(" & ")}</small></div>
+              <small class="requested-by text-body-secondary" id="id${requests[requestIndex].id}_by" >Requested by: ${requests[requestIndex].by.join(" & ")}</small>
             </div>
           </div>
           <div class="col-auto" style="align-self: center"><i class="material-icons notranslate delete-request" onclick="deleteRequest('${requests[requestIndex].id}')">delete</i></div>
@@ -739,15 +739,24 @@ function updatePlaylist(index) {
   if (requests[index].thumbnail && requests[index].title) {
     document.getElementById(`id${requests[index].id}_thumbnail`).innerHTML = `<img src="${requests[index].thumbnail}" alt="thumbnail" class="rounded" />`;
     document.getElementById(`id${requests[index].id}_title`).innerText = requests[index].title;
+    document.getElementById(`id${requests[index].id}_title`).title = requests[index].title;
     document.getElementById(`id${requests[index].id}_duration`).innerText = requests[index].duration == -1 ? "🔴live" : secondsToTimeString(Math.round(requests[index].duration));
-    document.getElementById(`id${requests[index].id}_by`).innerText = `Requested by: ${requests[index].by.join(" & ")}`;
+    document.getElementById(`id${requests[index].id}_by`).innerText = `Requested by @${requests[index].by[0]} ${
+      requests[index].by.length > 1 ? `and ${requests[index].by.length - 1} other ${requests[index].by.length - 1 == 1 ? "user" : "users"}` : ""
+    }`;
+    document.getElementById(`id${requests[index].id}_by`).title = `Requested by @${requests[index].by[0]} ${
+      requests[index].by.length > 1 ? `and ${requests[index].by.length - 1} other ${requests[index].by.length - 1 == 1 ? "user" : "users"}` : ""
+    }`;
+
     if (!playlist_playing) {
       playlist_playing = true;
       nextItem();
     }
   } else {
     //update requesters only if request info is not ready yet
-    document.getElementById(`id${requests[index].id}_by`).innerText = `Requested by: ${requests[index].by.join(" & ")}`;
+    document.getElementById(`id${requests[index].id}_by`).innerText = `Requested by @${requests[index].by[0]} ${
+      requests[index].by.length > 1 ? `and ${requests[index].by.length - 1} other ${requests[index].by.length - 1 == 1 ? "user" : "users"}` : ""
+    }`;
   }
 } //updatePlaylist
 
@@ -1094,7 +1103,8 @@ function playItem(item) {
     total_duration -= currentItem.duration;
   }
 
-  elements.nowPlaying.innerText = truncateString(currentItem.title, 80);
+  elements.nowPlaying.innerText = currentItem.title;
+  elements.nowPlaying.title = currentItem.title;
 } //playItem
 
 function resetPlayers() {
