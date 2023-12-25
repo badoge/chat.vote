@@ -142,20 +142,38 @@ video {
 
 #playersCard {
   height: 100%;
-  border-color: transparent;
+  /* border-color: transparent; */
 }
 
 #playlist {
-  height: 68vh;
+  height: calc(100vh - 290px);
 }
 
 #mainList,
 #approvalList,
 #historyList {
-  height: 60vh;
+  height: calc(100vh - 350px);
   overflow-x: hidden;
   overflow-y: auto;
   text-align: start;
+  margin-left: -10px;
+  margin-right: -10px;
+}
+
+#rightCol {
+  width: 450px;
+}
+
+@media screen and (max-width: 1800px) {
+  #rightCol {
+    width: 25vw;
+  }
+}
+
+@media screen and (max-width: 1400px) {
+  #rightCol {
+    width: 20vw;
+  }
 }
 
 .delete-request {
