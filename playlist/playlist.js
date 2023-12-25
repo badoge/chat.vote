@@ -148,11 +148,11 @@ let PLAYLIST = {
   allowMods: true,
   allowVips: true,
   allowFirstTimeChatters: true,
-  plebLimit: 1,
-  subLimit: 1,
-  modLimit: 1,
-  vipLimit: 1,
-  firstTimeChatterLimit: 1,
+  plebLimit: "",
+  subLimit: "",
+  modLimit: "",
+  vipLimit: "",
+  firstTimeChatterLimit: "",
   noCommand: false,
   requestCommand: "!request",
   requestCommandAlias: "!r",
@@ -199,11 +199,11 @@ async function refreshData() {
   PLAYLIST.allowMods = elements.allowMods.checked;
   PLAYLIST.allowVips = elements.allowVips.checked;
   PLAYLIST.allowFirstTimeChatters = elements.allowFirstTimeChatters.checked;
-  PLAYLIST.plebLimit = parseInt(elements.plebLimit.value, 10) || 1;
-  PLAYLIST.subLimit = parseInt(elements.subLimit.value, 10) || 1;
-  PLAYLIST.modLimit = parseInt(elements.modLimit.value, 10) || 1;
-  PLAYLIST.vipLimit = parseInt(elements.vipLimit.value, 10) || 1;
-  PLAYLIST.firstTimeChatterLimit = parseInt(elements.firstTimeChatterLimit.value, 10) || 1;
+  PLAYLIST.plebLimit = parseInt(elements.plebLimit.value, 10) || "";
+  PLAYLIST.subLimit = parseInt(elements.subLimit.value, 10) || "";
+  PLAYLIST.modLimit = parseInt(elements.modLimit.value, 10) || "";
+  PLAYLIST.vipLimit = parseInt(elements.vipLimit.value, 10) || "";
+  PLAYLIST.firstTimeChatterLimit = parseInt(elements.firstTimeChatterLimit.value, 10) || "";
   PLAYLIST.noCommand = elements.noCommand.checked;
   PLAYLIST.requestCommand = elements.requestCommand.value.replace(/\s+/g, "").toLowerCase() || "!request";
   PLAYLIST.requestCommandAlias = elements.requestCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!r";
@@ -288,11 +288,11 @@ function load_localStorage() {
     elements.allowMods.checked = PLAYLIST.allowMods ?? true;
     elements.allowVips.checked = PLAYLIST.allowVips ?? true;
     elements.allowFirstTimeChatters.checked = PLAYLIST.allowFirstTimeChatters ?? true;
-    elements.plebLimit.value = PLAYLIST.plebLimit || 1;
-    elements.subLimit.value = PLAYLIST.subLimit || 1;
-    elements.modLimit.value = PLAYLIST.modLimit || 1;
-    elements.vipLimit.value = PLAYLIST.vipLimit || 1;
-    elements.firstTimeChatterLimit.value = PLAYLIST.firstTimeChatterLimit || 1;
+    elements.plebLimit.value = PLAYLIST.plebLimit || "";
+    elements.subLimit.value = PLAYLIST.subLimit || "";
+    elements.modLimit.value = PLAYLIST.modLimit || "";
+    elements.vipLimit.value = PLAYLIST.vipLimit || "";
+    elements.firstTimeChatterLimit.value = PLAYLIST.firstTimeChatterLimit || "";
     elements.noCommand.checked = PLAYLIST.noCommand ?? false;
     elements.requestCommand.value = PLAYLIST.requestCommand || "!request";
     elements.requestCommandAlias.value = PLAYLIST.requestCommandAlias || "!r";
@@ -374,11 +374,11 @@ function resetSettings(logout = false) {
       allowMods: true,
       allowVips: true,
       allowFirstTimeChatters: true,
-      plebLimit: 1,
-      subLimit: 1,
-      modLimit: 1,
-      vipLimit: 1,
-      firstTimeChatterLimit: 1,
+      plebLimit: "",
+      subLimit: "",
+      modLimit: "",
+      vipLimit: "",
+      firstTimeChatterLimit: "",
       noCommand: false,
       requestCommand: "!request",
       requestCommandAlias: "!r",
@@ -459,19 +459,17 @@ function connect() {
 
     if (PLAYLIST.noCommand && playlist_open) {
       let link = parseLink(input[0]);
-      if (!link) {
+      if (link && linkTypeAllowed(link.type)) {
+        addRequest(context, link);
         return;
       }
-      if (!linkTypeAllowed(link.type)) {
+      if (link && !linkTypeAllowed(link.type)) {
         botReply("⛔ That platform is not enabled", context.id, false);
         return;
       }
-      addRequest(context, link);
-      return;
     }
 
     let command = input[0].toLowerCase();
-
     switch (command) {
       case PLAYLIST.requestCommand:
       case PLAYLIST.requestCommandAlias:
@@ -579,23 +577,38 @@ function getUser(context) {
 /**
  * @description checks if the user is allowed to request and returns their request limit
  * @param {number} userIndex
- * @returns {number} if the user is not allowed to request then the return value will be 0
+ * @returns {number} return values: 0 = user is not allowed to request | -1 = user can make unlimited requests
  */
 function checkRequestLimit(userIndex) {
   let limit = 0;
   if (!users[userIndex].sub && PLAYLIST.allowPlebs) {
+    if (PLAYLIST.plebLimit === "") {
+      return -1;
+    }
     limit = Math.max(limit, PLAYLIST.plebLimit);
   }
   if (users[userIndex].sub && PLAYLIST.allowSubs) {
+    if (PLAYLIST.subLimit === "") {
+      return -1;
+    }
     limit = Math.max(limit, PLAYLIST.subLimit);
   }
   if (users[userIndex].mod && PLAYLIST.allowMods) {
+    if (PLAYLIST.modLimit === "") {
+      return -1;
+    }
     limit = Math.max(limit, PLAYLIST.modLimit);
   }
   if (users[userIndex].vip && PLAYLIST.allowVips) {
+    if (PLAYLIST.vipLimit === "") {
+      return -1;
+    }
     limit = Math.max(limit, PLAYLIST.vipLimit);
   }
   if (users[userIndex].firstTimeChatter && PLAYLIST.allowFirstTimeChatters) {
+    if (PLAYLIST.firstTimeChatterLimit === "") {
+      return -1;
+    }
     limit = Math.max(limit, PLAYLIST.firstTimeChatterLimit);
   }
   return limit;
@@ -605,9 +618,15 @@ function addRequest(context, link) {
   const userIndex = getUser(context);
   const limit = checkRequestLimit(userIndex);
 
-  //if limit is 0 then the user does not have a role that is allowed to request
-  if (!limit || users[userIndex].requestsCount >= limit) {
+  //if limit is 0 then the user's roles are not allowed to request
+  if (limit === 0) {
     botReply("🚫 You are not allowed to send requests", context.id, false);
+    return;
+  }
+
+  //if limit is -1 then the user is allowed to make unlimited requests
+  if (limit !== -1 && users[userIndex].requestsCount >= limit) {
+    botReply("⚠ You used up all your requests", context.id, false);
     return;
   }
 
@@ -1342,13 +1361,14 @@ function updateWhoCanRequest() {
   };
 
   let allowed = [];
-  let limit = [];
-  let totalLimit = 0;
+  let limits = [];
+  let counts = [];
   for (let [key, value] of Object.entries(roles)) {
     if (value.allowed) {
       allowed.push(key);
-      limit.push(`${key} can make ${value.limit} ${value.limit == 1 ? "request" : "requests"}`);
-      totalLimit += value.limit - 1;
+      let count = value.limit === "" ? "unlimited" : value.limit;
+      limits.push(`${key} can make ${count} ${count == 1 ? "request" : "requests"}`);
+      counts.push(count);
     }
   }
 
@@ -1357,7 +1377,11 @@ function updateWhoCanRequest() {
     return;
   }
   elements.whoCanRequest.innerHTML = `${allowed.length == 1 ? "Only" : ""} ${allowed.length == 5 ? "Everyone" : allowed.join(", ")} will be able to request.<br>
-  ${totalLimit == 0 ? "Everyone will get 1 request." : limit.join(" - ")}`;
+  ${
+    counts.every((e) => e === counts[0])
+      ? `${counts.length == Object.keys(roles).length ? "Everyone" : "Viewers that can request"} will get ${counts[0]} ${counts[0] == 1 ? "request" : "requests"}.`
+      : limits.join(" - ")
+  }`;
 } //updateWhoCanRequest
 
 function checkCommands() {
