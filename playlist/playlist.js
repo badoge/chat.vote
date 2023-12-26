@@ -1151,7 +1151,7 @@ function voteSkip(userid) {
     return;
   }
 
-  if (!skippers.length) {
+  if (elements.voteSkipDiv.style.display == "none") {
     elements.voteSkipDiv.style.display = "";
     anime({
       targets: `#voteSkipDiv`,
