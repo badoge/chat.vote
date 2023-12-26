@@ -1067,18 +1067,8 @@ function previousItem() {} //previousItem
 
 function togglePlay() {} //togglePlay
 
-let playlistCooldown = false;
 let currentItem;
 function nextItem() {
-  if (playlistCooldown) {
-    return;
-  }
-  playlistCooldown = true;
-  elements.nextItem.disabled = true;
-  setTimeout(() => {
-    playlistCooldown = false;
-    elements.nextItem.disabled = false;
-  }, 200);
   resetPlayers();
   resetVoteSkip();
 
