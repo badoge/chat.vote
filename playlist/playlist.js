@@ -735,6 +735,34 @@ function addToPlaylist(requestIndex, position = "beforeend") {
   );
 } //addToPlaylist
 
+function addToHistory(request, position = "afterbegin") {
+  history.push(request);
+  elements.historyList.insertAdjacentHTML(
+    position,
+    `<div class="container-fluid p-0 mb-1">
+        <div class="row g-1">
+          <div class="col-auto thumbnail-div">
+            <div class="request-thumbnail">
+            <img src="${request.thumbnail}" alt="thumbnail" class="rounded" />
+            </div>
+            <span class="badge text-bg-dark duration-label">${request.duration == -1 ? "🔴live" : secondsToTimeString(Math.round(request.duration))}</span>
+          </div>
+          <div class="col">
+            <div class="vstack gap-3 h-100">
+              <div class="request-title mb-auto" title="${request.title}">
+                ${request.title}
+              </div>
+              <small class="requested-by text-body-secondary" title="Requested by @${request.by.join(" & ")}">
+              Requested by @${request.by[0]} 
+              ${request.by.length > 1 ? `and ${request.by.length - 1} other ${request.by.length - 1 == 1 ? "user" : "users"}` : ""}
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>`
+  );
+} //addToHistory
+
 function updatePlaylist(index) {
   if (requests[index].thumbnail && requests[index].title) {
     document.getElementById(`id${requests[index].id}_thumbnail`).innerHTML = `<img src="${requests[index].thumbnail}" alt="thumbnail" class="rounded" />`;
@@ -744,9 +772,7 @@ function updatePlaylist(index) {
     document.getElementById(`id${requests[index].id}_by`).innerText = `Requested by @${requests[index].by[0]} ${
       requests[index].by.length > 1 ? `and ${requests[index].by.length - 1} other ${requests[index].by.length - 1 == 1 ? "user" : "users"}` : ""
     }`;
-    document.getElementById(`id${requests[index].id}_by`).title = `Requested by @${requests[index].by[0]} ${
-      requests[index].by.length > 1 ? `and ${requests[index].by.length - 1} other ${requests[index].by.length - 1 == 1 ? "user" : "users"}` : ""
-    }`;
+    document.getElementById(`id${requests[index].id}_by`).title = `Requested by @${requests[index].by.join(" & ")}`;
 
     if (!playlist_playing) {
       playlist_playing = true;
@@ -1053,17 +1079,18 @@ function nextItem() {
     playlistCooldown = false;
     elements.nextItem.disabled = false;
   }, 1000);
-  currentItem = requests.shift();
-  console.log(currentItem);
-  history.push(currentItem);
   resetPlayers();
   resetVoteSkip();
+
+  currentItem = requests.shift();
   if (!currentItem) {
-    elements.placeholder.style.display = "";
     playlist_playing = false;
+    elements.placeholder.style.display = "";
     elements.nowPlaying.innerHTML = `<span class="text-body-secondary">Nothing :)</span>`;
     return;
   }
+  console.log(currentItem);
+  addToHistory(currentItem);
   deleteRequest(currentItem.id, false);
   playItem(currentItem);
 } //nextItem
