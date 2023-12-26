@@ -1078,7 +1078,7 @@ function nextItem() {
   setTimeout(() => {
     playlistCooldown = false;
     elements.nextItem.disabled = false;
-  }, 1000);
+  }, 200);
   resetPlayers();
   resetVoteSkip();
 
