@@ -91,6 +91,7 @@ let elements = {
   profileLink: document.getElementById("profileLink"),
   copyLinkButton: document.getElementById("copyLinkButton"),
   nowPlaying: document.getElementById("nowPlaying"),
+  nowPlayingRequester: document.getElementById("nowPlayingRequester"),
   playlistLength: document.getElementById("playlistLength"),
   resetPlaylist: document.getElementById("resetPlaylist"),
   togglePlaylist: document.getElementById("togglePlaylist"),
@@ -695,6 +696,7 @@ function clearPlaylist() {
   elements.mainList.innerHTML = "";
   elements.placeholder.style.display = "";
   elements.nowPlaying.innerHTML = `<span class="text-body-secondary">Nothing :)</span>`;
+  elements.nowPlayingRequester.innerHTML = `<span class="text-body-secondary">No one :)</span>`;
   updateLength();
 } //clearPlaylist
 
@@ -1077,6 +1079,7 @@ function nextItem() {
     playlist_playing = false;
     elements.placeholder.style.display = "";
     elements.nowPlaying.innerHTML = `<span class="text-body-secondary">Nothing :)</span>`;
+    elements.nowPlayingRequester.innerHTML = `<span class="text-body-secondary">No one :)</span>`;
     return;
   }
   console.log(currentItem);
@@ -1122,6 +1125,10 @@ function playItem(item) {
 
   elements.nowPlaying.innerText = currentItem.title;
   elements.nowPlaying.title = currentItem.title;
+  elements.nowPlayingRequester.innerText = `@${currentItem.by[0]} ${
+    currentItem.by.length > 1 ? `and ${currentItem.by.length - 1} other ${currentItem.by.length - 1 == 1 ? "user" : "users"}` : ""
+  }`;
+  elements.nowPlayingRequester.title = currentItem.by.join(" & ");
 } //playItem
 
 function resetPlayers() {

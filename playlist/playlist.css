@@ -191,7 +191,15 @@ video {
 }
 
 #nowPlaying {
-  max-width: 800px;
+  max-width: 600px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+}
+
+#nowPlayingRequester {
+  max-width: 200px;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
