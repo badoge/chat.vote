@@ -485,6 +485,11 @@ function connect() {
           }, 2000);
           return;
         } //playlist closed popover
+
+        if (!playlist_open) {
+          return;
+        }
+
         let link = parseLink(input[1]);
         if (!link) {
           return;
