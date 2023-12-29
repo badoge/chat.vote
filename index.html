@@ -195,6 +195,24 @@
       </div>
     </div>
 
+    <div class="modal fade" id="bulkAddModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add multiple options</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <textarea class="form-control" placeholder="1 option per line" id="optionList" style="white-space: pre-wrap" rows="9"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="addOptionBulk()"><i class="material-icons notranslate">add</i>Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
       <div class="container-fluid">
         <a
@@ -431,6 +449,12 @@
                 >
                   Add
                 </button>
+                <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                  <span class="visually-hidden">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#bulkAddModal">Add multiple options</a></li>
+                </ul>
               </div>
             </div>
           </div>
@@ -920,18 +944,6 @@
                                           </div>
 
                                           <button type="button" onclick="download()" class="btn btn-primary"><i class="material-icons notranslate">file_download</i>Download</button>
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                    <div class="col-12">
-                                      <div class="card border settingscard">
-                                        <div class="card-body">
-                                          <label for="optionList">Add poll options in bulk</label>
-                                          <textarea class="form-control" placeholder="1 option per line" id="optionList" style="white-space: pre-wrap" rows="7"></textarea>
-                                          <button type="button" data-bs-toggle="collapse" data-bs-target="#settingsCollapse" onclick="addOptionBulk()" class="btn btn-primary mt-1">
-                                            <i class="material-icons notranslate">add</i>Add
-                                          </button>
                                         </div>
                                       </div>
                                     </div>
