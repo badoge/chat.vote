@@ -1426,6 +1426,7 @@ async function updateSiteSend() {
     time: new Date(),
     settings: PLAYLIST,
     playlist: requests,
+    currentitem: currentItem,
   });
   let requestOptions = {
     method: "POST",
