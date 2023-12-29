@@ -1049,6 +1049,9 @@ function linkTypeAllowed(type) {
 } //linkTypeAllowed
 
 function addLink() {
+  if (!checkLogin()) {
+    return;
+  }
   let link = parseLink(elements.link.value.replace(/\s+/g, ""));
   if (!link || !linkTypeAllowed(link.type)) {
     showToast("Could not parse the provided link", "warning", 3000);
@@ -1537,6 +1540,10 @@ window.onload = function () {
   };
 
   elements.togglePlaylist.onchange = function () {
+    if (!checkLogin()) {
+      this.checked = false;
+      return;
+    }
     playlist_open = this.checked;
     if (this.checked) {
       elements.togglePlaylistLabel.classList = "btn btn-danger";

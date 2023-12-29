@@ -756,6 +756,9 @@ function showStartModal(id) {
 } //showStartModal
 
 function startBracket() {
+  if (!checkLogin()) {
+    return;
+  }
   let id = parseInt(startID, 10);
   let bracket = structuredClone(BRACKETS.brackets.find((x) => x.id === id));
   if (bracket.options.length < 2) {
