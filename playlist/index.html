@@ -291,9 +291,18 @@
             </div>
             <h6>Bot Commands</h6>
             <div class="input-group mb-3">
-              <span class="input-group-text">Song name</span>
+              <span class="input-group-text">Song/video name & link</span>
               <input type="text" id="songCommand" data-default="!song" value="!song" aria-label="Song name command" placeholder="command" class="form-control" onchange="saveSettings()" />
-              <input type="text" id="songCommandAlias" data-default="!s" value="!s" aria-label="Song name command alias" placeholder="alias" class="form-control" onchange="saveSettings()" />
+              <input
+                type="text"
+                id="songCommandAlias"
+                data-default="!video"
+                value="!video"
+                aria-label="Song name command alias"
+                placeholder="alias"
+                class="form-control"
+                onchange="saveSettings()"
+              />
             </div>
             <div class="input-group mb-3">
               <span class="input-group-text">Playlist</span>

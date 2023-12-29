@@ -164,7 +164,7 @@ let PLAYLIST = {
   enableBot: false,
   botCooldown: 1,
   songCommand: "!song",
-  songCommandAlias: "!s",
+  songCommandAlias: "!video",
   playlistCommand: "!playlist",
   playlistCommandAlias: "!pl",
   approvalQueue: false,
@@ -215,7 +215,7 @@ async function refreshData() {
   PLAYLIST.enableBot = elements.enableBot.checked;
   PLAYLIST.botCooldown = parseInt(elements.botCooldown.value, 10) || 1;
   PLAYLIST.songCommand = elements.songCommand.value.replace(/\s+/g, "").toLowerCase() || "!song";
-  PLAYLIST.songCommandAlias = elements.songCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!s";
+  PLAYLIST.songCommandAlias = elements.songCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!video";
   PLAYLIST.playlistCommand = elements.playlistCommand.value.replace(/\s+/g, "").toLowerCase() || "!playlist";
   PLAYLIST.playlistCommandAlias = elements.playlistCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!pl";
   PLAYLIST.approvalQueue = elements.approvalQueue.checked;
@@ -257,6 +257,7 @@ function saveSettings() {
   localStorage.setItem("USER", JSON.stringify(USER));
   localStorage.setItem("PLAYLIST", JSON.stringify(PLAYLIST));
   localStorage.setItem("darkTheme", darkTheme);
+  updateSite();
 } //saveSettings
 
 function load_localStorage() {
@@ -304,7 +305,7 @@ function load_localStorage() {
     elements.enableBot.checked = PLAYLIST.enableBot ?? false;
     elements.botCooldown.value = PLAYLIST.botCooldown || 1;
     elements.songCommand.value = PLAYLIST.songCommand || "!song";
-    elements.songCommandAlias.value = PLAYLIST.songCommandAlias || "!s";
+    elements.songCommandAlias.value = PLAYLIST.songCommandAlias || "!video";
     elements.playlistCommand.value = PLAYLIST.playlistCommand || "!playlist";
     elements.playlistCommandAlias.value = PLAYLIST.playlistCommandAlias || "!pl";
     elements.approvalQueue.checked = PLAYLIST.approvalQueue ?? false;
@@ -390,7 +391,7 @@ function resetSettings(logout = false) {
       enableBot: false,
       botCooldown: 1,
       songCommand: "!song",
-      songCommandAlias: "!s",
+      songCommandAlias: "!video",
       playlistCommand: "!playlist",
       playlistCommandAlias: "!pl",
       approvalQueue: false,
@@ -465,7 +466,7 @@ function connect() {
         return;
       }
       if (link && !linkTypeAllowed(link.type)) {
-        botReply("⛔ That platform is not enabled", context.id, false);
+        botReply(`⛔ ${link.type} links are not enabled`, context.id, false);
         return;
       }
     }
@@ -495,7 +496,7 @@ function connect() {
           return;
         }
         if (!linkTypeAllowed(link.type)) {
-          botReply("⛔ That platform is not enabled", context.id, false);
+          botReply(`⛔ ${link.type} links are not enabled`, context.id, false);
           return;
         }
         addRequest(context, link);
@@ -511,7 +512,7 @@ function connect() {
           botReply(
             `Current song/video: ${currentItem.title} | Requested by @${currentItem.by[0]} ${
               currentItem.by.length > 1 ? `and ${currentItem.by.length - 1} other ${currentItem.by.length - 1 == 1 ? "user" : "users"}` : ""
-            }`,
+            } | ${getItemLink(currentItem.type, currentItem.id)}`,
             context.id,
             true
           );
@@ -519,7 +520,9 @@ function connect() {
         break;
       case PLAYLIST.playlistCommand:
       case PLAYLIST.playlistCommandAlias:
-        //botReply("", context.id,true);
+        if (USER.access_token) {
+          botReply(`You can view the playlist here: https://playlist.chat.vote/${USER.channel}`, context.id, true);
+        }
         break;
       case PLAYLIST.skipCommand:
         if (context.username == USER.channel || (PLAYLIST.modSkip && context.mod)) {
@@ -650,7 +653,7 @@ function addRequest(context, link) {
   if (requestIndex > -1) {
     requests[requestIndex].by.push(context.username);
     updatePlaylist(requestIndex);
-    botReply("✅ Your request is already in the playlist (someone else already requested it)", context.id, false);
+    botReply("⚠ Someone else already requested this", context.id, false);
   } else {
     requests.push({
       id: link.id,
@@ -669,6 +672,7 @@ function addRequest(context, link) {
     updatePlaylist(index);
   }
   updateLength();
+  updateSite();
 } //addRequest
 
 function deleteRequest(id, refund = true) {
@@ -773,7 +777,13 @@ function addToHistory(request, position = "afterbegin") {
 function updatePlaylist(index) {
   if (requests[index].thumbnail && requests[index].title) {
     document.getElementById(`id${requests[index].id}_thumbnail`).innerHTML = `<img src="${requests[index].thumbnail}" alt="thumbnail" class="rounded" />`;
-    document.getElementById(`id${requests[index].id}_title`).innerText = requests[index].title;
+    document.getElementById(`id${requests[index].id}_title`).innerHTML = `<a 
+    class="link-body-emphasis link-underline-opacity-0"
+    href="${getItemLink(requests[index].type, requests[index].id)}"
+    target="_blank"
+    rel="noopener noreferrer">
+    ${validator.escape(requests[index].title)}
+    </a>`;
     document.getElementById(`id${requests[index].id}_title`).title = requests[index].title;
     document.getElementById(`id${requests[index].id}_duration`).innerText = requests[index].duration == -1 ? "🔴live" : secondsToTimeString(Math.round(requests[index].duration));
     document.getElementById(`id${requests[index].id}_by`).innerText = `Requested by @${requests[index].by[0]} ${
@@ -842,7 +852,7 @@ async function getRequestInfo(index, id) {
       requests[index].duration = -1;
     } catch (error) {
       deleteRequest(requests[index].id);
-      botReply("⚠ Your request was removed because I could not find its info", id, false);
+      botReply("⚠ Your stream was removed because I could not find its info", id, false);
       console.log("getRequestInfo twitch stream error", error);
       return;
     }
@@ -859,12 +869,12 @@ async function getRequestInfo(index, id) {
       requests[index].uri = result.tracks[0].uri;
       if (!result.tracks[0].is_playable) {
         deleteRequest(requests[index].id);
-        botReply("⛔ Your request was removed because it is not playable", id, false);
+        botReply("⛔ Your song was removed because it is not playable", id, false);
         return;
       }
     } catch (error) {
       deleteRequest(requests[index].id);
-      botReply("⚠ Your request was removed because I could not find its info", id, false);
+      botReply("⚠ Your song was removed because I could not find its info", id, false);
       console.log("getRequestInfo spotify error", error);
       return;
     }
@@ -926,7 +936,7 @@ async function getRequestInfo(index, id) {
       elements.togglePlaylist.click();
     }
     deleteRequest(requests[index].id);
-    botReply("⛔ Your request was removed because the playlist's duration limit was reached", id, false);
+    botReply(`⛔ Your request was removed because the playlist's duration limit was reached (${PLAYLIST.maxDuration}${PLAYLIST.maxDurationUnit})`, id, false);
     return;
   }
 
@@ -941,7 +951,7 @@ async function getRequestInfo(index, id) {
       elements.togglePlaylist.click();
     }
     deleteRequest(requests[index].id);
-    botReply("⛔ Your request was removed because the playlist's size limit was reached", id, false);
+    botReply(`⛔ Your request was removed because the playlist's size limit was reached (${PLAYLIST.maxSize})`, id, false);
     return;
   }
 
@@ -956,7 +966,17 @@ async function getRequestInfo(index, id) {
   }
   updatePlaylist(index);
   updateLength();
-  botReply("✅ Your request has been added to the playlist", id, false);
+  botReply(
+    `✅ Your request has been added to the playlist ${
+      requests.length == 1
+        ? `| Playing right after the current request (<${secondsToTimeString(currentItem.duration)})`
+        : `| ${requests.length - 1} ${requests.length - 1 == 1 ? "request" : "requests"} ahead of you (${secondsToTimeString(
+            total_duration + currentItem.duration - requests[index].duration
+          )})`
+    }`,
+    id,
+    false
+  );
 } //getRequestInfo
 
 /**
@@ -1048,6 +1068,27 @@ function linkTypeAllowed(type) {
   return true;
 } //linkTypeAllowed
 
+function getItemLink(type, id) {
+  switch (type) {
+    case "youtube":
+      return `https://youtu.be/${id}`;
+    case "youtube short":
+      return `https://youtube.com/shorts/${id}`;
+    case "spotify":
+      return `https://open.spotify.com/track/${id}`;
+    case "twitch stream":
+      return `https://www.twitch.tv/${id}`;
+    case "twitch vod":
+      return `https://www.twitch.tv/videos/${id}`;
+    case "twitch clip":
+      return `https://clips.twitch.tv/${id}`;
+    case "streamable":
+      return `https://streamable.com/${id}`;
+    default:
+      return "";
+  }
+} //getItemLink
+
 function addLink() {
   if (!checkLogin()) {
     return;
@@ -1094,6 +1135,7 @@ function nextItem() {
   addToHistory(currentItem);
   deleteRequest(currentItem.id, false);
   playItem(currentItem);
+  updateSite();
 } //nextItem
 
 function playItem(item) {
@@ -1365,6 +1407,43 @@ async function botReply(msg, id, followCooldown) {
     console.log("botReply error", error);
   }
 } //botReply
+
+let updateCooldown;
+async function updateSite() {
+  clearTimeout(updateCooldown);
+  if (USER.access_token) {
+    updateCooldown = setTimeout(() => {
+      updateSiteSend();
+    }, 3000);
+  }
+} //updateSite
+
+async function updateSiteSend() {
+  let body = JSON.stringify({
+    userid: USER.userID,
+    username: USER.channel,
+    access_token: USER.access_token,
+    time: new Date(),
+    settings: PLAYLIST,
+    playlist: requests,
+  });
+  let requestOptions = {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: body,
+    redirect: "follow",
+  };
+  try {
+    let response = await fetch(`https://playlist.chat.vote/update`, requestOptions);
+    let result = await response.json();
+    console.log(result);
+  } catch (error) {
+    console.log("update error", error);
+  }
+} //updateSiteSend
 
 function copyLink() {
   navigator.clipboard.writeText(`https://playlist.chat.vote/${USER.channel || ""}`);
