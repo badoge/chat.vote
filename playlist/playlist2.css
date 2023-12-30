@@ -1,0 +1,277 @@
+.table {
+  word-break: break-all;
+}
+
+.removebtn {
+  width: 90%;
+  margin: 0px;
+}
+
+.cursorPointer {
+  cursor: pointer;
+}
+
+[data-placeholder]:empty:before {
+  content: attr(data-placeholder);
+}
+
+.blur {
+  -webkit-filter: blur(10px) grayscale(100%);
+  -moz-filter: blur(10px) grayscale(100%);
+  -o-filter: blur(10px) grayscale(100%);
+  -ms-filter: blur(10px) grayscale(100%);
+  filter: blur(10px) grayscale(100%);
+  position: absolute;
+}
+
+#linkpreview {
+  padding: 10px;
+  display: none;
+  position: fixed;
+  pointer-events: none;
+  z-index: 1;
+  max-width: 400px;
+}
+
+.previewThumbnail {
+  max-width: 100%;
+}
+
+#voteSkipDiv {
+  pointer-events: none;
+  border-color: var(--bs-warning);
+  border-width: 2px 2px 0px 2px;
+  border-style: solid;
+  position: fixed;
+  right: 40%;
+  bottom: -20px;
+  padding-bottom: 20px;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  width: 360px;
+  z-index: 2000;
+}
+
+#voteSkipDiv > span {
+  margin-left: 10px;
+  font-size: 1.8rem;
+}
+#voteSkipDiv > small {
+  margin-left: 10px;
+}
+
+#toastContainer {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  z-index: 1056;
+  font-weight: bold;
+}
+
+#toastContainer > div > div {
+  font-size: 1.5em;
+}
+
+#settingsOffcanvas {
+  width: 30vw;
+}
+
+#commandHint {
+  height: 57px;
+}
+
+.custom-popover {
+  --bs-popover-border-color: var(--bs-warning);
+  --bs-popover-header-bg: var(--bs-warning);
+  --bs-popover-header-color: var(--bs-white);
+}
+
+.accordion-button,
+.accordion-button i {
+  padding: 5px;
+  font-size: 2rem;
+}
+
+.request-limit {
+  width: 120px;
+}
+
+.redborder {
+  border-color: #e74c3c;
+}
+
+.blueborder {
+  border-color: #3498db;
+}
+
+.tooltip.show {
+  opacity: 1;
+}
+
+.deletebtn {
+  color: #e74c3c;
+}
+
+.deletebtn:hover {
+  color: #c44133;
+  cursor: pointer;
+}
+
+iframe,
+video {
+  border-radius: 6px;
+}
+
+#profileLink > i,
+#copyLinkButton {
+  color: #000000;
+  border-color: #d3c22e;
+  background-color: #ebda44;
+}
+
+#profileLink {
+  border-color: #d3c22e;
+  cursor: pointer;
+  width: 15vw;
+}
+
+#copyLinkButton:hover {
+  background-color: #cabb36;
+  border-color: #d3c22e;
+}
+
+#playersCard {
+  height: 100%;
+  /* border-color: transparent; */
+}
+
+#playlist {
+  height: calc(100vh - 290px);
+}
+
+#mainList,
+#approvalList,
+#historyList {
+  height: calc(100vh - 350px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  text-align: start;
+  margin-left: -10px;
+  margin-right: -10px;
+}
+
+#rightCol {
+  width: 450px;
+}
+
+@media screen and (max-width: 1800px) {
+  #rightCol {
+    width: 25vw;
+  }
+}
+
+@media screen and (max-width: 1400px) {
+  #rightCol {
+    width: 20vw;
+  }
+}
+
+.request-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.requested-by {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+}
+
+#nowPlaying {
+  max-width: 600px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+}
+
+#nowPlayingRequester {
+  max-width: 200px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+}
+
+.delete-request {
+  cursor: pointer;
+  float: inline-end;
+}
+
+.delete-request:hover {
+  opacity: 80%;
+}
+
+.delete-request:active {
+  opacity: 50%;
+}
+
+.duration-label {
+  position: absolute;
+  right: 4px;
+  bottom: 2px;
+  font-weight: 500;
+}
+
+.request-thumbnail > img {
+  max-height: 90px;
+}
+.request-thumbnail {
+  width: min-content;
+}
+
+.thumbnail-div {
+  position: relative;
+  height: min-content;
+}
+
+#playlistTabs {
+  margin-left: -17px;
+  margin-right: -17px;
+  margin-top: -17px;
+  border-top-right-radius: 6px;
+  border-top-left-radius: 6px;
+}
+
+#volumeSlider {
+  width: 10vw;
+}
+
+#volumeSliderValue {
+  width: 50px;
+}
+
+#streamableEmbed,
+#twitchEmbed,
+#twitchClipsEmbed,
+#youtubeEmbedContainer {
+  width: 100%;
+  height: 100%;
+}
+
+#placeholder {
+  text-align: center;
+}
+
+.bottomBarLabel {
+  user-select: none;
+  font-size: 14px;
+}
+
+#playlistLength {
+  display: inline-block;
+  min-width: 120px;
+}
