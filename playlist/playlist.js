@@ -761,7 +761,13 @@ function addToHistory(request, position = "afterbegin") {
           <div class="col">
             <div class="vstack gap-3 h-100">
               <div class="request-title mb-auto" title="${request.title}">
-                ${request.title}
+              <a 
+              class="link-body-emphasis link-underline-opacity-0" 
+              href="${getItemLink(requests.type, requests.id)}" 
+              target="_blank" 
+              rel="noopener noreferrer"> 
+              ${validator.escape(request.title)}
+              </a>
               </div>
               <small class="requested-by text-body-secondary" title="Requested by @${request.by.join(" & ")}">
               Requested by @${request.by[0]} 
