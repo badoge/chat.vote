@@ -130,7 +130,7 @@
                       data-bs-toggle="tooltip"
                       data-bs-delay="200"
                       data-bs-placement="top"
-                      data-bs-title="Autoplay is disabled because Spotify embeds break if you skip too quickly"
+                      data-bs-title="Spotify autoplay is disabled for now because the embed can break when skipping"
                       >warning
                     </i>
                   </div>
@@ -150,7 +150,7 @@
                       data-bs-toggle="tooltip"
                       data-bs-delay="200"
                       data-bs-placement="top"
-                      data-bs-title="Twitch clip embeds don't notify the site when they are done so you will have to manually skip to next item"
+                      data-bs-title="Autoplay won't work after a Twitch clip is done because the embed is not interactive"
                       >warning
                     </i>
                   </div>
@@ -544,7 +544,7 @@
                 data-bs-toggle="tooltip"
                 data-bs-delay="200"
                 data-bs-placement="bottom"
-                data-bs-title="playlist"
+                data-bs-title="Song & video requests"
                 aria-current="page"
                 target="_self"
                 rel="noopener noreferrer"
@@ -873,6 +873,13 @@
             </div>
 
             <div class="vr"></div>
+
+            <div>
+              <small class="bottomBarLabel"><i class="material-icons notranslate">playlist_play</i>Autoplay</small><br />
+              <div class="form-check form-switch ms-4">
+                <input class="form-check-input" type="checkbox" role="switch" id="autoplay" onchange="saveSettings()" checked />
+              </div>
+            </div>
 
             <div class="p-1">
               <div class="btn-group" role="group" aria-label="Playback controls">

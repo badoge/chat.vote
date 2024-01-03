@@ -96,6 +96,7 @@ let elements = {
   resetPlaylist: document.getElementById("resetPlaylist"),
   togglePlaylist: document.getElementById("togglePlaylist"),
   togglePlaylistLabel: document.getElementById("togglePlaylistLabel"),
+  autoplay: document.getElementById("autoplay"),
   previousItem: document.getElementById("previousItem"),
   togglePlay: document.getElementById("togglePlay"),
   nextItem: document.getElementById("nextItem"),
@@ -132,6 +133,7 @@ let USER = {
 };
 
 let PLAYLIST = {
+  autoplay: true,
   allowSpotifySongs: true,
   allowStreamable: true,
   allowTwitchClips: true,
@@ -183,6 +185,7 @@ async function refreshData() {
     USER.userID = await getUserID(USER.channel);
   }
 
+  PLAYLIST.autoplay = elements.autoplay.checked;
   PLAYLIST.allowSpotifySongs = elements.allowSpotifySongs.checked;
   PLAYLIST.allowStreamable = elements.allowStreamable.checked;
   PLAYLIST.allowTwitchClips = elements.allowTwitchClips.checked;
@@ -273,6 +276,7 @@ function load_localStorage() {
   } else {
     PLAYLIST = JSON.parse(localStorage.getItem("PLAYLIST"));
 
+    elements.autoplay.checked = PLAYLIST.autoplay ?? true;
     elements.allowSpotifySongs.checked = PLAYLIST.allowSpotifySongs ?? true;
     elements.allowStreamable.checked = PLAYLIST.allowStreamable ?? true;
     elements.allowTwitchClips.checked = PLAYLIST.allowTwitchClips ?? true;
@@ -359,6 +363,7 @@ function resetSettings(logout = false) {
   localStorage.setItem(
     "PLAYLIST",
     JSON.stringify({
+      autoplay: true,
       allowSpotifySongs: true,
       allowStreamable: true,
       allowTwitchClips: true,
@@ -797,7 +802,7 @@ function updatePlaylist(index) {
     }`;
     document.getElementById(`id${requests[index].id}_by`).title = `Requested by @${requests[index].by.join(" & ")}`;
 
-    if (!playlist_playing) {
+    if (!playlist_playing && PLAYLIST.autoplay) {
       playlist_playing = true;
       nextItem();
     }
@@ -1698,7 +1703,7 @@ function onYouTubeIframeAPIReady() {
 
 function youtubePlayerOnStateChange(event) {
   console.log(event);
-  if (event.data == YT.PlayerState.ENDED) {
+  if (event.data == YT.PlayerState.ENDED && PLAYLIST.autoplay) {
     nextItem();
   }
 } //youtubePlayerOnStateChange
@@ -1726,7 +1731,7 @@ window.onSpotifyIframeApiReady = (IFrameAPI) => {
     //   EmbedController.play();
     // });
     EmbedController.addListener("playback_update", (event) => {
-      if (event.data.position == event.data.duration && event.data.duration > 0) {
+      if (event.data.position == event.data.duration && event.data.duration > 0 && PLAYLIST.autoplay) {
         nextItem();
       }
     });
@@ -1755,7 +1760,9 @@ function enableTwitchEmbed() {
   twitchPlayer.addEventListener(Twitch.Player.PAUSE, twitchPlayerPaused);
 
   function twitchPlayerEnded(event) {
-    nextItem();
+    if (PLAYLIST.autoplay) {
+      nextItem();
+    }
   }
   function twitchPlayerPaused(event) {
     console.log(event);
@@ -1764,6 +1771,8 @@ function enableTwitchEmbed() {
 
 function streamableEmbedEventListeners() {
   elements.streamableEmbed.addEventListener("ended", (event) => {
-    nextItem();
+    if (PLAYLIST.autoplay) {
+      nextItem();
+    }
   });
 }
