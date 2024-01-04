@@ -977,17 +977,21 @@ async function getRequestInfo(index, id) {
   }
   updatePlaylist(index);
   updateLength();
-  botReply(
-    `✅ Your request has been added to the playlist ${
-      requests.length == 1
-        ? `| Playing right after the current request (<${secondsToTimeString(currentItem.duration)})`
-        : `| ${requests.length - 1} ${requests.length - 1 == 1 ? "request" : "requests"} ahead of you (${secondsToTimeString(
-            total_duration + currentItem.duration - requests[index].duration
-          )})`
-    }`,
-    id,
-    false
-  );
+  if (currentItem && requests[index]) {
+    botReply(
+      `✅ Your request has been added to the playlist ${
+        requests.length == 1
+          ? `| Playing right after the current request (<${secondsToTimeString(currentItem.duration)})`
+          : `| ${requests.length - 1} ${requests.length - 1 == 1 ? "request" : "requests"} ahead of you (${secondsToTimeString(
+              total_duration + currentItem.duration - requests[index].duration
+            )})`
+      }`,
+      id,
+      false
+    );
+  } else {
+    botReply(`✅ Your request has been added to the playlist`, id, false);
+  }
 } //getRequestInfo
 
 /**
@@ -1663,7 +1667,7 @@ window.onload = function () {
   enableTooltips();
   enableTwitchEmbed();
   streamableEmbedEventListeners();
-  elements.twitchClipsEmbed.src = `https://clips.twitch.tv/embed?parent=${window.location.hostname}&autoplay=true`;
+  elements.twitchClipsEmbed.src = "";
 }; //onload
 
 let youtubePlayer;
