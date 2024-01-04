@@ -856,7 +856,7 @@
               <button id="resetPlaylist" class="btn btn-outline-warning" type="button" data-bs-toggle="modal" data-bs-target="#clearPlaylistModal">
                 <i class="material-icons notranslate">delete_forever</i>Clear playlist
               </button>
-              <input id="togglePlaylist" type="checkbox" class="btn-check" autocomplete="off" />
+              <input id="togglePlaylist" onchange="togglePlaylist()" type="checkbox" class="btn-check" autocomplete="off" />
               <label
                 id="togglePlaylistLabel"
                 class="btn btn-success"

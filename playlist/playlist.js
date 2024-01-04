@@ -1600,6 +1600,21 @@ function changeVolume(slider) {
   }
 } //changeVolume
 
+function togglePlaylist() {
+  if (!checkLogin()) {
+    elements.togglePlaylist.checked = false;
+    return;
+  }
+  playlist_open = elements.togglePlaylist.checked;
+  if (elements.togglePlaylist.checked) {
+    elements.togglePlaylistLabel.classList = "btn btn-danger";
+    elements.togglePlaylistLabel.innerHTML = "Close Playlist";
+  } else {
+    elements.togglePlaylistLabel.classList = "btn btn-success";
+    elements.togglePlaylistLabel.innerHTML = "Open Playlist";
+  }
+}
+
 window.onload = function () {
   darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
   elements.darkTheme.checked = darkTheme ?? true;
@@ -1631,21 +1646,6 @@ window.onload = function () {
     saveSettings();
     if (elements.approvalTab.classList.contains("active")) {
       playlistTab.show();
-    }
-  };
-
-  elements.togglePlaylist.onchange = function () {
-    if (!checkLogin()) {
-      this.checked = false;
-      return;
-    }
-    playlist_open = this.checked;
-    if (this.checked) {
-      elements.togglePlaylistLabel.classList = "btn btn-danger";
-      elements.togglePlaylistLabel.innerHTML = "Close Playlist";
-    } else {
-      elements.togglePlaylistLabel.classList = "btn btn-success";
-      elements.togglePlaylistLabel.innerHTML = "Open Playlist";
     }
   };
 
