@@ -103,7 +103,7 @@
 
     <div id="voteSkipDiv" class="bg-body-tertiary" style="display: none">
       <small class="text-body-secondary">
-        Vote skip using <span id="voteSkipHint"><kbd>!voteskip</kbd> or <kbd>!vs</kbd></span>
+        Vote skip using <span id="voteSkipHint"><strong>!voteskip</strong> or <strong>!vs</strong></span>
       </small>
       <br />
       <span id="voteSkipVotes">100 votes needed to skip</span>
@@ -184,10 +184,10 @@
         </div>
 
         <div class="card mb-3">
-          <div class="card-header"><i class="material-icons notranslate">settings</i>Playlist Settings</div>
+          <div class="card-header"><i class="material-icons notranslate">settings</i>Playlist limits</div>
           <div class="card-body">
-            <h6>Max playlist duration</h6>
             <div class="input-group">
+              <span class="input-group-text"><i class="material-icons notranslate">schedule</i>Max playlist duration</span>
               <input type="number" aria-label="Max playlist duration" id="maxDuration" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
               <select class="form-select" id="maxDurationUnit" onchange="saveSettings()">
                 <option selected value="m">Minutes</option>
@@ -196,29 +196,34 @@
             </div>
             <small class="form-text text-body-secondary">The max duration of all videos/songs added up</small>
 
-            <h6 class="mt-3">Max song/video length</h6>
-            <div class="input-group">
+            <div class="input-group mt-3">
+              <span class="input-group-text"><i class="material-icons notranslate">timelapse</i>Max song/video length</span>
               <input type="number" aria-label="Max song/video length" id="maxLength" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
               <span class="input-group-text">Minutes</span>
             </div>
             <small class="form-text text-body-secondary">How long a single video/song can be</small>
 
             <div class="input-group mt-3">
-              <span class="input-group-text">Max playlist size</span>
+              <span class="input-group-text"><i class="material-icons notranslate">format_list_numbered</i>Max playlist size</span>
               <input type="number" aria-label="Max playlist length" id="maxSize" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
             </div>
             <small class="form-text text-body-secondary">How many videos/songs are allowed to be in the playlist</small>
+
+            <div class="input-group mt-3">
+              <span class="input-group-text"><i class="material-icons notranslate">person</i>Minimum view count</span>
+              <input type="number" aria-label="Minimum view count" id="minViewCount" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
+            </div>
+            <small class="form-text text-body-secondary">
+              Videos/songs that have a view count lower than the limit will be blocked
+              <span class="text-warning">Does not apply to Streamable, Spotify, and live streams</span>
+            </small>
           </div>
         </div>
 
         <div class="card mb-3">
           <div class="card-header"><i class="material-icons notranslate">chat</i>Chat Commands</div>
           <div class="card-body">
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" role="switch" id="noCommand" onchange="saveSettings()" />
-              <label class="form-check-label" for="noCommand"><i class="material-icons notranslate">link</i>Add any link in chat to the playlist</label>
-            </div>
-            <div class="input-group mb-3">
+            <div class="input-group">
               <span class="input-group-text">Request</span>
               <input
                 type="text"
@@ -241,13 +246,17 @@
                 onchange="saveSettings()"
               />
             </div>
+            <div class="form-check form-switch mb-5">
+              <input class="form-check-input" type="checkbox" role="switch" id="noCommand" onchange="saveSettings()" />
+              <label class="form-check-label" for="noCommand"><i class="material-icons notranslate">link</i>Allow requests without a command</label>
+            </div>
 
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" role="switch" id="allowVoteSkip" onchange="saveSettings()" />
               <label class="form-check-label" for="allowVoteSkip"><i class="material-icons notranslate">how_to_vote</i>Allow viewers to vote skip</label>
             </div>
             <div class="input-group mb-1">
-              <span class="input-group-text">Vote Skip</span>
+              <span class="input-group-text">Vote Skip command</span>
               <input
                 type="text"
                 id="voteskipCommand"
@@ -305,7 +314,7 @@
               />
             </div>
             <div class="input-group mb-3">
-              <span class="input-group-text">Playlist</span>
+              <span class="input-group-text">Playlist link</span>
               <input
                 type="text"
                 id="playlistCommand"
@@ -408,7 +417,7 @@
                 </tr>
               </tbody>
             </table>
-            <div class="btn-group mb-3" role="group" aria-label="Check all/Uncheck all">
+            <div class="btn-group" role="group" aria-label="Check all/Uncheck all">
               <button type="button" id="selectAll" class="btn btn-sm btn-success">Select all</button>
               <button type="button" id="unselectAll" class="btn btn-sm btn-danger">Unselect all</button>
             </div>
@@ -424,21 +433,72 @@
               <br /><small class="form-text text-body-secondary">Requests will have to be manually approved by you before they get added to the playlist</small>
             </div>
 
+            <h6>Moderation Commands</h6>
+            <div class="input-group mb-1">
+              <span class="input-group-text">Open playlist</span>
+              <input
+                disabled
+                type="text"
+                id="openCommand"
+                data-default="!open"
+                value="!open"
+                aria-label="Open playlist command"
+                placeholder="Open playlist command"
+                class="form-control"
+                onchange="saveSettings()"
+              />
+            </div>
+            <div class="input-group mb-1">
+              <span class="input-group-text">Close playlist</span>
+              <input
+                disabled
+                type="text"
+                id="closeCommand"
+                data-default="!close"
+                value="!close"
+                aria-label="Close playlist command"
+                placeholder="Close playlist command"
+                class="form-control"
+                onchange="saveSettings()"
+              />
+            </div>
+            <div class="input-group mb-1">
+              <span class="input-group-text">Play current video/song</span>
+              <input
+                disabled
+                type="text"
+                id="playCommand"
+                data-default="!play"
+                value="!play"
+                aria-label="Play command"
+                placeholder="Play command"
+                class="form-control"
+                onchange="saveSettings()"
+              />
+            </div>
+            <div class="input-group mb-1">
+              <span class="input-group-text">Pause current video/song</span>
+              <input
+                disabled
+                type="text"
+                id="pauseCommand"
+                data-default="!pause"
+                value="!pause"
+                aria-label="Pause command"
+                placeholder="Pause command"
+                class="form-control"
+                onchange="saveSettings()"
+              />
+            </div>
             <div class="input-group mb-1">
               <span class="input-group-text">Skip current video/song</span>
-              <input type="text" id="skipCommand" data-default="!skip" value="!skip" aria-label="Skip command" placeholder="command" class="form-control" onchange="saveSettings()" />
-            </div>
-            <div class="form-check form-switch mb-3">
-              <input class="form-check-input" type="checkbox" role="switch" id="modSkip" onchange="saveSettings()" />
-              <label class="form-check-label" for="modSkip"><i class="material-icons notranslate">verified_user</i>Allow mods to skip</label>
+              <input type="text" id="skipCommand" data-default="!skip" value="!skip" aria-label="Skip command" placeholder="Skip command" class="form-control" onchange="saveSettings()" />
             </div>
 
-            <div class="input-group mt-3">
-              <span class="input-group-text">Minimum view count</span>
-              <input type="number" aria-label="Minimum view count" id="minViewCount" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" role="switch" id="modCommands" onchange="saveSettings()" checked />
+              <label class="form-check-label" for="modCommands"><i class="material-icons notranslate">verified_user</i>Allow mods to use moderation commands</label>
             </div>
-            <small class="form-text text-body-secondary">Videos/songs that have a view count lower than the limit will be blocked</small><br />
-            <small class="form-text text-warning">Does not apply to Streamable, Spotify, and live streams</small>
           </div>
         </div>
 

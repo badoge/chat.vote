@@ -893,3 +893,10 @@ function secondsToTimeString(seconds) {
     return string;
   }
 } //secondsToTimeString
+
+function formatViewCount(count) {
+  return Intl.NumberFormat("en-US", {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(count);
+} //formatViewCount

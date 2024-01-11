@@ -30,6 +30,7 @@ let elements = {
   maxDurationUnit: document.getElementById("maxDurationUnit"),
   maxLength: document.getElementById("maxLength"),
   maxSize: document.getElementById("maxSize"),
+  minViewCount: document.getElementById("minViewCount"),
   whoCanRequest: document.getElementById("whoCanRequest"),
   allowPlebs: document.getElementById("allowPlebs"),
   allowSubs: document.getElementById("allowSubs"),
@@ -58,8 +59,7 @@ let elements = {
   playlistCommandAlias: document.getElementById("playlistCommandAlias"),
   approvalQueue: document.getElementById("approvalQueue"),
   skipCommand: document.getElementById("skipCommand"),
-  modSkip: document.getElementById("modSkip"),
-  minViewCount: document.getElementById("minViewCount"),
+  modCommands: document.getElementById("modCommands"),
 
   //main
   toastContainer: document.getElementById("toastContainer"),
@@ -146,6 +146,7 @@ let PLAYLIST = {
   maxDurationUnit: "m",
   maxLength: "",
   maxSize: "",
+  minViewCount: "",
   allowPlebs: true,
   allowSubs: true,
   allowMods: true,
@@ -171,8 +172,7 @@ let PLAYLIST = {
   playlistCommandAlias: "!pl",
   approvalQueue: false,
   skipCommand: "!skip",
-  modSkip: false,
-  minViewCount: "",
+  modCommands: true,
 };
 
 async function refreshData() {
@@ -198,6 +198,7 @@ async function refreshData() {
   PLAYLIST.maxDurationUnit = elements.maxDurationUnit.value || "m";
   PLAYLIST.maxLength = parseInt(elements.maxLength.value, 10) || "";
   PLAYLIST.maxSize = parseInt(elements.maxSize.value, 10) || "";
+  PLAYLIST.minViewCount = parseInt(elements.minViewCount.value, 10) || "";
   PLAYLIST.allowPlebs = elements.allowPlebs.checked;
   PLAYLIST.allowSubs = elements.allowSubs.checked;
   PLAYLIST.allowMods = elements.allowMods.checked;
@@ -223,8 +224,7 @@ async function refreshData() {
   PLAYLIST.playlistCommandAlias = elements.playlistCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!pl";
   PLAYLIST.approvalQueue = elements.approvalQueue.checked;
   PLAYLIST.skipCommand = elements.skipCommand.value.replace(/\s+/g, "").toLowerCase() || "!skip";
-  PLAYLIST.modSkip = elements.modSkip.checked;
-  PLAYLIST.minViewCount = parseInt(elements.minViewCount.value, 10) || "";
+  PLAYLIST.modCommands = elements.modCommands.checked;
 
   elements.voteskipCommand.disabled = !PLAYLIST.allowVoteSkip;
   elements.voteskipCommandAlias.disabled = !PLAYLIST.allowVoteSkip;
@@ -237,7 +237,7 @@ async function refreshData() {
 
   elements.approvalTabButton.style.display = PLAYLIST.approvalQueue ? "" : "none";
 
-  elements.voteSkipHint.innerHTML = `<kbd>${PLAYLIST.voteskipCommand}</kbd> or <kbd>${PLAYLIST.voteskipCommandAlias}</kbd>`;
+  elements.voteSkipHint.innerHTML = `<strong>${PLAYLIST.voteskipCommand}</strong> or <strong>${PLAYLIST.voteskipCommandAlias}</strong>`;
 
   if (PLAYLIST.noCommand) {
     elements.commandHint.innerHTML = `Add songs or videos to the playlist by posting a link in chat`;
@@ -289,6 +289,7 @@ function load_localStorage() {
     elements.maxDurationUnit.value = PLAYLIST.maxDurationUnit || "m";
     elements.maxLength.value = PLAYLIST.maxLength || "";
     elements.maxSize.value = PLAYLIST.maxSize || "";
+    elements.minViewCount.value = PLAYLIST.minViewCount || "";
     elements.allowPlebs.checked = PLAYLIST.allowPlebs ?? true;
     elements.allowSubs.checked = PLAYLIST.allowSubs ?? true;
     elements.allowMods.checked = PLAYLIST.allowMods ?? true;
@@ -314,8 +315,7 @@ function load_localStorage() {
     elements.playlistCommandAlias.value = PLAYLIST.playlistCommandAlias || "!pl";
     elements.approvalQueue.checked = PLAYLIST.approvalQueue ?? false;
     elements.skipCommand.value = PLAYLIST.skipCommand || "!skip";
-    elements.modSkip.checked = PLAYLIST.modSkip ?? false;
-    elements.minViewCount.value = PLAYLIST.minViewCount || "";
+    elements.modCommands.checked = PLAYLIST.modCommands ?? true;
 
     elements.voteskipCommand.disabled = !PLAYLIST.allowVoteSkip;
     elements.voteskipCommandAlias.disabled = !PLAYLIST.allowVoteSkip;
@@ -328,7 +328,7 @@ function load_localStorage() {
 
     elements.approvalTabButton.style.display = PLAYLIST.approvalQueue ? "" : "none";
 
-    elements.voteSkipHint.innerHTML = `<kbd>${PLAYLIST.voteskipCommand}</kbd> or <kbd>${PLAYLIST.voteskipCommandAlias}</kbd>`;
+    elements.voteSkipHint.innerHTML = `<strong>${PLAYLIST.voteskipCommand}</strong> or <strong>${PLAYLIST.voteskipCommandAlias}</strong>`;
 
     if (PLAYLIST.noCommand) {
       elements.commandHint.innerHTML = `Add songs or videos to the playlist by posting a link in chat`;
@@ -376,6 +376,7 @@ function resetSettings(logout = false) {
       maxDurationUnit: "m",
       maxLength: "",
       maxSize: "",
+      minViewCount: "",
       allowPlebs: true,
       allowSubs: true,
       allowMods: true,
@@ -401,8 +402,7 @@ function resetSettings(logout = false) {
       playlistCommandAlias: "!pl",
       approvalQueue: false,
       skipCommand: "!skip",
-      modSkip: false,
-      minViewCount: "",
+      modCommands: true,
     })
   );
   location.reload();
@@ -530,7 +530,7 @@ function connect() {
         }
         break;
       case PLAYLIST.skipCommand:
-        if (context.username == USER.channel || (PLAYLIST.modSkip && context.mod)) {
+        if (context.username == USER.channel || (PLAYLIST.modCommands && context.mod)) {
           nextItem();
         }
         break;
@@ -729,19 +729,27 @@ function addToPlaylist(requestIndex, position = "beforeend") {
         <div class="row g-1">
           <div class="col-auto thumbnail-div">
             <div id="id${requests[requestIndex].id}_thumbnail" class="request-thumbnail">
-              <p class="placeholder-glow" style="width: 160px; height: 90px">
-                <span class="placeholder col-12 rounded" style="height: 100%"></span>
-              </p>
+              <div class="placeholder-glow" style="width: 160px; height: 90px">
+                <span class="placeholder col-12 rounded h-100"></span>
+              </div>
             </div>
             <span class="badge text-bg-dark duration-label" id="id${requests[requestIndex].id}_duration">00:00</span>
           </div>
           <div class="col">
-            <div class="vstack gap-3 h-100">
+            <div class="vstack h-100">
               <div class="request-title mb-auto" id="id${requests[requestIndex].id}_title" >
                 <span class="placeholder-glow">
                   <span class="placeholder col-12"></span>
                 </span>
+                <span class="placeholder-glow">
+                  <span class="placeholder col-12"></span>
+                </span>
               </div>
+              <small class="request-info text-body-secondary" id="id${requests[requestIndex].id}_info" >
+                <span class="placeholder-glow">
+                  <span class="placeholder col-12"></span>
+                </span>
+              </small>
               <small class="requested-by text-body-secondary" id="id${requests[requestIndex].id}_by" >Requested by: ${requests[requestIndex].by.join(" & ")}</small>
             </div>
           </div>
@@ -764,18 +772,28 @@ function addToHistory(request, position = "afterbegin") {
             <span class="badge text-bg-dark duration-label">${request.duration == -1 ? "🔴live" : secondsToTimeString(Math.round(request.duration))}</span>
           </div>
           <div class="col">
-            <div class="vstack gap-3 h-100">
+            <div class="vstack h-100">
               <div class="request-title mb-auto" title="${request.title}">
-              <a 
-              class="link-body-emphasis link-underline-opacity-0" 
-              href="${getItemLink(requests.type, requests.id)}" 
-              target="_blank" 
-              rel="noopener noreferrer"> 
-              ${validator.escape(request.title)}
-              </a>
+                <a 
+                class="link-body-emphasis link-underline-opacity-0" 
+                href="${getItemLink(request.type, request.id)}" 
+                target="_blank" 
+                rel="noopener noreferrer"> 
+                ${validator.escape(request.title)}
+                </a>
               </div>
+              <small class="request-info text-body-secondary">
+              ${validator.escape(request.channel)} ${request.views > -1 ? ` · ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}
+              </small>
               <small class="requested-by text-body-secondary" title="Requested by @${request.by.join(" & ")}">
-              Requested by @${request.by[0]} 
+              Requested by 
+              <a 
+              class="link-body-emphasis link-underline-opacity-0"
+              href="https://www.twitch.tv/popout/${USER.channel}/viewercard/${request.by[0]}"
+              target="_blank"
+              rel="noopener noreferrer">
+              @${request.by[0]}
+              </a>
               ${request.by.length > 1 ? `and ${request.by.length - 1} other ${request.by.length - 1 == 1 ? "user" : "users"}` : ""}
               </small>
             </div>
@@ -788,7 +806,8 @@ function addToHistory(request, position = "afterbegin") {
 function updatePlaylist(index) {
   if (requests[index].thumbnail && requests[index].title) {
     document.getElementById(`id${requests[index].id}_thumbnail`).innerHTML = `<img src="${requests[index].thumbnail}" alt="thumbnail" class="rounded" />`;
-    document.getElementById(`id${requests[index].id}_title`).innerHTML = `<a 
+    document.getElementById(`id${requests[index].id}_title`).innerHTML = `
+    <a 
     class="link-body-emphasis link-underline-opacity-0"
     href="${getItemLink(requests[index].type, requests[index].id)}"
     target="_blank"
@@ -796,10 +815,21 @@ function updatePlaylist(index) {
     ${validator.escape(requests[index].title)}
     </a>`;
     document.getElementById(`id${requests[index].id}_title`).title = requests[index].title;
+    document.getElementById(`id${requests[index].id}_info`).innerHTML = `
+    ${validator.escape(requests[index].channel)} ${requests[index].views > -1 ? ` · ${formatViewCount(requests[index].views)} ${requests[index].views == 1 ? "view" : "views"}` : ""}`;
+    document.getElementById(`id${requests[index].id}_info`).title = `
+    ${validator.escape(requests[index].channel)} ${requests[index].views > -1 ? ` · ${formatViewCount(requests[index].views)} ${requests[index].views == 1 ? "view" : "views"}` : ""}`;
     document.getElementById(`id${requests[index].id}_duration`).innerText = requests[index].duration == -1 ? "🔴live" : secondsToTimeString(Math.round(requests[index].duration));
-    document.getElementById(`id${requests[index].id}_by`).innerText = `Requested by @${requests[index].by[0]} ${
-      requests[index].by.length > 1 ? `and ${requests[index].by.length - 1} other ${requests[index].by.length - 1 == 1 ? "user" : "users"}` : ""
-    }`;
+    document.getElementById(`id${requests[index].id}_by`).innerHTML = `
+    Requested by 
+    <a 
+    class="link-body-emphasis link-underline-opacity-0"
+    href="https://www.twitch.tv/popout/${USER.channel}/viewercard/${requests[index].by[0]}"
+    target="_blank"
+    rel="noopener noreferrer">
+    @${requests[index].by[0]}
+    </a>
+     ${requests[index].by.length > 1 ? `and ${requests[index].by.length - 1} other ${requests[index].by.length - 1 == 1 ? "user" : "users"}` : ""}`;
     document.getElementById(`id${requests[index].id}_by`).title = `Requested by @${requests[index].by.join(" & ")}`;
 
     if (!playlist_playing && PLAYLIST.autoplay) {
@@ -824,7 +854,8 @@ async function getRequestInfo(index, id) {
       let response = await fetch(`https://helper.donk.workers.dev/twitch/clips?id=${requests[index].id}`, GETrequestOptions);
       let result = await response.json();
       console.log(result);
-      requests[index].title = `${result.data[0].title} - ${result.data[0].broadcaster_name}` || "(untitled)";
+      requests[index].title = result.data[0].title || "(untitled)";
+      requests[index].channel = result.data[0].broadcaster_name || "(unknown)";
       requests[index].thumbnail = result.data[0].thumbnail_url;
       requests[index].duration = result.data[0].duration;
       requests[index].views = result.data[0].view_count;
@@ -841,7 +872,8 @@ async function getRequestInfo(index, id) {
       let response = await fetch(`https://helper.donk.workers.dev/twitch/videos?id=${requests[index].id}`, GETrequestOptions);
       let result = await response.json();
       console.log(result);
-      requests[index].title = `${result.data[0].title} - ${result.data[0].user_login}` || "(untitled)";
+      requests[index].title = result.data[0].title || "(untitled)";
+      requests[index].channel = result.data[0].user_login || "(unknown)";
       requests[index].thumbnail = result.data[0].thumbnail_url.replace("%{width}", "320").replace("%{height}", "180");
       requests[index].duration = convertTwitchVODDuration(result.data[0].duration);
       requests[index].views = result.data[0].view_count;
@@ -858,7 +890,8 @@ async function getRequestInfo(index, id) {
       let response = await fetch(`https://helper.donk.workers.dev/twitch/streams?user_login=${requests[index].id}`, GETrequestOptions);
       let result = await response.json();
       console.log(result);
-      requests[index].title = `${result.data[0].title} - ${result.data[0].user_name}` || "(untitled)";
+      requests[index].title = result.data[0].title || "(untitled)";
+      requests[index].channel = result.data[0].user_name || "(unknown)";
       requests[index].thumbnail = result.data[0].thumbnail_url.replace("{width}", "320").replace("{height}", "180");
       requests[index].duration = -1;
     } catch (error) {
@@ -874,7 +907,8 @@ async function getRequestInfo(index, id) {
       let response = await fetch(`https://helper.donk.workers.dev/spotify/tracks?ids=${requests[index].id}`, GETrequestOptions);
       let result = await response.json();
       console.log(result);
-      requests[index].title = `${result.tracks[0].name} - ${result.tracks[0].artists[0].name}` || "(untitled)";
+      requests[index].title = result.tracks[0].name || "(untitled)";
+      requests[index].channel = result.tracks[0].artists[0].name || "(unknown)";
       requests[index].thumbnail = result.tracks[0].album.images[0].url;
       requests[index].duration = result.tracks[0].duration_ms / 1000;
       requests[index].uri = result.tracks[0].uri;
@@ -896,7 +930,8 @@ async function getRequestInfo(index, id) {
       let response = await fetch(`https://helper.donk.workers.dev/youtube/videos?id=${requests[index].id}`, GETrequestOptions);
       let result = await response.json();
       console.log(result);
-      requests[index].title = `${result.items[0].snippet.title} - ${result.items[0].snippet.channelTitle}` || "(untitled)";
+      requests[index].title = result.items[0].snippet.title || "(untitled)";
+      requests[index].channel = result.items[0].snippet.channelTitle || "(unknown)";
       requests[index].thumbnail = result.items[0].snippet.thumbnails.medium.url;
       requests[index].duration = ISO8601ToSeconds(result.items[0].contentDetails.duration);
       requests[index].views = result.items[0].statistics.viewCount;
@@ -931,6 +966,7 @@ async function getRequestInfo(index, id) {
       let result = await response.json();
       console.log(result);
       requests[index].title = result.title || "(untitled)";
+      requests[index].channel = "(unknown)";
       requests[index].thumbnail = result.thumbnail_url;
       requests[index].duration = result.files.mp4.duration;
       requests[index].video = result.files.mp4.url;
@@ -1188,11 +1224,24 @@ function playItem(item) {
     total_duration -= currentItem.duration;
   }
 
-  elements.nowPlaying.innerText = currentItem.title;
+  elements.nowPlaying.innerHTML = `
+  <a 
+  class="link-body-emphasis link-underline-opacity-0"
+  href="${getItemLink(currentItem.type, currentItem.id)}"
+  target="_blank"
+  rel="noopener noreferrer">
+  ${validator.escape(currentItem.title)}
+  </a>`;
   elements.nowPlaying.title = currentItem.title;
-  elements.nowPlayingRequester.innerText = `@${currentItem.by[0]} ${
-    currentItem.by.length > 1 ? `and ${currentItem.by.length - 1} other ${currentItem.by.length - 1 == 1 ? "user" : "users"}` : ""
-  }`;
+  elements.nowPlayingRequester.innerHTML = `
+  <a 
+  class="link-body-emphasis link-underline-opacity-0"
+  href="https://www.twitch.tv/popout/${USER.channel}/viewercard/${currentItem.by[0]}"
+  target="_blank"
+  rel="noopener noreferrer">
+  @${currentItem.by[0]}
+  </a>
+  ${currentItem.by.length > 1 ? `and ${currentItem.by.length - 1} other ${currentItem.by.length - 1 == 1 ? "user" : "users"}` : ""}`;
   elements.nowPlayingRequester.title = currentItem.by.join(" & ");
 } //playItem
 
@@ -1221,7 +1270,7 @@ function voteSkip(userid) {
     anime({
       targets: `#voteSkipDiv`,
       easing: "easeOutElastic",
-      translateY: ["100%", 0],
+      translateY: ["-100%", 0],
     });
   }
 
@@ -1244,7 +1293,7 @@ function resetVoteSkip() {
   anime({
     targets: `#voteSkipDiv`,
     easing: "easeOutBounce",
-    translateY: [0, "100%"],
+    translateY: [0, "-100%"],
     complete: function (anim) {
       elements.voteSkipDiv.style.display = "none";
     },
