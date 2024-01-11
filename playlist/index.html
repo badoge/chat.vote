@@ -101,6 +101,24 @@
       </div>
     </div>
 
+    <div class="modal fade" id="clearHistoryModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Are you sure?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>All videos/songs will be removed from the history</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="clearHistory()"><i class="material-icons notranslate">delete_forever</i>Clear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="voteSkipDiv" class="bg-body-tertiary" style="display: none">
       <small class="text-body-secondary">
         Vote skip using <span id="voteSkipHint"><strong>!voteskip</strong> or <strong>!vs</strong></span>
@@ -847,6 +865,9 @@
                   </ul>
                 </div>
                 <div class="tab-pane fade" id="history-tab-pane" role="tabpanel" aria-labelledby="historyTab" tabindex="0">
+                  <button class="btn btn-outline-warning mt-2" type="button" data-bs-toggle="modal" data-bs-target="#clearHistoryModal">
+                    <i class="material-icons notranslate">delete_forever</i>Clear history
+                  </button>
                   <div class="mt-2" id="historyList"></div>
                 </div>
               </div>
@@ -911,7 +932,7 @@
             <div class="vr"></div>
 
             <div class="p-1">
-              <button id="resetPlaylist" class="btn btn-outline-warning" type="button" data-bs-toggle="modal" data-bs-target="#clearPlaylistModal">
+              <button class="btn btn-outline-warning" type="button" data-bs-toggle="modal" data-bs-target="#clearPlaylistModal">
                 <i class="material-icons notranslate">delete_forever</i>Clear playlist
               </button>
               <input id="togglePlaylist" onchange="togglePlaylist()" type="checkbox" class="btn-check" autocomplete="off" />

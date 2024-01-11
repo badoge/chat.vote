@@ -97,7 +97,6 @@ let elements = {
   nowPlaying: document.getElementById("nowPlaying"),
   nowPlayingRequester: document.getElementById("nowPlayingRequester"),
   playlistLength: document.getElementById("playlistLength"),
-  resetPlaylist: document.getElementById("resetPlaylist"),
   togglePlaylist: document.getElementById("togglePlaylist"),
   togglePlaylistLabel: document.getElementById("togglePlaylistLabel"),
   autoplay: document.getElementById("autoplay"),
@@ -271,6 +270,8 @@ function saveSettings() {
   refreshData();
   localStorage.setItem("USER", JSON.stringify(USER));
   localStorage.setItem("PLAYLIST", JSON.stringify(PLAYLIST));
+  localStorage.setItem("PLAYLIST_REQUESTS", JSON.stringify(requests));
+  localStorage.setItem("PLAYLIST_HISTORY", JSON.stringify(history));
   localStorage.setItem("darkTheme", darkTheme);
   updateSite();
 } //saveSettings
@@ -360,6 +361,26 @@ function load_localStorage() {
 
     updateWhoCanRequest();
     checkCommands();
+  }
+
+  if (!localStorage.getItem("PLAYLIST_REQUESTS")) {
+    console.log("localStorage playlist requests not found");
+  } else {
+    requests = JSON.parse(localStorage.getItem("PLAYLIST_REQUESTS"));
+    for (let index = 0; index < requests.length; index++) {
+      addToPlaylist(index);
+      updatePlaylist(index, true);
+    }
+    updateLength();
+  }
+
+  if (!localStorage.getItem("PLAYLIST_HISTORY")) {
+    console.log("localStorage playlist history not found");
+  } else {
+    history = JSON.parse(localStorage.getItem("PLAYLIST_HISTORY"));
+    for (let index = 0; index < history.length; index++) {
+      addToHistory(history[index], true);
+    }
   }
 } //load_localStorage
 
@@ -725,18 +746,21 @@ function deleteRequest(id, refund = true) {
   if (refund) {
     for (let index = 0; index < requests[requestIndex].by.length; index++) {
       const userIndex = users.findIndex((u) => u.username === requests[requestIndex].by[index]);
-      users[userIndex].requestsCount--;
-      users[userIndex].requests.splice(
-        users[userIndex].requests.findIndex(function (r) {
-          return r.value === id;
-        }),
-        1
-      );
+      if (userIndex != -1) {
+        users[userIndex].requestsCount--;
+        users[userIndex].requests.splice(
+          users[userIndex].requests.findIndex(function (r) {
+            return r.value === id;
+          }),
+          1
+        );
+      }
     }
     requests.splice(requestIndex, 1);
   }
   document.getElementById(`id${id}`).remove();
   updateLength();
+  saveSettings();
 } //deleteRequest
 
 function clearPlaylist() {
@@ -744,7 +768,6 @@ function clearPlaylist() {
   total_duration = 0;
   users = [];
   requests = [];
-  history = [];
   resetVoteSkip();
   resetPlayers();
   elements.mainList.innerHTML = "";
@@ -752,6 +775,12 @@ function clearPlaylist() {
   elements.nowPlaying.innerHTML = `<span class="text-body-secondary">Nothing :)</span>`;
   elements.nowPlayingRequester.innerHTML = `<span class="text-body-secondary">No one :)</span>`;
   updateLength();
+} //clearPlaylist
+
+function clearHistory() {
+  history = [];
+  elements.historyList.innerHTML = "";
+  saveSettings();
 } //clearPlaylist
 
 function updateLength() {
@@ -799,10 +828,12 @@ function addToPlaylist(requestIndex, position = "beforeend") {
   );
 } //addToPlaylist
 
-function addToHistory(request, position = "afterbegin") {
-  history.push(request);
+function addToHistory(request, localStorageLoad = false) {
+  if (!localStorageLoad) {
+    history.push(request);
+  }
   elements.historyList.insertAdjacentHTML(
-    position,
+    "afterbegin",
     `<div class="container-fluid p-0 mb-1">
         <div class="row g-1">
           <div class="col-auto thumbnail-div">
@@ -843,7 +874,7 @@ function addToHistory(request, position = "afterbegin") {
   );
 } //addToHistory
 
-function updatePlaylist(index) {
+function updatePlaylist(index, localStorageLoad = false) {
   if (requests[index].thumbnail && requests[index].title) {
     document.getElementById(`id${requests[index].id}_thumbnail`).innerHTML = `<img src="${requests[index].thumbnail}" alt="thumbnail" class="rounded" />`;
     document.getElementById(`id${requests[index].id}_title`).innerHTML = `
@@ -872,9 +903,13 @@ function updatePlaylist(index) {
      ${requests[index].by.length > 1 ? `and ${requests[index].by.length - 1} other ${requests[index].by.length - 1 == 1 ? "user" : "users"}` : ""}`;
     document.getElementById(`id${requests[index].id}_by`).title = `Requested by @${requests[index].by.join(" & ")}`;
 
-    if (!playlist_playing && PLAYLIST.autoplay) {
+    if (!playlist_playing && PLAYLIST.autoplay && !localStorageLoad) {
       playlist_playing = true;
       nextItem();
+    }
+
+    if (!localStorageLoad) {
+      saveSettings();
     }
   } else {
     //update requesters only if request info is not ready yet
@@ -887,6 +922,7 @@ function updatePlaylist(index) {
 async function getRequestInfo(index, id) {
   //skip if request already has info
   if (requests[index].title) {
+    updatePlaylist(index);
     return;
   }
   if (requests[index].type == "twitch clip") {
@@ -1227,6 +1263,7 @@ function nextItem() {
   deleteRequest(currentItem.id, false);
   playItem(currentItem);
   updateSite();
+  saveSettings();
 } //nextItem
 
 function playItem(item) {

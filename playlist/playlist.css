@@ -91,7 +91,7 @@ video {
 #mainList,
 #approvalList,
 #historyList {
-  height: calc(100vh - 350px);
+  height: calc(100vh - 400px);
   overflow-x: hidden;
   overflow-y: auto;
   text-align: start;
