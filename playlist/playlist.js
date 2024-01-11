@@ -58,6 +58,10 @@ let elements = {
   playlistCommand: document.getElementById("playlistCommand"),
   playlistCommandAlias: document.getElementById("playlistCommandAlias"),
   approvalQueue: document.getElementById("approvalQueue"),
+  openCommand: document.getElementById("openCommand"),
+  closeCommand: document.getElementById("closeCommand"),
+  playCommand: document.getElementById("playCommand"),
+  pauseCommand: document.getElementById("pauseCommand"),
   skipCommand: document.getElementById("skipCommand"),
   modCommands: document.getElementById("modCommands"),
 
@@ -171,6 +175,10 @@ let PLAYLIST = {
   playlistCommand: "!playlist",
   playlistCommandAlias: "!pl",
   approvalQueue: false,
+  openCommand: "!open",
+  closeCommand: "!close",
+  playCommand: "!play",
+  pauseCommand: "!pause",
   skipCommand: "!skip",
   modCommands: true,
 };
@@ -223,6 +231,10 @@ async function refreshData() {
   PLAYLIST.playlistCommand = elements.playlistCommand.value.replace(/\s+/g, "").toLowerCase() || "!playlist";
   PLAYLIST.playlistCommandAlias = elements.playlistCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!pl";
   PLAYLIST.approvalQueue = elements.approvalQueue.checked;
+  PLAYLIST.openCommand = elements.openCommand.value.replace(/\s+/g, "").toLowerCase() || "!open";
+  PLAYLIST.closeCommand = elements.closeCommand.value.replace(/\s+/g, "").toLowerCase() || "!close";
+  PLAYLIST.playCommand = elements.playCommand.value.replace(/\s+/g, "").toLowerCase() || "!play";
+  PLAYLIST.pauseCommand = elements.pauseCommand.value.replace(/\s+/g, "").toLowerCase() || "!pause";
   PLAYLIST.skipCommand = elements.skipCommand.value.replace(/\s+/g, "").toLowerCase() || "!skip";
   PLAYLIST.modCommands = elements.modCommands.checked;
 
@@ -314,6 +326,10 @@ function load_localStorage() {
     elements.playlistCommand.value = PLAYLIST.playlistCommand || "!playlist";
     elements.playlistCommandAlias.value = PLAYLIST.playlistCommandAlias || "!pl";
     elements.approvalQueue.checked = PLAYLIST.approvalQueue ?? false;
+    elements.openCommand.value = PLAYLIST.openCommand || "!open";
+    elements.closeCommand.value = PLAYLIST.closeCommand || "!close";
+    elements.playCommand.value = PLAYLIST.playCommand || "!play";
+    elements.pauseCommand.value = PLAYLIST.pauseCommand || "!pause";
     elements.skipCommand.value = PLAYLIST.skipCommand || "!skip";
     elements.modCommands.checked = PLAYLIST.modCommands ?? true;
 
@@ -401,6 +417,10 @@ function resetSettings(logout = false) {
       playlistCommand: "!playlist",
       playlistCommandAlias: "!pl",
       approvalQueue: false,
+      openCommand: "!open",
+      closeCommand: "!close",
+      playCommand: "!play",
+      pauseCommand: "!pause",
       skipCommand: "!skip",
       modCommands: true,
     })
@@ -527,6 +547,26 @@ function connect() {
       case PLAYLIST.playlistCommandAlias:
         if (USER.access_token) {
           botReply(`You can view the playlist here: https://playlist.chat.vote/${USER.channel}`, context.id, true);
+        }
+        break;
+      case PLAYLIST.openCommand:
+        if (context.username == USER.channel || (PLAYLIST.modCommands && context.mod)) {
+          openPlaylist();
+        }
+        break;
+      case PLAYLIST.closeCommand:
+        if (context.username == USER.channel || (PLAYLIST.modCommands && context.mod)) {
+          closePlaylist();
+        }
+        break;
+      case PLAYLIST.playCommand:
+        if (context.username == USER.channel || (PLAYLIST.modCommands && context.mod)) {
+          playPlaylist();
+        }
+        break;
+      case PLAYLIST.pauseCommand:
+        if (context.username == USER.channel || (PLAYLIST.modCommands && context.mod)) {
+          pausePlaylist();
         }
         break;
       case PLAYLIST.skipCommand:
@@ -1580,6 +1620,10 @@ function checkCommands() {
     elements.songCommandAlias,
     elements.playlistCommand,
     elements.playlistCommandAlias,
+    elements.openCommand,
+    elements.closeCommand,
+    elements.playCommand,
+    elements.pauseCommand,
     elements.skipCommand,
   ];
 
@@ -1663,6 +1707,26 @@ function togglePlaylist() {
     elements.togglePlaylistLabel.innerHTML = "Open Playlist";
   }
 }
+
+function openPlaylist() {
+  if (!playlist_open) {
+    playlist_open = true;
+    elements.togglePlaylist.click();
+    elements.togglePlaylistLabel.classList = "btn btn-danger";
+    elements.togglePlaylistLabel.innerHTML = "Close Playlist";
+  }
+} //openPlaylist
+function closePlaylist() {
+  if (playlist_open) {
+    playlist_open = false;
+    elements.togglePlaylist.click();
+    elements.togglePlaylistLabel.classList = "btn btn-success";
+    elements.togglePlaylistLabel.innerHTML = "Open Playlist";
+  }
+} //closePlaylist
+
+function playPlaylist() {} //playPlaylist
+function pausePlaylist() {} //pausePlaylist
 
 window.onload = function () {
   darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
