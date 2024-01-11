@@ -775,6 +775,7 @@ function clearPlaylist() {
   elements.nowPlaying.innerHTML = `<span class="text-body-secondary">Nothing :)</span>`;
   elements.nowPlayingRequester.innerHTML = `<span class="text-body-secondary">No one :)</span>`;
   updateLength();
+  saveSettings();
 } //clearPlaylist
 
 function clearHistory() {
