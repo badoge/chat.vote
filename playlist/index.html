@@ -480,22 +480,11 @@
             </div>
             <div class="input-group mb-1">
               <span class="input-group-text">Play current video/song</span>
-              <input
-                disabled
-                type="text"
-                id="playCommand"
-                data-default="!play"
-                value="!play"
-                aria-label="Play command"
-                placeholder="Play command"
-                class="form-control"
-                onchange="saveSettings()"
-              />
+              <input type="text" id="playCommand" data-default="!play" value="!play" aria-label="Play command" placeholder="Play command" class="form-control" onchange="saveSettings()" />
             </div>
             <div class="input-group mb-1">
               <span class="input-group-text">Pause current video/song</span>
               <input
-                disabled
                 type="text"
                 id="pauseCommand"
                 data-default="!pause"
@@ -507,8 +496,35 @@
               />
             </div>
             <div class="input-group mb-1">
+              <span class="input-group-text">Toggle autoplay</span>
+              <input
+                type="text"
+                id="autoplayCommand"
+                data-default="!autoplay"
+                value="!autoplay"
+                aria-label="Autoplay command"
+                placeholder="Autoplay command"
+                class="form-control"
+                onchange="saveSettings()"
+              />
+            </div>
+            <div class="input-group mb-1">
               <span class="input-group-text">Skip current video/song</span>
               <input type="text" id="skipCommand" data-default="!skip" value="!skip" aria-label="Skip command" placeholder="Skip command" class="form-control" onchange="saveSettings()" />
+            </div>
+            <div class="input-group mb-1">
+              <span class="input-group-text">Go back to previous video/song</span>
+              <input
+                disabled
+                type="text"
+                id="rewindCommand"
+                data-default="!rewind"
+                value="!rewind"
+                aria-label="Rewind command"
+                placeholder="Rewind command"
+                class="form-control"
+                onchange="saveSettings()"
+              />
             </div>
 
             <div class="form-check form-switch mb-3">
@@ -741,7 +757,8 @@
               <h1 id="placeholder" class="display-1">
                 Nothing here :)<br />
                 <span id="commandHint2">
-                  Request something using <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">!request [link]</kbd> or
+                  Request something using<br />
+                  <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">!request [link]</kbd> or
                   <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">!r [link]</kbd>
                 </span>
               </h1>
@@ -963,7 +980,6 @@
             <div class="p-1">
               <div class="btn-group" role="group" aria-label="Playback controls">
                 <button disabled type="button" class="btn btn-secondary" id="previousItem" onclick="previousItem()"><i class="material-icons notranslate">skip_previous</i></button>
-                <button disabled type="button" class="btn btn-secondary" id="togglePlay" onclick="togglePlay()"><i class="material-icons notranslate">play_arrow</i></button>
                 <button type="button" class="btn btn-secondary" id="nextItem" onclick="nextItem()"><i class="material-icons notranslate">skip_next</i></button>
               </div>
             </div>

@@ -62,7 +62,9 @@ let elements = {
   closeCommand: document.getElementById("closeCommand"),
   playCommand: document.getElementById("playCommand"),
   pauseCommand: document.getElementById("pauseCommand"),
+  autoplayCommand: document.getElementById("autoplayCommand"),
   skipCommand: document.getElementById("skipCommand"),
+  rewindCommand: document.getElementById("rewindCommand"),
   modCommands: document.getElementById("modCommands"),
 
   //main
@@ -101,7 +103,6 @@ let elements = {
   togglePlaylistLabel: document.getElementById("togglePlaylistLabel"),
   autoplay: document.getElementById("autoplay"),
   previousItem: document.getElementById("previousItem"),
-  togglePlay: document.getElementById("togglePlay"),
   nextItem: document.getElementById("nextItem"),
   volumeSliderIcon: document.getElementById("volumeSliderIcon"),
   volumeSlider: document.getElementById("volumeSlider"),
@@ -178,7 +179,9 @@ let PLAYLIST = {
   closeCommand: "!close",
   playCommand: "!play",
   pauseCommand: "!pause",
+  autoplayCommand: "!autoplay",
   skipCommand: "!skip",
+  rewindCommand: "!rewind",
   modCommands: true,
 };
 
@@ -234,7 +237,9 @@ async function refreshData() {
   PLAYLIST.closeCommand = elements.closeCommand.value.replace(/\s+/g, "").toLowerCase() || "!close";
   PLAYLIST.playCommand = elements.playCommand.value.replace(/\s+/g, "").toLowerCase() || "!play";
   PLAYLIST.pauseCommand = elements.pauseCommand.value.replace(/\s+/g, "").toLowerCase() || "!pause";
+  PLAYLIST.autoplayCommand = elements.autoplayCommand.value.replace(/\s+/g, "").toLowerCase() || "!autoplay";
   PLAYLIST.skipCommand = elements.skipCommand.value.replace(/\s+/g, "").toLowerCase() || "!skip";
+  PLAYLIST.rewindCommand = elements.rewindCommand.value.replace(/\s+/g, "").toLowerCase() || "!rewind";
   PLAYLIST.modCommands = elements.modCommands.checked;
 
   elements.voteskipCommand.disabled = !PLAYLIST.allowVoteSkip;
@@ -257,7 +262,7 @@ async function refreshData() {
     elements.commandHint.innerHTML = `Add songs or videos to the playlist using 
     <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">${PLAYLIST.requestCommand} [link]</kbd> or 
     <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">${PLAYLIST.requestCommandAlias} [link]</kbd>`;
-    elements.commandHint2.innerHTML = `Request something using 
+    elements.commandHint2.innerHTML = `Request something using<br />
     <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">${PLAYLIST.requestCommand} [link]</kbd> or 
     <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">${PLAYLIST.requestCommandAlias} [link]</kbd>`;
   }
@@ -331,7 +336,9 @@ function load_localStorage() {
     elements.closeCommand.value = PLAYLIST.closeCommand || "!close";
     elements.playCommand.value = PLAYLIST.playCommand || "!play";
     elements.pauseCommand.value = PLAYLIST.pauseCommand || "!pause";
+    elements.autoplayCommand.value = PLAYLIST.autoplayCommand || "!autoplay";
     elements.skipCommand.value = PLAYLIST.skipCommand || "!skip";
+    elements.rewindCommand.value = PLAYLIST.rewindCommand || "!rewind";
     elements.modCommands.checked = PLAYLIST.modCommands ?? true;
 
     elements.voteskipCommand.disabled = !PLAYLIST.allowVoteSkip;
@@ -442,7 +449,9 @@ function resetSettings(logout = false) {
       closeCommand: "!close",
       playCommand: "!play",
       pauseCommand: "!pause",
+      autoplayCommand: "!autoplay",
       skipCommand: "!skip",
+      rewindCommand: "!rewind",
       modCommands: true,
     })
   );
@@ -572,27 +581,37 @@ function connect() {
         break;
       case PLAYLIST.openCommand:
         if (context.username == USER.channel || (PLAYLIST.modCommands && context.mod)) {
-          openPlaylist();
+          openPlaylist(context.id);
         }
         break;
       case PLAYLIST.closeCommand:
         if (context.username == USER.channel || (PLAYLIST.modCommands && context.mod)) {
-          closePlaylist();
+          closePlaylist(context.id);
         }
         break;
       case PLAYLIST.playCommand:
         if (context.username == USER.channel || (PLAYLIST.modCommands && context.mod)) {
-          playPlaylist();
+          playPlaylist(context.id);
         }
         break;
       case PLAYLIST.pauseCommand:
         if (context.username == USER.channel || (PLAYLIST.modCommands && context.mod)) {
-          pausePlaylist();
+          pausePlaylist(context.id);
+        }
+        break;
+      case PLAYLIST.autoplayCommand:
+        if (context.username == USER.channel || (PLAYLIST.modCommands && context.mod)) {
+          toggleAutoplay(context.id);
         }
         break;
       case PLAYLIST.skipCommand:
         if (context.username == USER.channel || (PLAYLIST.modCommands && context.mod)) {
-          nextItem();
+          nextItem(context.id);
+        }
+        break;
+      case PLAYLIST.rewindCommand:
+        if (context.username == USER.channel || (PLAYLIST.modCommands && context.mod)) {
+          previousItem(context.id);
         }
         break;
       default:
@@ -1244,12 +1263,14 @@ function addLink() {
 
 function previousItem() {} //previousItem
 
-function togglePlay() {} //togglePlay
-
 let currentItem;
-function nextItem() {
+function nextItem(reply) {
   resetPlayers();
   resetVoteSkip();
+
+  if (reply) {
+    botReply(`⏩ Skipped`, reply, false);
+  }
 
   currentItem = requests.shift();
   if (!currentItem) {
@@ -1662,7 +1683,9 @@ function checkCommands() {
     elements.closeCommand,
     elements.playCommand,
     elements.pauseCommand,
+    elements.autoplayCommand,
     elements.skipCommand,
+    elements.rewindCommand,
   ];
 
   let commands = commandElements.map((e) => e.value.replace(/\s+/g, "").toLowerCase());
@@ -1746,25 +1769,99 @@ function togglePlaylist() {
   }
 }
 
-function openPlaylist() {
+function openPlaylist(reply) {
   if (!playlist_open) {
     playlist_open = true;
     elements.togglePlaylist.click();
     elements.togglePlaylistLabel.classList = "btn btn-danger";
     elements.togglePlaylistLabel.innerHTML = "Close Playlist";
+    botReply(`✅ The playlist is now open`, reply, false);
   }
 } //openPlaylist
-function closePlaylist() {
+function closePlaylist(reply) {
   if (playlist_open) {
     playlist_open = false;
     elements.togglePlaylist.click();
     elements.togglePlaylistLabel.classList = "btn btn-success";
     elements.togglePlaylistLabel.innerHTML = "Open Playlist";
+    botReply(`⛔ The playlist is now closed`, reply, false);
   }
 } //closePlaylist
 
-function playPlaylist() {} //playPlaylist
-function pausePlaylist() {} //pausePlaylist
+function playPlaylist(reply) {
+  if (!currentItem) {
+    botReply(`⚠ Nothing is playing`, reply, false);
+    return;
+  }
+
+  switch (currentItem.type) {
+    case "youtube":
+    case "youtube short":
+      youtubePlayer.playVideo();
+      break;
+    case "spotify":
+      spotifyPlayer.play();
+      break;
+    case "twitch stream":
+    case "twitch vod":
+      twitchPlayer.play();
+      break;
+    case "streamable":
+      elements.streamableEmbed.play();
+      break;
+    default:
+      break;
+  }
+
+  if (reply) {
+    if (currentItem.type == "twitch clip") {
+      botReply(`⚠ Twitch clip playback can't be controlled`, reply, false);
+    } else {
+      botReply(`▶ Playlist is now playing`, reply, false);
+    }
+  }
+} //playPlaylist
+
+function pausePlaylist(reply) {
+  if (!currentItem) {
+    botReply(`⚠ Nothing is playing`, reply, false);
+    return;
+  }
+
+  switch (currentItem.type) {
+    case "youtube":
+    case "youtube short":
+      youtubePlayer.pauseVideo();
+      break;
+    case "spotify":
+      spotifyPlayer.pause();
+      break;
+    case "twitch stream":
+    case "twitch vod":
+      twitchPlayer.pause();
+      break;
+    case "streamable":
+      elements.streamableEmbed.pause();
+      break;
+    default:
+      break;
+  }
+
+  if (reply) {
+    if (currentItem.type == "twitch clip") {
+      botReply(`⚠ Twitch clip playback can't be controlled`, reply, false);
+    } else {
+      botReply(`⏸ Playlist is now paused`, reply, false);
+    }
+  }
+} //pausePlaylist
+
+function toggleAutoplay(reply) {
+  let enabled = elements.autoplay.checked;
+  elements.autoplay.checked = !enabled;
+  botReply(`${enabled ? "🚫" : "✅"} autoplay is now ${enabled ? "disabled" : "enabled"}`, reply, false);
+  saveSettings();
+} //toggleAutoplay
 
 window.onload = function () {
   darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
