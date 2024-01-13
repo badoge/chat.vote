@@ -70,7 +70,7 @@ video {
 
 #profileLink {
   border-color: #d3c22e;
-  cursor: pointer;
+  cursor: text;
   width: 15vw;
 }
 
@@ -89,7 +89,15 @@ video {
 }
 
 #mainList,
-#approvalList,
+#approvalList {
+  height: calc(100vh - 350px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  text-align: start;
+  margin-left: -10px;
+  margin-right: -10px;
+}
+
 #historyList {
   height: calc(100vh - 400px);
   overflow-x: hidden;
