@@ -90,13 +90,15 @@ body {
 }
 
 .defaultbtn {
-  margin-top: 5px;
-  margin-bottom: 5px;
-  margin-left: 10px;
+  height: 62px;
 }
 
-#enableSuggestionsDropdown {
-  margin-right: 10px;
+.quick-actions {
+  height: 62px !important;
+  aspect-ratio: 1 / 1;
+}
+.quick-actions > i {
+  font-size: 2rem;
 }
 
 #removeContainer {
@@ -123,12 +125,6 @@ body {
   border-radius: 0 6px 6px 0;
 }
 
-#settingsCollapse > div > div {
-  height: 40vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
 .values {
   margin: -10px;
 }
@@ -144,11 +140,6 @@ body {
   .toast {
     display: none;
   }
-}
-
-#settingsAccordionHeader,
-#settingsAccordionHeader > button {
-  height: 82px;
 }
 
 #randomOptionWinner,
@@ -173,10 +164,6 @@ th {
   margin-bottom: 0px !important;
 }
 
-#enableVoting,
-#enableVotingDropdown {
-  height: 62px;
-}
 #enableVotingText {
   font-size: 1.5rem;
   line-height: 1.5rem;
@@ -191,9 +178,9 @@ th {
   padding-bottom: 5px;
 }
 
-.settingscard {
-  margin-top: 10px;
-  margin-bottom: 10px;
+#settingsOffcanvas {
+  width: 450px;
+  max-width: 80vw;
 }
 
 .resizable {

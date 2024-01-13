@@ -22,6 +22,9 @@ let elements = {
   channelName: document.getElementById("channelName"),
   darkTheme: document.getElementById("darkTheme"),
 
+  //settings
+  settingsOffcanvas: document.getElementById("settingsOffcanvas"),
+
   //start voting button
   enableVoting: document.getElementById("enableVoting"),
   enableVotingText: document.getElementById("enableVotingText"),
@@ -51,10 +54,6 @@ let elements = {
   stopTimer: document.getElementById("stopTimer"),
 
   //basic settings
-  settingsCollapse: document.getElementById("settingsCollapse"),
-  basicTab: document.getElementById("basicTab"),
-  advancedTab: document.getElementById("advancedTab"),
-  contactTab: document.getElementById("contactTab"),
   remove: document.getElementById("remove"),
   multiChoice: document.getElementById("multiChoice"),
   multiChoiceExample: document.getElementById("multiChoiceExample"),
@@ -97,9 +96,7 @@ let elements = {
   tableTabButton: document.getElementById("tableTabButton"),
   chartTabButton: document.getElementById("chartTabButton"),
   yesnoTabButton: document.getElementById("yesnoTabButton"),
-  enterPollOptionCard: document.getElementById("enterPollOptionCard"),
   options: document.getElementById("options"),
-  settingsAccordion: document.getElementById("settingsAccordion"),
   chatiframe: document.getElementById("chatiframe"),
   chat: document.getElementById("chat"),
   subOnlyAlert: document.getElementById("subOnlyAlert"),
@@ -137,10 +134,9 @@ let votePopover, suggestPopover;
 let loginButton;
 let optionField;
 let deleteAllModal, randomOptionModal, resetSettingsModal, timeOverModal, yesnoTimeOverModal, loginExpiredModal, tieModal, randomYesnoModal;
-let settingsCollapse;
-let basicTab, advancedTab, contactTab;
 let enableVotingDropdown, enableSuggestionsDropdown;
 let tableTab, chartTab, yesnoTab;
+let settingsOffcanvas;
 
 let thirdPartyEmotes = [];
 
@@ -1613,7 +1609,6 @@ function enableVoteButton() {
     chartTab.show();
   }
   voting_enabled = true;
-  elements.enterPollOptionCard.style.display = "none";
   elements.enableVoting.classList.remove("btn-success");
   elements.enableVoting.classList.add("btn-danger");
   elements.enableVotingDropdown.classList.remove("btn-success");
@@ -1626,7 +1621,6 @@ function disableVoteButton() {
   if (timer && timer.isRunning()) {
     stopTimer();
   }
-  elements.enterPollOptionCard.style.display = "block";
   elements.enableVoting.classList.remove("btn-danger");
   elements.enableVoting.classList.add("btn-success");
   elements.enableVotingDropdown.classList.remove("btn-danger");
@@ -1657,8 +1651,7 @@ function disableSuggestButton() {
 
 function changeSuggestionCommand() {
   enableSuggestionsDropdown.hide();
-  settingsCollapse.show();
-  basicTab.show();
+  settingsOffcanvas.show();
   elements.suggestionPrefix.focus();
   elements.suggestionPrefix.select();
   elements.suggestionPrefix.scrollIntoView();
@@ -1745,6 +1738,7 @@ window.onload = function () {
   elements.pollOption.focus();
   elements.pollOption.select();
   loadAndConnect();
+  settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
   optionField = new bootstrap.Popover(elements.pollOptionSpan);
   votePopover = new bootstrap.Popover(elements.enableVoting);
   suggestPopover = new bootstrap.Popover(elements.enableSuggestions);
@@ -1762,14 +1756,8 @@ window.onload = function () {
   tieModal = new bootstrap.Modal(elements.tieModal);
   randomYesnoModal = new bootstrap.Modal(elements.randomYesnoModal);
 
-  settingsCollapse = new bootstrap.Collapse(elements.settingsCollapse, {
-    toggle: false,
-  });
   enableVotingDropdown = new bootstrap.Dropdown(elements.enableVotingDropdown);
   enableSuggestionsDropdown = new bootstrap.Dropdown(elements.enableSuggestionsDropdown);
-  basicTab = new bootstrap.Tab(elements.basicTab);
-  advancedTab = new bootstrap.Tab(elements.advancedTab);
-  contactTab = new bootstrap.Tab(elements.contactTab);
 
   tableTab = new bootstrap.Tab(elements.tableTabButton);
   chartTab = new bootstrap.Tab(elements.chartTabButton);
@@ -1780,7 +1768,6 @@ window.onload = function () {
       yesNoMode = false;
       stopYesNo();
     }
-    elements.enterPollOptionCard.style.display = "block";
   });
 
   elements.chartTabButton.addEventListener("shown.bs.tab", (event) => {
@@ -1788,17 +1775,11 @@ window.onload = function () {
       yesNoMode = false;
       stopYesNo();
     }
-    elements.enterPollOptionCard.style.display = "block";
   });
 
   elements.yesnoTabButton.addEventListener("shown.bs.tab", (event) => {
     yesNoMode = true;
     startYesNo();
-    elements.enterPollOptionCard.style.display = "none";
-  });
-
-  elements.settingsAccordion.addEventListener("hide.bs.collapse", function () {
-    saveSettings();
   });
 
   enableTooltips();
@@ -2004,7 +1985,7 @@ window.onbeforeunload = function () {
     scores: table.column(4).data().toArray(),
   });
   if (CHATVOTE.refreshWarningEnabled && (vote_results.length > 0 || vote_results_yesno.yea > 0 || vote_results_yesno.nay > 0)) {
-    return "Close/refresh warning enabled. You can turn it off in the advanced settings tab.";
+    return "Close/refresh warning enabled. You can turn it off in the settings.";
   }
   return null;
 }; //onbeforeunload

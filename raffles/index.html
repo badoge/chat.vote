@@ -342,8 +342,8 @@
         </div>
 
         <div class="col-xxl-2 col-lg-2 order-lg-2 order-1">
-          <div class="card">
-            <div class="card-body text-center" id="raffleButtons">
+          <div class="card bg-body-tertiary mb-2">
+            <div class="card-body text-center align-self-center" id="raffleButtons">
               <a
                 role="button"
                 tabindex="0"
@@ -370,26 +370,27 @@
               <button class="btn btn-secondary m-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#settingsOffcanvas" aria-controls="settingsOffcanvas">
                 <i class="material-icons notranslate">settings</i> Settings
               </button>
-            </div>
-          </div>
-          <div id="extraTimerDiv" class="mt-3" style="display: none">
-            <div class="input-group">
-              <label class="input-group-text" for="extraTimerMins">Timer</label>
-              <input type="number" style="max-width: 5em" class="form-control" id="extraTimerMins" min="0" placeholder="0" aria-label="minutes" />
-              <button class="btn btn-outline-secondary" type="button" id="stopExtraTimer" onclick="stopExtraTimer()" style="display: none">
-                Stop<i class="material-icons notranslate">timer_off</i>
-              </button>
-              <button class="btn btn-outline-secondary" type="button" id="pauseExtraTimer" onclick="pauseExtraTimer()" style="display: none">
-                <i class="material-icons notranslate">pause</i>
-              </button>
-              <button class="btn btn-outline-secondary" type="button" id="unpauseExtraTimer" onclick="unpauseExtraTimer()" style="display: none">
-                <i class="material-icons notranslate">play_arrow</i>
-              </button>
-              <button class="btn btn-outline-secondary" type="button" id="startExtraTimer" onclick="startExtraTimer()">Start <i class="material-icons notranslate">timer</i></button>
-            </div>
-            <div class="card border-danger" id="extraCountdown" style="display: none; font-size: 3em">
-              <div class="card-body">
-                <div class="values"></div>
+
+              <div id="extraTimerDiv" class="mt-3" style="display: none">
+                <div class="input-group">
+                  <label class="input-group-text" for="extraTimerMins">Timer</label>
+                  <input type="number" style="max-width: 5em" class="form-control" id="extraTimerMins" min="0" placeholder="0" aria-label="minutes" />
+                  <button class="btn btn-outline-secondary" type="button" id="stopExtraTimer" onclick="stopExtraTimer()" style="display: none">
+                    Stop<i class="material-icons notranslate">timer_off</i>
+                  </button>
+                  <button class="btn btn-outline-secondary" type="button" id="pauseExtraTimer" onclick="pauseExtraTimer()" style="display: none">
+                    <i class="material-icons notranslate">pause</i>
+                  </button>
+                  <button class="btn btn-outline-secondary" type="button" id="unpauseExtraTimer" onclick="unpauseExtraTimer()" style="display: none">
+                    <i class="material-icons notranslate">play_arrow</i>
+                  </button>
+                  <button class="btn btn-outline-secondary" type="button" id="startExtraTimer" onclick="startExtraTimer()">Start <i class="material-icons notranslate">timer</i></button>
+                </div>
+                <div class="card border-danger" id="extraCountdown" style="display: none; font-size: 3em">
+                  <div class="card-body">
+                    <div class="values"></div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
