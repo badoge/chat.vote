@@ -102,8 +102,6 @@ let elements = {
   togglePlaylist: document.getElementById("togglePlaylist"),
   togglePlaylistLabel: document.getElementById("togglePlaylistLabel"),
   autoplay: document.getElementById("autoplay"),
-  previousItem: document.getElementById("previousItem"),
-  nextItem: document.getElementById("nextItem"),
   volumeSliderIcon: document.getElementById("volumeSliderIcon"),
   volumeSlider: document.getElementById("volumeSlider"),
   volumeSliderValue: document.getElementById("volumeSliderValue"),
@@ -385,7 +383,7 @@ function load_localStorage() {
     console.log("localStorage playlist history not found");
   } else {
     history = JSON.parse(localStorage.getItem("PLAYLIST_HISTORY"));
-    for (let index = 0; index < history.length; index++) {
+    for (let index = history.length - 1; index >= 0; index--) {
       addToHistory(history[index], true);
     }
   }
@@ -850,7 +848,7 @@ function addToPlaylist(requestIndex, position = "beforeend") {
 
 function addToHistory(request, localStorageLoad = false) {
   if (!localStorageLoad) {
-    history.push(request);
+    history.unshift(request);
   }
   elements.historyList.insertAdjacentHTML(
     "afterbegin",
@@ -1261,7 +1259,38 @@ function addLink() {
   elements.link.value = "";
 } //addLink
 
-function previousItem() {} //previousItem
+let historyIndex = -1;
+function previousItem(reply) {
+  if (history.length == 0) {
+    return;
+  }
+
+  resetPlayers();
+  resetVoteSkip();
+
+  if (currentItem?.id == history[historyIndex + 1]?.id) {
+    historyIndex++;
+  }
+
+  currentItem = history[++historyIndex];
+
+  if (!currentItem) {
+    playlist_playing = false;
+    elements.placeholder.style.display = "";
+    elements.nowPlaying.innerHTML = `<span class="text-body-secondary">Nothing :)</span>`;
+    elements.nowPlayingRequester.innerHTML = `<span class="text-body-secondary">No one :)</span>`;
+    return;
+  }
+
+  if (reply) {
+    botReply(`⏪ Rewinded`, reply, false);
+  }
+
+  console.log(currentItem);
+  playItem(currentItem);
+  updateSite();
+  saveSettings();
+} //previousItem
 
 let currentItem;
 function nextItem(reply) {
@@ -1272,7 +1301,16 @@ function nextItem(reply) {
     botReply(`⏩ Skipped`, reply, false);
   }
 
-  currentItem = requests.shift();
+  if (historyIndex > 0) {
+    currentItem = history[--historyIndex];
+  } else {
+    currentItem = requests.shift();
+    historyIndex = -1;
+    if (currentItem) {
+      addToHistory(currentItem);
+      deleteRequest(currentItem.id, false);
+    }
+  }
   if (!currentItem) {
     playlist_playing = false;
     elements.placeholder.style.display = "";
@@ -1281,8 +1319,6 @@ function nextItem(reply) {
     return;
   }
   console.log(currentItem);
-  addToHistory(currentItem);
-  deleteRequest(currentItem.id, false);
   playItem(currentItem);
   updateSite();
   saveSettings();
