@@ -1345,7 +1345,7 @@ function playItem(item) {
       break;
     case "twitch clip":
       elements.twitchClipsEmbed.style.display = "";
-      elements.twitchClipsEmbed.src = `https://clips.twitch.tv/embed?clip=${item.id}&parent=${window.location.hostname}&autoplay=true`;
+      elements.twitchClipsEmbed.src = `https://clips.twitch.tv/embed?clip=${item.id}&parent=${window.location.hostname}&autoplay=true&muted=false`;
       break;
     case "streamable":
       elements.streamableEmbed.style.display = "";
