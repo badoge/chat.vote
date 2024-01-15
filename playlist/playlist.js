@@ -922,7 +922,6 @@ function updatePlaylist(index, localStorageLoad = false) {
     document.getElementById(`id${requests[index].id}_by`).title = `Requested by @${requests[index].by.join(" & ")}`;
 
     if (!playlist_playing && PLAYLIST.autoplay && !localStorageLoad) {
-      playlist_playing = true;
       nextItem();
     }
 
@@ -1378,6 +1377,7 @@ function playItem(item) {
   </a>
   ${currentItem.by.length > 1 ? `and ${currentItem.by.length - 1} other ${currentItem.by.length - 1 == 1 ? "user" : "users"}` : ""}`;
   elements.nowPlayingRequester.title = currentItem.by.join(" & ");
+  playlist_playing = true;
 } //playItem
 
 function resetPlayers() {
