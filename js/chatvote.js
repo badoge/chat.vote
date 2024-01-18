@@ -11,6 +11,7 @@ let elements = {
   restartYesno: document.getElementById("restartYesno"),
   loginExpiredModal: document.getElementById("loginExpiredModal"),
   tieModal: document.getElementById("tieModal"),
+  tieModalText: document.getElementById("tieModalText"),
   randomYesnoModal: document.getElementById("randomYesnoModal"),
   coin: document.getElementById("coin"),
 
@@ -376,6 +377,9 @@ async function removeAndRestart() {
 
 async function restartPoll() {
   startingHue = Math.random() * 360;
+  if (timer && timer.isRunning()) {
+    timer.reset();
+  }
   if (yesNoMode) {
     restartYesNoMode();
     return;
@@ -392,11 +396,9 @@ async function restartPoll() {
     pushVoteResults(vote_results_copy[k].id, vote_results_copy[k].option, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
     pushTable(vote_results_copy[k].id, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
   }
-  if (timer && timer.isRunning()) {
-    timer.reset();
-  }
   loadChart();
   updateChart();
+  enableVoteButton();
 } //restartPoll
 
 function restartYesNoMode() {
@@ -439,7 +441,6 @@ async function removeWinner() {
   }
   loadChart();
   updateChart();
-  timeOverModal.hide();
   enableVoteButton();
 } //removeWinner
 
@@ -458,13 +459,53 @@ function pickRandomOption() {
   let title = elements.questionLabel.innerHTML;
   elements.randomOptionWinner.innerHTML = `<h2>${title}</h2><h3>${vote_results[random].option_emotes}</h3>`;
   if (vote_results[random].by != USER.channel) {
-    elements.randomOptionWinner.innerHTML += `<h4>Submitted by: <button class="btn btn-secondary" onclick=window.open("https://www.twitch.tv/popout/${USER.channel}/viewercard/${vote_results[random].by}?popout=","_blank","width=340,height=800")>${vote_results[random].by}</button></h4>`;
+    elements.randomOptionWinner.innerHTML += `
+    <h4>Submitted by: <button class="btn btn-secondary" onclick=window.open("https://www.twitch.tv/popout/${USER.channel}/viewercard/${vote_results[random].by}?popout=","_blank","width=340,height=800")>
+    ${vote_results[random].by}
+    </button>
+    </h4>`;
   }
   linkifyElementID("randomOptionWinner", CHATVOTE.linkPreviewThumbnailsEnabled);
   if (CHATVOTE.confettiLevel > 0) {
     showConfetti(CHATVOTE.confettiLevel);
   }
 } //pickRandomOption
+
+function pickRandomTiedOption() {
+  if (yesNoMode) {
+    tieModal.hide();
+    randomYesnoModal.show();
+    pickRandomYesNo();
+    return;
+  }
+
+  let tied = [];
+  let vote_results_copy = structuredClone(vote_results);
+  vote_results_copy.sort(function (a, b) {
+    return a.score > b.score ? -1 : a.score == b.score ? 0 : 1;
+  });
+
+  for (let index = 0; index < vote_results_copy.length; index++) {
+    if (vote_results_copy[0].score == vote_results_copy[index].score) {
+      tied.push(vote_results_copy[index]);
+    }
+  }
+
+  let random = Math.floor(Math.random() * tied.length);
+
+  elements.tieModalText.innerHTML = `
+  <h2>${elements.questionLabel.innerHTML}</h2>
+  <h3>Random tied option: "${tied[random].option_emotes}"</h3>`;
+  if (tied[random].by != USER.channel) {
+    elements.tieModalText.innerHTML += `
+    <h4>Submitted by: 
+    <button class="btn btn-secondary" onclick=window.open("https://www.twitch.tv/popout/${USER.channel}/viewercard/${tied[random].by}?popout=","_blank","width=340,height=800")>
+    ${tied[random].by}
+    </button>
+    </h4>`;
+  }
+  linkifyElementID("tieModalText", CHATVOTE.linkPreviewThumbnailsEnabled);
+} //pickRandomTiedOption
 
 function pickRandomYesNo() {
   elements.coin.className = "";
@@ -764,10 +805,6 @@ function connect() {
         showConfetti(input[1]);
         return;
       }
-      if (Math.floor(Math.random() * 200) == 69 && CHATVOTE.confettiLevel > 0) {
-        showConfetti(1);
-        return;
-      }
       return;
     } //confetti
 
@@ -1040,13 +1077,7 @@ async function addOption() {
   let extraoption_clean = extraoption.toLowerCase().replace(/\W/g, "");
   if (!vote_results.some((e) => e.option_clean === extraoption_clean) && extraoption_clean) {
     oid++;
-    pushTable(oid, replaceEmotes(extraoption, thirdPartyEmotes), USER.channel, 0, {
-      badges: "streamer",
-      "user-id": USER.userID,
-      "first-msg": false,
-      "display-name": USER.channel,
-      color: streamerColor,
-    });
+    pushTable(oid, replaceEmotes(extraoption, thirdPartyEmotes), USER.channel, 0, null);
     pushVoteResults(oid, extraoption.replace(/<div.*?<\/div>/, "↖ Switch to Table view to see image :)"), replaceEmotes(extraoption, thirdPartyEmotes), USER.channel, 0, null);
     updateChart();
     elements.pollOption.value = "";
@@ -1091,13 +1122,7 @@ async function addOptionBulk() {
 
     if (!vote_results.some((e) => e.option_clean === option_clean) && option_clean) {
       oid++;
-      pushTable(oid, replaceEmotes(f2[i], thirdPartyEmotes), USER.channel, 0, {
-        badges: "streamer",
-        "user-id": USER.userID,
-        "first-msg": false,
-        "display-name": USER.channel,
-        color: streamerColor,
-      });
+      pushTable(oid, replaceEmotes(f2[i], thirdPartyEmotes), USER.channel, 0, null);
       pushVoteResults(oid, f2[i], replaceEmotes(f2[i], thirdPartyEmotes), USER.channel, 0, null);
       updateChart();
     } else {
@@ -1112,6 +1137,17 @@ function pushTable(id, suggestion, by, score, context) {
     suggestion = suggestion.replace(/[^a-zA-Z0-9]+/g, "-");
     command = suggestion;
   }
+
+  if (!context && by == USER.channel) {
+    context = {
+      badges: "streamer",
+      "user-id": USER.userID,
+      "first-msg": false,
+      "display-name": USER.channel,
+      color: streamerColor,
+    };
+  }
+
   let badgesHTML = "";
   let color = "#FFFFFF";
   let username = by;
@@ -1523,6 +1559,7 @@ function startTimer() {
         return a.score > b.score ? -1 : a.score == b.score ? 0 : 1;
       });
       if (vote_results_copy[0].score == vote_results_copy[1].score) {
+        elements.tieModalText.innerHTML = "Winner and runner up are tied, unable to pick a winner";
         tieModal.show();
         return;
       }
@@ -1603,6 +1640,7 @@ function enableVoteButton() {
   for (let index = 0; index < vote_results.length; index++) {
     if (vote_results[index].option.startsWith("↖ Switch to Table view to see image :)")) {
       hasImages = true;
+      break;
     }
   }
   if (!hasImages && !yesNoMode) {
@@ -1903,6 +1941,7 @@ window.onload = function () {
         animation: false,
         html: true,
         delay: { show: 200, hide: 0 },
+        trigger: "hover",
       });
     });
   };

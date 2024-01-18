@@ -411,7 +411,9 @@ async function createPoll() {
       </button>
     </div>
     `;
-    copyTooltip = new bootstrap.Tooltip(document.getElementById("copyLinkButton"));
+    copyTooltip = new bootstrap.Tooltip(document.getElementById("copyLinkButton"), {
+      trigger: "hover",
+    });
 
     //load title
     elements.pollTitleDiv.innerHTML = `

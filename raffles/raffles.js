@@ -1524,6 +1524,7 @@ window.onload = function () {
         animation: false,
         html: true,
         delay: { show: 200, hide: 0 },
+        trigger: "hover",
       });
     });
   };

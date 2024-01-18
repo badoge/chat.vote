@@ -99,7 +99,8 @@
             <p id="timeOverWinner"></p>
           </div>
           <div class="modal-footer">
-            <button type="button" onclick="removeWinner()" class="btn btn-info">Remove winner and restart</button>
+            <button type="button" class="btn btn-info" data-bs-dismiss="modal" onclick="removeWinner()">Remove winner and restart</button>
+            <button type="button" class="btn btn-warning" data-bs-dismiss="modal" onclick="restartPoll()"><i class="material-icons notranslate">refresh</i>Restart</button>
             <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
           </div>
         </div>
@@ -117,7 +118,7 @@
             <p id="yesnoTimeOverWinner"></p>
           </div>
           <div class="modal-footer">
-            <button type="button" id="restartYesno" class="btn btn-info">Restart</button>
+            <button type="button" id="restartYesno" class="btn btn-warning">Restart</button>
             <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
           </div>
         </div>
@@ -164,9 +165,11 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <p>Winner and runner up are tied, unable to pick a winner</p>
+            <p id="tieModalText">Winner and runner up are tied, unable to pick a winner</p>
           </div>
           <div class="modal-footer">
+            <button type="button" class="btn btn-primary" onclick="pickRandomTiedOption()"><i class="material-icons notranslate">casino</i>Pick a random option</button>
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="enableVoteButton()"><i class="material-icons notranslate">timer</i>Keep voting</button>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
           </div>
         </div>

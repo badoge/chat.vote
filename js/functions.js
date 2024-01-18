@@ -704,13 +704,19 @@ function linkifyElementID(id, allowThumbnails) {
       animation: false,
       html: true,
       delay: { show: 200, hide: 0 },
+      trigger: "hover",
     });
   });
 } //linkifyElementID
 
 function enableTooltips() {
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-  const tooltipList = [...tooltipTriggerList].map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
+  const tooltipList = [...tooltipTriggerList].map(
+    (tooltipTriggerEl) =>
+      new bootstrap.Tooltip(tooltipTriggerEl, {
+        trigger: "hover",
+      })
+  );
 } //enableTooltips
 
 function enablePopovers() {
