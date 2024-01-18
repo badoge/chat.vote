@@ -108,7 +108,6 @@ let elements = {
 };
 
 let client;
-let color = "";
 let currentTime = 0;
 let loginButton;
 let settingsOffcanvas;
@@ -119,6 +118,7 @@ let playlist_open = false;
 let playlist_playing = false;
 let total_duration = 0;
 let togglePlaylistPopover;
+let streamerColor = "";
 
 let users = [];
 let requests = [];
@@ -401,6 +401,8 @@ function resetSettings(logout = false) {
         platform: "",
       })
     );
+    localStorage.setItem("PLAYLIST_REQUESTS", JSON.stringify([]));
+    localStorage.setItem("PLAYLIST_HISTORY", JSON.stringify([]));
   }
   localStorage.setItem(
     "PLAYLIST",
@@ -563,7 +565,7 @@ function connect() {
       case PLAYLIST.songCommandAlias:
         if (currentItem) {
           botReply(
-            `Current song/video: ${currentItem.title} | Requested by @${currentItem.by[0]} ${
+            `Current song/video: ${currentItem.title} | Requested by @${currentItem.by[0].username} ${
               currentItem.by.length > 1 ? `and ${currentItem.by.length - 1} other ${currentItem.by.length - 1 == 1 ? "user" : "users"}` : ""
             } | ${getItemLink(currentItem.type, currentItem.id)}`,
             context.id,
@@ -652,12 +654,15 @@ function getUser(context) {
     users.push({
       id: context["user-id"],
       username: context.username,
+      displayName: context["display-name"],
       mod: context?.mod || false,
       sub: context?.subscriber || false,
       vip: context?.vip || false,
       firstTimeChatter: firstTimeChatters.includes(context.username),
       requestsCount: 0,
       requestsDuration: 0,
+      badges: addBadges(context.badges, context["user-id"], firstTimeChatters.includes(context.username)),
+      color: context.color || "#FFFFFF",
       requests: [],
     });
     return users.length - 1;
@@ -734,7 +739,7 @@ function addRequest(context, link) {
   //check if other users already requested this link id
   const requestIndex = requests.findIndex((r) => r.id === link.id);
   if (requestIndex > -1) {
-    requests[requestIndex].by.push(context.username);
+    requests[requestIndex].by.push(users[userIndex]);
     updatePlaylist(requestIndex);
     botReply("⚠ Someone else already requested this", context.id, false);
   } else {
@@ -747,7 +752,7 @@ function addRequest(context, link) {
       views: -1,
       thumbnail: "",
       time: Date.now(),
-      by: [context.username],
+      by: [users[userIndex]],
     });
     let index = requests.length - 1;
     addToPlaylist(index);
@@ -762,7 +767,7 @@ function deleteRequest(id, refund = true) {
   const requestIndex = requests.findIndex((r) => r.id === id);
   if (refund) {
     for (let index = 0; index < requests[requestIndex].by.length; index++) {
-      const userIndex = users.findIndex((u) => u.username === requests[requestIndex].by[index]);
+      const userIndex = users.findIndex((u) => u.username === requests[requestIndex].by[index].username);
       if (userIndex != -1) {
         users[userIndex].requestsCount--;
         users[userIndex].requests.splice(
@@ -837,7 +842,11 @@ function addToPlaylist(requestIndex, position = "beforeend") {
                   <span class="placeholder col-12"></span>
                 </span>
               </small>
-              <small class="requested-by text-body-secondary" id="id${requests[requestIndex].id}_by" >Requested by: ${requests[requestIndex].by.join(" & ")}</small>
+              <small class="requested-by text-body-secondary" id="id${requests[requestIndex].id}_by" >
+              Requested by: 
+              ${requests[requestIndex].by[0].badges}
+              <span style="color: ${requests[requestIndex].by[0].color}">${requests[requestIndex].by.map((u) => u.username).join(" & ")}</span>
+              </small>
             </div>
           </div>
           <div class="col-auto" style="align-self: center"><i class="material-icons notranslate delete-request" onclick="deleteRequest('${requests[requestIndex].id}')">delete</i></div>
@@ -874,14 +883,15 @@ function addToHistory(request, localStorageLoad = false) {
               <small class="request-info text-body-secondary">
               ${validator.escape(request.channel)} ${request.views > -1 ? ` · ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}
               </small>
-              <small class="requested-by text-body-secondary" title="Requested by @${request.by.join(" & ")}">
+              <small class="requested-by text-body-secondary" title="Requested by @${request.by.map((u) => u.username).join(" & ")}">
               Requested by 
+              ${request.by[0].badges}
               <a 
               class="link-body-emphasis link-underline-opacity-0"
-              href="https://www.twitch.tv/popout/${USER.channel}/viewercard/${request.by[0]}"
+              href="https://www.twitch.tv/popout/${USER.channel}/viewercard/${request.by[0].username}"
               target="_blank"
               rel="noopener noreferrer">
-              @${request.by[0]}
+              <span style="color: ${request.by[0].color}">${request.by[0].username}</span>
               </a>
               ${request.by.length > 1 ? `and ${request.by.length - 1} other ${request.by.length - 1 == 1 ? "user" : "users"}` : ""}
               </small>
@@ -893,6 +903,7 @@ function addToHistory(request, localStorageLoad = false) {
 } //addToHistory
 
 function updatePlaylist(index, localStorageLoad = false) {
+  //check if request info has been fetched
   if (requests[index].thumbnail && requests[index].title) {
     document.getElementById(`id${requests[index].id}_thumbnail`).innerHTML = `<img src="${requests[index].thumbnail}" alt="thumbnail" class="rounded" />`;
     document.getElementById(`id${requests[index].id}_title`).innerHTML = `
@@ -911,15 +922,16 @@ function updatePlaylist(index, localStorageLoad = false) {
     document.getElementById(`id${requests[index].id}_duration`).innerText = requests[index].duration == -1 ? "🔴live" : secondsToTimeString(Math.round(requests[index].duration));
     document.getElementById(`id${requests[index].id}_by`).innerHTML = `
     Requested by 
+    ${requests[index].by[0].badges}
     <a 
     class="link-body-emphasis link-underline-opacity-0"
-    href="https://www.twitch.tv/popout/${USER.channel}/viewercard/${requests[index].by[0]}"
+    href="https://www.twitch.tv/popout/${USER.channel}/viewercard/${requests[index].by[0].username}"
     target="_blank"
     rel="noopener noreferrer">
-    @${requests[index].by[0]}
+    <span style="color: ${requests[index].by[0].color}">${requests[index].by[0].username}</span>
     </a>
      ${requests[index].by.length > 1 ? `and ${requests[index].by.length - 1} other ${requests[index].by.length - 1 == 1 ? "user" : "users"}` : ""}`;
-    document.getElementById(`id${requests[index].id}_by`).title = `Requested by @${requests[index].by.join(" & ")}`;
+    document.getElementById(`id${requests[index].id}_by`).title = `Requested by @${requests[index].by.map((u) => u.username).join(" & ")}`;
 
     if (!playlist_playing && PLAYLIST.autoplay && !localStorageLoad) {
       nextItem();
@@ -929,8 +941,8 @@ function updatePlaylist(index, localStorageLoad = false) {
       saveSettings();
     }
   } else {
-    //update requesters only if request info is not ready yet
-    document.getElementById(`id${requests[index].id}_by`).innerText = `Requested by @${requests[index].by[0]} ${
+    //if request info is not ready yet then update requesters only
+    document.getElementById(`id${requests[index].id}_by`).innerText = `Requested by @${requests[index].by[0].username} ${
       requests[index].by.length > 1 ? `and ${requests[index].by.length - 1} other ${requests[index].by.length - 1 == 1 ? "user" : "users"}` : ""
     }`;
   }
@@ -1248,10 +1260,13 @@ function addLink() {
       id: null,
       "user-id": USER.userID,
       username: USER.channel,
+      displayName: USER.channel,
       mod: true,
       sub: true,
       vip: true,
       firstTimeChatter: false,
+      badges: "streamer",
+      color: streamerColor,
     },
     link
   );
@@ -1368,15 +1383,16 @@ function playItem(item) {
   </a>`;
   elements.nowPlaying.title = currentItem.title;
   elements.nowPlayingRequester.innerHTML = `
+  ${currentItem.by[0].badges}
   <a 
   class="link-body-emphasis link-underline-opacity-0"
-  href="https://www.twitch.tv/popout/${USER.channel}/viewercard/${currentItem.by[0]}"
+  href="https://www.twitch.tv/popout/${USER.channel}/viewercard/${currentItem.by[0].username}"
   target="_blank"
   rel="noopener noreferrer">
-  @${currentItem.by[0]}
+  <span style="color: ${currentItem.by[0].color}">${currentItem.by[0].username}</span>
   </a>
   ${currentItem.by.length > 1 ? `and ${currentItem.by.length - 1} other ${currentItem.by.length - 1 == 1 ? "user" : "users"}` : ""}`;
-  elements.nowPlayingRequester.title = currentItem.by.join(" & ");
+  elements.nowPlayingRequester.title = currentItem.by.map((u) => u.username).join(" & ");
   playlist_playing = true;
 } //playItem
 
@@ -1945,6 +1961,12 @@ window.onload = function () {
   elements.link.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       addLink();
+    }
+  });
+
+  elements.link.addEventListener("focus", async function () {
+    if (!streamerColor && USER.userID) {
+      streamerColor = await getStreamerColor(USER.userID);
     }
   });
 

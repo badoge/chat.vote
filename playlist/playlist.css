@@ -128,6 +128,7 @@ video {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
+  word-break: break-all;
 }
 
 .request-info {
@@ -135,6 +136,7 @@ video {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
   overflow: hidden;
+  word-break: break-all;
 }
 
 .requested-by {
@@ -142,22 +144,25 @@ video {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
   overflow: hidden;
+  word-break: break-all;
 }
 
 #nowPlaying {
-  max-width: 550px;
+  max-width: 500px;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
   overflow: hidden;
+  word-break: break-all;
 }
 
 #nowPlayingRequester {
-  max-width: 150px;
+  max-width: 200px;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
   overflow: hidden;
+  word-break: break-all;
 }
 
 .delete-request {
