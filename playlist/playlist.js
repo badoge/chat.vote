@@ -1394,7 +1394,23 @@ function playItem(item) {
   ${currentItem.by.length > 1 ? `and ${currentItem.by.length - 1} other ${currentItem.by.length - 1 == 1 ? "user" : "users"}` : ""}`;
   elements.nowPlayingRequester.title = currentItem.by.map((u) => u.username).join(" & ");
   playlist_playing = true;
+  updateMetadata();
 } //playItem
+
+function updateMetadata() {
+  if ("mediaSession" in navigator) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: currentItem.title,
+      artist: currentItem.channel,
+      album: `Requested By: ${currentItem.by.map((u) => u.username).join(" & ")}`,
+      artwork: [
+        {
+          src: currentItem.thumbnail,
+        },
+      ],
+    });
+  }
+} //updateMetadata
 
 function resetPlayers() {
   elements.placeholder.style.display = "none";
@@ -1969,6 +1985,15 @@ window.onload = function () {
       streamerColor = await getStreamerColor(USER.userID);
     }
   });
+
+  if ("mediaSession" in navigator) {
+    navigator.mediaSession.setActionHandler("previoustrack", () => {
+      previousItem();
+    });
+    navigator.mediaSession.setActionHandler("nexttrack", () => {
+      nextItem();
+    });
+  }
 
   enableTooltips();
   enableTwitchEmbed();
