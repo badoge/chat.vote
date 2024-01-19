@@ -56,22 +56,25 @@
           headers: myHeaders,
           redirect: "follow",
         };
-        await fetch("https://api.twitch.tv/helix/users", requestOptions)
-          .then((response) => response.json())
-          .then((result) => {
-            localStorage.setItem(
-              "USER",
-              JSON.stringify({
-                channel: result.data[0].login,
-                twitchLogin: true,
-                access_token: access_token,
-                userID: result.data[0].id,
-                platform: "twitch",
-              })
-            );
-            window.close();
-          })
-          .catch((error) => console.log("error", error));
+
+        try {
+          let response = await fetch("https://api.twitch.tv/helix/users", requestOptions);
+          let result = await response.json();
+          localStorage.setItem(
+            "USER",
+            JSON.stringify({
+              channel: result.data[0].login,
+              twitchLogin: true,
+              access_token: access_token,
+              userID: result.data[0].id,
+              platform: "twitch",
+            })
+          );
+          window.close();
+        } catch (error) {
+          console.log("error", error);
+          window.close();
+        }
       }
       window.onbeforeunload = function (e) {
         window.opener.loadAndConnect();

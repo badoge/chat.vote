@@ -748,6 +748,8 @@ function addRequest(context, link) {
       type: link.type,
       approved: PLAYLIST.approvalQueue ? false : true,
       title: "",
+      channel: "",
+      uri: "",
       duration: 0,
       views: -1,
       thumbnail: "",
