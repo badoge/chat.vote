@@ -7,6 +7,7 @@ const placeholder = `<div class="card placeholder-emote">
 let elements = {
   //modals
   grid: document.getElementById("grid"),
+  gameDiv: document.getElementById("gameDiv"),
   loginExpiredModal: document.getElementById("loginExpiredModal"),
   aboutModal: document.getElementById("aboutModal"),
 
