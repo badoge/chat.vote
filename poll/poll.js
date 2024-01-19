@@ -402,7 +402,6 @@ async function createPoll() {
         id="copyLinkButton"
         class="btn btn-outline-secondary"
         data-bs-toggle="tooltip"
-        data-bs-delay="200"
         data-bs-trigger="manual"
         data-bs-placement="bottom"
         data-bs-title="Link copied :)"

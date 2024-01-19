@@ -144,7 +144,6 @@
               type="button"
               class="btn btn-danger"
               data-bs-toggle="tooltip"
-              data-bs-delay="200"
               data-bs-placement="top"
               data-bs-title="Will reset everything so you can login again."
               data-bs-dismiss="modal"
@@ -673,7 +672,6 @@
                   id="addOption"
                   onclick="addOption()"
                   data-bs-toggle="tooltip"
-                  data-bs-delay="200"
                   data-bs-placement="top"
                   data-bs-title="or just press enter :)"
                 >
@@ -763,23 +761,16 @@
                       <div class="col">
                         <div class="btn-group" role="group" aria-label="chart type toggles">
                           <input class="btn-check" type="radio" name="charttype" id="barChart" autocomplete="off" checked />
-                          <label class="btn btn-outline-info" for="barChart" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="top" data-bs-title="Bar chart">
+                          <label class="btn btn-outline-info" for="barChart" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Bar chart">
                             <i style="transform: rotateZ(90deg)" class="material-icons notranslate">stacked_bar_chart</i>
                           </label>
                           <input class="btn-check" type="radio" name="charttype" id="pieChart" autocomplete="off" />
-                          <label class="btn btn-outline-info" for="pieChart" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="top" data-bs-title="Pie chart"
+                          <label class="btn btn-outline-info" for="pieChart" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Pie chart"
                             ><i class="material-icons notranslate">pie_chart</i></label
                           >
                         </div>
                         <input type="checkbox" class="btn-check" id="sortChart" autocomplete="off" />
-                        <label
-                          class="btn btn-outline-success"
-                          for="sortChart"
-                          id="sortChartLabel"
-                          data-bs-toggle="tooltip"
-                          data-bs-delay="200"
-                          data-bs-placement="top"
-                          data-bs-title="Sort chart"
+                        <label class="btn btn-outline-success" for="sortChart" id="sortChartLabel" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Sort chart"
                           ><i class="material-icons notranslate">sort</i></label
                         >
                         <div class="totalVotesDiv">Total votes: <span id="totalVotes">0</span></div>
@@ -853,13 +844,12 @@
                         <i
                           class="material-icons notranslate cursor-pointer"
                           data-bs-toggle="tooltip"
-                          data-bs-delay="200"
                           data-bs-custom-class="wide-tooltip"
                           data-bs-placement="auto"
                           data-bs-html="true"
                           data-bs-title='<img src="/pics/m2.webp"/>'
-                          >help</i
-                        >
+                          >help
+                        </i>
                       </label>
                       <small id="voteWithNumbersdesc" class="text-body-secondary"> <br />Viewers vote by typing the number of the option ("1", "2")</small>
                     </div>
@@ -870,13 +860,12 @@
                         <i
                           class="material-icons notranslate cursor-pointer"
                           data-bs-toggle="tooltip"
-                          data-bs-delay="200"
                           data-bs-custom-class="wide-tooltip"
                           data-bs-placement="auto"
                           data-bs-html="true"
                           data-bs-title='<img src="/pics/m3.webp"/>'
-                          >help</i
-                        >
+                          >help
+                        </i>
                       </label>
                       <small id="voteWithTextdesc" class="text-body-secondary"> <br />Viewers vote by typing the option ("option1", "option2").</small>
                     </div>
@@ -973,7 +962,6 @@
                     id="restartPoll"
                     onclick="restartPoll()"
                     data-bs-toggle="tooltip"
-                    data-bs-delay="200"
                     data-bs-placement="bottom"
                     data-bs-title="Restart the poll with the same options"
                     style="margin-right: 1px"
@@ -985,7 +973,6 @@
                     id="pickRandom"
                     class="btn btn-outline-info quick-actions"
                     data-bs-toggle="tooltip"
-                    data-bs-delay="200"
                     data-bs-placement="bottom"
                     data-bs-title="Pick a random option"
                     style="margin-right: 1px"
@@ -997,7 +984,6 @@
                     id="hideScore"
                     class="btn btn-outline-primary quick-actions"
                     data-bs-toggle="tooltip"
-                    data-bs-delay="200"
                     data-bs-placement="bottom"
                     data-bs-title="Hide score"
                     style="margin-right: 1px"
@@ -1009,7 +995,6 @@
                     class="btn btn-outline-danger quick-actions"
                     id="deleteAll"
                     data-bs-toggle="tooltip"
-                    data-bs-delay="200"
                     data-bs-placement="bottom"
                     data-bs-title="Remove all options from the poll"
                   >

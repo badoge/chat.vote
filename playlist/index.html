@@ -52,7 +52,6 @@
               type="button"
               class="btn btn-danger"
               data-bs-toggle="tooltip"
-              data-bs-delay="200"
               data-bs-placement="top"
               data-bs-title="Will reset everything so you can login again."
               data-bs-dismiss="modal"
@@ -146,7 +145,6 @@
                     <i
                       class="material-icons notranslate text-warning cursor-pointer"
                       data-bs-toggle="tooltip"
-                      data-bs-delay="200"
                       data-bs-placement="top"
                       data-bs-title="Spotify autoplay is disabled for now because the embed can break when skipping"
                       >warning
@@ -166,7 +164,6 @@
                     <i
                       class="material-icons notranslate text-warning cursor-pointer"
                       data-bs-toggle="tooltip"
-                      data-bs-delay="200"
                       data-bs-placement="top"
                       data-bs-title="Autoplay won't work after a Twitch clip is done because the embed is not interactive"
                       >warning
@@ -365,13 +362,7 @@
               <thead>
                 <tr>
                   <th scope="col">Role</th>
-                  <th
-                    scope="col"
-                    data-bs-toggle="tooltip"
-                    data-bs-delay="200"
-                    data-bs-placement="top"
-                    data-bs-title="How many requests each user can make based on the highest role limit they have"
-                  >
+                  <th scope="col" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="How many requests each user can make based on the highest role limit they have">
                     Request limit
                   </th>
                 </tr>
@@ -780,16 +771,7 @@
               <label for="link" class="form-label mt-3">Add songs or videos to the playlist:</label>
               <div class="input-group">
                 <input type="text" id="link" class="form-control" placeholder="Link" aria-label="Add link input text field" aria-describedby="addLink" />
-                <button
-                  class="btn btn-secondary"
-                  type="button"
-                  id="addLink"
-                  onclick="addLink()"
-                  data-bs-toggle="tooltip"
-                  data-bs-delay="200"
-                  data-bs-placement="top"
-                  data-bs-title="or just press enter :)"
-                >
+                <button class="btn btn-secondary" type="button" id="addLink" onclick="addLink()" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="or just press enter :)">
                   Add
                 </button>
               </div>

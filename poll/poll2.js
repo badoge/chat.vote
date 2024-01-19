@@ -199,16 +199,16 @@ async function vote() {
               <div class="col">
                 <div class="btn-group" role="group" aria-label="chart type toggles">
                   <input class="btn-check" type="radio" name="charttype" id="barChart" autocomplete="off" checked />
-                  <label class="btn btn-outline-info" for="barChart" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="top" data-bs-title="Bar chart">
+                  <label class="btn btn-outline-info" for="barChart" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Bar chart">
                     <i style="transform: rotateZ(90deg)" class="material-icons notranslate">stacked_bar_chart</i>
                   </label>
                   <input class="btn-check" type="radio" name="charttype" id="pieChart" autocomplete="off" />
-                  <label class="btn btn-outline-info" for="pieChart" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="top" data-bs-title="Pie chart">
+                  <label class="btn btn-outline-info" for="pieChart" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Pie chart">
                     <i class="material-icons notranslate">pie_chart</i>
                   </label>
                   </div>
                   <input type="checkbox" class="btn-check" id="sortChart" autocomplete="off" ${sorted ? "checked" : ""}/>
-                  <label class="btn btn-outline-success" for="sortChart" id="sortChartLabel" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="top" data-bs-title="${
+                  <label class="btn btn-outline-success" for="sortChart" id="sortChartLabel" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${
                     sorted ? "Unsort chart" : "Sort chart"
                   }"
                     ><i class="material-icons notranslate">sort</i>
@@ -216,10 +216,10 @@ async function vote() {
                   <div class="totalVotesDiv">Total votes: <span id="totalVotes">${total}</span></div>
               </div>
               <div class="col">
-              <button type="button" onclick="refresh()" class="float-end btn btn-info" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="top" data-bs-title="Refresh score">
+              <button type="button" onclick="refresh()" class="float-end btn btn-info" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Refresh score">
               <i class="material-icons notranslate">refresh</i>
               </button>
-              <button type="button" id="backToPoll" onclick="backToPoll()" class="float-end btn btn-secondary" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="top" data-bs-title="Back to poll">
+              <button type="button" id="backToPoll" onclick="backToPoll()" class="float-end btn btn-secondary" data-bs-toggle="tooltip"data-bs-placement="top" data-bs-title="Back to poll">
               <i class="material-icons notranslate">arrow_back</i>
               </button>
               </div>
@@ -319,16 +319,16 @@ async function refresh() {
               <div class="col">
                 <div class="btn-group" role="group" aria-label="chart type toggles">
                   <input class="btn-check" type="radio" name="charttype" id="barChart" autocomplete="off" checked />
-                  <label class="btn btn-outline-info" for="barChart" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="top" data-bs-title="Bar chart">
+                  <label class="btn btn-outline-info" for="barChart" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Bar chart">
                     <i style="transform: rotateZ(90deg)" class="material-icons notranslate">stacked_bar_chart</i>
                   </label>
                   <input class="btn-check" type="radio" name="charttype" id="pieChart" autocomplete="off" />
-                  <label class="btn btn-outline-info" for="pieChart" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="top" data-bs-title="Pie chart">
+                  <label class="btn btn-outline-info" for="pieChart" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Pie chart">
                     <i class="material-icons notranslate">pie_chart</i>
                   </label>
                   </div>
                   <input type="checkbox" class="btn-check" id="sortChart" autocomplete="off" ${sorted ? "checked" : ""}/>
-                  <label class="btn btn-outline-success" for="sortChart" id="sortChartLabel" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="top" data-bs-title="${
+                  <label class="btn btn-outline-success" for="sortChart" id="sortChartLabel" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${
                     sorted ? "Unsort chart" : "Sort chart"
                   }"
                     ><i class="material-icons notranslate">sort</i>
@@ -336,10 +336,10 @@ async function refresh() {
                   <div class="totalVotesDiv">Total votes: <span id="totalVotes">${total}</span></div>
               </div>
               <div class="col">
-              <button type="button" onclick="refresh()" class="float-end btn btn-info" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="top" data-bs-title="Refresh score">
+              <button type="button" onclick="refresh()" class="float-end btn btn-info" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Refresh score">
               <i class="material-icons notranslate">refresh</i>
               </button>
-              <button type="button" id="backToPoll" onclick="backToPoll()" class="float-end btn btn-secondary" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="top" data-bs-title="Back to poll">
+              <button type="button" id="backToPoll" onclick="backToPoll()" class="float-end btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Back to poll">
               <i class="material-icons notranslate">arrow_back</i>
               </button>
               </div>
