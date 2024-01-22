@@ -92,7 +92,7 @@
           <div class="modal-body">Results will be lost if you quit</div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-danger" onclick="quitBracket()">Quit bracket</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="quitBracket()">Quit</button>
           </div>
         </div>
       </div>
@@ -141,12 +141,6 @@
           </div>
           <div class="modal-body">
             <div class="hstack gap-3 mb-5">
-              <button type="button" class="btn btn-success btn-lg" data-bs-dismiss="modal" id="createBracket">
-                <div class="hstack"><i class="material-icons notranslate">add</i> Create empty bracket</div>
-              </button>
-              Creates an empty bracket that you have to fill out manually
-            </div>
-            <div class="hstack gap-3 mb-5">
               <button type="button" class="btn btn-info btn-lg" data-bs-dismiss="modal" id="importBracket">
                 <div class="hstack"><i class="material-icons notranslate">auto_awesome</i> Generate bracket</div>
               </button>
@@ -159,6 +153,25 @@
                 >help
               </i>
             </div>
+            <div class="hstack gap-3 mb-5">
+              <button type="button" class="btn btn-success btn-lg" data-bs-dismiss="modal" id="createBracket">
+                <div class="hstack"><i class="material-icons notranslate">create</i> Create empty bracket</div>
+              </button>
+              Creates an empty bracket that you have to fill out manually
+            </div>
+            <div class="hstack gap-3 mb-5" style="display: none">
+              <button type="button" class="btn btn-secondary btn-lg" data-bs-dismiss="modal" id="importChatBracket">
+                <div class="hstack"><i class="material-icons notranslate">chat</i> Chat bracket</div>
+              </button>
+              Generates a bracket from chat's requests
+              <i
+                class="material-icons notranslate"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                data-bs-title="Viewers will be able to add YouTube videos, Twitch clips, Spotify songs, and Streamable videos"
+                >help
+              </i>
+            </div>
             <div class="hstack gap-3" style="display: none">
               <button type="button" class="btn btn-primary btn-lg" data-bs-dismiss="modal" onclick="loadApproved()">
                 <div class="hstack"><i class="material-icons notranslate">search</i> Browse brackets</div>
@@ -168,6 +181,22 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="generateChatModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Chat bracket</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#createBracketModal"><i class="material-icons notranslate">arrow_back</i> Back</button>
+            <button type="button" class="btn btn-success" onclick="generateChatBracket()"><i class="material-icons notranslate">auto_awesome</i> Generate</button>
           </div>
         </div>
       </div>
@@ -328,10 +357,9 @@
             <div class="input-group mb-3">
               <label class="input-group-text" for="formatSelect">Format</label>
               <select class="form-select" id="formatSelect">
-                <option value="tierlist">Tier list - work in progress :)</option>
+                <option value="tierlist">Tier list</option>
                 <option value="single" selected>Single elimination</option>
                 <option value="double" disabled>Double elimination - not working yet :)</option>
-                <option value="roundrobin" disabled>Round-robin - not working yet :)</option>
               </select>
             </div>
 
@@ -390,8 +418,13 @@
             </div>
 
             <div id="spotifyWarning" class="mt-5" style="display: none">
-              <div class="alert alert-danger" role="alert">Spotify embeds don't have a volume slider; make sure to lower your volume before starting</div>
-              <div class="alert alert-warning mt-1" role="alert">You must be logged in to Spotify on this browser to listen to the full songs; you will be given a 30s preview otherwise</div>
+              <div class="alert alert-danger" role="alert">
+                <i class="material-icons notranslate">warning</i><i class="material-icons notranslate">volume_up</i> Spotify embeds don't have a volume slider; make sure to lower your volume
+                before starting
+              </div>
+              <div class="alert alert-warning mt-1" role="alert">
+                <i class="material-icons notranslate">login</i> You must be logged in to Spotify on this browser to listen to the full songs; you will be given a 30s preview otherwise
+              </div>
             </div>
           </div>
           <div class="modal-footer">
@@ -415,7 +448,7 @@
         >
           <img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" />
         </a>
-        <a class="navbar-brand notranslate site-link" href="/brackets/" target="_self" rel="noopener noreferrer"> chat.vote Brackets <span class="text-danger">beta</span></a>
+        <a class="navbar-brand notranslate site-link" href="/brackets/" target="_self" rel="noopener noreferrer"> chat.vote Brackets <span class="text-danger">BETA</span></a>
 
         <div class="collapse navbar-collapse">
           <ul class="navbar-nav">
@@ -608,15 +641,9 @@
     </div>
 
     <div class="container-fluid" id="bracket" style="display: none">
-      <div class="row align-items-start text-center" style="height: 24px">
-        <div class="col">
-          <i class="material-icons notranslate" style="cursor: pointer; display: flex; justify-content: flex-end" data-bs-toggle="modal" data-bs-target="#quitBracketModal">close</i>
-        </div>
-      </div>
-
       <div class="row align-items-start text-center" style="height: 10vh">
         <div class="col">
-          <div class="card" id="left_title">
+          <div class="card bg-body-tertiary" id="left_title">
             <div class="card-body">
               <span id="left_name"></span> <br />
               <span id="left_score">0 votes</span>
@@ -625,15 +652,20 @@
         </div>
 
         <div class="col">
-          <div class="card" id="centerTitle">
+          <div class="card bg-body-secondary" id="centerTitle">
             <div class="card-body">
               <span id="title"></span><br />
               <small class="text-body-secondary" id="round"></small>
             </div>
           </div>
+          <div class="card bg-body-secondary" id="winnerTitle" style="display: none">
+            <div class="card-body">
+              <h4 class="m-0" id="winner"></h4>
+            </div>
+          </div>
         </div>
         <div class="col">
-          <div class="card" id="right_title">
+          <div class="card bg-body-tertiary" id="right_title">
             <div class="card-body">
               <span id="right_name"></span><br />
               <span id="right_score">0 votes</span>
@@ -642,37 +674,76 @@
         </div>
       </div>
 
-      <div class="row align-items-center text-center" style="height: 70vh">
+      <div class="row align-items-center text-center" style="height: 75vh">
         <div class="col-md-1"></div>
         <div class="col-md-5" id="left_container">
           <div class="card option-card" id="left_card">
-            <div class="card-header">
+            <div class="card-header" id="left_card_header">
               Type <strong id="left_command">"1"</strong> in chat to vote for this option
               <i class="material-icons notranslate float-end" id="left_card_zoom_icon" style="cursor: pointer" onclick="zoomCard('left_card')">zoom_in</i>
             </div>
-            <div class="card-body" id="left_value"></div>
+            <div class="card-body p-0" id="left_value">
+              <div id="text_image_left" style="display: none"></div>
+              <div id="youtubeEmbedContainer_left" style="display: none"><div id="youtubeEmbed_left"></div></div>
+              <div id="spotifyEmbedContainer_left" style="display: none"><div id="spotifyEmbed_left"></div></div>
+              <iframe id="twitchClipsEmbed_left" style="display: none" height="100%" width="100%" preload="auto" allowfullscreen></iframe>
+              <video id="streamableEmbed_left" style="display: none" controls autoplay></video>
+            </div>
           </div>
-          <button type="button" class="btn btn-primary float-end streamer-vote mt-2" onclick="streamerVote('left')">Vote for this option</button>
-          <button type="button" class="btn btn-success float-start mt-2" onclick="pickWinner('left')">Pick winner</button>
+          <button
+            type="button"
+            class="btn btn-primary float-end streamer-vote mt-2"
+            data-bs-toggle="tooltip"
+            data-bs-placement="bottom"
+            data-bs-title="Vote for this option"
+            onclick="streamerVote('left')"
+          >
+            <i class="material-icons notranslate">thumb_up</i>
+          </button>
+          <button type="button" class="btn btn-success float-start mt-2" onclick="pickWinner('left')" style="display: none">Pick winner</button>
         </div>
         <div class="col-md-5" id="right_container">
           <div class="card option-card" id="right_card">
-            <div class="card-header">
+            <div class="card-header" id="right_card_header">
               Type <strong id="right_command">"2"</strong> in chat to vote for this option
               <i class="material-icons notranslate float-start" id="right_card_zoom_icon" style="cursor: pointer" onclick="zoomCard('right_card')">zoom_in</i>
             </div>
-            <div class="card-body" id="right_value"></div>
+            <div class="card-body p-0" id="right_value">
+              <div id="text_image_right" style="display: none"></div>
+              <div id="youtubeEmbedContainer_right" style="display: none"><div id="youtubeEmbed_right"></div></div>
+              <div id="spotifyEmbedContainer_right" style="display: none"><div id="spotifyEmbed_right"></div></div>
+              <iframe id="twitchClipsEmbed_right" style="display: none" height="100%" width="100%" preload="auto" allowfullscreen></iframe>
+              <video id="streamableEmbed_right" style="display: none" controls></video>
+            </div>
           </div>
 
-          <button type="button" class="btn btn-primary float-start streamer-vote mt-2" onclick="streamerVote('right')">Vote for this option</button>
-          <button type="button" class="btn btn-success float-end mt-2" onclick="pickWinner('right')">Pick winner</button>
+          <button
+            type="button"
+            class="btn btn-primary float-start streamer-vote mt-2"
+            data-bs-toggle="tooltip"
+            data-bs-placement="bottom"
+            data-bs-title="Vote for this option"
+            onclick="streamerVote('right')"
+          >
+            <i class="material-icons notranslate">thumb_up</i>
+          </button>
+          <button type="button" class="btn btn-success float-end mt-2" onclick="pickWinner('right')" style="display: none">Pick winner</button>
         </div>
         <div class="col-md-1"></div>
       </div>
-      <div class="row align-items-end text-center" style="height: 10vh">
-        <div class="col" id="controls">
-          <button type="button" class="btn btn-warning" onclick="restartMatch()">Restart current match</button>
-          <button type="button" id="hideScore" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Hide score" style="margin-right: 1px">
+
+      <div class="row fixed-bottom text-center mb-2">
+        <div class="col">
+          <button type="button" id="quitBracket" class="btn btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Quit bracket" onclick="showQuitBracketModal()">
+            <i class="material-icons notranslate">close</i>
+          </button>
+          <button type="button" id="settings" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Settings">
+            <i class="material-icons notranslate">settings</i>
+          </button>
+          <button type="button" id="restart" class="btn btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Restart match" onclick="restartMatch()">
+            <i class="material-icons notranslate">refresh</i>
+          </button>
+          <button type="button" id="hideScore" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Hide score">
             <i class="material-icons notranslate" id="hideScoreIcon">visibility</i>
           </button>
           <button
@@ -689,34 +760,8 @@
           >
             Start Voting
           </button>
-
           <button type="button" id="pickWinner" class="btn btn-info" onclick="pickWinner()"><i class="material-icons notranslate">navigate_next</i>Next match</button>
         </div>
-      </div>
-    </div>
-
-    <div class="container-fluid" id="end" style="display: none">
-      <div class="row align-items-start text-center" style="height: 10vh">
-        <div class="col">
-          <i class="material-icons notranslate float-end" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#quitBracketModal">close</i>
-
-          <div id="endTitle"></div>
-        </div>
-      </div>
-
-      <div class="row align-items-center text-center" style="height: 70vh">
-        <div class="col-md-3"></div>
-        <div class="col-md-6">
-          <div class="card">
-            <div class="card-header"><span id="winner_name"></span></div>
-            <div class="card-body" id="winner_value"></div>
-          </div>
-        </div>
-
-        <div class="col-md-3"></div>
-      </div>
-      <div class="row align-items-end text-center" style="height: 10vh">
-        <div class="col" id="endControls"></div>
       </div>
     </div>
 
@@ -730,7 +775,14 @@
         <div class="row">
           <div class="col text-center m-1 p-0">
             <h5 id="currentTierlistItemName"></h5>
-            <div id="currentTierlistItem"><img src="/pics/donk.png" /></div>
+
+            <div id="currentTierlistItem">
+              <div id="text_image_tierlist" style="display: none"></div>
+              <div id="youtubeEmbedContainer_tierlist" style="display: none"><div id="youtubeEmbed_tierlist"></div></div>
+              <div id="spotifyEmbedContainer_tierlist" style="display: none"><div id="spotifyEmbed_tierlist"></div></div>
+              <iframe id="twitchClipsEmbed_tierlist" style="display: none" height="100%" width="100%" preload="auto" allowfullscreen></iframe>
+              <video id="streamableEmbed_tierlist" style="display: none" controls autoplay></video>
+            </div>
           </div>
         </div>
 
@@ -782,7 +834,10 @@
               <i class="material-icons notranslate" id="hideScoreTierlistIcon">visibility</i>
             </button>
             <br />
-            <button type="button" class="btn btn-warning mb-3" onclick="restartMatch()">Restart round</button>
+            <button type="button" class="btn btn-warning mb-3" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Restart round" onclick="restartMatch()">
+              <i class="material-icons notranslate">refresh</i>
+            </button>
+
             <br />
             <button type="button" id="pickWinnerTierlist" class="btn btn-info mb-3" onclick="pickWinnerTierlist()"><i class="material-icons notranslate">navigate_next</i>Next item</button>
           </div>
@@ -822,7 +877,7 @@
             <div class="card-header">
               Editing bracket <span id="bracketEditorHeader"></span><i class="material-icons notranslate float-end" style="cursor: pointer" onclick="closeEditor()">close</i>
             </div>
-            <div class="card-body">
+            <div class="card-body" id="bracketEditorBody">
               <div class="mb-3">
                 <label for="bracketTitle" class="form-label">Bracket title</label>
                 <input type="text" class="form-control" id="bracketTitle" onchange="saveBracket()" placeholder="Bracket title" />
@@ -835,9 +890,9 @@
                 <small class="text-body-secondary">Bracket description</small>
               </div>
 
-              <button type="button" class="btn btn-secondary btn-sm mb-3" id="addOption"><i class="material-icons notranslate">add</i>Add option</button>
-
-              <div id="optionContainer" class="mb-3"></div>
+              <button type="button" class="btn btn-secondary btn-sm" id="addOption"><i class="material-icons notranslate">add</i>Add option</button>
+              <br /><small class="text-body-secondary">Tip: Preview the option to automatically populate the name and thumbnail if both are empty</small>
+              <div id="optionContainer" class="mb-3 mt-3"></div>
             </div>
           </div>
         </div>
@@ -848,15 +903,11 @@
     <script src="/js/tmi.min.js"></script>
     <script src="/js/bootstrap.bundle.min.js"></script>
     <script src="/js/validator.min.js"></script>
-    <script src="/js/purify.min.js"></script>
-    <script src="/js/linkify.min.js"></script>
-    <script src="/js/linkify-element.min.js"></script>
-    <script src="/js/linkify-plugin-mention.min.js"></script>
     <script src="/js/anime.min.js"></script>
-    <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
     <script src="/js/functions.min.js"></script>
     <script src="/brackets/brackets.min.js"></script>
     <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-H43YN7FSSP"></script>
     <script>

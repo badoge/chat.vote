@@ -12,6 +12,7 @@ let elements = {
   previewModal: document.getElementById("previewModal"),
   previewModalBody: document.getElementById("previewModalBody"),
   createBracketModal: document.getElementById("createBracketModal"),
+  generateChatModal: document.getElementById("generateChatModal"),
   generateModal: document.getElementById("generateModal"),
   generateBracketType: document.getElementById("generateBracketType"),
   spotifyplaylistSettings: document.getElementById("spotifyplaylistSettings"),
@@ -63,6 +64,7 @@ let elements = {
   myBrackets: document.getElementById("myBrackets"),
   createBracket: document.getElementById("createBracket"),
   importBracket: document.getElementById("importBracket"),
+  importChatBracket: document.getElementById("importChatBracket"),
   bracketEditor: document.getElementById("bracketEditor"),
   bracketEditorHeader: document.getElementById("bracketEditorHeader"),
   bracketTitle: document.getElementById("bracketTitle"),
@@ -74,12 +76,12 @@ let elements = {
   toastContainer: document.getElementById("toastContainer"),
   bracket: document.getElementById("bracket"),
   brackets_editor: document.getElementById("brackets_editor"),
-  pickWinner: document.getElementById("pickWinner"),
-  hideScore: document.getElementById("hideScore"),
-  hideScoreIcon: document.getElementById("hideScoreIcon"),
 
+  centerTitle: document.getElementById("centerTitle"),
   title: document.getElementById("title"),
   round: document.getElementById("round"),
+  winnerTitle: document.getElementById("winnerTitle"),
+  winner: document.getElementById("winner"),
 
   left_container: document.getElementById("left_container"),
   right_container: document.getElementById("right_container"),
@@ -88,7 +90,9 @@ let elements = {
   right_title: document.getElementById("right_title"),
 
   left_card: document.getElementById("left_card"),
+  left_card_header: document.getElementById("left_card_header"),
   right_card: document.getElementById("right_card"),
+  right_card_header: document.getElementById("right_card_header"),
   left_card_zoom_icon: document.getElementById("left_card_zoom_icon"),
   right_card_zoom_icon: document.getElementById("right_card_zoom_icon"),
   left_name: document.getElementById("left_name"),
@@ -98,19 +102,33 @@ let elements = {
   left_command: document.getElementById("left_command"),
   right_command: document.getElementById("right_command"),
   left_value: document.getElementById("left_value"),
+  text_image_left: document.getElementById("text_image_left"),
+  youtubeEmbedContainer_left: document.getElementById("youtubeEmbedContainer_left"),
+  youtubeEmbed_left: document.getElementById("youtubeEmbed_left"),
+  spotifyEmbedContainer_left: document.getElementById("spotifyEmbedContainer_left"),
+  spotifyEmbed_left: document.getElementById("spotifyEmbed_left"),
+  twitchClipsEmbed_left: document.getElementById("twitchClipsEmbed_left"),
+  streamableEmbed_left: document.getElementById("streamableEmbed_left"),
   right_value: document.getElementById("right_value"),
+  text_image_right: document.getElementById("text_image_right"),
+  youtubeEmbedContainer_right: document.getElementById("youtubeEmbedContainer_right"),
+  youtubeEmbed_right: document.getElementById("youtubeEmbed_right"),
+  spotifyEmbedContainer_right: document.getElementById("spotifyEmbedContainer_right"),
+  spotifyEmbed_right: document.getElementById("spotifyEmbed_right"),
+  twitchClipsEmbed_right: document.getElementById("twitchClipsEmbed_right"),
+  streamableEmbed_right: document.getElementById("streamableEmbed_right"),
   left_info: document.getElementById("left_info"),
   right_info: document.getElementById("right_info"),
 
-  controls: document.getElementById("controls"),
+  quitBracket: document.getElementById("quitBracket"),
+  settings: document.getElementById("settings"),
+  restart: document.getElementById("restart"),
+  hideScore: document.getElementById("hideScore"),
+  hideScoreIcon: document.getElementById("hideScoreIcon"),
   enableVoting: document.getElementById("enableVoting"),
-  enableVotingTierlist: document.getElementById("enableVotingTierlist"),
+  pickWinner: document.getElementById("pickWinner"),
 
-  end: document.getElementById("end"),
-  endTitle: document.getElementById("endTitle"),
-  winner_name: document.getElementById("winner_name"),
-  winner_value: document.getElementById("winner_value"),
-  endControls: document.getElementById("endControls"),
+  enableVotingTierlist: document.getElementById("enableVotingTierlist"),
 
   //tierlist
   tierlist: document.getElementById("tierlist"),
@@ -139,6 +157,14 @@ let elements = {
   pickWinnerTierlist: document.getElementById("pickWinnerTierlist"),
   hideScoreTierlist: document.getElementById("hideScoreTierlist"),
   hideScoreTierlistIcon: document.getElementById("hideScoreTierlistIcon"),
+
+  text_image_tierlist: document.getElementById("text_image_tierlist"),
+  youtubeEmbedContainer_tierlist: document.getElementById("youtubeEmbedContainer_tierlist"),
+  youtubeEmbed_tierlist: document.getElementById("youtubeEmbed_tierlist"),
+  spotifyEmbedContainer_tierlist: document.getElementById("spotifyEmbedContainer_tierlist"),
+  spotifyEmbed_tierlist: document.getElementById("spotifyEmbed_tierlist"),
+  twitchClipsEmbed_tierlist: document.getElementById("twitchClipsEmbed_tierlist"),
+  streamableEmbed_tierlist: document.getElementById("streamableEmbed_tierlist"),
 };
 
 const icons = {
@@ -147,6 +173,7 @@ const icons = {
   youtube: `<i class="material-icons notranslate">play_arrow</i>`,
   twitch: `<i class="material-icons notranslate">movie_creation</i>`,
   spotify: `<i class="material-icons notranslate">audiotrack</i>`,
+  streamable: `<i class="material-icons notranslate">play_arrow</i>`,
 };
 const spotifyURLRegex = /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:(album|track|playlist)\/|\?uri=spotify:track:)((\w|-){22})/;
 
@@ -154,7 +181,7 @@ let darkTheme = true;
 
 let client;
 let loginButton;
-let loginExpiredModal, deleteBracketModal, quitBracketModal, tierlistEditorModal, previewModal, createBracketModal, generateModal, browseModal, startModal;
+let loginExpiredModal, deleteBracketModal, quitBracketModal, tierlistEditorModal, previewModal, createBracketModal, generateChatModal, generateModal, browseModal, startModal;
 let votePopover, votePopoverTierlist;
 let currentBracket = {};
 let currentTierlist = {};
@@ -344,7 +371,7 @@ function checkLogin() {
 } //checkLogin
 
 function logout() {
-  elements.topRight.innerHTML = ` <div class="btn-group" role="group" aria-label="login options">
+  elements.topRight.innerHTML = `<div class="btn-group" role="group" aria-label="login options">
     <a
       role="button"
       id="loginButton"
@@ -432,7 +459,7 @@ function connect() {
         } //if chatter is trying to vote for bracket while voting is disabled show popover
       }
       if (currentFormat == "tierlist") {
-        if (currentTierlistCommands.includes(command)) {
+        if (currentTierlistCommands.includes(command) && (Date.now() - currentTime) / 1000 > 10) {
           currentTime = Date.now();
           votePopoverTierlist.show();
           setTimeout(function () {
@@ -510,7 +537,7 @@ function switchTheme(checkbox) {
   }
 } //switchTheme
 
-function addOption(name = "", type = "", value = "", thumbnail = "") {
+function addOption(name = "", type = "", value = "", thumbnail = "", video = "") {
   let optionNumber = ++document.querySelectorAll(".option-name").length;
   let optionType = "text";
   if (optionNumber > 1) {
@@ -526,12 +553,15 @@ function addOption(name = "", type = "", value = "", thumbnail = "") {
     `<div class="card mb-2" data-option-id="${optionNumber}">
       <div class="card-header">
       Option #${optionNumber}
-      <i class="material-icons notranslate  deletebtn float-end" onclick="deleteOption('${optionNumber}')">delete_forever</i>
+      <i class="material-icons notranslate deletebtn float-end" onclick="deleteOption('${optionNumber}')">delete_forever</i>
       </div>
       <div class="card-body">
         <div class="input-group mb-3">
-          <span class="input-group-text">Name</span>
-          <input type="text" class="form-control option-name" data-option-id="${optionNumber}" onchange="saveBracket()" value="${name}"  placeholder="Option Name" aria-label="Option Name" />
+          <span class="input-group-text option-value-label">Value/Link</span>
+          <input type="text" class="form-control option-value" data-option-id="${optionNumber}" onchange="saveBracket()" value="${value}" ${
+      optionType == "streamable" ? `data-video="${video}"` : ""
+    } placeholder="Option Value/Link" aria-label="Option Value" />
+          <button class="btn btn-outline-secondary" onclick="previewOption(${optionNumber},this)" type="button"><i class="material-icons notranslate">preview</i>Preview</button>
         </div>
 
         <div class="input-group mb-3">
@@ -542,16 +572,16 @@ function addOption(name = "", type = "", value = "", thumbnail = "") {
             <option value="youtube" ${optionType == "youtube" ? "selected" : ""}>YouTube video</option>
             <option value="twitch" ${optionType == "twitch" ? "selected" : ""}>Twitch clip</option>
             <option value="spotify" ${optionType == "spotify" ? "selected" : ""}>Spotify song</option>
+            <option value="streamable" ${optionType == "streamable" ? "selected" : ""}>Streamable video</option>
           </select>
         </div>
 
         <div class="input-group mb-3">
-          <span class="input-group-text option-value-label">Value</span>
-          <input type="text" class="form-control option-value" data-option-id="${optionNumber}" onchange="saveBracket()" value="${value}" placeholder="Option Value" aria-label="Option Value" />
-          <button class="btn btn-outline-secondary" onclick="previewOption(${optionNumber})" type="button">Preview</button>
+          <span class="input-group-text">Name</span>
+          <input type="text" class="form-control option-name" data-option-id="${optionNumber}" onchange="saveBracket()" value="${name}"  placeholder="Option Name" aria-label="Option Name" />
         </div>
 
-        <div class="input-group mb-3">
+        <div class="input-group">
           <span class="input-group-text">Thumbnail</span>
           <input type="text" class="form-control option-thumbnail" data-option-id="${optionNumber}" onchange="saveBracket()" value="${thumbnail}" placeholder="Thumbnail" aria-label="Thumbnail" />
         </div>
@@ -570,21 +600,31 @@ function deleteOption(id) {
   saveBracket();
 } //deleteOption
 
-function previewOption(id) {
+async function previewOption(id, button) {
+  button.innerHTML = spinner;
   id = parseInt(id, 10);
-  let optionNames = document.querySelectorAll(".option-name");
-  let optionTypes = document.querySelectorAll(".option-type");
   let optionValues = document.querySelectorAll(".option-value");
+  let optionTypes = document.querySelectorAll(".option-type");
+  let optionNames = document.querySelectorAll(".option-name");
   let optionThumbnails = document.querySelectorAll(".option-thumbnail");
 
-  let name = Array.from(optionNames).find((e) => e.dataset.optionId == id);
-  let type = Array.from(optionTypes).find((e) => e.dataset.optionId == id);
   let option = Array.from(optionValues).find((e) => e.dataset.optionId == id);
+  let type = Array.from(optionTypes).find((e) => e.dataset.optionId == id);
+  let name = Array.from(optionNames).find((e) => e.dataset.optionId == id);
   let thumbnail = Array.from(optionThumbnails).find((e) => e.dataset.optionId == id);
+
+  let link = parseLink(option?.value.replace(/\s+/g, ""));
+
+  if (!link && type.value != "image") {
+    type.value = "text";
+  }
+
   if (type.value == "text") {
     elements.previewModalBody.innerHTML = `
     <div class="card">
-    <div class="card-body">${option?.value || `<span class="text-body-secondary">Empty option</span>`}</div>
+    <div class="card-body">
+    ${option?.value || `<span class="text-body-secondary">Empty option</span>`}
+    </div>
     </div>`;
     previewModal.show();
   } //text
@@ -593,6 +633,7 @@ function previewOption(id) {
     let image = option?.value.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g) || null;
     if (!image) {
       showToast("Invalid image URL", "warning", 3000);
+      button.innerHTML = `<i class="material-icons notranslate">preview</i>Preview`;
       return;
     }
     elements.previewModalBody.innerHTML = `
@@ -604,22 +645,20 @@ function previewOption(id) {
     previewModal.show();
   } //image
 
-  if (type.value == "youtube") {
-    let regex = /(youtu.*be.*)\/(watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$))/gm;
-    let videoID = regex.exec(option?.value) || null;
-    if (!videoID) {
-      showToast("Invalid YouTube URL", "warning", 3000);
-      return;
+  if (link?.type == "youtube") {
+    if (!name.value && !thumbnail.value) {
+      link = await getRequestInfo(link);
+      name.value = link.title;
+      thumbnail.value = link.thumbnail;
     }
-    videoID = videoID[3];
+    type.value = "youtube";
     elements.previewModalBody.innerHTML = `
     <div class="card">
     <div class="card-body">
     <iframe 
-    id="ytplayer" 
     type="text/html" 
     width="100%" height="480" 
-    src="https://www.youtube.com/embed/${videoID}?autoplay=1&origin=https://chat.vote" 
+    src="https://www.youtube.com/embed/${link.id}?autoplay=1&origin=${window.location.hostname}" 
     frameborder="0">
     </iframe>
     </div>
@@ -627,24 +666,18 @@ function previewOption(id) {
     previewModal.show();
   } //youtube
 
-  if (type.value == "twitch") {
-    try {
-      let clipURL = new URL(option?.value);
-      let clipID =
-        clipURL.hostname === "clips.twitch.tv"
-          ? /^\/(\w+(?:\/[A-Z]\w+)?(?:[\-\w]*))(?:\/|$)/.exec(clipURL.pathname)
-          : /^\/\w+\/clip\/(\w+(?:\/[A-Z]\w+)?(?:[\-\w]*))(?:\/|$)/.exec(clipURL.pathname);
-
-      if (!clipID[1]) {
-        showToast("Invalid Twitch clip URL", "warning", 3000);
-        return;
-      }
-
-      elements.previewModalBody.innerHTML = `
+  if (link?.type == "twitch") {
+    if (!name.value && !thumbnail.value) {
+      link = await getRequestInfo(link);
+      name.value = link.title;
+      thumbnail.value = link.thumbnail;
+    }
+    type.value = "twitch";
+    elements.previewModalBody.innerHTML = `
       <div class="card">
       <div class="card-body">
       <iframe 
-      src="https://clips.twitch.tv/embed?clip=${clipID[1]}&parent=chat.vote&autoplay=true" 
+      src="https://clips.twitch.tv/embed?clip=${link.id}&parent=${window.location.hostname}&autoplay=true" 
       height="480" 
       width="100%" 
       preload="auto" 
@@ -652,36 +685,175 @@ function previewOption(id) {
       </iframe>
       </div>
       </div>`;
-      previewModal.show();
-    } catch (error) {
-      showToast("Invalid Twitch clip URL", "warning", 3000);
-      return;
-    }
+    previewModal.show();
   } //twitch
 
-  if (type.value == "spotify") {
-    try {
-      let id = option?.value.match(spotifyURLRegex);
-      if (!id[2] || id[1] !== "track") {
-        showToast("Invalid Spotify track URL", "warning", 3000);
-        return;
-      }
-      elements.previewModalBody.innerHTML = `
+  if (link?.type == "spotify") {
+    if (!name.value && !thumbnail.value) {
+      link = await getRequestInfo(link);
+      name.value = link.title;
+      thumbnail.value = link.thumbnail;
+    }
+    type.value = "spotify";
+    elements.previewModalBody.innerHTML = `
       <div class="card">
       <div class="card-body">
       <iframe 
-      style="border-radius:12px" src="https://open.spotify.com/embed/track/${id[2]}${darkTheme ? "?theme=0" : ""}" 
+      style="border-radius:12px" src="https://open.spotify.com/embed/track/${link.id}${darkTheme ? "?theme=0" : ""}" 
       width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture">
       </iframe>
       </div>
       </div>`;
-      previewModal.show();
+    previewModal.show();
+  } //spotify
+
+  if (link?.type == "streamable") {
+    link = await getRequestInfo(link);
+    name.value = link.title;
+    thumbnail.value = link.thumbnail;
+    type.value = "streamable";
+    option.dataset.video = link.video;
+    elements.previewModalBody.innerHTML = `
+      <div class="card">
+      <div class="card-body">
+      <video src="${link.video}" controls autoplay height="480" width="100%"></video>
+      </div>
+      </div>`;
+    previewModal.show();
+  } else {
+    option.dataset.video = "";
+  } //streamable
+
+  button.innerHTML = `<i class="material-icons notranslate">preview</i>Preview`;
+  saveBracket();
+} //previewOption
+
+/**
+ * @description gets the video/track/clip id from a url string
+ * @param {string} link
+ * @returns {Object}
+ */
+function parseLink(link) {
+  if (link.includes("twitch.tv")) {
+    if (link.includes("/clip/") || link.includes("clips.twitch.tv")) {
+      let clipURL = new URL(link);
+      let clipID =
+        clipURL.hostname === "clips.twitch.tv"
+          ? /^\/(\w+(?:\/[A-Z]\w+)?(?:[\-\w]*))(?:\/|$)/.exec(clipURL.pathname)
+          : /^\/\w+\/clip\/(\w+(?:\/[A-Z]\w+)?(?:[\-\w]*))(?:\/|$)/.exec(clipURL.pathname);
+      if (!clipID || !clipID[1]) {
+        return null;
+      }
+      return { type: "twitch", id: clipID[1] };
+    } //clips
+  } //twitch
+
+  if (link.includes("youtube.com") || link.includes("youtu.be")) {
+    const youtubeURLRegex = /(youtu.*be.*)\/(watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$))/gm;
+    const videoID = youtubeURLRegex.exec(link) || null;
+    if (videoID[3]?.length != 11) {
+      return null;
+    }
+    return { type: "youtube", id: videoID[3] };
+  } //youtube
+
+  if (link.includes("spotify.com")) {
+    const spotifyURLRegex = /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:(album|track|playlist)\/|\?uri=spotify:track:)((\w|-){22})/;
+    let id = link.match(spotifyURLRegex);
+    if (!id[2] || id[1] !== "track") {
+      return null;
+    }
+    return { type: "spotify", id: id[2] };
+  } //spotify
+
+  if (link.includes("streamable.com")) {
+    const match = link.match(/streamable\.com\/([a-zA-Z0-9]+)/);
+    if (!match[1]) {
+      return null;
+    }
+    return { type: "streamable", id: match[1] };
+  } //spotify
+
+  return null;
+} //parseLink
+
+async function getRequestInfo(link) {
+  if (link.type == "twitch") {
+    try {
+      let response = await fetch(`https://helper.donk.workers.dev/twitch/clips?id=${link.id}`, GETrequestOptions);
+      let result = await response.json();
+      console.log(result);
+      link.title = result.data[0].title || "(untitled)";
+      link.channel = result.data[0].broadcaster_name || "(unknown)";
+      link.thumbnail = result.data[0].thumbnail_url;
+      link.duration = result.data[0].duration;
+      link.views = result.data[0].view_count;
     } catch (error) {
-      showToast("Invalid Spotify track URL", "warning", 3000);
+      showToast("Could not get clip info", "warning", 3000);
+      console.log("getRequestInfo twitch clip error", error);
       return;
     }
-  } //spotify
-} //previewOption
+  }
+
+  if (link.type == "spotify") {
+    try {
+      let response = await fetch(`https://helper.donk.workers.dev/spotify/tracks?ids=${link.id}`, GETrequestOptions);
+      let result = await response.json();
+      console.log(result);
+      link.title = result.tracks[0].name || "(untitled)";
+      link.channel = result.tracks[0].artists[0].name || "(unknown)";
+      link.thumbnail = result.tracks[0].album.images[0].url;
+      link.duration = result.tracks[0].duration_ms / 1000;
+      if (!result.tracks[0].is_playable) {
+        showToast("This song is not playable", "warning", 3000);
+        return;
+      }
+    } catch (error) {
+      showToast("Could not get song info", "warning", 3000);
+      console.log("getRequestInfo spotify error", error);
+      return;
+    }
+  }
+
+  if (link.type == "youtube") {
+    try {
+      let response = await fetch(`https://helper.donk.workers.dev/youtube/videos?id=${link.id}`, GETrequestOptions);
+      let result = await response.json();
+      console.log(result);
+      link.title = result.items[0].snippet.title || "(untitled)";
+      link.channel = result.items[0].snippet.channelTitle || "(unknown)";
+      link.thumbnail = result.items[0].snippet.thumbnails.medium.url;
+      link.duration = ISO8601ToSeconds(result.items[0].contentDetails.duration);
+      link.views = result.items[0].statistics.viewCount;
+      if (result.items[0].contentDetails?.contentRating?.ytRating == "ytAgeRestricted" || !result.items[0].status?.embeddable) {
+        showToast("This video is age restricted or not embeddable", "warning", 3000);
+        return;
+      }
+    } catch (error) {
+      showToast("Could not get video info", "warning", 3000);
+      console.log("getRequestInfo youtube error", error);
+      return;
+    }
+  }
+
+  if (link.type == "streamable") {
+    try {
+      let response = await fetch(`https://helper.donk.workers.dev/streamable/videos?id=${link.id}`, GETrequestOptions);
+      let result = await response.json();
+      console.log(result);
+      link.title = result.title || "(untitled)";
+      link.channel = "(unknown)";
+      link.thumbnail = result.thumbnail_url.startsWith("//") ? `https:${result.thumbnail_url}` : result.thumbnail_url;
+      link.duration = result.files.mp4.duration;
+      link.video = result.files.mp4.url;
+    } catch (error) {
+      showToast("Could not get video info", "warning", 3000);
+      console.log("getRequestInfo streamable error", error);
+      return;
+    }
+  }
+  return link;
+} //getRequestInfo
 
 function createBracket(generated = false, type = "single") {
   let maxID = 0;
@@ -717,12 +889,39 @@ function saveBracket() {
   bracket.options = [];
 
   for (let index = 0; index < optionNames.length; index++) {
-    bracket.options.push({
-      name: optionNames[index].value,
-      type: optionTypes[index].value,
-      value: optionValues[index].value,
-      thumbnail: optionThumbnails[index].value,
-    });
+    let link = parseLink(optionValues[index].value);
+    console.log(link);
+    switch (link?.type) {
+      case "youtube":
+      case "twitch":
+      case "spotify":
+        bracket.options.push({
+          value: optionValues[index].value,
+          type: optionTypes[index].value,
+          name: optionNames[index].value,
+          thumbnail: optionThumbnails[index].value,
+          id: link.id,
+        });
+        break;
+      case "streamable":
+        bracket.options.push({
+          value: optionValues[index].value,
+          type: optionTypes[index].value,
+          name: optionNames[index].value,
+          thumbnail: optionThumbnails[index].value,
+          id: link.id,
+          video: optionValues[index].dataset?.video || "",
+        });
+        break;
+      default:
+        bracket.options.push({
+          value: optionValues[index].value,
+          type: optionTypes[index].value,
+          name: optionNames[index].value,
+          thumbnail: optionThumbnails[index].value,
+        });
+        break;
+    }
   }
 
   loadBrackets();
@@ -820,7 +1019,7 @@ function startSingleElimination(bracket) {
   elements.brackets_editor.style.display = "none";
   elements.bracket.style.display = "";
   elements.title.innerHTML = bracket.title;
-  elements.endTitle.innerHTML = `<h1 class="display-6">Winner of ${bracket.title}</h1>`;
+  elements.winner.innerHTML = `Winner of ${bracket.title}<br>`;
   elements.pickWinner.innerHTML = `<i class="material-icons notranslate">navigate_next</i>Next match`;
 
   console.log(currentBracket);
@@ -829,6 +1028,16 @@ function startSingleElimination(bracket) {
   currentOption = 0;
   currentScores = { left: 0, right: 0 };
   currentCommand = { left: "a", right: "b" };
+
+  elements.settings.disabled = false;
+  elements.restart.disabled = false;
+  elements.hideScore.disabled = false;
+  elements.enableVoting.disabled = false;
+  elements.pickWinner.disabled = false;
+  elements.left_card_header.style.display = "";
+  elements.right_card_header.style.display = "";
+  elements.winnerTitle.style.display = "none";
+
   nextMatch();
 } //startSingleElimination
 
@@ -838,15 +1047,16 @@ function startTierlist(bracket) {
   elements.upcoming_thumbnails.innerHTML = "";
   shuffleArray(bracket.options);
   for (let index = 0; index < bracket.options.length; index++) {
-    if (bracket.options[index].type == "text") {
-      elements.upcoming_thumbnails.insertAdjacentHTML("beforeend", `<div class="border rounded tierlist-item me-1">${bracket.options[index].value}</div>`);
-      continue;
-    }
     let link = bracket.options[index].thumbnail ? `https://proxy.donk.workers.dev/?url=${encodeURI(bracket.options[index].thumbnail)}` : "/pics/nothumbnail.png";
 
     elements.upcoming_thumbnails.insertAdjacentHTML(
       "beforeend",
-      `<img class="border rounded tierlist-item me-1" alt="${bracket.options[index].name}" title="${bracket.options[index].name}" loading="lazy" src="${link}" />`
+      `<a
+      href="${getItemLink(bracket.options[index].type, bracket.options[index].id)}"
+      target="_blank"
+      rel="noopener noreferrer"><img class="border rounded tierlist-item me-1" alt="${bracket.options[index].name}" title="${
+        bracket.options[index].name
+      }" loading="lazy" src="${link}" /></a>`
     );
   }
   addTier("S", "s", "#de0b0b");
@@ -900,13 +1110,13 @@ function nextMatch() {
 
   //check if bracket is done
   if (Object.keys(currentBracket).length == currentRound) {
-    showWinner(currentBracket[`round${currentRound}`]);
+    showWinner(currentBracket[`round${currentRound}`], currentBracket[`round${currentRound - 1}`]);
     return;
   }
 
   //change next match button text for final match
   if (Object.keys(currentBracket).length - 1 == currentRound) {
-    elements.pickWinner.innerHTML = `<i class="material-icons notranslate">emoji_events</i>Show winner`;
+    elements.pickWinner.innerHTML = `<i class="material-icons notranslate">emoji_events</i>Reveal winner`;
   }
 
   let left = currentBracket[`round${currentRound}`][currentOption++];
@@ -921,12 +1131,12 @@ function nextMatch() {
     promoteOption(left);
     return;
   }
-
+  resetPlayers();
   showOption("left", left);
   showOption("right", right);
 
   for (let element of document.getElementsByClassName("streamer-vote")) {
-    element.style.display = "";
+    element.style.visibility = "visible";
   }
 
   resetScores();
@@ -934,6 +1144,7 @@ function nextMatch() {
     disableVoteButton();
   }
 
+  elements.centerTitle.style = "";
   elements.left_card.style = "";
   elements.right_card.style = "";
   elements.left_title.style = "";
@@ -957,7 +1168,7 @@ function nextMatch() {
   if (!elements.disableAnimations.checked) {
     anime({
       targets: `#centerTitle`,
-      translateY: ["-100%", 0],
+      translateY: ["-200px", 0],
     });
     anime({
       targets: `#left_title`,
@@ -999,7 +1210,8 @@ let currentTierlistData = [
 let currentTierlistCommands = [];
 let tierlist_player;
 let currentTierlistItem;
-function nextTierlistItem() {
+async function nextTierlistItem() {
+  resetPlayers();
   let item = currentTierlist.options.shift();
   if (!item) {
     endTierlist();
@@ -1008,90 +1220,70 @@ function nextTierlistItem() {
   currentTierlistItem = item;
   elements.upcoming_thumbnails.firstElementChild.remove();
 
+  if (!elements.upcoming_thumbnails.firstElementChild) {
+    elements.upcoming.style.display = "none";
+  }
+
   elements.currentTierlistItemName.innerHTML = item.name || "Untitled item";
 
+  if (!item?.id && (item.type == "youtube" || item.type == "twitch" || item.type == "spotify")) {
+    let info = parseLink(item.value);
+    if (info) {
+      item.id = info.id;
+    } else {
+      showToast("Could not load video", "warning", 3000);
+    }
+  }
+
   if (item.type == "text") {
-    elements.currentTierlistItem.innerHTML = item.value || `<span class="text-body-secondary">Empty option</span>`;
+    elements.text_image_tierlist.style.display = "";
+    elements.text_image_tierlist.innerHTML = item.value || `<span class="text-body-secondary">Empty option</span>`;
   } //text
 
   if (item.type == "image") {
+    elements.text_image_tierlist.style.display = "";
     let image = item?.value.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g) || null;
     if (!image) {
-      elements.currentTierlistItem.innerHTML = `Invalid image URL`;
+      elements.text_image_tierlist.innerHTML = `Invalid image URL`;
       return;
     }
-    elements.currentTierlistItem.innerHTML = `<img src="https://proxy.donk.workers.dev/?url=${encodeURI(item.value)}" alt="${item.name}" title="${item.name}" class="tierlist-image">`;
+    elements.text_image_tierlist.innerHTML = `<img src="https://proxy.donk.workers.dev/?url=${encodeURI(item.value)}" alt="${item.name}" title="${item.name}" class="tierlist-image">`;
   } //image
 
   if (item.type == "youtube") {
-    let regex = /(youtu.*be.*)\/(watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$))/gm;
-    let videoID = regex.exec(item?.value) || null;
-    if (!videoID) {
-      elements.currentTierlistItem.innerHTML = "Invalid YouTube URL";
-      return;
-    }
-    videoID = videoID[3];
-    elements.currentTierlistItem.innerHTML = `
-    <iframe 
-    id="tierlist_youtube" 
-    type="text/html" 
-    width="100%" height="360" 
-    src="https://www.youtube.com/embed/${videoID}?enablejsapi=1&origin=https://chat.vote" 
-    frameborder="0">
-    </iframe>`;
-
-    tierlist_player = new YT.Player("tierlist_youtube", {
-      events: {
-        onReady: (event) => {
-          event.target.playVideo();
-        },
-        onStateChange: (event) => {},
-      },
-    });
+    elements.youtubeEmbedContainer_tierlist.style.display = "";
+    youtubePlayer_tierlist.loadVideoById(item.id);
   } //youtube
 
   if (item.type == "twitch") {
-    try {
-      let clipURL = new URL(item?.value);
-      let clipID =
-        clipURL.hostname === "clips.twitch.tv"
-          ? /^\/(\w+(?:\/[A-Z]\w+)?(?:[\-\w]*))(?:\/|$)/.exec(clipURL.pathname)
-          : /^\/\w+\/clip\/(\w+(?:\/[A-Z]\w+)?(?:[\-\w]*))(?:\/|$)/.exec(clipURL.pathname);
-      if (!clipID[1]) {
-        elements.currentTierlistItem.innerHTML = `Invalid Twitch clip URL`;
-        return;
-      }
-      elements.currentTierlistItem.innerHTML = `
-      <iframe 
-      src="https://clips.twitch.tv/embed?clip=${clipID[1]}&parent=chat.vote&autoplay=true" 
-      height="360" 
-      width="100%" 
-      preload="auto" 
-      >
-      </iframe>`;
-    } catch (error) {
-      elements.currentTierlistItem.innerHTML = `Invalid Twitch clip URL`;
-      return;
-    }
+    elements.twitchClipsEmbed_tierlist.style.display = "";
+    elements.twitchClipsEmbed_tierlist.src = `https://clips.twitch.tv/embed?clip=${item.id}&parent=${window.location.hostname}&autoplay=true&muted=false`;
   } //twitch
 
   if (item.type == "spotify") {
-    try {
-      let id = item?.value.match(spotifyURLRegex);
-      if (!id[2] || id[1] !== "track") {
-        elements.currentTierlistItem.innerHTML = `Invalid Spotify track URL`;
-        return;
-      }
-      elements.currentTierlistItem.innerHTML = `
-      <iframe 
-      style="border-radius:12px" src="https://open.spotify.com/embed/track/${id[2]}${darkTheme ? "?theme=0" : ""}" 
-      width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture">
-      </iframe>`;
-    } catch (error) {
-      elements.currentTierlistItem.innerHTML = `Invalid Spotify track URL`;
-      return;
-    }
+    elements.spotifyEmbedContainer_tierlist.style.display = "";
+    spotifyPlayer_tierlist.loadUri(`spotify:track:${item.id}`);
+    spotifyPlayer_tierlist.play();
   } //spotify
+
+  if (item.type == "streamable") {
+    let video = item?.video;
+    //check if video link expired
+    if (video) {
+      const url = new URL(video);
+      const params = url.searchParams;
+      if (parseInt(params.get("Expires"), 10) * 1000 < Date.now()) {
+        video = null;
+      }
+    }
+    //get video link if it was never fetched or expired
+    if (!video) {
+      let info = await getRequestInfo(item);
+      video = info.video;
+    }
+    elements.streamableEmbed_tierlist.style.display = "";
+    elements.streamableEmbed_tierlist.src = video;
+  } //streamable
 
   resetScores();
   if (!elements.keepVotingEnabled.checked) {
@@ -1109,7 +1301,7 @@ function streamerVote(position) {
   voters.push(USER.userID);
   updateScores();
   for (let element of document.getElementsByClassName("streamer-vote")) {
-    element.style.display = "none";
+    element.style.visibility = "hidden";
   }
 } //streamerVote
 
@@ -1130,6 +1322,16 @@ function pickWinner(winner = null) {
   } else {
     winner = winner == "left" ? left : right;
   }
+
+  //check if bracket is done
+  if (Object.keys(currentBracket).length == currentRound + 1) {
+    //promote the winner and skip promoteOption() to use the winner animation in nextMatch() instead
+    let index = currentBracket[`round${currentRound + 1}`].findIndex((e) => e === undefined);
+    currentBracket[`round${currentRound + 1}`][index] = winner;
+    nextMatch();
+    return;
+  }
+
   promoteOption(winner, position);
 } //pickWinner
 
@@ -1155,7 +1357,7 @@ function pickWinnerTierlist() {
 function restartMatch() {
   resetScores();
   for (let element of document.getElementsByClassName("streamer-vote")) {
-    element.style.display = "";
+    element.style.visibility = "visible";
   }
 } //restartMatch
 
@@ -1176,7 +1378,7 @@ function promoteOption(option, position = null) {
     //title
     anime({
       targets: `#centerTitle`,
-      translateY: `2000px`,
+      translateY: `-200px`,
       duration: 1000,
     });
 
@@ -1223,7 +1425,14 @@ function placeTierlistItem(tier) {
   let id = `item${Date.now()}`;
   let link = currentTierlistItem.thumbnail ? `https://proxy.donk.workers.dev/?url=${encodeURI(currentTierlistItem.thumbnail)}` : "/pics/nothumbnail.png";
   let card = document.querySelector(`[data-tier="${tier.command}"]`);
-  card.innerHTML += `<img id="${id}" class="border rounded tierlist-item me-1" alt="${elements.currentTierlistItemName.innerHTML}" title="${elements.currentTierlistItemName.innerHTML}" src="${link}">`;
+  card.innerHTML += `
+  <a
+  id="${id}"
+  href="${getItemLink(currentTierlistItem.type, currentTierlistItem.id)}"
+  target="_blank"
+  rel="noopener noreferrer"><img class="border rounded tierlist-item me-1" alt="${elements.currentTierlistItemName.innerHTML}" title="${
+    elements.currentTierlistItemName.innerHTML
+  }" loading="lazy" src="${link}" /></a>`;
   let start = elements.currentTierlistItem.getBoundingClientRect();
   let destination = document.getElementById(id).getBoundingClientRect();
   if (!elements.disableAnimations.checked) {
@@ -1238,101 +1447,80 @@ function placeTierlistItem(tier) {
   nextTierlistItem();
 } //placeTierlistItem
 
-let left_player, right_player;
-function showOption(position, option) {
+async function showOption(position, option) {
+  if (!option?.id && (option.type == "youtube" || option.type == "twitch" || option.type == "spotify")) {
+    let info = parseLink(option.value);
+    if (info) {
+      option.id = info.id;
+    } else {
+      showToast("Could not load video", "warning", 3000);
+    }
+  }
+
   elements[`${position}_name`].innerHTML = option.name || `<span class="text-body-secondary">Untitled option</span>`;
 
   if (option.type == "text") {
-    elements[`${position}_value`].innerHTML = option.value || `<span class="text-body-secondary">Empty option</span>`;
+    elements[`text_image_${position}`].style.display = "";
+    elements[`text_image_${position}`].innerHTML = option.value || `<span class="text-body-secondary">Empty option</span>`;
   } //text
 
   if (option.type == "image") {
+    elements[`text_image_${position}`].style.display = "";
     let image = option?.value.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g) || null;
     if (!image) {
-      elements[`${position}_value`].innerHTML = `Invalid image URL`;
+      elements[`text_image_${position}`].innerHTML = `Invalid image URL`;
       return;
     }
-    elements[`${position}_value`].innerHTML = `<img src="https://proxy.donk.workers.dev/?url=${encodeURI(option.value)}" alt="${option.name}" title="${option.name}" class="option-image">`;
+    elements[`text_image_${position}`].innerHTML = `<img src="https://proxy.donk.workers.dev/?url=${encodeURI(option.value)}" alt="${option.name}" title="${
+      option.name
+    }" class="option-image">`;
   } //image
 
   if (option.type == "youtube") {
-    let regex = /(youtu.*be.*)\/(watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$))/gm;
-    let videoID = regex.exec(option?.value) || null;
-    if (!videoID) {
-      elements[`${position}_value`].innerHTML = "Invalid YouTube URL";
-      return;
-    }
-    videoID = videoID[3];
-    elements[`${position}_value`].innerHTML = `
-    <iframe 
-    id="${position}_youtube" 
-    type="text/html" 
-    width="100%" height="480" 
-    src="https://www.youtube.com/embed/${videoID}?enablejsapi=1&origin=https://chat.vote" 
-    frameborder="0">
-    </iframe>`;
-
+    elements[`youtubeEmbedContainer_${position}`].style.display = "";
     if (position == "left") {
-      left_player = new YT.Player("left_youtube", {
-        events: {
-          onReady: (event) => {
-            event.target.playVideo();
-          },
-          onStateChange: (event) => {},
-        },
-      });
+      youtubePlayer_left.loadVideoById(option.id);
     } else {
-      right_player = new YT.Player("right_youtube", {
-        events: {
-          onReady: (event) => {},
-          onStateChange: (event) => {},
-        },
-      });
+      youtubePlayer_right.cueVideoById(option.id);
     }
   } //youtube
 
   if (option.type == "twitch") {
-    try {
-      let clipURL = new URL(option?.value);
-      let clipID =
-        clipURL.hostname === "clips.twitch.tv"
-          ? /^\/(\w+(?:\/[A-Z]\w+)?(?:[\-\w]*))(?:\/|$)/.exec(clipURL.pathname)
-          : /^\/\w+\/clip\/(\w+(?:\/[A-Z]\w+)?(?:[\-\w]*))(?:\/|$)/.exec(clipURL.pathname);
-      if (!clipID[1]) {
-        elements[`${position}_value`].innerHTML = `Invalid Twitch clip URL`;
-        return;
-      }
-      elements[`${position}_value`].innerHTML = `
-      <iframe 
-      src="https://clips.twitch.tv/embed?clip=${clipID[1]}&parent=chat.vote&autoplay=${position == "left"}" 
-      height="480" 
-      width="100%" 
-      preload="auto" 
-      >
-      </iframe>`;
-    } catch (error) {
-      elements[`${position}_value`].innerHTML = `Invalid Twitch clip URL`;
-      return;
-    }
+    elements[`twitchClipsEmbed_${position}`].style.display = "";
+    elements[`twitchClipsEmbed_${position}`].src = `https://clips.twitch.tv/embed?clip=${option.id}&parent=${window.location.hostname}&autoplay=${
+      position == "left" ? "true" : "false"
+    }&muted=false`;
   } //twitch
 
   if (option.type == "spotify") {
-    try {
-      let id = option?.value.match(spotifyURLRegex);
-      if (!id[2] || id[1] !== "track") {
-        elements[`${position}_value`].innerHTML = `Invalid Spotify track URL`;
-        return;
-      }
-      elements[`${position}_value`].innerHTML = `
-      <iframe 
-      style="border-radius:12px" src="https://open.spotify.com/embed/track/${id[2]}${darkTheme ? "?theme=0" : ""}" 
-      width="100%" height="352" frameBorder="0" allowfullscreen="" allow="${position == "left" ? "autoplay;" : ""} clipboard-write; encrypted-media; picture-in-picture">
-      </iframe>`;
-    } catch (error) {
-      elements[`${position}_value`].innerHTML = `Invalid Spotify track URL`;
-      return;
+    elements[`spotifyEmbedContainer_${position}`].style.display = "";
+
+    if (position == "left") {
+      spotifyPlayer_left.loadUri(`spotify:track:${option.id}`);
+      spotifyPlayer_left.play();
+    } else {
+      spotifyPlayer_right.loadUri(`spotify:track:${option.id}`);
     }
   } //spotify
+
+  if (option.type == "streamable") {
+    let video = option?.video;
+    //check if video link expired
+    if (video) {
+      const url = new URL(video);
+      const params = url.searchParams;
+      if (parseInt(params.get("Expires"), 10) * 1000 < Date.now()) {
+        video = null;
+      }
+    }
+    //get video link if it was never fetched or expired
+    if (!video) {
+      let info = await getRequestInfo(option);
+      video = info.video;
+    }
+    elements[`streamableEmbed_${position}`].style.display = "";
+    elements[`streamableEmbed_${position}`].src = video;
+  } //streamable
 } //showOption
 
 function updateScores() {
@@ -1387,12 +1575,120 @@ function updateScores() {
   }
 } //updateScores
 
-function showWinner(winner) {
-  showOption("winner", winner[0]);
-  elements.left_value.innerHTML = "";
-  elements.right_value.innerHTML = "";
-  elements.bracket.style.display = "none";
-  elements.end.style.display = "";
+function showWinner(first, firstAndSecond) {
+  elements.winner.innerHTML += `<strong>${first[0].name}</strong>`;
+
+  elements.settings.disabled = true;
+  elements.restart.disabled = true;
+  elements.hideScore.disabled = true;
+  elements.enableVoting.disabled = true;
+  elements.pickWinner.disabled = true;
+
+  if (!elements.disableAnimations.checked) {
+    //move title away
+    anime({
+      targets: `#centerTitle`,
+      translateY: [0, "-200px"],
+      duration: 500,
+      complete: function (anim) {
+        //bring winner title in
+        elements.centerTitle.style.display = "none";
+        elements.left_card_header.style.display = "none";
+        elements.right_card_header.style.display = "none";
+        elements.winnerTitle.style.display = "";
+        anime({
+          targets: `#winnerTitle`,
+          translateY: ["-200px", 0],
+          duration: 1000,
+        });
+      },
+    });
+
+    //move option titles away
+    anime({
+      targets: `#left_title`,
+      translateX: [0, "-200%"],
+      duration: 1000,
+      complete: function (anim) {
+        elements.left_title.style.display = "none";
+      },
+    });
+    anime({
+      targets: `#right_title`,
+      translateX: [0, "200%"],
+      duration: 2000,
+      complete: function (anim) {
+        elements.right_title.style.display = "none";
+      },
+    });
+  } else {
+    elements.left_card_header.style.display = "none";
+    elements.right_card_header.style.display = "none";
+    elements.left_title.style.display = "none";
+    elements.right_title.style.display = "none";
+    elements.centerTitle.style.display = "none";
+    elements.winnerTitle.style.display = "";
+  }
+
+  if (first[0].value == firstAndSecond[0].value) {
+    //left is the winner
+    //reset right player only
+    resetPlayers(false, true);
+
+    if (!elements.disableAnimations.checked) {
+      //move loser away
+      anime({
+        targets: `#right_card`,
+        translateX: `2000px`,
+        scale: "0.8",
+        duration: 1000,
+        complete: function (anim) {
+          elements.right_card.style.display = "none";
+        },
+      });
+
+      //bring winner to center
+      anime({
+        targets: `#left_card`,
+        translateX: `50%`,
+        translateY: `5%`,
+        scale: "1.3",
+        duration: 2000,
+      });
+    } else {
+      elements.right_card.style.display = "none";
+      elements.left_card.style = "transform: translateX(50%) translateY(5%) scale(1.3);";
+    }
+  } else {
+    //right is the winner
+    //reset left player only
+    resetPlayers(true, false);
+
+    if (!elements.disableAnimations.checked) {
+      //move loser away
+      anime({
+        targets: `#left_card`,
+        translateX: `2000px`,
+        scale: "0.8",
+        duration: 1000,
+        complete: function (anim) {
+          elements.left_card.style.display = "none";
+        },
+      });
+
+      //bring winner to center
+      anime({
+        targets: `#right_card`,
+        translateX: `-50%`,
+        translateY: `5%`,
+        scale: "1.3",
+        duration: 2000,
+      });
+    } else {
+      elements.left_card.style.display = "none";
+      elements.right_card.style = "transform: translateX(-50%) translateY(5%) scale(1.3);";
+    }
+  }
 } //showWinner
 
 function toggleVoting() {
@@ -1425,17 +1721,16 @@ function disableVoteButton() {
 
 function quitBracket() {
   elements.bracket.style.display = "none";
-  elements.end.style.display = "none";
   elements.tierlist.style.display = "none";
   elements.brackets_editor.style.display = "";
-  elements.left_value.innerHTML = "";
-  elements.right_value.innerHTML = "";
-  elements.winner_value.innerHTML = "";
-  elements.currentTierlistItem.innerHTML = "";
-  quitBracketModal.hide();
+  resetPlayers();
   disableVoteButton();
   changeSiteLinkTarget("_self");
 } //quitBracket
+
+function showQuitBracketModal() {
+  quitBracketModal.show();
+} //showQuitBracketModal
 
 function editBracket(id) {
   elements.bracketEditor.style.display = "";
@@ -1451,7 +1746,7 @@ function editBracket(id) {
   elements.bracketEditorHeader.innerHTML = `ID${id}`;
 
   for (let index = 0; index < bracket.options.length; index++) {
-    addOption(bracket.options[index].name, bracket.options[index].type, bracket.options[index].value, bracket.options[index].thumbnail);
+    addOption(bracket.options[index].name, bracket.options[index].type, bracket.options[index].value, bracket.options[index].thumbnail, bracket.options[index]?.video);
   }
 } //editBracket
 
@@ -1908,7 +2203,7 @@ async function generateBracket() {
   elements.bracketTitle.value = previewedBracketTitle;
   elements.bracketDescription.value = previewedBracketDescription;
   for (let index = 0; index < previewedBracket.length; index++) {
-    addOption(previewedBracket[index].name, previewedBracket[index].type, previewedBracket[index].value, previewedBracket[index].thumbnail);
+    addOption(previewedBracket[index].name, previewedBracket[index].type, previewedBracket[index].value, previewedBracket[index].thumbnail, previewedBracket[index]?.video);
   }
 
   saveBracket();
@@ -1921,7 +2216,13 @@ async function importApproved(id) {
   elements.bracketTitle.value = bracket.bracket.title;
   elements.bracketDescription.value = `${bracket.bracket.description} - Bracket by @${bracket.username} - bracket ID: ${bracket.id}`;
   for (let index = 0; index < bracket.bracket.options.length; index++) {
-    addOption(bracket.bracket.options[index].name, bracket.bracket.options[index].type, bracket.bracket.options[index].value, bracket.bracket.options[index].thumbnail);
+    addOption(
+      bracket.bracket.options[index].name,
+      bracket.bracket.options[index].type,
+      bracket.bracket.options[index].value,
+      bracket.bracket.options[index].thumbnail,
+      bracket.bracket.options[index]?.video
+    );
   }
   saveBracket();
   browseModal.hide();
@@ -2006,7 +2307,6 @@ async function loadApproved() {
       </div>`;
     }
     elements.browseModalBody.innerHTML = html;
-    linkifyElementID("browseModalBody");
   } catch (error) {
     elements.browseModalBody.innerHTML = "Could not load brackets :(";
     console.log("loadApproved error", error);
@@ -2020,13 +2320,13 @@ function zoomCard(id) {
     anime({
       targets: `#${id}`,
       translateX: `${id == "left_card" ? "+=50%" : "-=50%"}`,
-      scale: "+=0.6",
+      scale: "+=0.4",
     });
   } else {
     anime({
       targets: `#${id}`,
       translateX: `${id == "left_card" ? "-=50%" : "+=50%"}`,
-      scale: "-=0.6",
+      scale: "-=0.4",
     });
   }
 } //zoomCard
@@ -2077,7 +2377,6 @@ function loadTierlistEditor() {
     <button class="btn btn-outline-secondary" type="button" id="button-addon2"><i class="material-icons notranslate" style="cursor: pointer">delete_forever</i></button>
     </div>`;
   }
-
   elements.tierlistEditor.innerHTML = html;
 } //loadTierlistEditor
 
@@ -2220,6 +2519,57 @@ async function testImage(url, format) {
   }
 } //testImage
 
+function resetPlayers(left = true, right = true) {
+  if (left) {
+    elements.text_image_left.style.display = "none";
+    elements.youtubeEmbedContainer_left.style.display = "none";
+    elements.spotifyEmbedContainer_left.style.display = "none";
+    elements.twitchClipsEmbed_left.style.display = "none";
+    elements.streamableEmbed_left.style.display = "none";
+    youtubePlayer_left.loadVideoById("");
+    spotifyPlayer_left.pause();
+    elements.twitchClipsEmbed_left.src = "";
+    elements.streamableEmbed_left.src = "";
+  }
+
+  if (right) {
+    elements.text_image_right.style.display = "none";
+    elements.youtubeEmbedContainer_right.style.display = "none";
+    elements.spotifyEmbedContainer_right.style.display = "none";
+    elements.twitchClipsEmbed_right.style.display = "none";
+    elements.streamableEmbed_right.style.display = "none";
+    youtubePlayer_right.loadVideoById("");
+    spotifyPlayer_right.pause();
+    elements.twitchClipsEmbed_right.src = "";
+    elements.streamableEmbed_right.src = "";
+  }
+
+  elements.text_image_tierlist.style.display = "none";
+  elements.youtubeEmbedContainer_tierlist.style.display = "none";
+  elements.spotifyEmbedContainer_tierlist.style.display = "none";
+  elements.twitchClipsEmbed_tierlist.style.display = "none";
+  elements.streamableEmbed_tierlist.style.display = "none";
+  youtubePlayer_tierlist.loadVideoById("");
+  spotifyPlayer_tierlist.pause();
+  elements.twitchClipsEmbed_tierlist.src = "";
+  elements.streamableEmbed_tierlist.src = "";
+} //resetPlayers
+
+function getItemLink(type, id) {
+  switch (type) {
+    case "youtube":
+      return `https://youtu.be/${id}`;
+    case "spotify":
+      return `https://open.spotify.com/track/${id}`;
+    case "twitch":
+      return `https://clips.twitch.tv/${id}`;
+    case "streamable":
+      return `https://streamable.com/${id}`;
+    default:
+      return "";
+  }
+} //getItemLink
+
 window.onload = async function () {
   darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
   elements.darkTheme.checked = darkTheme ?? true;
@@ -2241,7 +2591,7 @@ window.onload = async function () {
       anime({
         targets: `#left_card`,
         translateX: "-=50%",
-        scale: "-=0.6",
+        scale: "-=0.4",
       });
     }
     if (!elements.right_card.contains(event.target) && elements.right_card.classList.contains(`zoomed`)) {
@@ -2250,7 +2600,7 @@ window.onload = async function () {
       anime({
         targets: `#right_card`,
         translateX: "+=50%",
-        scale: "-=0.6",
+        scale: "-=0.4",
       });
     }
   });
@@ -2264,6 +2614,7 @@ window.onload = async function () {
   tierlistEditorModal = new bootstrap.Modal(elements.tierlistEditorModal);
   previewModal = new bootstrap.Modal(elements.previewModal);
   createBracketModal = new bootstrap.Modal(elements.createBracketModal);
+  generateChatModal = new bootstrap.Modal(elements.generateChatModal);
   generateModal = new bootstrap.Modal(elements.generateModal);
   browseModal = new bootstrap.Modal(elements.browseModal);
   startModal = new bootstrap.Modal(elements.startModal);
@@ -2272,11 +2623,26 @@ window.onload = async function () {
     loadTierlistEditor();
   });
 
-  elements.quitBracketModal.addEventListener("hidden.bs.modal", (event) => {
-    // do something...
+  elements.previewModal.addEventListener("hidden.bs.modal", (event) => {
+    elements.previewModalBody.innerHTML = "";
   });
 
   elements.generateModal.addEventListener("hidden.bs.modal", (event) => {
+    previewedBracket = [];
+    previewedBracketDescription = "";
+    previewedBracketTitle = "";
+    for (let element of document.getElementsByClassName("generate-type")) {
+      element.style.display = "none";
+    }
+    for (let element of document.getElementsByClassName("generate-value")) {
+      element.value = "";
+    }
+    for (let element of document.getElementsByClassName("generate-preview")) {
+      element.innerHTML = "";
+    }
+  });
+
+  elements.generateChatModal.addEventListener("hidden.bs.modal", (event) => {
     previewedBracket = [];
     previewedBracketDescription = "";
     previewedBracketTitle = "";
@@ -2351,6 +2717,22 @@ window.onload = async function () {
     generateModal.show();
   });
 
+  elements.importChatBracket.addEventListener("click", function () {
+    previewedBracket = [];
+    previewedBracketDescription = "";
+    previewedBracketTitle = "";
+    for (let element of document.getElementsByClassName("generate-type")) {
+      element.style.display = "none";
+    }
+    for (let element of document.getElementsByClassName("generate-value")) {
+      element.value = "";
+    }
+    for (let element of document.getElementsByClassName("generate-preview")) {
+      element.innerHTML = "";
+    }
+    generateChatModal.show();
+  });
+
   elements.addOption.addEventListener("click", function () {
     addOption();
     saveBracket();
@@ -2370,27 +2752,122 @@ window.onload = async function () {
   });
 
   dragElement();
+  elements.twitchClipsEmbed_left.src = "";
+  elements.twitchClipsEmbed_right.src = "";
+  elements.twitchClipsEmbed_tierlist.src = "";
 }; //onload
 
+let youtubePlayer_left;
+let youtubePlayer_right;
+let youtubePlayer_tierlist;
+
 function onYouTubeIframeAPIReady() {
+  //youtubePlayer.loadVideoById("id")
+  //youtubePlayer.playVideo()
+  //youtubePlayer.pauseVideo()
+  // player.mute():Void
+  // Mutes the player.
+  // player.unMute():Void
+  // Unmutes the player.
+  // player.isMuted():Boolean
+  // Returns true if the player is muted, false if not.
+  // player.setVolume(volume:Number):Void
+  // Sets the volume. Accepts an integer between 0 and 100.
+  // player.getVolume():Number
+
   elements.left_value.addEventListener("mouseover", (event) => {
     try {
-      if (left_player.getPlayerState() >= 1 && right_player.getPlayerState() >= 1) {
-        right_player.mute();
-        left_player.unMute();
+      if (youtubePlayer_left.getPlayerState() >= 1 && youtubePlayer_right.getPlayerState() >= 1) {
+        youtubePlayer_right.mute();
+        youtubePlayer_left.unMute();
       }
     } catch (error) {}
   });
   elements.right_value.addEventListener("mouseover", (event) => {
     try {
-      if (left_player.getPlayerState() >= 1 && right_player.getPlayerState() >= 1) {
-        left_player.mute();
-        right_player.unMute();
+      if (youtubePlayer_left.getPlayerState() >= 1 && youtubePlayer_right.getPlayerState() >= 1) {
+        youtubePlayer_left.mute();
+        youtubePlayer_right.unMute();
       }
     } catch (error) {}
   });
+
+  console.log("onYouTubeIframeAPIReady");
+  youtubePlayer_left = new YT.Player("youtubeEmbed_left", {
+    height: "100%",
+    width: "100%",
+    playerVars: {
+      autoplay: 1,
+      enablejsapi: 1,
+      playsinline: 1,
+      rel: 0,
+      origin: "chat.vote",
+    },
+    events: {
+      onError: youtubePlayerOnError,
+      onAutoplayBlocked: youtubePlayerOnAutoplayBlocked,
+    },
+  });
+  youtubePlayer_right = new YT.Player("youtubeEmbed_right", {
+    height: "100%",
+    width: "100%",
+    playerVars: {
+      autoplay: 0,
+      enablejsapi: 1,
+      playsinline: 1,
+      rel: 0,
+      origin: "chat.vote",
+    },
+    events: {
+      onError: youtubePlayerOnError,
+      onAutoplayBlocked: youtubePlayerOnAutoplayBlocked,
+    },
+  });
+  youtubePlayer_tierlist = new YT.Player("youtubeEmbed_tierlist", {
+    height: "100%",
+    width: "100%",
+    playerVars: {
+      autoplay: 1,
+      enablejsapi: 1,
+      playsinline: 1,
+      rel: 0,
+      origin: "chat.vote",
+    },
+    events: {
+      onError: youtubePlayerOnError,
+      onAutoplayBlocked: youtubePlayerOnAutoplayBlocked,
+    },
+  });
 } //onYouTubeIframeAPIReady
 
+function youtubePlayerOnError(event) {
+  console.log(event);
+} //youtubePlayerOnError
+
+function youtubePlayerOnAutoplayBlocked(event) {
+  console.log(event);
+} //youtubePlayerOnAutoplayBlocked
+
+let spotifyPlayer_left;
+let spotifyPlayer_right;
+let spotifyPlayer_tierlist;
 window.onSpotifyIframeApiReady = (IFrameAPI) => {
   console.log("onSpotifyIframeApiReady");
-};
+
+  //spotifyPlayer.loadUri('spotify:episode:7makk4oTQel546B0PZlDM5');
+  //spotifyPlayer.play()
+  //spotifyPlayer.pause();
+
+  const callback_left = (EmbedController) => {
+    spotifyPlayer_left = EmbedController;
+  };
+  const callback_right = (EmbedController) => {
+    spotifyPlayer_right = EmbedController;
+  };
+  const callback_tierlist = (EmbedController) => {
+    spotifyPlayer_tierlist = EmbedController;
+  };
+  IFrameAPI.createController(elements.spotifyEmbed_left, {}, callback_left);
+  IFrameAPI.createController(elements.spotifyEmbed_right, {}, callback_right);
+  IFrameAPI.createController(elements.spotifyEmbed_tierlist, {}, callback_tierlist);
+}; //onSpotifyIframeApiReady
