@@ -11,7 +11,6 @@ let elements = {
 
   previewModal: document.getElementById("previewModal"),
   previewModalBody: document.getElementById("previewModalBody"),
-  createBracketModal: document.getElementById("createBracketModal"),
   generateChatModal: document.getElementById("generateChatModal"),
   generateModal: document.getElementById("generateModal"),
   generateBracketType: document.getElementById("generateBracketType"),
@@ -22,6 +21,10 @@ let elements = {
   uwufufuSettings: document.getElementById("uwufufuSettings"),
   ytchannelSettings: document.getElementById("ytchannelSettings"),
   ytplaylistSettings: document.getElementById("ytplaylistSettings"),
+
+  publishedModal: document.getElementById("publishedModal"),
+  bracketCode: document.getElementById("bracketCode"),
+  bracketLink: document.getElementById("bracketLink"),
 
   spotifyPlaylistLink: document.getElementById("spotifyPlaylistLink"),
   spotifyPlaylistPreview: document.getElementById("spotifyPlaylistPreview"),
@@ -38,8 +41,13 @@ let elements = {
   ytplaylistLink: document.getElementById("ytplaylistLink"),
   ytplaylistPreview: document.getElementById("ytplaylistPreview"),
 
-  browseModal: document.getElementById("browseModal"),
-  browseModalBody: document.getElementById("browseModalBody"),
+  communityModal: document.getElementById("communityModal"),
+  communityModalBody: document.getElementById("communityModalBody"),
+  shareCode: document.getElementById("shareCode"),
+  importModal: document.getElementById("importModal"),
+  importModalBody: document.getElementById("importModalBody"),
+  myBracketsModal: document.getElementById("myBracketsModal"),
+  myBracketsModalBody: document.getElementById("myBracketsModalBody"),
 
   startModal: document.getElementById("startModal"),
   formatSelect: document.getElementById("formatSelect"),
@@ -62,9 +70,7 @@ let elements = {
   darkTheme: document.getElementById("darkTheme"),
 
   myBrackets: document.getElementById("myBrackets"),
-  createBracket: document.getElementById("createBracket"),
   importBracket: document.getElementById("importBracket"),
-  importChatBracket: document.getElementById("importChatBracket"),
   bracketEditor: document.getElementById("bracketEditor"),
   bracketEditorHeader: document.getElementById("bracketEditorHeader"),
   bracketTitle: document.getElementById("bracketTitle"),
@@ -181,7 +187,7 @@ let darkTheme = true;
 
 let client;
 let loginButton;
-let loginExpiredModal, deleteBracketModal, quitBracketModal, tierlistEditorModal, previewModal, createBracketModal, generateChatModal, generateModal, browseModal, startModal;
+let loginExpiredModal, deleteBracketModal, quitBracketModal, tierlistEditorModal, previewModal, generateChatModal, generateModal, communityModal, startModal, publishedModal, importModal;
 let votePopover, votePopoverTierlist;
 let currentBracket = {};
 let currentTierlist = {};
@@ -558,7 +564,7 @@ function addOption(name = "", type = "", value = "", thumbnail = "", video = "")
       <div class="card-body">
         <div class="input-group mb-3">
           <span class="input-group-text option-value-label">Value/Link</span>
-          <input type="text" class="form-control option-value" data-option-id="${optionNumber}" onchange="saveBracket()" value="${value}" ${
+          <input type="text" class="form-control option-value" data-option-id="${optionNumber}" onchange="saveBracket(true)" value="${value}" ${
       optionType == "streamable" ? `data-video="${video}"` : ""
     } placeholder="Option Value/Link" aria-label="Option Value" />
           <button class="btn btn-outline-secondary" onclick="previewOption(${optionNumber},this)" type="button"><i class="material-icons notranslate">preview</i>Preview</button>
@@ -566,7 +572,7 @@ function addOption(name = "", type = "", value = "", thumbnail = "", video = "")
 
         <div class="input-group mb-3">
           <label class="input-group-text">Type</label>
-          <select class="form-select option-type" data-option-id="${optionNumber}" onchange="saveBracket()">
+          <select class="form-select option-type" data-option-id="${optionNumber}" onchange="saveBracket(true)">
             <option value="text" ${optionType == "text" ? "selected" : ""}>Text</option>
             <option value="image" ${optionType == "image" ? "selected" : ""}>Image</option>
             <option value="youtube" ${optionType == "youtube" ? "selected" : ""}>YouTube video</option>
@@ -578,12 +584,12 @@ function addOption(name = "", type = "", value = "", thumbnail = "", video = "")
 
         <div class="input-group mb-3">
           <span class="input-group-text">Name</span>
-          <input type="text" class="form-control option-name" data-option-id="${optionNumber}" onchange="saveBracket()" value="${name}"  placeholder="Option Name" aria-label="Option Name" />
+          <input type="text" class="form-control option-name" data-option-id="${optionNumber}" onchange="saveBracket(true)" value="${name}"  placeholder="Option Name" aria-label="Option Name" />
         </div>
 
         <div class="input-group">
           <span class="input-group-text">Thumbnail</span>
-          <input type="text" class="form-control option-thumbnail" data-option-id="${optionNumber}" onchange="saveBracket()" value="${thumbnail}" placeholder="Thumbnail" aria-label="Thumbnail" />
+          <input type="text" class="form-control option-thumbnail" data-option-id="${optionNumber}" onchange="saveBracket(true)" value="${thumbnail}" placeholder="Thumbnail" aria-label="Thumbnail" />
         </div>
       </div>
     </div>`
@@ -597,7 +603,7 @@ function deleteOption(id) {
   BRACKETS.brackets[bracketIndex].options.splice(id - 1, 1);
 
   editBracket(bracketID);
-  saveBracket();
+  saveBracket(true);
 } //deleteOption
 
 async function previewOption(id, button) {
@@ -866,6 +872,7 @@ function createBracket(generated = false, type = "single") {
     description: "",
     options: [],
     generated: generated,
+    published: false,
     defaultFormat: type == "tiermaker" ? "tierlist" : "single",
     time: Date.now(),
   });
@@ -874,12 +881,18 @@ function createBracket(generated = false, type = "single") {
   saveBracket();
 } //createBracket
 
-function saveBracket() {
+function saveBracket(edited = false) {
   let id = parseInt(elements.bracketTitle.dataset.bracketId, 10);
   let bracket = BRACKETS.brackets.find((x) => x.id === id);
 
   bracket.title = elements.bracketTitle.value || "Untitled bracket";
   bracket.description = elements.bracketDescription.value || "No description";
+
+  if (edited) {
+    //let user publish generated brackets if they edit them or republish already published brackets
+    bracket.generated = false;
+    bracket.published = false;
+  }
 
   let optionNames = document.querySelectorAll(".option-name");
   let optionTypes = document.querySelectorAll(".option-type");
@@ -890,7 +903,6 @@ function saveBracket() {
 
   for (let index = 0; index < optionNames.length; index++) {
     let link = parseLink(optionValues[index].value);
-    console.log(link);
     switch (link?.type) {
       case "youtube":
       case "twitch":
@@ -1780,7 +1792,7 @@ function loadBrackets() {
         <button type="button" class="btn btn-success" onclick="showStartModal(${BRACKETS.brackets[index].id})">
           <i class="material-icons notranslate">play_arrow</i> Start bracket
         </button>
-        <button type="button" class="btn btn-secondary" ${BRACKETS.brackets[index]?.generated ? `style="display: none"` : ""}
+        <button type="button" class="btn btn-secondary" ${BRACKETS.brackets[index]?.generated || BRACKETS.brackets[index]?.published ? `style="display: none"` : ""}
         data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Publish bracket" onclick="publishBracket(${BRACKETS.brackets[index].id},this)">
          <i class="material-icons notranslate">cloud_upload</i>
        </button>
@@ -1853,6 +1865,7 @@ async function previewSpotifyPlaylist() {
       previewedBracket.push({
         name: `${tracks[index].track.name} - ${tracks[index].track.artists.map((a) => a.name).join(", ")}`,
         type: "spotify",
+        id: tracks[index].track.id,
         value: tracks[index].track.external_urls.spotify,
         thumbnail: tracks[index].track.album.images[0].url,
       });
@@ -1962,12 +1975,13 @@ async function previewClips() {
     }
 
     previewedBracketTitle = `Top ${channel} clips`;
-    previewedBracketDescription = `Bracket with 100 ${channel} clips`;
+    previewedBracketDescription = `Bracket with ${clips.length} ${channel} clips`;
     previewedBracket = [];
     let html = `<ul class="list-group">`;
     for (let index = 0; index < clips.length; index++) {
       previewedBracket.push({
         name: clips[index].title,
+        id: clips[index].id,
         type: "twitch",
         value: clips[index].url,
         thumbnail: clips[index].thumbnail_url,
@@ -2123,6 +2137,7 @@ async function previewYTChannel() {
       numberOfVideos++;
       previewedBracket.push({
         name: videos[index].snippet.title,
+        id: videos[index].id.videoId,
         type: "youtube",
         value: `https://www.youtube.com/watch?v=${videos[index].id.videoId}`,
         thumbnail: videos[index].snippet.thumbnails.high.url,
@@ -2168,6 +2183,7 @@ async function previewYTPlaylist() {
     for (let index = 0; index < videos.length; index++) {
       previewedBracket.push({
         name: videos[index].snippet.title,
+        id: videos[index].snippet.resourceId.videoId,
         type: "youtube",
         value: `https://www.youtube.com/watch?v=${videos[index].snippet.resourceId.videoId}`,
         thumbnail: videos[index].snippet.thumbnails.high.url,
@@ -2210,6 +2226,128 @@ async function generateBracket() {
   generateModal.hide();
 } //generateBracket
 
+async function publishBracket(id, e) {
+  e.innerHTML = `<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Loading...</span></div>`;
+  const tooltip = bootstrap.Tooltip.getInstance(e);
+  tooltip.dispose();
+
+  id = parseInt(id, 10);
+  const bracketIndex = BRACKETS.brackets.findIndex((e) => e.id === id);
+
+  if (BRACKETS.brackets[bracketIndex].options.length < 2) {
+    showToast("Bracket must have 2 options at least", "warning", 3000);
+    e.innerHTML = `<i class="material-icons notranslate">cloud_upload</i>`;
+    return;
+  }
+  let body = JSON.stringify({
+    userid: USER.userID,
+    username: USER.channel,
+    access_token: USER.access_token,
+    bracket: BRACKETS.brackets[bracketIndex],
+  });
+  let requestOptions = {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: body,
+    redirect: "follow",
+  };
+  try {
+    let response = await fetch(`https://brackets.donk.workers.dev/publish`, requestOptions);
+    let result = await response.json();
+    console.log(result);
+    showToast(result.message, "info", 3000);
+    if (response.status == 200) {
+      BRACKETS.brackets[bracketIndex].published = true;
+      elements.bracketCode.innerHTML = result.id;
+      elements.bracketLink.innerHTML = `https://chat.vote/brackets#${result.id}`;
+      publishedModal.show();
+      saveSettings();
+      loadBrackets();
+    }
+    e.innerHTML = `<i class="material-icons notranslate">cloud_upload</i>`;
+  } catch (error) {
+    showToast("Could not publish bracket", "danger", 3000);
+    e.innerHTML = `<i class="material-icons notranslate">cloud_upload</i>`;
+    console.log("publishBracket error", error);
+  }
+} //publishBracket
+
+let importPreviewedBracket;
+async function importCode(hashCode = "") {
+  elements.importModalBody.innerHTML = spinner;
+  let code = elements.shareCode.value?.trim();
+
+  if (hashCode) {
+    code = hashCode;
+  }
+
+  if (!code || code.length != 4) {
+    showToast("Invalid bracket code", "warning", 3000);
+    return;
+  }
+  elements.shareCode.value = "";
+  communityModal.hide();
+  importModal.show();
+  try {
+    let response = await fetch(`https://brackets.donk.workers.dev/id/${code}`, GETrequestOptions);
+    if (response.status !== 200) {
+      elements.importModalBody.innerHTML = "Bracket not found :(";
+      return;
+    }
+    let result = await response.json();
+    console.log(result);
+    importPreviewedBracket = result;
+
+    if (result.blacklisted) {
+      elements.importModalBody.innerHTML = `<span class="text-danger">This bracket is blacklisted (${result.reason})</span>`;
+      return;
+    }
+
+    let html = `
+    <div class="card">
+    <div class="card-header">${validator.escape(result.bracket.title)} <span class="text-body-secondary">by @${result.username}</span></div>
+    <div class="card-body">
+    <p class="card-text">${validator.escape(result.bracket.description)}</p>
+    Options (${result.bracket.options.length}):
+    <ul class="list-group" style="max-height: 400px; overflow: auto">`;
+    for (let index = 0; index < result.bracket.options.length; index++) {
+      html += `<li class="list-group-item">${validator.escape(result.bracket.options[index].name)} - ${validator.escape(result.bracket.options[index].value)}</li>`;
+    }
+    html += `
+    </ul>
+    </div>
+    </div>
+    <span class="text-warning">Import brackets from users you trust only</span><br>
+    <button type="button" class="btn btn-danger mt-3" data-bs-dismiss="modal" onclick="importPreviewed()">
+    <i class="material-icons notranslate">cloud_download</i> Import
+    </button>`;
+    elements.importModalBody.innerHTML = html;
+  } catch (error) {
+    elements.importModalBody.innerHTML = "Could not import bracket :(";
+    console.log("importCode error", error);
+  }
+} //importCode
+
+function importPreviewed() {
+  createBracket(true);
+  elements.bracketTitle.value = importPreviewedBracket.bracket.title;
+  elements.bracketDescription.value = `${importPreviewedBracket.bracket.description} - Bracket by @${importPreviewedBracket.username} - bracket ID: ${importPreviewedBracket.id}`;
+  for (let index = 0; index < importPreviewedBracket.bracket.options.length; index++) {
+    addOption(
+      importPreviewedBracket.bracket.options[index].name,
+      importPreviewedBracket.bracket.options[index].type,
+      importPreviewedBracket.bracket.options[index].value,
+      importPreviewedBracket.bracket.options[index].thumbnail,
+      importPreviewedBracket.bracket.options[index]?.video
+    );
+  }
+  saveBracket();
+  importModal.hide();
+} //importPreviewed
+
 async function importApproved(id) {
   let bracket = approvedBrackets.find((e) => e.id === id);
   createBracket(true);
@@ -2225,93 +2363,8 @@ async function importApproved(id) {
     );
   }
   saveBracket();
-  browseModal.hide();
+  communityModal.hide();
 } //importApproved
-
-async function publishBracket(id, e) {
-  e.innerHTML = `<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Loading...</span></div>`;
-  id = parseInt(id, 10);
-  let bracket = BRACKETS.brackets.find((x) => x.id === id);
-  if (bracket.options.length < 2) {
-    showToast("Bracket must have 2 options at least", "warning", 3000);
-    e.innerHTML = `<i class="material-icons notranslate">cloud_upload</i>`;
-    return;
-  }
-  let body = JSON.stringify({
-    userid: USER.userID,
-    username: USER.channel,
-    access_token: USER.access_token,
-    time: new Date(),
-    bracket: bracket,
-  });
-  let requestOptions = {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: body,
-    redirect: "follow",
-  };
-  try {
-    let response = await fetch(`https://brackets.donk.workers.dev/publish`, requestOptions);
-    let result = await response.json();
-    showToast(result.message, "info", 3000);
-    e.innerHTML = `<i class="material-icons notranslate">cloud_upload</i>`;
-  } catch (error) {
-    showToast("Could not publish bracket", "danger", 3000);
-    e.innerHTML = `<i class="material-icons notranslate">cloud_upload</i>`;
-    console.log("publishBracket error", error);
-  }
-} //publishBracket
-
-let approvedBrackets;
-async function loadApproved() {
-  elements.browseModalBody.innerHTML = spinner;
-  browseModal.show();
-
-  let requestOptions = {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    redirect: "follow",
-  };
-  try {
-    let response = await fetch(`https://brackets.donk.workers.dev/approved`, requestOptions);
-    let result = await response.json();
-    approvedBrackets = result;
-    console.log(result);
-    let html = "";
-    if (result.length == 0) {
-      html = "Could not find any brackets :(";
-    }
-    for (let index = 0; index < result.length; index++) {
-      html += `
-      <div class="card mb-5">
-      <div class="card-header">${result[index].bracket.title} <span class="text-body-secondary">by @${result[index].username}</span></div>
-      <div class="card-body">
-      <p class="card-text">${result[index].bracket.description}</p>
-      Options(${result[index].bracket.options.length}):
-      <ul class="list-group" style="height: 200px; overflow: auto">`;
-      for (let index2 = 0; index2 < result[index].bracket.options.length; index2++) {
-        html += `<li class="list-group-item">${result[index].bracket.options[index2].name} - ${result[index].bracket.options[index2].value}</li>`;
-      }
-      html += `
-      </ul>
-      <button type="button" class="btn btn-success float-end mt-3 me-2" onclick="importApproved('${result[index].id}')">
-      <i class="material-icons notranslate">cloud_download</i> Import
-      </button>
-      </div>
-      </div>`;
-    }
-    elements.browseModalBody.innerHTML = html;
-  } catch (error) {
-    elements.browseModalBody.innerHTML = "Could not load brackets :(";
-    console.log("loadApproved error", error);
-  }
-} //loadApproved
 
 function zoomCard(id) {
   elements[id].classList.toggle(`zoomed`);
@@ -2613,11 +2666,12 @@ window.onload = async function () {
   quitBracketModal = new bootstrap.Modal(elements.quitBracketModal);
   tierlistEditorModal = new bootstrap.Modal(elements.tierlistEditorModal);
   previewModal = new bootstrap.Modal(elements.previewModal);
-  createBracketModal = new bootstrap.Modal(elements.createBracketModal);
   generateChatModal = new bootstrap.Modal(elements.generateChatModal);
   generateModal = new bootstrap.Modal(elements.generateModal);
-  browseModal = new bootstrap.Modal(elements.browseModal);
+  communityModal = new bootstrap.Modal(elements.communityModal);
   startModal = new bootstrap.Modal(elements.startModal);
+  publishedModal = new bootstrap.Modal(elements.publishedModal);
+  importModal = new bootstrap.Modal(elements.importModal);
 
   elements.tierlistEditorModal.addEventListener("show.bs.modal", (event) => {
     loadTierlistEditor();
@@ -2628,21 +2682,6 @@ window.onload = async function () {
   });
 
   elements.generateModal.addEventListener("hidden.bs.modal", (event) => {
-    previewedBracket = [];
-    previewedBracketDescription = "";
-    previewedBracketTitle = "";
-    for (let element of document.getElementsByClassName("generate-type")) {
-      element.style.display = "none";
-    }
-    for (let element of document.getElementsByClassName("generate-value")) {
-      element.value = "";
-    }
-    for (let element of document.getElementsByClassName("generate-preview")) {
-      element.innerHTML = "";
-    }
-  });
-
-  elements.generateChatModal.addEventListener("hidden.bs.modal", (event) => {
     previewedBracket = [];
     previewedBracketDescription = "";
     previewedBracketTitle = "";
@@ -2696,11 +2735,6 @@ window.onload = async function () {
     hideScore();
   });
 
-  elements.createBracket.addEventListener("click", function () {
-    createBracket();
-    enableTooltips();
-  });
-
   elements.importBracket.addEventListener("click", function () {
     previewedBracket = [];
     previewedBracketDescription = "";
@@ -2717,25 +2751,9 @@ window.onload = async function () {
     generateModal.show();
   });
 
-  elements.importChatBracket.addEventListener("click", function () {
-    previewedBracket = [];
-    previewedBracketDescription = "";
-    previewedBracketTitle = "";
-    for (let element of document.getElementsByClassName("generate-type")) {
-      element.style.display = "none";
-    }
-    for (let element of document.getElementsByClassName("generate-value")) {
-      element.value = "";
-    }
-    for (let element of document.getElementsByClassName("generate-preview")) {
-      element.innerHTML = "";
-    }
-    generateChatModal.show();
-  });
-
   elements.addOption.addEventListener("click", function () {
     addOption();
-    saveBracket();
+    saveBracket(true);
   });
 
   elements.deleteBracketButton.addEventListener("click", function () {
@@ -2755,6 +2773,12 @@ window.onload = async function () {
   elements.twitchClipsEmbed_left.src = "";
   elements.twitchClipsEmbed_right.src = "";
   elements.twitchClipsEmbed_tierlist.src = "";
+
+  let code = location.hash?.replace("#", "")?.trim();
+  if (code.length == 4) {
+    importCode(code);
+    history.replaceState(undefined, undefined, "#");
+  }
 }; //onload
 
 let youtubePlayer_left;

@@ -153,14 +153,16 @@
                 >help
               </i>
             </div>
+
             <div class="hstack gap-3 mb-5">
-              <button type="button" class="btn btn-success btn-lg" data-bs-dismiss="modal" id="createBracket">
+              <button type="button" class="btn btn-success btn-lg" data-bs-dismiss="modal" onclick="createBracket()">
                 <div class="hstack"><i class="material-icons notranslate">create</i> Create empty bracket</div>
               </button>
               Creates an empty bracket that you have to fill out manually
             </div>
+
             <div class="hstack gap-3 mb-5" style="display: none">
-              <button type="button" class="btn btn-secondary btn-lg" data-bs-dismiss="modal" id="importChatBracket">
+              <button type="button" class="btn btn-secondary btn-lg" data-bs-dismiss="modal" data-bs-target="#generateChatModal">
                 <div class="hstack"><i class="material-icons notranslate">chat</i> Chat bracket</div>
               </button>
               Generates a bracket from chat's requests
@@ -172,11 +174,12 @@
                 >help
               </i>
             </div>
-            <div class="hstack gap-3" style="display: none">
-              <button type="button" class="btn btn-primary btn-lg" data-bs-dismiss="modal" onclick="loadApproved()">
-                <div class="hstack"><i class="material-icons notranslate">search</i> Browse brackets</div>
+
+            <div class="hstack gap-3">
+              <button type="button" class="btn btn-primary btn-lg" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#communityModal">
+                <div class="hstack"><i class="material-icons notranslate">search</i> Import bracket</div>
               </button>
-              Browse and download brackets created by other users
+              Download brackets created by other users or browse your published brackets
             </div>
           </div>
           <div class="modal-footer">
@@ -193,9 +196,11 @@
             <h5 class="modal-title">Chat bracket</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body"></div>
+          <div class="modal-body">not working yet :)</div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#createBracketModal"><i class="material-icons notranslate">arrow_back</i> Back</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#createBracketModal">
+              <i class="material-icons notranslate">arrow_back</i> Back
+            </button>
             <button type="button" class="btn btn-success" onclick="generateChatBracket()"><i class="material-icons notranslate">auto_awesome</i> Generate</button>
           </div>
         </div>
@@ -323,24 +328,101 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#createBracketModal"><i class="material-icons notranslate">arrow_back</i> Back</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#createBracketModal">
+              <i class="material-icons notranslate">arrow_back</i> Back
+            </button>
             <button type="button" class="btn btn-success" onclick="generateBracket()"><i class="material-icons notranslate">auto_awesome</i> Generate</button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="modal fade" id="browseModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-lg">
+    <div class="modal fade" id="communityModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Community brackets</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body" style="max-height: 80vh; overflow: auto" id="browseModalBody">nothing here :)</div>
+          <div class="modal-body" id="communityModalBody">
+            <label for="shareCode" class="form-label">Import bracket</label>
+            <div class="input-group">
+              <span class="input-group-text">Bracket code</span>
+              <input type="text" class="form-control" placeholder="XXXX" id="shareCode" />
+              <button class="btn btn-outline-success" type="button" onclick="importCode()"><i class="material-icons notranslate">download</i>Import</button>
+            </div>
+            <hr />
+            <button type="button" class="btn btn-info" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#myBracketsModal">
+              <i class="material-icons notranslate">person</i> My published brackets
+            </button>
+          </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#createBracketModal"><i class="material-icons notranslate">arrow_back</i> Back</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#createBracketModal">
+              <i class="material-icons notranslate">arrow_back</i> Back
+            </button>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="importModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Import bracket</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" style="max-height: 80vh; overflow: auto" id="importModalBody"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#communityModal">
+              <i class="material-icons notranslate">arrow_back</i> Back
+            </button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="myBracketsModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">My bracket</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" style="max-height: 80vh; overflow: auto" id="myBracketsModalBody">not working yet :)</div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#communityModal">
+              <i class="material-icons notranslate">arrow_back</i> Back
+            </button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="publishedModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Bracket published</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Share your bracket with other users using the code
+            <h2><kbd id="bracketCode"></kbd></h2>
+            <small class="text-body-secondary"
+              >To use the code click on <i class="material-icons notranslate">add_circle_outline</i> Create new bracket → <i class="material-icons notranslate">search</i> Import
+              bracket</small
+            >
+            <hr />
+            You can also share the bracket using this link
+            <h3><kbd id="bracketLink"></kbd></h3>
+            <small class="text-body-secondary">Bracket will be automatically downloaded when a user opens the link</small>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
           </div>
         </div>
       </div>
@@ -880,13 +962,13 @@
             <div class="card-body" id="bracketEditorBody">
               <div class="mb-3">
                 <label for="bracketTitle" class="form-label">Bracket title</label>
-                <input type="text" class="form-control" id="bracketTitle" onchange="saveBracket()" placeholder="Bracket title" />
+                <input type="text" class="form-control" id="bracketTitle" onchange="saveBracket(true)" placeholder="Bracket title" />
                 <small class="text-body-secondary">Bracket title</small>
               </div>
 
               <div class="mb-3">
                 <label for="bracketDescription" class="form-label">Bracket description</label>
-                <textarea class="form-control" id="bracketDescription" onchange="saveBracket()" rows="2" placeholder="Bracket description"></textarea>
+                <textarea class="form-control" id="bracketDescription" onchange="saveBracket(true)" rows="2" placeholder="Bracket description"></textarea>
                 <small class="text-body-secondary">Bracket description</small>
               </div>
 
