@@ -12,6 +12,7 @@ let elements = {
   previewModal: document.getElementById("previewModal"),
   previewModalBody: document.getElementById("previewModalBody"),
   generateChatModal: document.getElementById("generateChatModal"),
+  playlist: document.getElementById("playlist"),
   generateModal: document.getElementById("generateModal"),
   generateBracketType: document.getElementById("generateBracketType"),
   spotifyplaylistSettings: document.getElementById("spotifyplaylistSettings"),
@@ -629,7 +630,7 @@ async function previewOption(id, button) {
     elements.previewModalBody.innerHTML = `
     <div class="card">
     <div class="card-body">
-    ${option?.value || `<span class="text-body-secondary">Empty option</span>`}
+    ${validator.escape(option?.value) || `<span class="text-body-secondary">Empty option</span>`}
     </div>
     </div>`;
     previewModal.show();
@@ -1030,8 +1031,8 @@ function startSingleElimination(bracket) {
 
   elements.brackets_editor.style.display = "none";
   elements.bracket.style.display = "";
-  elements.title.innerHTML = bracket.title;
-  elements.winner.innerHTML = `Winner of ${bracket.title}<br>`;
+  elements.title.innerText = bracket.title;
+  elements.winner.innerHTML = `Winner of ${validator.escape(bracket.title)}<br>`;
   elements.pickWinner.innerHTML = `<i class="material-icons notranslate">navigate_next</i>Next match`;
 
   console.log(currentBracket);
@@ -1236,7 +1237,7 @@ async function nextTierlistItem() {
     elements.upcoming.style.display = "none";
   }
 
-  elements.currentTierlistItemName.innerHTML = item.name || "Untitled item";
+  elements.currentTierlistItemName.innerText = item.name || "Untitled item";
 
   if (!item?.id && (item.type == "youtube" || item.type == "twitch" || item.type == "spotify")) {
     let info = parseLink(item.value);
@@ -1249,7 +1250,7 @@ async function nextTierlistItem() {
 
   if (item.type == "text") {
     elements.text_image_tierlist.style.display = "";
-    elements.text_image_tierlist.innerHTML = item.value || `<span class="text-body-secondary">Empty option</span>`;
+    elements.text_image_tierlist.innerHTML = validator.escape(item.value) || `<span class="text-body-secondary">Empty option</span>`;
   } //text
 
   if (item.type == "image") {
@@ -1469,11 +1470,11 @@ async function showOption(position, option) {
     }
   }
 
-  elements[`${position}_name`].innerHTML = option.name || `<span class="text-body-secondary">Untitled option</span>`;
+  elements[`${position}_name`].innerHTML = validator.escape(option.name) || `<span class="text-body-secondary">Untitled option</span>`;
 
   if (option.type == "text") {
     elements[`text_image_${position}`].style.display = "";
-    elements[`text_image_${position}`].innerHTML = option.value || `<span class="text-body-secondary">Empty option</span>`;
+    elements[`text_image_${position}`].innerHTML = validator.escape(option.value) || `<span class="text-body-secondary">Empty option</span>`;
   } //text
 
   if (option.type == "image") {
@@ -1588,7 +1589,7 @@ function updateScores() {
 } //updateScores
 
 function showWinner(first, firstAndSecond) {
-  elements.winner.innerHTML += `<strong>${first[0].name}</strong>`;
+  elements.winner.innerHTML += `<strong>${validator.escape(first[0].name)}</strong>`;
 
   elements.settings.disabled = true;
   elements.restart.disabled = true;
@@ -1765,7 +1766,7 @@ function editBracket(id) {
 function deleteBracket(id) {
   id = parseInt(id, 10);
   let bracket = BRACKETS.brackets.find((x) => x.id === id);
-  elements.deleteBracketModalBody.innerHTML = `Delete "${bracket.title}"?`;
+  elements.deleteBracketModalBody.innerText = `Delete "${bracket.title}"?`;
   elements.deleteBracketButton.dataset.bracketId = id;
   deleteBracketModal.show();
 } //deleteBracket
@@ -1780,14 +1781,14 @@ function loadBrackets() {
 
   for (let index = BRACKETS.brackets.length - 1; index >= 0; index--) {
     let warning = BRACKETS.brackets[index].options.some((e) => !e.value)
-      ? `<i class="material-icons notranslate text-danger" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Some of the options have no value">warning</i>`
+      ? `<i class="material-icons notranslate text-danger cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Some of the options have no value">warning</i>`
       : "";
     warning += BRACKETS.brackets[index].options.some((e) => !e.thumbnail)
-      ? `<i class="material-icons notranslate text-warning" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Some of the options have no thumbnail">warning</i>`
+      ? `<i class="material-icons notranslate text-warning cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Some of the options have no thumbnail">warning</i>`
       : "";
     html += `<div class="card mb-3">
     <div class="card-header">
-      ${BRACKETS.brackets[index].title || "Untitled bracket"} ${warning}
+      ${validator.escape(BRACKETS.brackets[index].title) || "Untitled bracket"} ${warning}
       <div class="btn-group btn-group-sm float-end" role="group" aria-label="bracket controls">
         <button type="button" class="btn btn-success" onclick="showStartModal(${BRACKETS.brackets[index].id})">
           <i class="material-icons notranslate">play_arrow</i> Start bracket
@@ -1808,7 +1809,7 @@ function loadBrackets() {
     </div>
     <div class="card-body my-bracket-body">
       <h5 class="card-title">${BRACKETS.brackets[index].description || "No description"}</h5>
-      <p class="card-text">${BRACKETS.brackets[index].options.map((e) => `${icons[e.type]} ${e.name}`).join(" • ") || "No options"}</p>
+      <p class="card-text">${BRACKETS.brackets[index].options.map((e) => `${icons[e.type]} ${validator.escape(e.name)}`).join(" • ") || "No options"}</p>
     </div>
   </div>`;
   }
@@ -1871,11 +1872,13 @@ async function previewSpotifyPlaylist() {
       });
       html += `
       <li class="list-group-item">
-      <a target="_blank" rel="noopener noreferrer" href="${tracks[index].track.preview_url}">${tracks[index].track.name} - ${tracks[index].track.artists.map((a) => a.name).join(", ")}</a>
+      <a target="_blank" rel="noopener noreferrer" href="${tracks[index].track.preview_url}">${validator.escape(tracks[index].track.name)} - ${tracks[index].track.artists
+        .map((a) => a.name)
+        .join(", ")}</a>
       </li>`;
     }
     html += `</ul>`;
-    elements.spotifyPlaylistPreview.innerHTML = `<p>${result[0].name || "Untitled playlist"} - ${result[0].description || "No description"} - ${
+    elements.spotifyPlaylistPreview.innerHTML = `<p>${validator.escape(result[0].name) || "Untitled playlist"} - ${validator.escape(result[0].description) || "No description"} - ${
       previewedBracket.length == 0 ? "Playlist has no tracks" : `${previewedBracket.length} ${previewedBracket.length == 1 ? "track" : "tracks"}`
     } </p>${html}`;
   } catch (error) {
@@ -1935,7 +1938,7 @@ async function previewTiermaker() {
       html += `
         <li class="list-group-item">
         <a target="_blank" rel="noopener noreferrer" href="https://proxy.donk.workers.dev/?url=${encodeURI(link)}">
-        ${name || "Untitled option"}
+        ${validator.escape(name) || "Untitled option"}
         </a>
         </li>`;
       images++;
@@ -1989,7 +1992,7 @@ async function previewClips() {
       html += `
       <li class="list-group-item">
       <a target="_blank" rel="noopener noreferrer" href="${clips[index].url}">
-      ${clips[index].title} - ${clips[index].view_count.toLocaleString()} ${clips[index].view_count == 1 ? "view" : "views"}
+      ${validator.escape(clips[index].title)} - ${clips[index].view_count.toLocaleString()} ${clips[index].view_count == 1 ? "view" : "views"}
       </a>
       </li>`;
     }
@@ -2093,7 +2096,7 @@ async function previewUwufufu() {
         html += `
         <li class="list-group-item">
         <a target="_blank" rel="noopener noreferrer" href="https://proxy.donk.workers.dev/?url=${encodeURI(previewedBracket[index].value)}">
-        ${previewedBracket[index].name || "Untitled option"}
+        ${validator.escape(previewedBracket[index].name) || "Untitled option"}
         </a>
         </li>`;
         images++;
@@ -2145,7 +2148,7 @@ async function previewYTChannel() {
       html += `
       <li class="list-group-item">
       <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/watch?v=${videos[index].id.videoId}">
-      ${videos[index].snippet.title}
+      ${validator.escape(videos[index].snippet.title)}
       </a>
       </li>`;
     }
@@ -2191,7 +2194,7 @@ async function previewYTPlaylist() {
       html += `
       <li class="list-group-item">
       <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/watch?v=${videos[index].snippet.resourceId.videoId}">
-      ${videos[index].snippet.title}
+      ${validator.escape(videos[index].snippet.title)}
       </a>
       </li>`;
     }
@@ -2365,6 +2368,82 @@ async function importApproved(id) {
   saveBracket();
   communityModal.hide();
 } //importApproved
+
+let chatBracket = [];
+function loadPlaylist() {
+  let playlist = JSON.parse(localStorage.getItem("PLAYLIST_REQUESTS"));
+
+  if (!playlist || playlist.length < 2) {
+    elements.playlist.innerHTML = `<span class="text-warning">Playlist needs to have at least 2 videos</span>`;
+    return;
+  }
+
+  let count = 0;
+  chatBracket = [];
+  let html = `<ul class="list-group">`;
+  for (let index = 0; index < playlist.length; index++) {
+    let type = playlist[index].type;
+    if (type == "twitch stream" || type == "twitch vod") {
+      //skip streams and vods bcz they are not supported in the brackets site
+      continue;
+    }
+
+    if (!playlist[index].title || !playlist[index].id || !playlist[index].type || !playlist[index].thumbnail || (playlist[index].type == "streamable" && !playlist[index].video)) {
+      //skip broken requests
+      continue;
+    }
+
+    if (type == "youtube short") {
+      type = "youtube";
+    }
+
+    if (type == "twitch clip") {
+      type = "twitch";
+    }
+
+    count++;
+
+    let link = getItemLink(type, playlist[index].id);
+
+    chatBracket.push({
+      name: playlist[index].title,
+      id: playlist[index].id,
+      type: type,
+      value: link,
+      thumbnail: playlist[index].thumbnail,
+      video: playlist[index]?.video,
+    });
+    html += `
+    <li class="list-group-item">
+    <a target="_blank" rel="noopener noreferrer" href="${link}">
+    ${validator.escape(playlist[index].title)}
+    </a>
+    </li>`;
+  }
+  html += `</ul>`;
+  let diff = playlist.length - count;
+  elements.playlist.innerHTML = `
+  Playlist has ${count} videos ${diff ? ` (${diff} unsupported/broken ${diff == 1 ? "video" : "videos"} skipped)` : ""}
+  ${html}`;
+
+  console.log(playlist);
+} //loadPlaylist
+
+function generateChatBracket() {
+  if (chatBracket.length == 0) {
+    showToast(`You must <button type="button" class="btn btn-success" ><i class="material-icons notranslate">file_download</i> Load</button> the playlist first`, "warning", 3000);
+    return;
+  }
+  createBracket(true);
+  elements.bracketTitle.value = "Chat bracket";
+  elements.bracketDescription.value = "Bracket with chat's requests";
+  for (let index = 0; index < chatBracket.length; index++) {
+    addOption(chatBracket[index].name, chatBracket[index].type, chatBracket[index].value, chatBracket[index].thumbnail, chatBracket[index]?.video);
+  }
+
+  saveBracket();
+  generateChatModal.hide();
+} //generateChatBracket
 
 function zoomCard(id) {
   elements[id].classList.toggle(`zoomed`);

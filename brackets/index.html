@@ -146,7 +146,7 @@
               </button>
               Automatically generates a bracket from 3rd party sources
               <i
-                class="material-icons notranslate"
+                class="material-icons notranslate cursor-pointer"
                 data-bs-toggle="tooltip"
                 data-bs-placement="top"
                 data-bs-title="Sources include: Spotify playlists, TierMaker.com tier list, Twitch clips & emotes, UwUFUFU.com brackets, YouTube channels & playlists"
@@ -161,13 +161,13 @@
               Creates an empty bracket that you have to fill out manually
             </div>
 
-            <div class="hstack gap-3 mb-5" style="display: none">
-              <button type="button" class="btn btn-secondary btn-lg" data-bs-dismiss="modal" data-bs-target="#generateChatModal">
+            <div class="hstack gap-3 mb-5">
+              <button type="button" class="btn btn-secondary btn-lg" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#generateChatModal">
                 <div class="hstack"><i class="material-icons notranslate">chat</i> Chat bracket</div>
               </button>
               Generates a bracket from chat's requests
               <i
-                class="material-icons notranslate"
+                class="material-icons notranslate cursor-pointer"
                 data-bs-toggle="tooltip"
                 data-bs-placement="top"
                 data-bs-title="Viewers will be able to add YouTube videos, Twitch clips, Spotify songs, and Streamable videos"
@@ -196,7 +196,33 @@
             <h5 class="modal-title">Chat bracket</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body">not working yet :)</div>
+          <div class="modal-body">
+            <h4>How to use:</h4>
+            <ul>
+              <li>
+                Go to the <a href="/playlist/" target="_blank" rel="noopener noreferrer">chat.vote <i class="material-icons notranslate">queue_music</i> Playlist site</a>
+              </li>
+              <li>
+                Adjust settings (limits, platforms, etc)
+                <i
+                  class="material-icons notranslate text-warning cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  data-bs-title="Twitch streams and VODs are not supported here"
+                >
+                  warning_amber
+                </i>
+              </li>
+              <li>Viewers send requests on the Playlist site</li>
+              <li>
+                <button type="button" class="btn btn-success" onclick="loadPlaylist()"><i class="material-icons notranslate">file_download</i> Load playlist</button>
+              </li>
+            </ul>
+
+            <small class="text-warning">Current playing video won't be included, disable autoplay to not miss any video when generating the bracket</small>
+
+            <div id="playlist" class="generate-preview"></div>
+          </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#createBracketModal">
               <i class="material-icons notranslate">arrow_back</i> Back
