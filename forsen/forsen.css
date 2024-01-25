@@ -17,19 +17,25 @@
   cursor: pointer;
 }
 
-#raffleOutput {
+#raffleOutput,
+#raffleOutputTier3 {
   overflow-y: auto;
-  height: 88.5vh;
-  padding-bottom: 500px;
+  height: 35vh;
 }
 
-#raffleOutput > p {
+#raffleOutput > p,
+#raffleOutputTier3 > p {
   margin-bottom: 0;
+}
+
+#raffleUsersDivTier3 {
+  overflow-y: auto;
+  height: 31vh;
 }
 
 #raffleUsersDiv {
   overflow-y: auto;
-  height: 55vh;
+  height: 35vh;
 }
 
 section {

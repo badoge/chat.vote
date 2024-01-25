@@ -7,6 +7,7 @@ const raffle_command2 = "!ticket";
 let elements = {
   //modals
   restartRaffleModal: document.getElementById("restartRaffleModal"),
+  restartTier3RaffleModal: document.getElementById("restartTier3RaffleModal"),
   fancyRaffleModal: document.getElementById("fancyRaffleModal"),
   slot: document.getElementById("slot"),
   claw: document.getElementById("claw"),
@@ -15,48 +16,51 @@ let elements = {
   status: document.getElementById("status"),
   topRight: document.getElementById("topRight"),
   //raffle
-  enableRaffle: document.getElementById("enableRaffle"),
-  enableRaffleText: document.getElementById("enableRaffleText"),
-  raffleAccordion: document.getElementById("raffleAccordion"),
-  raffleCollapse: document.getElementById("raffleCollapse"),
-  rafflePrefix: document.getElementById("rafflePrefix"),
-  pussymode: document.getElementById("pussymode"),
-  t3: document.getElementById("t3"),
-  raffleUsersDiv: document.getElementById("raffleUsersDiv"),
   raffleUsers: document.getElementById("raffleUsers"),
+  raffleUsersTier3: document.getElementById("raffleUsersTier3"),
   entrants: document.getElementById("entrants"),
+  entrantsTier3: document.getElementById("entrantsTier3"),
   raffleOutput: document.getElementById("raffleOutput"),
-  //main
+  raffleOutputTier3: document.getElementById("raffleOutputTier3"),
+  emotes: document.getElementById("emotes"),
 };
 
 let client;
 let raffle_users = [];
-let raffle_tickets = [];
+let raffle_users_tier3 = [];
+let tier3Emotes = [];
+
 let n = 0;
 let n2 = 0;
 let n3 = 0;
 let raffle_open;
 let color = "";
 let currentTime = 0;
-let restartRaffleModal, fancyRaffleModal;
+let restartRaffleModal, restartTier3RaffleModal, fancyRaffleModal;
 let winner = "";
 let winners = [];
-let raffleCollapse;
+let winnerTier3 = "";
+let winnersTier3 = [];
 let tickSound, revealSound;
 let thirdPartyEmotes = [];
 
 function restartRaffle() {
   raffle_users = [];
-  raffle_tickets = [];
   winner = "";
   winners = [];
-  if (!!document.getElementById("countdown_raffle")) {
-    document.getElementById("countdown_raffle").remove();
-  }
   elements.raffleUsers.innerHTML = "";
   elements.raffleOutput.innerHTML = "";
   elements.entrants.innerHTML = "Entrants: 0";
 } //restartRaffle
+
+function restartTier3Raffle() {
+  raffle_users_tier3 = [];
+  winnerTier3 = "";
+  winnersTier3 = [];
+  elements.raffleUsersTier3.innerHTML = "";
+  elements.raffleOutputTier3.innerHTML = "";
+  elements.entrantsTier3.innerHTML = "Entrants: 0";
+} //restartTier3Raffle
 
 function connect() {
   elements.status.innerHTML = `
@@ -92,17 +96,14 @@ function connect() {
   client = new tmi.client(options);
 
   client.on("message", async (target, context, msg, self) => {
+    if (!context.subscriber) {
+      return;
+    }
+
     let input = msg.split(" ").filter(Boolean);
     let command = input[0].toLowerCase();
-    let args = input.slice(1);
 
     if (command == raffle_command1 || command == raffle_command2) {
-      if (!context.subscriber) {
-        return;
-      }
-      if (elements.t3.checked && context?.badges?.subscriber?.length != 4) {
-        return;
-      }
       if (!raffle_users.some((e) => e.username === context.username) && !winners.includes(context.username)) {
         let user = {
           id: context["user-id"],
@@ -122,6 +123,31 @@ function connect() {
     if (context.username == winner) {
       raffleWinnerChat(context, msg);
     } //raffle winner chat
+
+    if (context.username == winnerTier3) {
+      raffleWinnerChat(context, msg, true);
+    } //raffle winner chat tier 3
+
+    if (context?.emotes) {
+      for (let index = 0; index < tier3Emotes.length; index++) {
+        if (Object.hasOwn(context.emotes, tier3Emotes[index])) {
+          if (!raffle_users_tier3.some((e) => e.username === context.username) && !winnersTier3.includes(context.username)) {
+            let user = {
+              id: context["user-id"],
+              username: context.username,
+              displayname: context["display-name"],
+              tickets: 1,
+              color: context.color,
+              firstmsg: context["first-msg"],
+              badges: context.badges,
+              msg: msg,
+            };
+            addUserToRaffleTier3(user);
+          }
+          return;
+        }
+      }
+    } //raffle tier 3
   }); //message
 
   client.on("timeout", (channel, username, reason, duration, userstate) => {
@@ -168,12 +194,30 @@ async function addUserToRaffle(user) {
   let name = user.username == user.displayname.toLowerCase() ? `${user.displayname}` : `${user.displayname} (${user.username})`;
   let color = !user.color ? "#FFFFFF" : user.color;
   let badges = addBadges(user.badges, user.id, user.firstmsg);
-  let deletebtn = `<i class="material-icons notranslate deletebtn float-end" onclick="removeFromRaffle('${user.username}')">highlight_off</i>`;
-  elements.raffleUsers.innerHTML =
+  elements.raffleUsers.insertAdjacentHTML(
+    "afterbegin",
     `<li id="${user.username}_raffle" class="list-group-item">
-  ${badges}<span style="color:${color};"> ${name}</span>: ${user.tickets} ${user.tickets == 1 ? "ticket" : "tickets"} ${deletebtn}</li>` + elements.raffleUsers.innerHTML;
+    ${badges}<span style="color:${color};"> ${name}</span>: 1 ticket
+    <i class="material-icons notranslate deletebtn float-end" onclick="removeFromRaffle('${user.username}')">highlight_off</i>
+    </li>`
+  );
   elements.entrants.innerHTML = `Entrants: ${raffle_users.length}`;
 } //addUserToRaffle
+
+async function addUserToRaffleTier3(user) {
+  raffle_users_tier3.push(user);
+  let name = user.username == user.displayname.toLowerCase() ? `${user.displayname}` : `${user.displayname} (${user.username})`;
+  let color = !user.color ? "#FFFFFF" : user.color;
+  let badges = addBadges(user.badges, user.id, user.firstmsg);
+  elements.raffleUsersTier3.insertAdjacentHTML(
+    "afterbegin",
+    `<li id="${user.username}_raffle_tier3" class="list-group-item">
+    ${badges}<span style="color:${color};"> ${name}</span>: 1 ticket
+    <i class="material-icons notranslate deletebtn float-end" onclick="removeFromRaffleTier3('${user.username}')">highlight_off</i>
+    </li>`
+  );
+  elements.entrantsTier3.innerHTML = `Entrants: ${raffle_users_tier3.length}`;
+} //addUserToRaffleTier3
 
 async function drawRaffleWinner() {
   if (raffle_users.length < 2) {
@@ -185,6 +229,16 @@ async function drawRaffleWinner() {
   drawRaffleWinnerFancy();
 } //drawRaffleWinner
 
+async function drawRaffleWinnerTier3() {
+  if (raffle_users_tier3.length < 2) {
+    let p = document.createElement("p");
+    p.innerHTML = `Less than 2 users in raffle.`;
+    elements.raffleOutputTier3.append(p);
+    return;
+  }
+  drawRaffleWinnerFancyTier3(true);
+} //drawRaffleWinnerTier3
+
 class Slot {
   constructor(username, pfp, color) {
     this.username = username;
@@ -195,22 +249,11 @@ class Slot {
     this.left = 0;
     this.div = document.createElement("div");
     this.div.classList.add("slot-element");
-    if (elements.pussymode.checked) {
-      this.div.innerHTML = `<span style="color:${this.color};"> ${this.username} </span>
-        <div style="height: 310px; width: 300px; border-bottom: 10px solid transparent; background: radial-gradient(circle, rgba(255,255,255,1) 0%, ${this.color} 100%);">
-          <img style="background: ${this.color}; height: 300px; width: 300px;" src="${this.pfp}" alt="${this.username}" title="${this.username}" />
-        </div>`;
-    } else {
-      this.div.innerHTML = `<span style="color:${this.color};"> ${this.username} </span>
-        <div style="height: 310px; width: 300px; border-bottom: 10px solid transparent; background: radial-gradient(circle, rgba(255,255,255,1) 0%, ${this.color} 100%);">
-          <img
-            style="background: linear-gradient(0deg, ${this.color} 1%, rgba(100,100,100,1) 40%); height: 300px; width: 300px;"
-            src="${this.pfp}"
-            alt="${this.username}"
-            title="${this.username}"
-          />
-        </div>`;
-    }
+    this.div.innerHTML = `
+    <span style="color:${this.color};"> ${this.username} </span>
+    <div style="height: 310px; width: 300px; border-bottom: 10px solid transparent; background: radial-gradient(circle, rgba(255,255,255,1) 0%, ${this.color} 100%);">
+    <img style="background: ${this.color}; height: 300px; width: 300px;" src="${this.pfp}" alt="${this.username}" title="${this.username}" />
+    </div>`;
   }
 
   init(num = 0) {
@@ -283,7 +326,38 @@ const detectWinner = function () {
   } else {
     window.alert("Could not determine winner FeelsDonkMan");
   }
-};
+}; //detectWinner
+
+const detectWinnerTier3 = function () {
+  revealSound.play();
+  let winnerSlot = null;
+  for (let index = 0, j = app.slotOptions.length; index < j; index++) {
+    if (app.slotOptions[index].checkEquatorPosition()) {
+      winnerSlot = app.slotOptions[index];
+    }
+  }
+  if (winnerSlot) {
+    const resultDiv = winnerSlot.cloneSelf();
+    elements.gameWinner.appendChild(resultDiv.div);
+    app.spinStarted = false;
+    winnersTier3.push(winnerSlot.username);
+    winnerTier3 = winnerSlot.username;
+
+    removeFromRaffleTier3(winnerSlot.username);
+
+    let p = document.createElement("p");
+    p.classList.add("h2");
+    p.innerHTML = `Winner #${winnersTier3.length}: <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USERNAME}/viewercard/${winnerSlot.username}?popout=","_blank","width=340,height=800")>${winnerSlot.username}</a>`;
+    elements.raffleOutputTier3.append(p);
+    setTimeout(() => {
+      fancyRaffleModal.hide();
+      elements.gameWinner.innerHTML = "";
+      elements.slot.innerHTML = `<div class="spinner-border" style="width: 10rem; height: 10rem; margin-left: auto; margin-right: auto; display:block;" role="status"><span class="visually-hidden">Loading...</span></div>`;
+    }, 2000);
+  } else {
+    window.alert("Could not determine winner FeelsDonkMan");
+  }
+}; //detectWinnerTier3
 
 const animateRoll = function () {
   app.animation.speed += app.animation.acceleration;
@@ -300,7 +374,24 @@ const animateRoll = function () {
     // loopback
     window.requestAnimationFrame(animateRoll);
   }
-};
+}; //animateRoll
+
+const animateRollTier3 = function () {
+  app.animation.speed += app.animation.acceleration;
+  if (app.animation.speed < 0) {
+    // animation ended
+    app.animation.speed = 0;
+    app.animation.acceleration = 0;
+    setTimeout(detectWinnerTier3, 1000);
+  } else {
+    // draw frame
+    for (let index = 0, j = app.slotOptions.length; index < j; index++) {
+      app.slotOptions[index].scroll(app.animation.speed);
+    }
+    // loopback
+    window.requestAnimationFrame(animateRollTier3);
+  }
+}; //animateRollTier3
 
 Array.prototype.shuffle = function () {
   for (let i = this.length - 1; i > 0; i--) {
@@ -387,6 +478,67 @@ async function drawRaffleWinnerFancy() {
   animateRoll();
 } //drawRaffleWinnerFancy
 
+async function drawRaffleWinnerFancyTier3() {
+  fancyRaffleModal.show();
+  elements.claw.style.display = "none";
+  let user_tickets = [];
+  for (let index = 0, j = raffle_users_tier3.length; index < j; index++) {
+    for (let i = raffle_users_tier3[index].tickets; i > 0; i--) {
+      user_tickets.push(raffle_users_tier3[index]);
+    }
+  }
+  user_tickets = user_tickets.shuffle().slice(0, 100);
+  for (let index = 0, j = user_tickets.length; index < j; index++) {
+    user_tickets[index].pfp = "/pics/raffledonk.png";
+  }
+
+  // destroy previous slots
+  for (let index = 0, j = app.slotOptions.length; index < j; index++) {
+    app.slotOptions[index].destroy();
+  }
+  app.slotOptions.length = 0;
+  // rebuild the wheel by adding options (slots)
+  for (let index = 0, j = user_tickets.length; index < j; index++) {
+    app.slotOptions.push(new Slot(user_tickets[index].username, user_tickets[index].pfp, user_tickets[index].color));
+  }
+  // prevent roll stacking
+  if (app.spinStarted) {
+    return;
+  }
+  app.spinStarted = true;
+  // check if slot wheel is not empty
+  if (app.slotOptions.length < 1) {
+    app.spinStarted = false;
+    return window.alert("Nothing to spin!");
+  }
+  // hack: too many slots is bad for animations
+  while (app.slotOptions.length < 20) {
+    for (let index = 0, j = app.slotOptions.length; index < j; index++) {
+      app.slotOptions.push(app.slotOptions[index].cloneSelf());
+    }
+  }
+  // restart the wheel
+  elements.gameWinner.innerHTML = "";
+  elements.slot.innerHTML = "";
+  elements.claw.style.display = "block";
+  app.slotOptions.shuffle().forEach((game, i) => {
+    game.init(i);
+    game.resetPosition(-20);
+    elements.slot.appendChild(game.div);
+  });
+  // set up the animation:
+  app.animation.speed = app.animation.constants.STARTING_SPEED;
+  const targetFPS = 60;
+  const correction = targetFPS / app.animation.projectedFPS;
+  app.animation.speed *= correction;
+  setTimeout(() => {
+    // slow down
+    app.animation.acceleration = app.animation.constants.SLOW_DOWN;
+    app.animation.acceleration *= correction * correction;
+  }, Math.round(1500 + Math.random() * 1000));
+  animateRollTier3();
+} //drawRaffleWinnerFancy
+
 const fpsBenchmark = function () {
   // fps correction
   let timestamp = performance.now();
@@ -409,7 +561,7 @@ const fpsBenchmark = function () {
   }, 1000);
 };
 
-function raffleWinnerChat(context, msg) {
+function raffleWinnerChat(context, msg, tier3 = false) {
   let msg_s = validator.escape(msg);
   if (context.emotes) {
     let emotes = [];
@@ -433,8 +585,13 @@ function raffleWinnerChat(context, msg) {
   let badges = addBadges(context.badges, context["user-id"], context.firstmsg);
   let p = document.createElement("p");
   p.innerHTML = `${badges}<span style="color:${color};"> ${name}:</span> ${msg_s}`;
-  elements.raffleOutput.append(p);
-  linkifyElementID("raffleOutput", RAFFLES.linkPreviewThumbnailsEnabled);
+  if (tier3) {
+    elements.raffleOutputTier3.append(p);
+    linkifyElementID("raffleOutputTier3", false);
+  } else {
+    elements.raffleOutput.append(p);
+    linkifyElementID("raffleOutput", false);
+  }
 } //raffleWinnerChat
 
 function removeFromRaffle(username) {
@@ -442,6 +599,12 @@ function removeFromRaffle(username) {
   document.getElementById(username + "_raffle").remove();
   elements.entrants.innerHTML = `Entrants: ${raffle_users.length}`;
 } //removeFromRaffle
+
+function removeFromRaffleTier3(username) {
+  raffle_users_tier3 = raffle_users_tier3.filter((e) => e.username !== username);
+  document.getElementById(username + "_raffle_tier3").remove();
+  elements.entrantsTier3.innerHTML = `Entrants: ${raffle_users_tier3.length}`;
+} //removeFromRaffleTier3
 
 async function getEmotes() {
   setTimeout(async () => {
@@ -455,11 +618,36 @@ async function getEmotes() {
   }, 3000);
 } //getEmotes
 
+async function loadTier3Emotes() {
+  try {
+    let requestOptions = {
+      method: "GET",
+      redirect: "follow",
+    };
+    let response = await fetch(`https://helper.donk.workers.dev/twitch/chat/emotes?broadcaster_id=${userid}`, requestOptions);
+    let result = await response.json();
+    elements.emotes.innerHTML = "";
+    for (let index = 0; index < result.data.length; index++) {
+      if (result.data[index].tier == 3000) {
+        tier3Emotes.push(result.data[index].id);
+        elements.emotes.insertAdjacentHTML(
+          "afterbegin",
+          `<img title="${result.data[index].name}" src="https://static-cdn.jtvnw.net/emoticons/v2/${result.data[index].id}/default/dark/1.0"> `
+        );
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    elements.emotes.innerHTML = `<span class="text-danger">Could not load emotes</span>`;
+  }
+}
+
 window.onload = async function () {
   connect();
   fpsBenchmark();
 
   restartRaffleModal = new bootstrap.Modal(elements.restartRaffleModal);
+  restartTier3RaffleModal = new bootstrap.Modal(elements.restartTier3RaffleModal);
   fancyRaffleModal = new bootstrap.Modal(elements.fancyRaffleModal);
 
   enableTooltips();
@@ -470,8 +658,9 @@ window.onload = async function () {
   revealSound = new Howl({
     src: ["/raffles/reveal.mp3"],
   });
+  loadTier3Emotes();
 }; //onload
 
 window.onbeforeunload = function () {
-  //return "dank";
+  return "Are you sure?";
 }; //onbeforeunload

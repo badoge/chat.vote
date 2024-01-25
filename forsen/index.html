@@ -51,6 +51,24 @@
       </div>
     </div>
 
+    <div class="modal fade" id="restartTier3RaffleModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Are you sure?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>All winners and entrants will get removed from the raffle.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-warning" data-bs-dismiss="modal" onclick="restartTier3Raffle()">Restart raffle</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="modal fade" data-bs-backdrop="static" id="fancyRaffleModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog widemodal modal-dialog-centered">
         <div class="modal-content">
@@ -75,7 +93,7 @@
         <a
           class="navbar-brand notranslate"
           href="/home/"
-          target="_self"
+          target="_blank"
           rel="noopener noreferrer"
           data-bs-toggle="tooltip"
           data-bs-delay="200"
@@ -84,7 +102,7 @@
         >
           <img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" />
         </a>
-        <a class="navbar-brand notranslate" href="/forsen/" target="_self" rel="noopener noreferrer"> chat.vote/forsen </a>
+        <a class="navbar-brand notranslate" href="/forsen/" target="_blank" rel="noopener noreferrer"> chat.vote/forsen </a>
 
         <div class="collapse navbar-collapse">
           <ul class="navbar-nav">
@@ -185,46 +203,53 @@
 
     <div class="container-fluid">
       <div class="row">
-        <div class="col-md-8">
+        <div class="col-lg-2"></div>
+
+        <div class="col">
           <div class="card">
-            <div class="card-body">
-              <div id="raffleOutput"></div>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card">
-            <div class="card-body" id="raffleButtons">
+            <div class="card-body bg-body-tertiary rounded">
               <a role="button" tabindex="0" onclick="drawRaffleWinner()" class="btn btn-lg btn-info defaultbtn me-3"><i class="material-icons notranslate">celebration</i> Draw A Winner</a>
               <a role="button" tabindex="0" class="btn btn-sm btn-outline-warning defaultbtn" data-bs-toggle="modal" data-bs-target="#restartRaffleModal">
                 <i class="material-icons notranslate">refresh</i>Restart raffle
               </a>
-
-              <div class="form-check form-switch mt-3">
-                <input type="checkbox" class="form-check-input" id="pussymode" style="cursor: not-allowed" aria-describedby="pussymodedesc" checked disabled />
-                <label class="form-check-label" for="pussymode" style="cursor: not-allowed"><i class="material-icons notranslate">account_circle</i> Pussy mode</label>
-                <small id="pussymodedesc" class="text-body-secondary" style="cursor: not-allowed"
-                  ><br />Replaces the Twitch avatars with <img src="/pics/donk.png" alt="donk" style="height: 24px; width: 24px" />
-                </small>
-              </div>
-              <div class="form-check form-switch mt-3">
-                <input type="checkbox" class="form-check-input" id="t3" onchange="restartRaffle()" aria-describedby="t3desc" />
-                <label class="form-check-label" for="t3">🤡 Tier3/Tier2 raffle</label>
-                <small id="t3desc" class="text-body-secondary"><br />Only Tier 3 and Tier 2 subs will be able to join the raffle</small>
-              </div>
-            </div>
-          </div>
-
-          <div class="card mt-3">
-            <div class="card-body">
-              <h2>Type <span style="color: #00bc8c" class="notranslate">!join</span> in chat to join</h2>
+              <h2>Type <span class="notranslate text-success">!join</span> or <span class="notranslate text-success">!ticket 1</span> in chat to join</h2>
               <h4 id="entrants">Entrants: 0</h4>
-              <div id="raffleUsersDiv">
+
+              <div id="raffleUsersDiv" class="border rounded">
                 <ul class="list-group" id="raffleUsers"></ul>
               </div>
+
+              <h5>Winner:</h5>
+              <div id="raffleOutput" class="border rounded"></div>
             </div>
           </div>
         </div>
+
+        <div class="col">
+          <div class="card">
+            <div class="card-body bg-body-tertiary rounded">
+              <a role="button" tabindex="0" onclick="drawRaffleWinnerTier3()" class="btn btn-lg btn-info defaultbtn me-3">
+                <i class="material-icons notranslate">celebration</i> Draw A Winner (tier 3)
+              </a>
+              <a role="button" tabindex="0" class="btn btn-sm btn-outline-warning defaultbtn" data-bs-toggle="modal" data-bs-target="#restartTier3RaffleModal">
+                <i class="material-icons notranslate">refresh</i>Restart raffle (tier 3)
+              </a>
+              <h2>
+                Type a tier 3 emote (<span id="emotes"><span class="text-success">Loading...</span></span
+                >) in chat to join
+              </h2>
+              <h4 id="entrantsTier3">Entrants: 0</h4>
+
+              <div id="raffleUsersDivTier3" class="border rounded">
+                <ul class="list-group" id="raffleUsersTier3"></ul>
+              </div>
+
+              <h5>Winner:</h5>
+              <div id="raffleOutputTier3" class="border rounded"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-2"></div>
       </div>
     </div>
 

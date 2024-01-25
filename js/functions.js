@@ -538,7 +538,7 @@ async function loadBadges(channel) {
   }
 } //loadBadges
 
-function addBadges(badges, userid, firstmsg) {
+function addBadges(badges, userid, firstmsg = null) {
   try {
     let badgesHTML = "";
     if (firstmsg) {
