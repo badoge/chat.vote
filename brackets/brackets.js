@@ -115,7 +115,7 @@ let elements = {
   spotifyEmbedContainer_left: document.getElementById("spotifyEmbedContainer_left"),
   spotifyEmbed_left: document.getElementById("spotifyEmbed_left"),
   twitchClipsEmbed_left: document.getElementById("twitchClipsEmbed_left"),
-  streamableEmbed_left: document.getElementById("streamableEmbed_left"),
+  videoEmbed_left: document.getElementById("videoEmbed_left"),
   right_value: document.getElementById("right_value"),
   text_image_right: document.getElementById("text_image_right"),
   youtubeEmbedContainer_right: document.getElementById("youtubeEmbedContainer_right"),
@@ -123,7 +123,7 @@ let elements = {
   spotifyEmbedContainer_right: document.getElementById("spotifyEmbedContainer_right"),
   spotifyEmbed_right: document.getElementById("spotifyEmbed_right"),
   twitchClipsEmbed_right: document.getElementById("twitchClipsEmbed_right"),
-  streamableEmbed_right: document.getElementById("streamableEmbed_right"),
+  videoEmbed_right: document.getElementById("videoEmbed_right"),
   left_info: document.getElementById("left_info"),
   right_info: document.getElementById("right_info"),
 
@@ -171,7 +171,7 @@ let elements = {
   spotifyEmbedContainer_tierlist: document.getElementById("spotifyEmbedContainer_tierlist"),
   spotifyEmbed_tierlist: document.getElementById("spotifyEmbed_tierlist"),
   twitchClipsEmbed_tierlist: document.getElementById("twitchClipsEmbed_tierlist"),
-  streamableEmbed_tierlist: document.getElementById("streamableEmbed_tierlist"),
+  videoEmbed_tierlist: document.getElementById("videoEmbed_tierlist"),
 };
 
 const icons = {
@@ -181,6 +181,7 @@ const icons = {
   twitch: `<i class="material-icons notranslate">movie_creation</i>`,
   spotify: `<i class="material-icons notranslate">audiotrack</i>`,
   streamable: `<i class="material-icons notranslate">play_arrow</i>`,
+  "supa video/audio": `<i class="material-icons notranslate">play_arrow</i>`,
 };
 const spotifyURLRegex = /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:(album|track|playlist)\/|\?uri=spotify:track:)((\w|-){22})/;
 
@@ -580,6 +581,7 @@ function addOption(name = "", type = "", value = "", thumbnail = "", video = "")
             <option value="twitch" ${optionType == "twitch" ? "selected" : ""}>Twitch clip</option>
             <option value="spotify" ${optionType == "spotify" ? "selected" : ""}>Spotify song</option>
             <option value="streamable" ${optionType == "streamable" ? "selected" : ""}>Streamable video</option>
+            <option value="supa video/audio" ${optionType == "supa video/audio" ? "selected" : ""}>supa video/audio file</option>
           </select>
         </div>
 
@@ -731,6 +733,19 @@ async function previewOption(id, button) {
     option.dataset.video = "";
   } //streamable
 
+  if (link?.type == "supa video/audio") {
+    link = await getRequestInfo(link);
+    name.value = link.title;
+    type.value = "supa video/audio";
+    elements.previewModalBody.innerHTML = `
+      <div class="card">
+      <div class="card-body">
+      <video src="https://i.supa.codes/${link.id}" controls autoplay height="480" width="100%"></video>
+      </div>
+      </div>`;
+    previewModal.show();
+  }
+
   button.innerHTML = `<i class="material-icons notranslate">preview</i>Preview`;
   saveBracket();
 } //previewOption
@@ -779,7 +794,16 @@ function parseLink(link) {
       return null;
     }
     return { type: "streamable", id: match[1] };
-  } //spotify
+  } //streamable
+
+  if (link.includes("i.supa.codes") || link.includes("gachi.gay") || link.includes("kappa.lol") || link.includes("femboy.beauty")) {
+    const match = link.match(/\/([a-zA-Z0-9]{5})(?:\.\w+)?(?:\?.*)?(?:\/)?$/);
+    console.log(match);
+    if (!match[1]) {
+      return null;
+    }
+    return { type: "supa video/audio", id: match[1] };
+  } //supa
 
   return null;
 } //parseLink
@@ -859,6 +883,22 @@ async function getRequestInfo(link) {
       return;
     }
   }
+
+  if (link.type == "supa video/audio") {
+    try {
+      let response = await fetch(`https://helper.donk.workers.dev/supa/info?id=${link.id}`, GETrequestOptions);
+      let result = await response.json();
+      console.log(result);
+      link.title = result?.name?.split(".")[0] || "(untitled)";
+      link.thumbnail = "/pics/nothumbnail.png";
+      link.duration = result?.mediainfo?.duration || 0;
+    } catch (error) {
+      showToast("Could not get video info", "warning", 3000);
+      console.log("getRequestInfo supa error", error);
+      return;
+    }
+  } //supa
+
   return link;
 } //getRequestInfo
 
@@ -908,6 +948,7 @@ function saveBracket(edited = false) {
       case "youtube":
       case "twitch":
       case "spotify":
+      case "supa video/audio":
         bracket.options.push({
           value: optionValues[index].value,
           type: optionTypes[index].value,
@@ -1294,9 +1335,14 @@ async function nextTierlistItem() {
       let info = await getRequestInfo(item);
       video = info.video;
     }
-    elements.streamableEmbed_tierlist.style.display = "";
-    elements.streamableEmbed_tierlist.src = video;
+    elements.videoEmbed_tierlist.style.display = "";
+    elements.videoEmbed_tierlist.src = video;
   } //streamable
+
+  if (item.type == "supa video/audio") {
+    elements.videoEmbed_tierlist.style.display = "";
+    elements.videoEmbed_tierlist.src = `https://i.supa.codes/${item.id}`;
+  } //supa
 
   resetScores();
   if (!elements.keepVotingEnabled.checked) {
@@ -1531,9 +1577,14 @@ async function showOption(position, option) {
       let info = await getRequestInfo(option);
       video = info.video;
     }
-    elements[`streamableEmbed_${position}`].style.display = "";
-    elements[`streamableEmbed_${position}`].src = video;
+    elements[`videoEmbed_${position}`].style.display = "";
+    elements[`videoEmbed_${position}`].src = video;
   } //streamable
+
+  if (option.type == "supa video/audio") {
+    elements[`videoEmbed_${position}`].style.display = "";
+    elements[`videoEmbed_${position}`].src = `https://i.supa.codes/${option.id}`;
+  } //supa
 } //showOption
 
 function updateScores() {
@@ -2401,6 +2452,10 @@ function loadPlaylist() {
       type = "twitch";
     }
 
+    if (type == "supa video" || type == "supa audio") {
+      type = "supa video/audio";
+    }
+
     count++;
 
     let link = getItemLink(type, playlist[index].id);
@@ -2657,11 +2712,11 @@ function resetPlayers(left = true, right = true) {
     elements.youtubeEmbedContainer_left.style.display = "none";
     elements.spotifyEmbedContainer_left.style.display = "none";
     elements.twitchClipsEmbed_left.style.display = "none";
-    elements.streamableEmbed_left.style.display = "none";
+    elements.videoEmbed_left.style.display = "none";
     youtubePlayer_left.loadVideoById("");
     spotifyPlayer_left.pause();
     elements.twitchClipsEmbed_left.src = "";
-    elements.streamableEmbed_left.src = "";
+    elements.videoEmbed_left.src = "";
   }
 
   if (right) {
@@ -2669,22 +2724,22 @@ function resetPlayers(left = true, right = true) {
     elements.youtubeEmbedContainer_right.style.display = "none";
     elements.spotifyEmbedContainer_right.style.display = "none";
     elements.twitchClipsEmbed_right.style.display = "none";
-    elements.streamableEmbed_right.style.display = "none";
+    elements.videoEmbed_right.style.display = "none";
     youtubePlayer_right.loadVideoById("");
     spotifyPlayer_right.pause();
     elements.twitchClipsEmbed_right.src = "";
-    elements.streamableEmbed_right.src = "";
+    elements.videoEmbed_right.src = "";
   }
 
   elements.text_image_tierlist.style.display = "none";
   elements.youtubeEmbedContainer_tierlist.style.display = "none";
   elements.spotifyEmbedContainer_tierlist.style.display = "none";
   elements.twitchClipsEmbed_tierlist.style.display = "none";
-  elements.streamableEmbed_tierlist.style.display = "none";
+  elements.videoEmbed_tierlist.style.display = "none";
   youtubePlayer_tierlist.loadVideoById("");
   spotifyPlayer_tierlist.pause();
   elements.twitchClipsEmbed_tierlist.src = "";
-  elements.streamableEmbed_tierlist.src = "";
+  elements.videoEmbed_tierlist.src = "";
 } //resetPlayers
 
 function getItemLink(type, id) {
@@ -2697,6 +2752,8 @@ function getItemLink(type, id) {
       return `https://clips.twitch.tv/${id}`;
     case "streamable":
       return `https://streamable.com/${id}`;
+    case "supa video/audio":
+      return `https://i.supa.codes/${id}`;
     default:
       return "";
   }

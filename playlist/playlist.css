@@ -213,12 +213,13 @@ video {
   width: 50px;
 }
 
-#streamableEmbed,
+#videoEmbed,
 #twitchEmbed,
 #twitchClipsEmbed,
 #youtubeEmbedContainer {
   width: 100%;
   height: 100%;
+  max-height: calc(100vh - 115px);
 }
 
 #placeholder {

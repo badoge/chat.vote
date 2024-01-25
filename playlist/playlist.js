@@ -20,6 +20,8 @@ let elements = {
   settingsOffcanvas: document.getElementById("settingsOffcanvas"),
   allowSpotifySongs: document.getElementById("allowSpotifySongs"),
   allowStreamable: document.getElementById("allowStreamable"),
+  allowSupaVideo: document.getElementById("allowSupaVideo"),
+  allowSupaAudio: document.getElementById("allowSupaAudio"),
   allowTwitchClips: document.getElementById("allowTwitchClips"),
   allowTwitchStreams: document.getElementById("allowTwitchStreams"),
   allowTwitchVODs: document.getElementById("allowTwitchVODs"),
@@ -77,7 +79,7 @@ let elements = {
   spotifyEmbed: document.getElementById("spotifyEmbed"),
   twitchEmbed: document.getElementById("twitchEmbed"),
   twitchClipsEmbed: document.getElementById("twitchClipsEmbed"),
-  streamableEmbed: document.getElementById("streamableEmbed"),
+  videoEmbed: document.getElementById("videoEmbed"),
 
   commandHint: document.getElementById("commandHint"),
   commandHint2: document.getElementById("commandHint2"),
@@ -138,6 +140,8 @@ let PLAYLIST = {
   autoplay: true,
   allowSpotifySongs: true,
   allowStreamable: true,
+  allowSupaVideo: true,
+  allowSupaAudio: true,
   allowTwitchClips: true,
   allowTwitchStreams: true,
   allowTwitchVODs: true,
@@ -196,6 +200,8 @@ async function refreshData() {
   PLAYLIST.autoplay = elements.autoplay.checked;
   PLAYLIST.allowSpotifySongs = elements.allowSpotifySongs.checked;
   PLAYLIST.allowStreamable = elements.allowStreamable.checked;
+  PLAYLIST.allowSupaVideo = elements.allowSupaVideo.checked;
+  PLAYLIST.allowSupaAudio = elements.allowSupaAudio.checked;
   PLAYLIST.allowTwitchClips = elements.allowTwitchClips.checked;
   PLAYLIST.allowTwitchStreams = elements.allowTwitchStreams.checked;
   PLAYLIST.allowTwitchVODs = elements.allowTwitchVODs.checked;
@@ -295,6 +301,8 @@ function load_localStorage() {
     elements.autoplay.checked = PLAYLIST.autoplay ?? true;
     elements.allowSpotifySongs.checked = PLAYLIST.allowSpotifySongs ?? true;
     elements.allowStreamable.checked = PLAYLIST.allowStreamable ?? true;
+    elements.allowSupaVideo.checked = PLAYLIST.allowSupaVideo ?? true;
+    elements.allowSupaAudio.checked = PLAYLIST.allowSupaAudio ?? true;
     elements.allowTwitchClips.checked = PLAYLIST.allowTwitchClips ?? true;
     elements.allowTwitchStreams.checked = PLAYLIST.allowTwitchStreams ?? true;
     elements.allowTwitchVODs.checked = PLAYLIST.allowTwitchVODs ?? true;
@@ -410,6 +418,8 @@ function resetSettings(logout = false) {
       autoplay: true,
       allowSpotifySongs: true,
       allowStreamable: true,
+      allowSupaVideo: true,
+      allowSupaAudio: true,
       allowTwitchClips: true,
       allowTwitchStreams: true,
       allowTwitchVODs: true,
@@ -972,7 +982,7 @@ async function getRequestInfo(index, id) {
       console.log("getRequestInfo twitch clip error", error);
       return;
     }
-  }
+  } //twitch clip
 
   if (requests[index].type == "twitch vod") {
     try {
@@ -990,7 +1000,7 @@ async function getRequestInfo(index, id) {
       console.log("getRequestInfo twitch vod error", error);
       return;
     }
-  }
+  } //twitch vod
 
   if (requests[index].type == "twitch stream") {
     try {
@@ -1007,7 +1017,7 @@ async function getRequestInfo(index, id) {
       console.log("getRequestInfo twitch stream error", error);
       return;
     }
-  }
+  } //twitch stream
 
   if (requests[index].type == "spotify") {
     try {
@@ -1030,7 +1040,7 @@ async function getRequestInfo(index, id) {
       console.log("getRequestInfo spotify error", error);
       return;
     }
-  }
+  } //spotify
 
   if (requests[index].type == "youtube" || requests[index].type == "youtube short") {
     try {
@@ -1065,7 +1075,7 @@ async function getRequestInfo(index, id) {
       console.log("getRequestInfo youtube error", error);
       return;
     }
-  }
+  } //youtube
 
   if (requests[index].type == "streamable") {
     try {
@@ -1083,7 +1093,42 @@ async function getRequestInfo(index, id) {
       console.log("getRequestInfo streamable error", error);
       return;
     }
-  }
+  } //streamable
+
+  if (requests[index].type == "supa video/audio" || requests[index].type == "supa video" || requests[index].type == "supa audio") {
+    try {
+      let response = await fetch(`https://helper.donk.workers.dev/supa/info?id=${requests[index].id}`, GETrequestOptions);
+      let result = await response.json();
+      console.log(result);
+      requests[index].title = result?.name?.split(".")[0] || "(untitled)";
+      requests[index].channel = "(unknown)";
+      requests[index].thumbnail = "https://chat.vote/pics/nothumbnail.png";
+      requests[index].duration = result?.mediainfo?.duration || 0;
+
+      //update type here bcz video and audio links are the same and checking file extension is not reliable
+      if (result.type.startsWith("video")) {
+        if (!PLAYLIST.allowSupaVideo) {
+          botReply(`⛔ supa video links are not enabled`, id, false);
+          deleteRequest(requests[index].id);
+          return;
+        }
+        requests[index].type = "supa video";
+      }
+      if (result.type.startsWith("audio")) {
+        if (!PLAYLIST.allowSupaVideo) {
+          botReply(`⛔ supa audio links are not enabled`, id, false);
+          deleteRequest(requests[index].id);
+          return;
+        }
+        requests[index].type = "supa audio";
+      }
+    } catch (error) {
+      deleteRequest(requests[index].id);
+      botReply("⚠ Your video was removed because I could not find its info", id, false);
+      console.log("getRequestInfo supa error", error);
+      return;
+    }
+  } //supa
 
   if (PLAYLIST.maxDuration !== "" && requests[index].duration !== -1 && total_duration + requests[index].duration > PLAYLIST.maxDuration * (PLAYLIST.maxDurationUnit == "m" ? 60 : 3600)) {
     if (playlist_open) {
@@ -1197,6 +1242,15 @@ function parseLink(link) {
     return { type: "streamable", id: match[1] };
   } //spotify
 
+  if (link.includes("i.supa.codes") || link.includes("gachi.gay") || link.includes("kappa.lol") || link.includes("femboy.beauty")) {
+    const match = link.match(/\/([a-zA-Z0-9]{5})(?:\.\w+)?(?:\?.*)?(?:\/)?$/);
+    console.log(match);
+    if (!match[1]) {
+      return null;
+    }
+    return { type: "supa video/audio", id: match[1] };
+  } //supa
+
   return null;
 } //parseLink
 
@@ -1214,6 +1268,10 @@ function linkTypeAllowed(type) {
     return false;
   }
   if (type == "streamable" && !PLAYLIST.allowStreamable) {
+    return false;
+  }
+  if (type == "supa video/audio" && !PLAYLIST.allowSupaVideo && !PLAYLIST.allowSupaAudio) {
+    //supa links dont have a specific type yet so check if both are disabled
     return false;
   }
   if (type == "youtube" && !PLAYLIST.allowYTStreams && !PLAYLIST.allowYTVideos) {
@@ -1242,6 +1300,10 @@ function getItemLink(type, id) {
       return `https://clips.twitch.tv/${id}`;
     case "streamable":
       return `https://streamable.com/${id}`;
+    case "supa video":
+    case "supa audio":
+    case "supa video/audio":
+      return `https://i.supa.codes/${id}`;
     default:
       return "";
   }
@@ -1364,8 +1426,13 @@ function playItem(item) {
       elements.twitchClipsEmbed.src = `https://clips.twitch.tv/embed?clip=${item.id}&parent=${window.location.hostname}&autoplay=true&muted=false`;
       break;
     case "streamable":
-      elements.streamableEmbed.style.display = "";
-      elements.streamableEmbed.src = item.video;
+      elements.videoEmbed.style.display = "";
+      elements.videoEmbed.src = item.video;
+      break;
+    case "supa video":
+    case "supa audio":
+      elements.videoEmbed.style.display = "";
+      elements.videoEmbed.src = `https://i.supa.codes/${item.id}`;
       break;
     default:
       break;
@@ -1420,13 +1487,13 @@ function resetPlayers() {
   elements.spotifyEmbedContainer.style.display = "none";
   elements.twitchEmbed.style.display = "none";
   elements.twitchClipsEmbed.style.display = "none";
-  elements.streamableEmbed.style.display = "none";
+  elements.videoEmbed.style.display = "none";
 
   youtubePlayer.loadVideoById("");
   spotifyPlayer.pause();
   twitchPlayer.setChannel("");
   elements.twitchClipsEmbed.src = "";
-  elements.streamableEmbed.src = "";
+  elements.videoEmbed.src = "";
 } //resetPlayers
 
 function voteSkip(userid) {
@@ -1877,7 +1944,9 @@ function playPlaylist(reply) {
       twitchPlayer.play();
       break;
     case "streamable":
-      elements.streamableEmbed.play();
+    case "supa video":
+    case "supa audio":
+      elements.videoEmbed.play();
       break;
     default:
       break;
@@ -1911,7 +1980,9 @@ function pausePlaylist(reply) {
       twitchPlayer.pause();
       break;
     case "streamable":
-      elements.streamableEmbed.pause();
+    case "supa video":
+    case "supa audio":
+      elements.videoEmbed.pause();
       break;
     default:
       break;
@@ -1999,7 +2070,7 @@ window.onload = function () {
 
   enableTooltips();
   enableTwitchEmbed();
-  streamableEmbedEventListeners();
+  videoEmbedEventListeners();
   elements.twitchClipsEmbed.src = "";
 }; //onload
 
@@ -2106,10 +2177,10 @@ function enableTwitchEmbed() {
   }
 } //enableTwitchEmbed
 
-function streamableEmbedEventListeners() {
-  elements.streamableEmbed.addEventListener("ended", (event) => {
+function videoEmbedEventListeners() {
+  elements.videoEmbed.addEventListener("ended", (event) => {
     if (PLAYLIST.autoplay) {
       nextItem();
     }
   });
-}
+} //videoEmbedEventListeners
