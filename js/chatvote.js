@@ -1318,6 +1318,8 @@ function loadChart() {
         scales: {
           x: {
             ticks: {
+              textStrokeColor: "rgba(0,0,0,1)",
+              textStrokeWidth: 2,
               color: "white",
             },
             beginAtZero: true,

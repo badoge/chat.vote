@@ -121,25 +121,20 @@ function initGraph() {
       ],
     },
     options: {
-      indexAxis: "y",
       maintainAspectRatio: false,
       scales: {
         x: {
           ticks: {
+            textStrokeColor: "rgba(0,0,0,1)",
+            textStrokeWidth: 2,
             color: "white",
+            maxRotation: 0,
           },
           beginAtZero: true,
         },
         y: {
           ticks: {
-            textStrokeColor: "rgba(0,0,0,1)",
-            textStrokeWidth: 3,
-            color: "white",
-            mirror: true,
-            font: {
-              size: 32,
-            },
-            z: 1,
+            display: false,
           },
           beginAtZero: true,
         },
@@ -473,11 +468,11 @@ C4.UI = function (_game, _options) {
         let cell = $("#cell-" + col_index + "-" + row_index);
         cell.addClass("connected");
       }
-      message = data.winner.color + " wins";
+      message = data.winner.color + " wins!";
     }
 
     $message.text(message);
-    document.getElementById("c4output").innerHTML = `${message}<br> <button type="button" onclick="resetGame()" class="btn btn-primary">Play again</button>`;
+    document.getElementById("c4output").innerHTML = `<h4>${message}</h4><br> <button type="button" onclick="resetGame()" class="btn btn-primary">Play again</button>`;
   });
 
   init();

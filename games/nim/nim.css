@@ -90,6 +90,7 @@ div.nim-popsicle {
 
 div.nim-popsicle.nim-taken {
   opacity: 0.5;
+  filter: grayscale(100%) !important;
 }
 
 div.nim-popsicle.nim-last-taken {

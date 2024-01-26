@@ -472,17 +472,24 @@
           </div>
         </div>
         <div class="row" id="gameRow">
-          <div class="col-xl-7">
-            <div id="board"></div>
-          </div>
-          <div class="col-xl-5 centertext">
-            <button type="button" onclick="playTurn()" class="btn btn-lg btn-success">Play chat's turn</button>
-            <div id="c4output"></div>
-            <div id="c4chartdiv" class="chart-container">
-              <div id="c4overlay"></div>
-              <canvas id="c4chartCanvas" class="blur"></canvas>
+          <div class="col"></div>
+          <div class="col-auto">
+            <div class="row">
+              <div class="col">
+                <div id="c4chartdiv" class="chart-container">
+                  <div id="c4overlay"></div>
+                  <canvas id="c4chartCanvas" class="blur"></canvas>
+                </div>
+              </div>
             </div>
+            <div class="row">
+              <div class="col" id="board"></div>
+            </div>
+          </div>
+          <div class="col">
+            <button type="button" onclick="playTurn()" class="btn btn-lg btn-success">Play chat's turn</button><br />
             <span id="totalvotesc4">Total votes: 0</span>
+            <div id="c4output"></div>
           </div>
         </div>
       </div>

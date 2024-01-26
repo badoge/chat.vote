@@ -49,11 +49,12 @@ body {
 
 #c4chartdiv {
   position: relative;
-  height: 80vh;
-  width: 100%;
+  height: 20vh;
+  width: 704px;
 }
 
 #c4overlay {
+  text-align: center;
   width: 100%;
   height: 100%;
   position: absolute;
@@ -230,10 +231,6 @@ body {
   box-shadow: none !important;
 }
 
-.centertext {
-  text-align: center;
-}
-
 .blur {
   -webkit-filter: blur(10px) grayscale(100%);
   -moz-filter: blur(10px) grayscale(100%);
@@ -245,7 +242,6 @@ body {
 
 .rack {
   display: inline-block;
-  border: 2px solid black;
 }
 
 .rack * {
@@ -265,6 +261,8 @@ body {
   background: #aaaaaa;
   visibility: hidden;
   z-index: 1000;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
 }
 
 .controls.enabled,
