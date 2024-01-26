@@ -622,7 +622,7 @@ async function previewOption(id, button) {
   let name = Array.from(optionNames).find((e) => e.dataset.optionId == id);
   let thumbnail = Array.from(optionThumbnails).find((e) => e.dataset.optionId == id);
 
-  let link = parseLink(option?.value.replace(/\s+/g, ""));
+  let link = parseLink(option?.value?.replace(/\s+/g, ""));
 
   if (!link && type.value != "image") {
     type.value = "text";
@@ -736,6 +736,7 @@ async function previewOption(id, button) {
   if (link?.type == "supa video/audio") {
     link = await getRequestInfo(link);
     name.value = link.title;
+    thumbnail.value = link.thumbnail;
     type.value = "supa video/audio";
     elements.previewModalBody.innerHTML = `
       <div class="card">
@@ -890,7 +891,11 @@ async function getRequestInfo(link) {
       let result = await response.json();
       console.log(result);
       link.title = result?.name?.split(".")[0] || "(untitled)";
-      link.thumbnail = "/pics/nothumbnail.png";
+      if (await checkImage(`https://i.supa.codes/t/${link.id}`)) {
+        link.thumbnail = `https://i.supa.codes/t/${link.id}`;
+      } else {
+        link.thumbnail = "https://chat.vote/pics/nothumbnail.png";
+      }
       link.duration = result?.mediainfo?.duration || 0;
     } catch (error) {
       showToast("Could not get video info", "warning", 3000);
@@ -943,7 +948,7 @@ function saveBracket(edited = false) {
   bracket.options = [];
 
   for (let index = 0; index < optionNames.length; index++) {
-    let link = parseLink(optionValues[index].value);
+    let link = parseLink(optionValues[index].value?.replace(/\s+/g, ""));
     switch (link?.type) {
       case "youtube":
       case "twitch":
@@ -1281,7 +1286,7 @@ async function nextTierlistItem() {
   elements.currentTierlistItemName.innerText = item.name || "Untitled item";
 
   if (!item?.id && (item.type == "youtube" || item.type == "twitch" || item.type == "spotify")) {
-    let info = parseLink(item.value);
+    let info = parseLink(item.value?.replace(/\s+/g, ""));
     if (info) {
       item.id = info.id;
     } else {
@@ -1508,7 +1513,7 @@ function placeTierlistItem(tier) {
 
 async function showOption(position, option) {
   if (!option?.id && (option.type == "youtube" || option.type == "twitch" || option.type == "spotify")) {
-    let info = parseLink(option.value);
+    let info = parseLink(option.value?.replace(/\s+/g, ""));
     if (info) {
       option.id = info.id;
     } else {

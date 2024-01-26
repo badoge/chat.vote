@@ -667,6 +667,24 @@ async function getLinkInfo(element, allowThumbnails) {
   }
 } //getLinkInfo
 
+/**
+ * @description checks if url has a image/? media type
+ * @param {string} url image url
+ * @returns {*} true if url is of an image or false if its not
+ */
+async function checkImage(url) {
+  try {
+    const res = await fetch(`https://helper.donk.workers.dev/cors/?${url}`);
+    const buff = await res.blob();
+    if (buff.type.startsWith("image/")) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    return false;
+  }
+} //checkImage
+
 function linkifyElementID(id, allowThumbnails) {
   linkifyElement(
     document.getElementById(id),

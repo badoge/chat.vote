@@ -1102,7 +1102,11 @@ async function getRequestInfo(index, id) {
       console.log(result);
       requests[index].title = result?.name?.split(".")[0] || "(untitled)";
       requests[index].channel = "(unknown)";
-      requests[index].thumbnail = "https://chat.vote/pics/nothumbnail.png";
+      if (await checkImage(`https://i.supa.codes/t/${requests[index].id}`)) {
+        requests[index].thumbnail = `https://i.supa.codes/t/${requests[index].id}`;
+      } else {
+        requests[index].thumbnail = "https://chat.vote/pics/nothumbnail.png";
+      }
       requests[index].duration = result?.mediainfo?.duration || 0;
 
       //update type here bcz video and audio links are the same and checking file extension is not reliable
@@ -1313,7 +1317,7 @@ function addLink() {
   if (!checkLogin()) {
     return;
   }
-  let link = parseLink(elements.link.value.replace(/\s+/g, ""));
+  let link = parseLink(elements.link.value?.replace(/\s+/g, ""));
   if (!link || !linkTypeAllowed(link.type)) {
     showToast("Could not parse the provided link", "warning", 3000);
     elements.link.value = "";
