@@ -737,13 +737,23 @@ async function previewOption(id, button) {
     link = await getRequestInfo(link);
     name.value = link.title;
     thumbnail.value = link.thumbnail;
-    type.value = "supa video/audio";
-    elements.previewModalBody.innerHTML = `
+    type.value = link.type;
+    if (link.type == "image") {
+      elements.previewModalBody.innerHTML = `
+      <div class="card">
+      <div class="card-body">
+      <img src="https://i.supa.codes/${link.id}" alt="${name.value}" title="${name.value}" class="option-image">
+      </div>
+      </div>`;
+    } else {
+      elements.previewModalBody.innerHTML = `
       <div class="card">
       <div class="card-body">
       <video src="https://i.supa.codes/${link.id}" controls autoplay height="480" width="100%"></video>
       </div>
       </div>`;
+    }
+
     previewModal.show();
   }
 
@@ -890,11 +900,18 @@ async function getRequestInfo(link) {
       let response = await fetch(`https://helper.donk.workers.dev/supa/info?id=${link.id}`, GETrequestOptions);
       let result = await response.json();
       console.log(result);
+      if (!result.type.startsWith("audio") && !result.type.startsWith("video") && !result.type.startsWith("image")) {
+        showToast("Link is not of a video or audio file", "warning", 3000);
+        return;
+      }
       link.title = result?.name?.split(".")[0] || "(untitled)";
       if (await checkImage(`https://i.supa.codes/t/${link.id}`)) {
         link.thumbnail = `https://i.supa.codes/t/${link.id}`;
       } else {
         link.thumbnail = "https://chat.vote/pics/nothumbnail.png";
+      }
+      if (result.type.startsWith("image")) {
+        link.type = "image";
       }
       link.duration = result?.mediainfo?.duration || 0;
     } catch (error) {

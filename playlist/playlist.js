@@ -1126,6 +1126,12 @@ async function getRequestInfo(index, id) {
         }
         requests[index].type = "supa audio";
       }
+
+      if (!result.type.startsWith("audio") && !result.type.startsWith("video")) {
+        deleteRequest(requests[index].id);
+        botReply("⚠ Only video and audio files are allowed", id, false);
+        return;
+      }
     } catch (error) {
       deleteRequest(requests[index].id);
       botReply("⚠ Your video was removed because I could not find its info", id, false);
