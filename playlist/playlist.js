@@ -527,7 +527,7 @@ function connect() {
     if (PLAYLIST.noCommand && playlist_open) {
       let link = parseLink(input[0]);
       if (link && linkTypeAllowed(link.type)) {
-        addRequest(context, link);
+        addRequest(context, link, context.id);
         return;
       }
       if (link && !linkTypeAllowed(link.type)) {
@@ -564,7 +564,7 @@ function connect() {
           botReply(`⛔ ${link.type} links are not enabled`, context.id, false);
           return;
         }
-        addRequest(context, link);
+        addRequest(context, link, context.id);
         break;
 
       case PLAYLIST.voteskipCommand:
@@ -630,6 +630,13 @@ function connect() {
   }); //message
 
   client.on("timeout", (channel, username, reason, duration, userstate) => {}); //timeout
+
+  client.on("messagedeleted", (channel, username, deletedMessage, userstate) => {
+    const requestIndex = requests.findIndex((r) => r.msgid === userstate["target-msg-id"]);
+    if (requestIndex > -1) {
+      deleteRequest(requests[requestIndex].id, false);
+    }
+  });
 
   client.on("connected", async (address, port) => {
     console.log(`Connected to ${address}:${port}`);
@@ -721,7 +728,7 @@ function checkRequestLimit(userIndex) {
   return limit;
 } //checkRequestLimit
 
-function addRequest(context, link) {
+function addRequest(context, link, msgid = 0) {
   const userIndex = getUser(context);
   const limit = checkRequestLimit(userIndex);
 
@@ -755,6 +762,7 @@ function addRequest(context, link) {
   } else {
     requests.push({
       id: link.id,
+      msgid: msgid,
       type: link.type,
       approved: PLAYLIST.approvalQueue ? false : true,
       title: "",
