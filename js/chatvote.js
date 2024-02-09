@@ -789,7 +789,7 @@ function connect() {
               continue;
             }
             let limits = value[index].split("-");
-            emotes.push({ emote: msg.substring(parseInt(limits[0], 10), parseInt(limits[1], 10) + 1), id: key });
+            emotes.push({ emote: [...msg].slice(parseInt(limits[0], 10), parseInt(limits[1], 10) + 1).join(""), id: key });
           }
         }
         for (let index = 0, j = emotes.length; index < j; index++) {
