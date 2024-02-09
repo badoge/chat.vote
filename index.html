@@ -157,7 +157,7 @@
     </div>
 
     <div class="modal fade" id="tieModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Can't pick a winner</h5>
@@ -167,9 +167,9 @@
             <p id="tieModalText">Winner and runner up are tied, unable to pick a winner</p>
           </div>
           <div class="modal-footer">
+            <button type="button" class="btn btn-info" id="removeRandomWinner" style="display: none" data-bs-dismiss="modal" onclick="removeRandomWinner()">Remove winner and restart</button>
             <button type="button" class="btn btn-primary" onclick="pickRandomTiedOption()"><i class="material-icons notranslate">casino</i>Pick a random option</button>
             <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="enableVoteButton()"><i class="material-icons notranslate">timer</i>Keep voting</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
           </div>
         </div>
       </div>
@@ -191,7 +191,6 @@
 
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" onclick="pickRandomYesNo()"><i class="material-icons notranslate">refresh</i>reroll</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
           </div>
         </div>
       </div>
@@ -659,7 +658,7 @@
                 data-bs-toggle="popover"
                 data-bs-trigger="manual"
                 data-bs-placement="top"
-                data-bs-title="No options added"
+                data-bs-title="Not enough options"
                 data-bs-content="You need to add 2 or more options to the poll before starting."
               >
                 <label for="pollOption" id="pollOptionLabel" class="form-label">Enter poll option:</label>

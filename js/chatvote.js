@@ -12,6 +12,7 @@ let elements = {
   loginExpiredModal: document.getElementById("loginExpiredModal"),
   tieModal: document.getElementById("tieModal"),
   tieModalText: document.getElementById("tieModalText"),
+  removeRandomWinner: document.getElementById("removeRandomWinner"),
   randomYesnoModal: document.getElementById("randomYesnoModal"),
   coin: document.getElementById("coin"),
 
@@ -435,6 +436,7 @@ async function removeWinner() {
   let oldlength = vote_results.length;
   table.clear().draw();
   vote_results = [];
+  //oldlength - 1 to skip the option with the most votes
   for (let k = 0; k < oldlength - 1; k++) {
     pushVoteResults(vote_results_copy[k].id, vote_results_copy[k].option, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
     pushTable(vote_results_copy[k].id, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
@@ -460,8 +462,11 @@ function pickRandomOption() {
   elements.randomOptionWinner.innerHTML = `<h2>${title}</h2><h3>${vote_results[random].option_emotes}</h3>`;
   if (vote_results[random].by != USER.channel) {
     elements.randomOptionWinner.innerHTML += `
-    <h4>Submitted by: <button class="btn btn-secondary" onclick=window.open("https://www.twitch.tv/popout/${USER.channel}/viewercard/${vote_results[random].by}?popout=","_blank","width=340,height=800")>
-    ${vote_results[random].by}
+    <h4>
+    Submitted by: <button class="btn btn-link" style="color:${vote_results[random].context.color || "#FFFFFF"};" onclick=window.open("https://www.twitch.tv/popout/${
+      USER.channel
+    }/viewercard/${vote_results[random].by}?popout=","_blank","width=340,height=800")>
+    ${addBadges(vote_results[random].context.badges, vote_results[random].context["user-id"], vote_results[random].context["first-msg"])}${vote_results[random].by}
     </button>
     </h4>`;
   }
@@ -471,6 +476,31 @@ function pickRandomOption() {
   }
 } //pickRandomOption
 
+function removeRandomWinner() {
+  sendData("chat.vote", USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube", {
+    table: table.column(2).data().toArray(),
+    scores: table.column(4).data().toArray(),
+  });
+  let vote_results_copy = structuredClone(vote_results);
+  //remove the random winner
+  vote_results_copy = vote_results_copy.filter((o) => o.id !== randomTiedOptionWinner.id);
+
+  voters = [];
+  voters_options = [];
+  vote_changed = [];
+  mainChart.destroy();
+  table.clear().draw();
+  vote_results = [];
+  for (let k = 0; k < vote_results_copy.length; k++) {
+    pushVoteResults(vote_results_copy[k].id, vote_results_copy[k].option, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
+    pushTable(vote_results_copy[k].id, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
+  }
+  loadChart();
+  updateChart();
+  enableVoteButton();
+} //removeRandomWinner
+
+let randomTiedOptionWinner;
 function pickRandomTiedOption() {
   if (yesNoMode) {
     tieModal.hide();
@@ -478,6 +508,7 @@ function pickRandomTiedOption() {
     pickRandomYesNo();
     return;
   }
+  elements.removeRandomWinner.style.display = "";
 
   let tied = [];
   let vote_results_copy = structuredClone(vote_results);
@@ -490,17 +521,21 @@ function pickRandomTiedOption() {
       tied.push(vote_results_copy[index]);
     }
   }
-
   let random = Math.floor(Math.random() * tied.length);
+
+  randomTiedOptionWinner = tied[random];
 
   elements.tieModalText.innerHTML = `
   <h2>${elements.questionLabel.innerHTML}</h2>
   <h3>Random tied option: "${tied[random].option_emotes}"</h3>`;
+
   if (tied[random].by != USER.channel) {
     elements.tieModalText.innerHTML += `
     <h4>Submitted by: 
-    <button class="btn btn-secondary" onclick=window.open("https://www.twitch.tv/popout/${USER.channel}/viewercard/${tied[random].by}?popout=","_blank","width=340,height=800")>
-    ${tied[random].by}
+    <button class="btn btn-link" style="color:${tied[random].context.color || "#FFFFFF"};" onclick=window.open("https://www.twitch.tv/popout/${USER.channel}/viewercard/${
+      tied[random].by
+    }?popout=","_blank","width=340,height=800")>
+    ${addBadges(tied[random].context.badges, tied[random].context["user-id"], tied[random].context["first-msg"])}${tied[random].by}
     </button>
     </h4>`;
   }
@@ -1546,6 +1581,8 @@ function startTimer() {
     disableVoteButton();
     if (yesNoMode) {
       if (vote_results_yesno.nay == vote_results_yesno.yea) {
+        elements.tieModalText.innerHTML = "Winner and runner up are tied, unable to pick a winner";
+        elements.removeRandomWinner.style.display = "none";
         tieModal.show();
         return;
       }
@@ -1562,6 +1599,7 @@ function startTimer() {
       });
       if (vote_results_copy[0].score == vote_results_copy[1].score) {
         elements.tieModalText.innerHTML = "Winner and runner up are tied, unable to pick a winner";
+        elements.removeRandomWinner.style.display = "none";
         tieModal.show();
         return;
       }
@@ -1569,7 +1607,12 @@ function startTimer() {
     <h2>${elements.questionLabel.innerHTML}</h2>
     <h3>"${vote_results_copy[0].option_emotes}" has won with ${vote_results_copy[0].score} ${vote_results_copy[0].score == 1 ? "vote" : "votes"}!</h3>`;
       if (vote_results_copy[0].by != USER.channel) {
-        elements.timeOverWinner.innerHTML += `<h4>Submitted by: <button class="btn btn-secondary" onclick=window.open("https://www.twitch.tv/popout/${USER.channel}/viewercard/${vote_results_copy[0].by}?popout=","_blank","width=340,height=800")>${vote_results_copy[0].by}</button></h4>`;
+        elements.timeOverWinner.innerHTML += `<h4>
+        Submitted by: <button class="btn btn-link" style="color:${vote_results_copy[0].context.color || "#FFFFFF"};" onclick=window.open("https://www.twitch.tv/popout/${
+          USER.channel
+        }/viewercard/${vote_results_copy[0].by}?popout=","_blank","width=340,height=800")>
+        ${addBadges(vote_results_copy[0].context.badges, vote_results_copy[0].context["user-id"], vote_results_copy[0].context["first-msg"])}${vote_results_copy[0].by}
+        </button></h4>`;
       }
       linkifyElementID("timeOverWinner", CHATVOTE.linkPreviewThumbnailsEnabled);
       timeOverModal.show();
