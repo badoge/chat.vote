@@ -1514,6 +1514,7 @@ function resetPlayers() {
   elements.videoEmbed.src = "";
 } //resetPlayers
 
+let voteskipTimeout;
 function voteSkip(userid) {
   if (!playlist_playing || !PLAYLIST.allowVoteSkip) {
     return;
@@ -1527,6 +1528,20 @@ function voteSkip(userid) {
       translateY: ["-100%", 0],
     });
   }
+
+  clearTimeout(voteskipTimeout);
+  voteskipTimeout = setTimeout(() => {
+    //hide voteskip counter if no more votes come in
+    anime({
+      targets: `#voteSkipDiv`,
+      easing: "easeOutBounce",
+      duration: 2000,
+      translateY: [0, "-100%"],
+      complete: function (anim) {
+        elements.voteSkipDiv.style.display = "none";
+      },
+    });
+  }, 5000);
 
   if (skippers.includes(userid)) {
     return;
