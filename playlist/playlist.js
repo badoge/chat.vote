@@ -123,7 +123,7 @@ let togglePlaylistPopover;
 let streamerColor = "";
 
 let users = [];
-let requests = [];
+let requests = new Map();
 let history = [];
 let firstTimeChatters = [];
 let skippers = [];
@@ -279,7 +279,7 @@ function saveSettings() {
   refreshData();
   localStorage.setItem("USER", JSON.stringify(USER));
   localStorage.setItem("PLAYLIST", JSON.stringify(PLAYLIST));
-  localStorage.setItem("PLAYLIST_REQUESTS", JSON.stringify(requests));
+  localStorage.setItem("PLAYLIST_REQUESTS", JSON.stringify(requests, replacer));
   localStorage.setItem("PLAYLIST_HISTORY", JSON.stringify(history));
   localStorage.setItem("darkTheme", darkTheme);
   updateSite();
@@ -379,10 +379,14 @@ function load_localStorage() {
   if (!localStorage.getItem("PLAYLIST_REQUESTS")) {
     console.log("localStorage playlist requests not found");
   } else {
-    requests = JSON.parse(localStorage.getItem("PLAYLIST_REQUESTS"));
-    for (let index = 0; index < requests.length; index++) {
-      addToPlaylist(index);
-      updatePlaylist(index, true);
+    requests = JSON.parse(localStorage.getItem("PLAYLIST_REQUESTS"), reviver);
+    if (requests instanceof Map !== true) {
+      //reset localstorage for users that have the old array localstorage
+      requests = new Map();
+    }
+    for (let request of requests.values()) {
+      addToPlaylist(request);
+      updatePlaylist(request, true);
     }
     updateLength();
   }
@@ -391,7 +395,7 @@ function load_localStorage() {
     console.log("localStorage playlist history not found");
   } else {
     history = JSON.parse(localStorage.getItem("PLAYLIST_HISTORY"));
-    for (let index = history.length - 1; index >= 0; index--) {
+    for (let index = 0; index < history.length; index++) {
       addToHistory(history[index], true);
     }
   }
@@ -409,7 +413,7 @@ function resetSettings(logout = false) {
         platform: "",
       })
     );
-    localStorage.setItem("PLAYLIST_REQUESTS", JSON.stringify([]));
+    localStorage.setItem("PLAYLIST_REQUESTS", JSON.stringify(new Map(), replacer));
     localStorage.setItem("PLAYLIST_HISTORY", JSON.stringify([]));
   }
   localStorage.setItem(
@@ -632,9 +636,9 @@ function connect() {
   client.on("timeout", (channel, username, reason, duration, userstate) => {}); //timeout
 
   client.on("messagedeleted", (channel, username, deletedMessage, userstate) => {
-    const requestIndex = requests.findIndex((r) => r.msgid === userstate["target-msg-id"]);
-    if (requestIndex > -1) {
-      deleteRequest(requests[requestIndex].id, false);
+    const requestKey = findRequestKey("msgid", userstate["target-msg-id"]);
+    if (requestKey) {
+      deleteRequest(requestKey, false);
     }
   });
 
@@ -728,6 +732,21 @@ function checkRequestLimit(userIndex) {
   return limit;
 } //checkRequestLimit
 
+/**
+ * @description gets the key/id of a request from a property value
+ * @param {*} requestProperty the property to search
+ * @param {*} lookupValue the value you are looking for
+ * @returns {*} the request key/id or null if not found
+ */
+function findRequestKey(requestProperty, lookupValue) {
+  for (const [key, value] of requests.entries()) {
+    if (value[requestProperty] === lookupValue) {
+      return key;
+    }
+  }
+  return null;
+} //findRequestKey
+
 function addRequest(context, link, msgid = 0) {
   const userIndex = getUser(context);
   const limit = checkRequestLimit(userIndex);
@@ -754,13 +773,14 @@ function addRequest(context, link, msgid = 0) {
   users[userIndex].requests.push(link.id);
 
   //check if other users already requested this link id
-  const requestIndex = requests.findIndex((r) => r.id === link.id);
-  if (requestIndex > -1) {
-    requests[requestIndex].by.push(users[userIndex]);
-    updatePlaylist(requestIndex);
+  let request = requests.get(link.id);
+  if (request) {
+    request.by.push(users[userIndex]);
+    requests.set(link.id, request);
+    updatePlaylist(request);
     botReply("⚠ Someone else already requested this", context.id, false);
   } else {
-    requests.push({
+    let newRequest = {
       id: link.id,
       msgid: msgid,
       type: link.type,
@@ -773,21 +793,21 @@ function addRequest(context, link, msgid = 0) {
       thumbnail: "",
       time: Date.now(),
       by: [users[userIndex]],
-    });
-    let index = requests.length - 1;
-    addToPlaylist(index);
-    getRequestInfo(index, context.id);
-    updatePlaylist(index);
+    };
+    requests.set(link.id, newRequest);
+    addToPlaylist(newRequest);
+    getRequestInfo(newRequest, context.id);
+    updatePlaylist(newRequest);
   }
   updateLength();
   updateSite();
 } //addRequest
 
 function deleteRequest(id, refund = true) {
-  const requestIndex = requests.findIndex((r) => r.id === id);
+  const request = requests.get(id);
   if (refund) {
-    for (let index = 0; index < requests[requestIndex].by.length; index++) {
-      const userIndex = users.findIndex((u) => u.username === requests[requestIndex].by[index].username);
+    for (let index = 0; index < request.by.length; index++) {
+      const userIndex = users.findIndex((u) => u.username === request.by[index].username);
       if (userIndex != -1) {
         users[userIndex].requestsCount--;
         users[userIndex].requests.splice(
@@ -798,7 +818,8 @@ function deleteRequest(id, refund = true) {
         );
       }
     }
-    requests.splice(requestIndex, 1);
+    //remove the request here if user got a refund, if refund is false then the request will be deleted somewhere else :)
+    requests.delete(id);
   }
   document.getElementById(`id${id}`).remove();
   updateLength();
@@ -809,7 +830,7 @@ function clearPlaylist() {
   playlist_playing = false;
   total_duration = 0;
   users = [];
-  requests = [];
+  requests = new Map();
   resetVoteSkip();
   resetPlayers();
   elements.mainList.innerHTML = "";
@@ -827,29 +848,35 @@ function clearHistory() {
 } //clearPlaylist
 
 function updateLength() {
-  const count = requests.length;
-  const duration = requests.reduce((sum, request) => {
-    return request.duration == -1 ? sum : sum + request.duration;
-  }, 0);
+  const count = requests.size;
+  let duration = 0;
+
+  for (let request of requests.values()) {
+    if (request.duration == -1) {
+      continue;
+    }
+    duration += request.duration;
+  }
+
   elements.playlistLength.innerHTML = `${secondsToTimeString(Math.round(duration)) || "00:00"} (${count} ${count == 1 ? "item" : "items"})`;
 } //updateLength
 
-function addToPlaylist(requestIndex, position = "beforeend") {
+function addToPlaylist(request, position = "beforeend") {
   elements.mainList.insertAdjacentHTML(
     position,
-    `<div class="container-fluid p-0 mb-1" id="id${requests[requestIndex].id}">
+    `<div class="container-fluid p-0 mb-1" id="id${request.id}">
         <div class="row g-1">
           <div class="col-auto thumbnail-div">
-            <div id="id${requests[requestIndex].id}_thumbnail" class="request-thumbnail">
+            <div id="id${request.id}_thumbnail" class="request-thumbnail">
               <div class="placeholder-glow" style="width: 160px; height: 90px">
                 <span class="placeholder col-12 rounded h-100"></span>
               </div>
             </div>
-            <span class="badge text-bg-dark duration-label" id="id${requests[requestIndex].id}_duration">00:00</span>
+            <span class="badge text-bg-dark duration-label" id="id${request.id}_duration">00:00</span>
           </div>
           <div class="col">
             <div class="vstack h-100">
-              <div class="request-title mb-auto" id="id${requests[requestIndex].id}_title" >
+              <div class="request-title mb-auto" id="id${request.id}_title" >
                 <span class="placeholder-glow">
                   <span class="placeholder col-12"></span>
                 </span>
@@ -857,19 +884,19 @@ function addToPlaylist(requestIndex, position = "beforeend") {
                   <span class="placeholder col-12"></span>
                 </span>
               </div>
-              <small class="request-info text-body-secondary" id="id${requests[requestIndex].id}_info" >
+              <small class="request-info text-body-secondary" id="id${request.id}_info" >
                 <span class="placeholder-glow">
                   <span class="placeholder col-12"></span>
                 </span>
               </small>
-              <small class="requested-by text-body-secondary" id="id${requests[requestIndex].id}_by" >
+              <small class="requested-by text-body-secondary" id="id${request.id}_by" >
               Requested by: 
-              ${requests[requestIndex].by[0].badges}
-              <span style="color: ${requests[requestIndex].by[0].color}">${requests[requestIndex].by.map((u) => u.username).join(" & ")}</span>
+              ${request.by[0].badges}
+              <span style="color: ${request.by[0].color}">${request.by.map((u) => u.username).join(" & ")}</span>
               </small>
             </div>
           </div>
-          <div class="col-auto" style="align-self: center"><i class="material-icons notranslate delete-request" onclick="deleteRequest('${requests[requestIndex].id}')">delete</i></div>
+          <div class="col-auto" style="align-self: center"><i class="material-icons notranslate delete-request" onclick="deleteRequest('${request.id}')">delete</i></div>
         </div>
       </div>`
   );
@@ -880,7 +907,7 @@ function addToHistory(request, localStorageLoad = false) {
     history.unshift(request);
   }
   elements.historyList.insertAdjacentHTML(
-    "afterbegin",
+    localStorageLoad ? "beforeend" : "afterbegin",
     `<div class="container-fluid p-0 mb-1">
         <div class="row g-1">
           <div class="col-auto thumbnail-div">
@@ -922,36 +949,36 @@ function addToHistory(request, localStorageLoad = false) {
   );
 } //addToHistory
 
-function updatePlaylist(index, localStorageLoad = false) {
+function updatePlaylist(request, localStorageLoad = false) {
   //check if request info has been fetched
-  if (requests[index].thumbnail && requests[index].title) {
-    document.getElementById(`id${requests[index].id}_thumbnail`).innerHTML = `<img src="${requests[index].thumbnail}" alt="thumbnail" class="rounded" />`;
-    document.getElementById(`id${requests[index].id}_title`).innerHTML = `
+  if (request.thumbnail && request.title) {
+    document.getElementById(`id${request.id}_thumbnail`).innerHTML = `<img src="${request.thumbnail}" alt="thumbnail" class="rounded" />`;
+    document.getElementById(`id${request.id}_title`).innerHTML = `
     <a 
     class="link-body-emphasis link-underline-opacity-0"
-    href="${getItemLink(requests[index].type, requests[index].id)}"
+    href="${getItemLink(request.type, request.id)}"
     target="_blank"
     rel="noopener noreferrer">
-    ${validator.escape(requests[index].title)}
+    ${validator.escape(request.title)}
     </a>`;
-    document.getElementById(`id${requests[index].id}_title`).title = requests[index].title;
-    document.getElementById(`id${requests[index].id}_info`).innerHTML = `
-    ${validator.escape(requests[index].channel)} ${requests[index].views > -1 ? ` · ${formatViewCount(requests[index].views)} ${requests[index].views == 1 ? "view" : "views"}` : ""}`;
-    document.getElementById(`id${requests[index].id}_info`).title = `
-    ${validator.escape(requests[index].channel)} ${requests[index].views > -1 ? ` · ${formatViewCount(requests[index].views)} ${requests[index].views == 1 ? "view" : "views"}` : ""}`;
-    document.getElementById(`id${requests[index].id}_duration`).innerText = requests[index].duration == -1 ? "🔴live" : secondsToTimeString(Math.round(requests[index].duration));
-    document.getElementById(`id${requests[index].id}_by`).innerHTML = `
+    document.getElementById(`id${request.id}_title`).title = request.title;
+    document.getElementById(`id${request.id}_info`).innerHTML = `
+    ${validator.escape(request.channel)} ${request.views > -1 ? ` · ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}`;
+    document.getElementById(`id${request.id}_info`).title = `
+    ${validator.escape(request.channel)} ${request.views > -1 ? ` · ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}`;
+    document.getElementById(`id${request.id}_duration`).innerText = request.duration == -1 ? "🔴live" : secondsToTimeString(Math.round(request.duration));
+    document.getElementById(`id${request.id}_by`).innerHTML = `
     Requested by 
-    ${requests[index].by[0].badges}
+    ${request.by[0].badges}
     <a 
     class="link-body-emphasis link-underline-opacity-0"
-    href="https://www.twitch.tv/popout/${USER.channel}/viewercard/${requests[index].by[0].username}"
+    href="https://www.twitch.tv/popout/${USER.channel}/viewercard/${request.by[0].username}"
     target="_blank"
     rel="noopener noreferrer">
-    <span style="color: ${requests[index].by[0].color}">${requests[index].by[0].username}</span>
+    <span style="color: ${request.by[0].color}">${request.by[0].username}</span>
     </a>
-     ${requests[index].by.length > 1 ? `and ${requests[index].by.length - 1} other ${requests[index].by.length - 1 == 1 ? "user" : "users"}` : ""}`;
-    document.getElementById(`id${requests[index].id}_by`).title = `Requested by @${requests[index].by.map((u) => u.username).join(" & ")}`;
+     ${request.by.length > 1 ? `and ${request.by.length - 1} other ${request.by.length - 1 == 1 ? "user" : "users"}` : ""}`;
+    document.getElementById(`id${request.id}_by`).title = `Requested by @${request.by.map((u) => u.username).join(" & ")}`;
 
     if (!playlist_playing && PLAYLIST.autoplay && !localStorageLoad) {
       nextItem();
@@ -962,241 +989,239 @@ function updatePlaylist(index, localStorageLoad = false) {
     }
   } else {
     //if request info is not ready yet then update requesters only
-    document.getElementById(`id${requests[index].id}_by`).innerText = `Requested by @${requests[index].by[0].username} ${
-      requests[index].by.length > 1 ? `and ${requests[index].by.length - 1} other ${requests[index].by.length - 1 == 1 ? "user" : "users"}` : ""
+    document.getElementById(`id${request.id}_by`).innerText = `Requested by @${request.by[0].username} ${
+      request.by.length > 1 ? `and ${request.by.length - 1} other ${request.by.length - 1 == 1 ? "user" : "users"}` : ""
     }`;
   }
 } //updatePlaylist
 
-async function getRequestInfo(index, id) {
+async function getRequestInfo(request, msgid) {
   //skip if request already has info
-  if (requests[index].title) {
-    updatePlaylist(index);
+  if (request.title) {
+    updatePlaylist(request);
     return;
   }
-  if (requests[index].type == "twitch clip") {
+  if (request.type == "twitch clip") {
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/twitch/clips?id=${requests[index].id}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/twitch/clips?id=${request.id}`, GETrequestOptions);
       let result = await response.json();
       console.log(result);
-      requests[index].title = result.data[0].title || "(untitled)";
-      requests[index].channel = result.data[0].broadcaster_name || "(unknown)";
-      requests[index].thumbnail = result.data[0].thumbnail_url;
-      requests[index].duration = result.data[0].duration;
-      requests[index].views = result.data[0].view_count;
+      request.title = result.data[0].title || "(untitled)";
+      request.channel = result.data[0].broadcaster_name || "(unknown)";
+      request.thumbnail = result.data[0].thumbnail_url;
+      request.duration = result.data[0].duration;
+      request.views = result.data[0].view_count;
     } catch (error) {
-      deleteRequest(requests[index].id);
-      botReply("⚠ Your clip was removed because I could not find its info", id, false);
+      deleteRequest(request.id);
+      botReply("⚠ Your clip was removed because I could not find its info", msgid, false);
       console.log("getRequestInfo twitch clip error", error);
       return;
     }
   } //twitch clip
 
-  if (requests[index].type == "twitch vod") {
+  if (request.type == "twitch vod") {
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/twitch/videos?id=${requests[index].id}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/twitch/videos?id=${request.id}`, GETrequestOptions);
       let result = await response.json();
       console.log(result);
-      requests[index].title = result.data[0].title || "(untitled)";
-      requests[index].channel = result.data[0].user_login || "(unknown)";
-      requests[index].thumbnail = result.data[0].thumbnail_url.replace("%{width}", "320").replace("%{height}", "180");
-      requests[index].duration = convertTwitchVODDuration(result.data[0].duration);
-      requests[index].views = result.data[0].view_count;
+      request.title = result.data[0].title || "(untitled)";
+      request.channel = result.data[0].user_login || "(unknown)";
+      request.thumbnail = result.data[0].thumbnail_url.replace("%{width}", "320").replace("%{height}", "180");
+      request.duration = convertTwitchVODDuration(result.data[0].duration);
+      request.views = result.data[0].view_count;
     } catch (error) {
-      deleteRequest(requests[index].id);
-      botReply("⚠ Your video was removed because I could not find its info", id, false);
+      deleteRequest(request.id);
+      botReply("⚠ Your video was removed because I could not find its info", msgid, false);
       console.log("getRequestInfo twitch vod error", error);
       return;
     }
   } //twitch vod
 
-  if (requests[index].type == "twitch stream") {
+  if (request.type == "twitch stream") {
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/twitch/streams?user_login=${requests[index].id}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/twitch/streams?user_login=${request.id}`, GETrequestOptions);
       let result = await response.json();
       console.log(result);
-      requests[index].title = result.data[0].title || "(untitled)";
-      requests[index].channel = result.data[0].user_name || "(unknown)";
-      requests[index].thumbnail = result.data[0].thumbnail_url.replace("{width}", "320").replace("{height}", "180");
-      requests[index].duration = -1;
+      request.title = result.data[0].title || "(untitled)";
+      request.channel = result.data[0].user_name || "(unknown)";
+      request.thumbnail = result.data[0].thumbnail_url.replace("{width}", "320").replace("{height}", "180");
+      request.duration = -1;
     } catch (error) {
-      deleteRequest(requests[index].id);
-      botReply("⚠ Your stream was removed because I could not find its info", id, false);
+      deleteRequest(request.id);
+      botReply("⚠ Your stream was removed because I could not find its info", msgid, false);
       console.log("getRequestInfo twitch stream error", error);
       return;
     }
   } //twitch stream
 
-  if (requests[index].type == "spotify") {
+  if (request.type == "spotify") {
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/spotify/tracks?ids=${requests[index].id}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/spotify/tracks?ids=${request.id}`, GETrequestOptions);
       let result = await response.json();
       console.log(result);
-      requests[index].title = result.tracks[0].name || "(untitled)";
-      requests[index].channel = result.tracks[0].artists[0].name || "(unknown)";
-      requests[index].thumbnail = result.tracks[0].album.images[0].url;
-      requests[index].duration = result.tracks[0].duration_ms / 1000;
-      requests[index].uri = result.tracks[0].uri;
+      request.title = result.tracks[0].name || "(untitled)";
+      request.channel = result.tracks[0].artists[0].name || "(unknown)";
+      request.thumbnail = result.tracks[0].album.images[0].url;
+      request.duration = result.tracks[0].duration_ms / 1000;
+      request.uri = result.tracks[0].uri;
       if (!result.tracks[0].is_playable) {
-        deleteRequest(requests[index].id);
-        botReply("⛔ Your song was removed because it is not playable", id, false);
+        deleteRequest(request.id);
+        botReply("⛔ Your song was removed because it is not playable", msgid, false);
         return;
       }
     } catch (error) {
-      deleteRequest(requests[index].id);
-      botReply("⚠ Your song was removed because I could not find its info", id, false);
+      deleteRequest(request.id);
+      botReply("⚠ Your song was removed because I could not find its info", msgid, false);
       console.log("getRequestInfo spotify error", error);
       return;
     }
   } //spotify
 
-  if (requests[index].type == "youtube" || requests[index].type == "youtube short") {
+  if (request.type == "youtube" || request.type == "youtube short") {
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/youtube/videos?id=${requests[index].id}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/youtube/videos?id=${request.id}`, GETrequestOptions);
       let result = await response.json();
       console.log(result);
-      requests[index].title = result.items[0].snippet.title || "(untitled)";
-      requests[index].channel = result.items[0].snippet.channelTitle || "(unknown)";
-      requests[index].thumbnail = result.items[0].snippet.thumbnails.medium.url;
-      requests[index].duration = ISO8601ToSeconds(result.items[0].contentDetails.duration);
-      requests[index].views = result.items[0].statistics.viewCount;
+      request.title = result.items[0].snippet.title || "(untitled)";
+      request.channel = result.items[0].snippet.channelTitle || "(unknown)";
+      request.thumbnail = result.items[0].snippet.thumbnails.medium.url;
+      request.duration = ISO8601ToSeconds(result.items[0].contentDetails.duration);
+      request.views = result.items[0].statistics.viewCount;
 
       if (Object.hasOwn(result.items[0], "liveStreamingDetails")) {
-        if (requests[index].duration == 0) {
-          requests[index].duration = -1;
+        if (request.duration == 0) {
+          request.duration = -1;
         }
         if (!PLAYLIST.allowYTStreams) {
-          deleteRequest(requests[index].id);
-          botReply("⛔ YouTube streams are not allowed", id, false);
+          deleteRequest(request.id);
+          botReply("⛔ YouTube streams are not allowed", msgid, false);
           return;
         }
       }
 
       if (result.items[0].contentDetails?.contentRating?.ytRating == "ytAgeRestricted" || !result.items[0].status?.embeddable) {
-        deleteRequest(requests[index].id);
-        botReply("⛔ Your video was removed because it is age restricted or not embeddable", id, false);
+        deleteRequest(request.id);
+        botReply("⛔ Your video was removed because it is age restricted or not embeddable", msgid, false);
         return;
       }
     } catch (error) {
-      deleteRequest(requests[index].id);
-      botReply("⚠ Your video was removed because I could not find its info", id, false);
+      deleteRequest(request.id);
+      botReply("⚠ Your video was removed because I could not find its info", msgid, false);
       console.log("getRequestInfo youtube error", error);
       return;
     }
   } //youtube
 
-  if (requests[index].type == "streamable") {
+  if (request.type == "streamable") {
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/streamable/videos?id=${requests[index].id}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/streamable/videos?id=${request.id}`, GETrequestOptions);
       let result = await response.json();
       console.log(result);
-      requests[index].title = result.title || "(untitled)";
-      requests[index].channel = "(unknown)";
-      requests[index].thumbnail = result.thumbnail_url;
-      requests[index].duration = result.files.mp4.duration;
-      requests[index].video = result.files.mp4.url;
+      request.title = result.title || "(untitled)";
+      request.channel = "(unknown)";
+      request.thumbnail = result.thumbnail_url;
+      request.duration = result.files.mp4.duration;
+      request.video = result.files.mp4.url;
     } catch (error) {
-      deleteRequest(requests[index].id);
-      botReply("⚠ Your video was removed because I could not find its info", id, false);
+      deleteRequest(request.id);
+      botReply("⚠ Your video was removed because I could not find its info", msgid, false);
       console.log("getRequestInfo streamable error", error);
       return;
     }
   } //streamable
 
-  if (requests[index].type == "supa video/audio" || requests[index].type == "supa video" || requests[index].type == "supa audio") {
+  if (request.type == "supa video/audio" || request.type == "supa video" || request.type == "supa audio") {
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/supa/info?id=${requests[index].id}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/supa/info?id=${request.id}`, GETrequestOptions);
       let result = await response.json();
       console.log(result);
-      requests[index].title = result?.name?.split(".")[0] || "(untitled)";
-      requests[index].channel = "(unknown)";
-      if (await checkImage(`https://i.supa.codes/t/${requests[index].id}`)) {
-        requests[index].thumbnail = `https://i.supa.codes/t/${requests[index].id}`;
+      request.title = result?.name?.split(".")[0] || "(untitled)";
+      request.channel = "(unknown)";
+      if (await checkImage(`https://i.supa.codes/t/${request.id}`)) {
+        request.thumbnail = `https://i.supa.codes/t/${request.id}`;
       } else {
-        requests[index].thumbnail = "https://chat.vote/pics/nothumbnail.png";
+        request.thumbnail = "https://chat.vote/pics/nothumbnail.png";
       }
-      requests[index].duration = result?.mediainfo?.duration || 0;
+      request.duration = result?.mediainfo?.duration || 0;
 
       //update type here bcz video and audio links are the same and checking file extension is not reliable
       if (result.type.startsWith("video")) {
         if (!PLAYLIST.allowSupaVideo) {
-          botReply(`⛔ supa video links are not enabled`, id, false);
-          deleteRequest(requests[index].id);
+          botReply(`⛔ supa video links are not enabled`, msgid, false);
+          deleteRequest(request.id);
           return;
         }
-        requests[index].type = "supa video";
+        request.type = "supa video";
       }
       if (result.type.startsWith("audio")) {
         if (!PLAYLIST.allowSupaVideo) {
-          botReply(`⛔ supa audio links are not enabled`, id, false);
-          deleteRequest(requests[index].id);
+          botReply(`⛔ supa audio links are not enabled`, msgid, false);
+          deleteRequest(request.id);
           return;
         }
-        requests[index].type = "supa audio";
+        request.type = "supa audio";
       }
 
       if (!result.type.startsWith("audio") && !result.type.startsWith("video")) {
-        deleteRequest(requests[index].id);
-        botReply("⚠ Only video and audio files are allowed", id, false);
+        deleteRequest(request.id);
+        botReply("⚠ Only video and audio files are allowed", msgid, false);
         return;
       }
     } catch (error) {
-      deleteRequest(requests[index].id);
-      botReply("⚠ Your video was removed because I could not find its info", id, false);
+      deleteRequest(request.id);
+      botReply("⚠ Your video was removed because I could not find its info", msgid, false);
       console.log("getRequestInfo supa error", error);
       return;
     }
   } //supa
 
-  if (PLAYLIST.maxDuration !== "" && requests[index].duration !== -1 && total_duration + requests[index].duration > PLAYLIST.maxDuration * (PLAYLIST.maxDurationUnit == "m" ? 60 : 3600)) {
+  if (PLAYLIST.maxDuration !== "" && request.duration !== -1 && total_duration + request.duration > PLAYLIST.maxDuration * (PLAYLIST.maxDurationUnit == "m" ? 60 : 3600)) {
     if (playlist_open) {
       elements.togglePlaylist.click();
     }
-    deleteRequest(requests[index].id);
-    botReply(`⛔ Your request was removed because the playlist's duration limit was reached (${PLAYLIST.maxDuration}${PLAYLIST.maxDurationUnit})`, id, false);
+    deleteRequest(request.id);
+    botReply(`⛔ Your request was removed because the playlist's duration limit was reached (${PLAYLIST.maxDuration}${PLAYLIST.maxDurationUnit})`, msgid, false);
     return;
   }
 
-  if (PLAYLIST.maxLength !== "" && requests[index].duration !== -1 && requests[index].duration > PLAYLIST.maxLength * 60) {
-    deleteRequest(requests[index].id);
-    botReply(`⛔ Your request was removed because it's too long (${PLAYLIST.maxLength}m max)`, id, false);
+  if (PLAYLIST.maxLength !== "" && request.duration !== -1 && request.duration > PLAYLIST.maxLength * 60) {
+    deleteRequest(request.id);
+    botReply(`⛔ Your request was removed because it's too long (${PLAYLIST.maxLength}m max)`, msgid, false);
     return;
   }
 
-  if (PLAYLIST.maxSize !== "" && requests.length > PLAYLIST.maxSize) {
+  if (PLAYLIST.maxSize !== "" && requests.size > PLAYLIST.maxSize) {
     if (playlist_open) {
       elements.togglePlaylist.click();
     }
-    deleteRequest(requests[index].id);
-    botReply(`⛔ Your request was removed because the playlist's size limit was reached (${PLAYLIST.maxSize})`, id, false);
+    deleteRequest(request.id);
+    botReply(`⛔ Your request was removed because the playlist's size limit was reached (${PLAYLIST.maxSize})`, msgid, false);
     return;
   }
 
-  if (PLAYLIST.minViewCount !== "" && requests[index].views !== -1 && requests[index].views < PLAYLIST.minViewCount) {
-    deleteRequest(requests[index].id);
-    botReply(`⛔ Your request was removed because it does not meet the minimum view count (${PLAYLIST.minViewCount.toLocaleString()})`, id, false);
+  if (PLAYLIST.minViewCount !== "" && request.views !== -1 && request.views < PLAYLIST.minViewCount) {
+    deleteRequest(request.id);
+    botReply(`⛔ Your request was removed because it does not meet the minimum view count (${PLAYLIST.minViewCount.toLocaleString()})`, msgid, false);
     return;
   }
 
-  if (requests[index].duration !== -1) {
-    total_duration += requests[index].duration;
+  if (request.duration !== -1) {
+    total_duration += request.duration;
   }
-  updatePlaylist(index);
+  updatePlaylist(request);
   updateLength();
-  if (currentItem && requests[index]) {
+  if (currentItem && request) {
     botReply(
       `✅ Your request has been added to the playlist ${
-        requests.length == 1
+        requests.size == 1
           ? `| Playing right after the current request (<${secondsToTimeString(currentItem.duration)})`
-          : `| ${requests.length - 1} ${requests.length - 1 == 1 ? "request" : "requests"} ahead of you (${secondsToTimeString(
-              total_duration + currentItem.duration - requests[index].duration
-            )})`
+          : `| ${requests.size - 1} ${requests.size - 1 == 1 ? "request" : "requests"} ahead of you (${secondsToTimeString(total_duration + currentItem.duration - request.duration)})`
       }`,
-      id,
+      msgid,
       false
     );
   } else {
-    botReply(`✅ Your request has been added to the playlist`, id, false);
+    botReply(`✅ Your request has been added to the playlist`, msgid, false);
   }
 } //getRequestInfo
 
@@ -1400,7 +1425,13 @@ function nextItem(reply) {
   if (historyIndex > 0) {
     currentItem = history[--historyIndex];
   } else {
-    currentItem = requests.shift();
+    //get key of first request
+    let currentKey = requests.keys().next().value;
+    //get the request data
+    currentItem = requests.get(currentKey);
+    //delete the request
+    requests.delete(currentKey);
+
     historyIndex = -1;
     if (currentItem) {
       addToHistory(currentItem);
@@ -1752,13 +1783,19 @@ async function updateSite() {
 } //updateSite
 
 async function updateSiteSend() {
+  let requestsArray = [];
+
+  for (let request of requests.values()) {
+    requestsArray.push(request);
+  }
+
   let body = JSON.stringify({
     userid: USER.userID,
     username: USER.channel,
     access_token: USER.access_token,
     time: new Date(),
     settings: PLAYLIST,
-    playlist: requests,
+    playlist: requestsArray,
     currentitem: currentItem,
   });
   let requestOptions = {
