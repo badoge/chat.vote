@@ -34,3 +34,28 @@ body {
   position: relative;
   height: min-content;
 }
+
+.copy-command {
+  cursor: pointer;
+  float: inline-end;
+}
+
+.copy-command:hover {
+  opacity: 80%;
+}
+
+.copy-command:active {
+  opacity: 50%;
+}
+
+#toastContainer {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  z-index: 1056;
+  font-weight: bold;
+}
+
+#toastContainer > div > div {
+  font-size: 1.5em;
+}
