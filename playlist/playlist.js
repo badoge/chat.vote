@@ -67,6 +67,7 @@ let elements = {
   autoplayCommand: document.getElementById("autoplayCommand"),
   skipCommand: document.getElementById("skipCommand"),
   rewindCommand: document.getElementById("rewindCommand"),
+  deleteCommand: document.getElementById("deleteCommand"),
   modCommands: document.getElementById("modCommands"),
 
   //main
@@ -184,6 +185,7 @@ let PLAYLIST = {
   autoplayCommand: "!autoplay",
   skipCommand: "!skip",
   rewindCommand: "!rewind",
+  deleteCommand: "!delete",
   modCommands: true,
 };
 
@@ -244,6 +246,7 @@ async function refreshData() {
   PLAYLIST.autoplayCommand = elements.autoplayCommand.value.replace(/\s+/g, "").toLowerCase() || "!autoplay";
   PLAYLIST.skipCommand = elements.skipCommand.value.replace(/\s+/g, "").toLowerCase() || "!skip";
   PLAYLIST.rewindCommand = elements.rewindCommand.value.replace(/\s+/g, "").toLowerCase() || "!rewind";
+  PLAYLIST.deleteCommand = elements.deleteCommand.value.replace(/\s+/g, "").toLowerCase() || "!delete";
   PLAYLIST.modCommands = elements.modCommands.checked;
 
   elements.voteskipCommand.disabled = !PLAYLIST.allowVoteSkip;
@@ -345,6 +348,7 @@ function load_localStorage() {
     elements.autoplayCommand.value = PLAYLIST.autoplayCommand || "!autoplay";
     elements.skipCommand.value = PLAYLIST.skipCommand || "!skip";
     elements.rewindCommand.value = PLAYLIST.rewindCommand || "!rewind";
+    elements.deleteCommand.value = PLAYLIST.deleteCommand || "!delete";
     elements.modCommands.checked = PLAYLIST.modCommands ?? true;
 
     elements.voteskipCommand.disabled = !PLAYLIST.allowVoteSkip;
@@ -466,6 +470,7 @@ function resetSettings(logout = false) {
       autoplayCommand: "!autoplay",
       skipCommand: "!skip",
       rewindCommand: "!rewind",
+      deleteCommand: "!delete",
       modCommands: true,
     })
   );
@@ -626,6 +631,11 @@ function connect() {
       case PLAYLIST.rewindCommand:
         if (context.username == USER.channel || (PLAYLIST.modCommands && context.mod)) {
           previousItem(context.id);
+        }
+        break;
+      case PLAYLIST.deleteCommand:
+        if (context.username == USER.channel || (PLAYLIST.modCommands && context.mod)) {
+          deleteItem(input[1], context.id);
         }
         break;
       default:
@@ -818,9 +828,8 @@ function deleteRequest(id, refund = true) {
         );
       }
     }
-    //remove the request here if user got a refund, if refund is false then the request will be deleted somewhere else :)
-    requests.delete(id);
   }
+  requests.delete(id);
   document.getElementById(`id${id}`).remove();
   updateLength();
   saveSettings();
@@ -896,7 +905,7 @@ function addToPlaylist(request, position = "beforeend") {
               </small>
             </div>
           </div>
-          <div class="col-auto" style="align-self: center"><i class="material-icons notranslate delete-request" onclick="deleteRequest('${request.id}')">delete</i></div>
+          <div class="col-auto" style="align-self: center"><i class="material-icons notranslate delete-request" onclick="deleteRequest('${request.id}',false)">delete</i></div>
         </div>
       </div>`
   );
@@ -1409,9 +1418,24 @@ function previousItem(reply) {
 
   console.log(currentItem);
   playItem(currentItem);
-  updateSite();
+  updateLength();
   saveSettings();
 } //previousItem
+
+function deleteItem(id, reply) {
+  let request = requests.get(id);
+
+  if (!request) {
+    botReply(`⚠ Request not found`, reply, false);
+    return;
+  }
+
+  deleteRequest(id, false);
+  botReply(`✅ Request deleted`, reply, false);
+
+  updateLength();
+  saveSettings();
+} //deleteItem
 
 let currentItem;
 function nextItem(reply) {
@@ -1447,7 +1471,7 @@ function nextItem(reply) {
   }
   console.log(currentItem);
   playItem(currentItem);
-  updateSite();
+  updateLength();
   saveSettings();
 } //nextItem
 
@@ -1893,6 +1917,7 @@ function checkCommands() {
     elements.autoplayCommand,
     elements.skipCommand,
     elements.rewindCommand,
+    elements.deleteCommand,
   ];
 
   let commands = commandElements.map((e) => e.value.replace(/\s+/g, "").toLowerCase());

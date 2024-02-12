@@ -532,7 +532,28 @@
                 onchange="saveSettings()"
               />
             </div>
-
+            <div class="input-group mb-1">
+              <span class="input-group-text">
+                Delete request by ID
+                <i
+                  class="material-icons notranslate cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  data-bs-title="Mods will be able to delete requests by copying the command from your playlist.chat.vote/username page"
+                  >info
+                </i>
+              </span>
+              <input
+                type="text"
+                id="deleteCommand"
+                data-default="!delete"
+                value="!delete"
+                aria-label="Delete command"
+                placeholder="Delete command"
+                class="form-control"
+                onchange="saveSettings()"
+              />
+            </div>
             <div class="form-check form-switch mb-3">
               <input class="form-check-input" type="checkbox" role="switch" id="modCommands" onchange="saveSettings()" checked />
               <label class="form-check-label" for="modCommands"><i class="material-icons notranslate">verified_user</i>Allow mods to use moderation commands</label>
