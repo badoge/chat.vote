@@ -64,7 +64,7 @@
         >
           <img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" />
         </a>
-        <a class="navbar-brand notranslate site-link" href="/trivia/" target="_self" rel="noopener noreferrer"> chat.vote/trivia</a>
+        <a class="navbar-brand notranslate site-link" href="/trivia/" target="_self" rel="noopener noreferrer"> chat.vote Trivia</a>
 
         <div class="collapse navbar-collapse">
           <ul class="navbar-nav">
@@ -166,22 +166,24 @@
     </nav>
 
     <div class="container-fluid">
-      <div class="row" id="mainrow">
+      <div class="row mt-3">
         <div class="col-xl-2"></div>
-        <div class="col-xl-8">
-          <div class="card" id="questionCard">
+        <div class="col-xl-5">
+          <div class="card mb-3">
             <div class="card-body">
               <h3 class="card-title" id="questionNumber">Question 0/0</h3>
-              <h2 id="question">Add questions by clicking settings bottom left :)</h2>
+              <div id="question">Add questions by clicking settings bottom left :)</div>
             </div>
           </div>
-          <div class="card" id="controlsCard">
-            <div class="card-body" id="controlsCardBody">
-              <button type="button" id="start" class="btn btn-success" onclick="start()">Start</button>
-              <button type="button" class="btn btn-warning" onclick="showAnswer()"><i class="material-icons notranslate">visibility</i>Show answer</button>
-              <button type="button" class="btn btn-primary" onclick="next()"><i class="material-icons notranslate">arrow_forward_ios</i>Next question</button>
-            </div>
-          </div>
+          <button type="button" id="start" class="btn btn-lg btn-success" onclick="start()">Start</button>
+          <button type="button" style="display: none" id="showAnswer" class="btn btn-lg btn-warning" onclick="showAnswer()">
+            <i class="material-icons notranslate">visibility</i>Show answer
+          </button>
+          <button type="button" style="display: none" id="next" class="btn btn-lg btn-primary" onclick="next()">
+            <i class="material-icons notranslate">arrow_forward_ios</i>Next question
+          </button>
+        </div>
+        <div class="col-xl-3">
           <div class="card" id="scoreCard">
             <div class="card-body">
               <h4 class="card-title"><i class="material-icons notranslate">leaderboard</i>Scores</h4>
@@ -198,32 +200,53 @@
       </div>
 
       <button id="openOffcanvasbtn" title="Settings" class="btn btn-warning" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" aria-controls="offcanvas">
-        <i class="material-icons notranslate">settings</i> Settings<i class="material-icons notranslate">arrow_forward_ios</i>
+        <i class="material-icons notranslate mb-1">settings</i> Settings<i class="material-icons notranslate mb-1">arrow_forward_ios</i>
       </button>
 
-      <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas" data-bs-backdrop="false" aria-labelledby="offcanvasLabel">
+      <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas" aria-labelledby="offcanvasLabel">
         <div class="offcanvas-header">
           <h5 class="offcanvas-title" id="offcanvasLabel"><i class="material-icons notranslate">settings</i> Settings</h5>
           <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
-          <h3>points</h3>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="showHint" checked />
+            <label class="form-check-label" for="showHint">Show hint</label>
+            <small><br />Shows a hint that reveals the number of characters (the answer → _ _ _ &nbsp; _ _ _ _ _ ) - only works if "Multiple choice answers" is off</small>
+          </div>
+          <br />
+          <h3>Points</h3>
           <div class="form-floating">
             <input type="number" class="form-control" id="points" value="10" />
-            <label for="points">Points for 1st answer</label>
+            <label for="points">Points for 1st correct answer</label>
           </div>
-          <small>1st user to answer will get this amount of points, each following answer will get 1 fewer points till it gets to 0</small>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="firstOnly" />
+            <label class="form-check-label" for="firstOnly">Only first viewer gets points</label>
+          </div>
+          <small>If this is off then the 1st viewer to answer correctly will get this amount of points, each following answer will get 1 fewer points till it gets to 0</small>
 
           <h3 class="mt-3">Questions:</h3>
-          <small class="text-info">Hint: Post an image link in the question field and press enter to embed it</small><br />
-          <button type="button" class="btn btn-warning" onclick="hideAnswers()">Hide/show answers</button>
+
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="multipleChoice" />
+            <label class="form-check-label" for="multipleChoice">Multiple choice answers</label>
+          </div>
+          <p>
+            If this is on then you have to write the answers like this: <strong>correct answer | choice 2 | choice 3 | choice 4</strong> <br />
+            If the switch is off you can add an alias for the answer: <strong>correct answer | alias | alias | alias</strong>
+          </p>
+          <br />
+          <p class="text-info">Post an image link in the question field and press enter to embed it</p>
+
+          <button type="button" class="btn btn-warning mb-3" onclick="hideAnswers()"><i class="material-icons notranslate">visibility</i>Hide/show answers</button>
 
           <div id="optionsDiv">
             <div class="card option-card" data-option-id="1">
               <div class="card-body">
                 <div class="input-group">
                   <input type="text" class="form-control questions" onkeydown="handleInput(event)" data-option-id="1" placeholder="Question" aria-label="Question" />
-                  <input type="text" class="form-control answers" onkeydown="handleInput(event)" data-option-id="1" placeholder="Answer" aria-label="Answer" />
+                  <input type="password" class="form-control answers" onkeydown="handleInput(event)" data-option-id="1" placeholder="Answer" aria-label="Answer" />
 
                   <span class="input-group-text poll-image" data-option-id="1" data-image-url="" style="display: none"> </span>
                   <button type="button" class="remove-image btn btn-warning" onclick="deleteImage(event)" data-option-id="1" style="display: none">
@@ -239,7 +262,7 @@
               <div class="card-body">
                 <div class="input-group">
                   <input type="text" class="form-control questions" onkeydown="handleInput(event)" data-option-id="2" placeholder="Question" aria-label="Question" />
-                  <input type="text" class="form-control answers" onkeydown="handleInput(event)" data-option-id="2" placeholder="Answer" aria-label="Answer" />
+                  <input type="password" class="form-control answers" onkeydown="handleInput(event)" data-option-id="2" placeholder="Answer" aria-label="Answer" />
 
                   <span class="input-group-text poll-image" data-option-id="2" data-image-url="" style="display: none"> </span>
                   <button type="button" class="remove-image btn btn-warning" onclick="deleteImage(event)" data-option-id="2" style="display: none">
@@ -253,8 +276,8 @@
             </div>
           </div>
 
-          <button type="button" onclick="saveSettings()" class="btn btn-success"><i class="material-icons notranslate">save</i>Save</button>
-          <button type="button" onclick="resetSettings()" class="btn btn-danger"><i class="material-icons notranslate">warning</i>Delete all questions</button>
+          <button type="button" onclick="saveSettings()" class="btn btn-success mt-3"><i class="material-icons notranslate">save</i>Save</button>
+          <button type="button" onclick="resetSettings()" class="btn btn-danger float-end mt-3"><i class="material-icons notranslate">warning</i>Delete all questions</button>
         </div>
       </div>
     </div>
@@ -262,7 +285,7 @@
     <script src="/js/tmi.min.js"></script>
     <script src="/js/bootstrap.bundle.min.js"></script>
     <script src="/js/functions.min.js"></script>
-    <script src="/trivia/trivia.min.js"></script>
+    <script src="/trivia/trivia.js"></script>
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-H43YN7FSSP"></script>

@@ -19,13 +19,18 @@ let elements = {
   twitchStatus: document.getElementById("twitchStatus"),
   topRight: document.getElementById("topRight"),
   start: document.getElementById("start"),
+  showAnswer: document.getElementById("showAnswer"),
+  next: document.getElementById("next"),
   questionNumber: document.getElementById("questionNumber"),
   optionsDiv: document.getElementById("optionsDiv"),
   toastContainer: document.getElementById("toastContainer"),
   usersDiv: document.getElementById("usersDiv"),
   users: document.getElementById("users"),
   question: document.getElementById("question"),
+  showHint: document.getElementById("showHint"),
   points: document.getElementById("points"),
+  firstOnly: document.getElementById("firstOnly"),
+  multipleChoice: document.getElementById("multipleChoice"),
 };
 
 let USER = {
@@ -100,6 +105,10 @@ function resetSettings() {
 }
 
 async function start() {
+  elements.start.style.display = "none";
+  elements.showAnswer.style.display = "";
+  elements.next.style.display = "";
+
   points = parseInt(elements.points.value, 10);
 
   started = true;
@@ -108,9 +117,6 @@ async function start() {
   users = [];
   elements.users.innerHTML = "";
 
-  elements.start.innerHTML = spinner;
-
-  elements.start.innerHTML = "Start";
   let questions = [...document.querySelectorAll(".questions")];
   let answers = [...document.querySelectorAll(".answers")];
   let imageSpans = [...document.querySelectorAll(".poll-image")];
@@ -130,14 +136,20 @@ async function start() {
       questionsArray.push(questions[index].value);
     }
     imagesArray.push(imageSpans[index].dataset.imageUrl);
-    answersArray.push(answers[index].value.trim().toLowerCase());
+
+    let options = answers[index].value.split("|");
+
+    for (let index2 = 0; index2 < options.length; index2++) {
+      options[index2] = options[index2].trim().toLowerCase();
+    }
+
+    answersArray.push(options);
   }
   answer = answersArray[questionNumber - 1];
 
   elements.questionNumber.innerText = `Question 1/${questionsArray.length}`;
   let img = imagesArray[questionNumber - 1] ? `<div class="resizable"><img src="${imagesArray[questionNumber - 1]}" alt="question image"/></div>` : "";
-
-  elements.question.innerHTML = `${img}<br>Question: ${questionsArray[questionNumber - 1]}<br>Answer: <span class="blur">${answer}</span>`;
+  elements.question.innerHTML = `${img}<br>Question: ${questionsArray[questionNumber - 1]}<br><span id="answer">${getHint()}</span>`;
 } //start
 
 function next() {
@@ -145,17 +157,15 @@ function next() {
 
   questionNumber++;
   answered = [];
+  started = true;
 
   answer = answersArray[questionNumber - 1];
   if (!questionsArray[questionNumber - 1]) {
     showToast("no more questions", "danger", 5000);
     return;
   }
-  if (!started) {
-    showToast("not started", "danger", 5000);
-    return;
-  }
-  if (!answer) {
+
+  if (!answer[0]) {
     showToast("question has no answer", "danger", 5000);
     return;
   }
@@ -163,13 +173,55 @@ function next() {
 
   let img = imagesArray[questionNumber - 1] ? `<div class="resizable"><img src="${imagesArray[questionNumber - 1]}" alt="question image" /></div>` : "";
 
-  elements.question.innerHTML = `${img}<br>Question: ${questionsArray[questionNumber - 1]}<br>Answer: <span class="blur">${answer}</span>`;
-}
+  elements.question.innerHTML = `${img}<br>Question: ${questionsArray[questionNumber - 1]}<br><span id="answer">${getHint()}</span>`;
+} //next
+
+let choices = ["a", "b", "c", "d"];
+let correctChoice;
+let correctAnswer;
+
+function getHint() {
+  if (elements.multipleChoice.checked) {
+    if (answer.length < 4) {
+      showToast("Question has less than 4 choices", "danger", 3000);
+    }
+
+    correctAnswer = answer[0];
+    let shuffled = shuffle(structuredClone(answer));
+    let index = shuffled.findIndex((element) => element === correctAnswer);
+    correctChoice = choices[index];
+
+    return `Choices:<br>
+    <button type="button" class="btn btn-lg btn-primary"><span class="float-start">A •</span> ${shuffled[0]}</button>
+    <button type="button" class="btn btn-lg btn-danger"><span class="float-start">B •</span> ${shuffled[1]}</button><br>
+    <button type="button" class="btn btn-lg btn-warning mt-2"><span class="float-start">C •</span> ${shuffled[2]}</button>
+    <button type="button" class="btn btn-lg btn-info mt-2"><span class="float-start">D •</span> ${shuffled[3]}</button>`;
+  }
+
+  if (!elements.showHint.checked) {
+    return "Answer: ?";
+  }
+
+  let hint = "";
+  for (let index = 0; index < answer[0].length; index++) {
+    if (answer[0].charAt(index).match(/^[0-9a-z]+$/)) {
+      hint += "_ ";
+    }
+    if (answer[0].charAt(index) == " ") {
+      hint += "&nbsp; ";
+    }
+  }
+  return hint;
+} //getHint
 
 function showAnswer() {
-  const el = document.querySelector(".blur");
-  el.classList.remove("blur");
-}
+  started = false;
+  if (elements.multipleChoice.checked) {
+    document.getElementById("answer").innerHTML = `Answer: ${correctAnswer}`;
+  } else {
+    document.getElementById("answer").innerHTML = `Answer: ${answer[0]}`;
+  }
+} //showAnswer
 
 async function loadAndConnect() {
   load_localStorage();
@@ -233,7 +285,7 @@ function addInput(move = true) {
       <div class="card-body">
         <div class="input-group">
           <input type="text" class="form-control questions" onkeydown="handleInput(event)" data-option-id="${numberOfOptions}" placeholder="Question" aria-label="Question" />
-          <input type="text" class="form-control answers" onkeydown="handleInput(event)" data-option-id="${numberOfOptions}" placeholder="Answer" aria-label="Answer" />
+          <input type="password" class="form-control answers" onkeydown="handleInput(event)" data-option-id="${numberOfOptions}" placeholder="Answer" aria-label="Answer" />
           <span class="input-group-text poll-image" data-option-id="${numberOfOptions}" data-image-url="" style="display: none"> </span>
           <button type="button" class="remove-image btn btn-warning" onclick="deleteImage(event)" data-option-id="${numberOfOptions}" style="display: none">
             <i data-option-id="${numberOfOptions}" class="material-icons notranslate">hide_image</i>
@@ -317,6 +369,17 @@ function selectPreviousInput(optionId) {
   }
 } //selectPreviousInput
 
+function shuffle(array) {
+  let currentIndex = array.length,
+    randomIndex;
+  while (currentIndex > 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+  }
+  return array;
+} //shuffle
+
 function connect() {
   elements.twitchStatus.innerHTML = `
     <h4>
@@ -349,39 +412,49 @@ function connect() {
   client = new tmi.client(options);
 
   client.on("message", async (target, context, msg, self) => {
-    let input = msg.split(" ").filter(Boolean);
-    let command = input[0].toLowerCase();
-    let args = input.slice(1);
+    if (!started) {
+      return;
+    }
+    if (answered.includes(context.username)) {
+      return;
+    }
+    if (points < 1) {
+      return;
+    }
 
-    if (started) {
-      if (answered.includes(context.username)) {
+    if (elements.multipleChoice.checked) {
+      if (msg.trim().toLowerCase() !== correctChoice) {
         return;
       }
-
-      if (msg.toLowerCase() == answer && points > 0) {
-        let pos = users.findIndex((element) => {
-          return element.username === context.username;
-        });
-        if (pos != -1) {
-          users[pos].points += points;
-          points--;
-          answered.push(context.username);
-          updateList();
-        } else {
-          let user = {
-            points: points,
-            id: context["user-id"],
-            username: context.username,
-            displayname: context["display-name"],
-            color: context.color,
-            firstmsg: context["first-msg"],
-            badges: context.badges,
-          };
-          points--;
-          addUser(user);
-          answered.push(context.username);
-        }
+    } else {
+      if (!answer.includes(msg.trim().toLowerCase())) {
+        return;
       }
+    }
+
+    let pos = users.findIndex((element) => element.username === context.username);
+    if (pos != -1) {
+      users[pos].points += points;
+      points--;
+      answered.push(context.username);
+      updateList();
+    } else {
+      let user = {
+        points: points,
+        id: context["user-id"],
+        username: context.username,
+        displayname: context["display-name"],
+        color: context.color,
+        firstmsg: context["first-msg"],
+        badges: context.badges,
+      };
+      points--;
+      addUser(user);
+      answered.push(context.username);
+    }
+
+    if (elements.firstOnly.checked) {
+      points = 0;
     }
   }); //message
 
@@ -413,16 +486,19 @@ function addUser(user) {
 
 function updateList() {
   users.sort(function (a, b) {
-    return a.points < b.points ? -1 : a.points == b.points ? 0 : 1;
+    return a.points > b.points ? -1 : a.points == b.points ? 0 : 1;
   });
   elements.users.innerHTML = "";
+  let html = "";
   for (let index = 0, j = users.length; index < j; index++) {
-    elements.users.innerHTML =
-      `<li class="list-group-item">
-    ${users[index].badgeshtml}<span style="color:${users[index].color};"> ${users[index].name}</span>: ${users[index].points} ${users[index].points == 1 ? "point" : "points"} </li>` +
-      elements.users.innerHTML;
+    html += `
+    <li class="list-group-item">
+    ${users[index].badgeshtml}<span style="color:${users[index].color};">${users[index].name}:</span>
+    ${users[index].points} ${users[index].points == 1 ? "point" : "points"}
+    </li>`;
   }
-}
+  elements.users.innerHTML = html;
+} //updateList
 
 async function loadPFP() {
   if (!USER.channel) {

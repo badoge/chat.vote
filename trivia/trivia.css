@@ -1,19 +1,6 @@
-#twitchStatus {
-  margin-right: 5px;
-}
-
-#questionCard {
-  margin-bottom: 10px;
-}
-#controlsCard {
-  margin-bottom: 10px;
-}
 #scoreCard {
-  margin-bottom: 10px;
-}
-
-#controlsCardBody > button {
-  margin-right: 10px;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 #openOffcanvasbtn {
@@ -27,15 +14,7 @@
 }
 
 #offcanvas {
-  width: 50vw;
-}
-
-.blur {
-  -webkit-filter: blur(10px);
-  filter: blur(10px);
-  background-color: #000000;
-  color: #000000;
-  font-size: large;
+  width: 60vw;
 }
 
 #toastContainer {
@@ -43,32 +22,14 @@
   bottom: 10px;
   z-index: 1056;
   font-weight: bold;
-  text-shadow: -1px 1px 2px #000000;
-}
-
-#users {
-  word-wrap: break-word;
 }
 
 #toastContainer > div > div {
   font-size: 1.5em;
 }
 
-.editbtn {
-  color: #2995ee;
-}
-
-.editbtn:hover {
-  color: #2481ce;
-  cursor: pointer;
-}
-
-label.list-group-item {
-  cursor: pointer;
-}
-
-#mainrow {
-  margin-top: 10px;
+#users {
+  word-wrap: break-word;
 }
 
 .custom-popover {
@@ -77,14 +38,14 @@ label.list-group-item {
   --bs-popover-header-color: var(--bs-white);
 }
 
-.dankcol {
-  width: 0px;
-  margin: 0px;
-  padding: 0px;
-}
-
 #question {
   text-align: center;
+  font-size: 2rem;
+}
+
+#answer > * {
+  width: 45%;
+  font-weight: 900;
 }
 
 .resizable {
