@@ -31,6 +31,8 @@ let elements = {
   points: document.getElementById("points"),
   firstOnly: document.getElementById("firstOnly"),
   multipleChoice: document.getElementById("multipleChoice"),
+  noDecay: document.getElementById("noDecay"),
+  oneChance: document.getElementById("oneChance"),
 };
 
 let USER = {
@@ -422,6 +424,10 @@ function connect() {
       return;
     }
 
+    if (elements.oneChance.checked) {
+      answered.push(context.username);
+    }
+
     if (elements.multipleChoice.checked) {
       if (msg.trim().toLowerCase() !== correctChoice) {
         return;
@@ -435,7 +441,9 @@ function connect() {
     let pos = users.findIndex((element) => element.username === context.username);
     if (pos != -1) {
       users[pos].points += points;
-      points--;
+      if (!elements.noDecay.checked) {
+        points--;
+      }
       answered.push(context.username);
       updateList();
     } else {
@@ -448,7 +456,9 @@ function connect() {
         firstmsg: context["first-msg"],
         badges: context.badges,
       };
-      points--;
+      if (!elements.noDecay.checked) {
+        points--;
+      }
       addUser(user);
       answered.push(context.username);
     }
