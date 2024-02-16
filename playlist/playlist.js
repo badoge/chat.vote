@@ -103,7 +103,6 @@ let elements = {
   nowPlayingRequester: document.getElementById("nowPlayingRequester"),
   playlistLength: document.getElementById("playlistLength"),
   togglePlaylist: document.getElementById("togglePlaylist"),
-  togglePlaylistLabel: document.getElementById("togglePlaylistLabel"),
   autoplay: document.getElementById("autoplay"),
   volumeSliderIcon: document.getElementById("volumeSliderIcon"),
   volumeSlider: document.getElementById("volumeSlider"),
@@ -1186,7 +1185,7 @@ async function getRequestInfo(request, msgid) {
 
   if (PLAYLIST.maxDuration !== "" && request.duration !== -1 && total_duration + request.duration > PLAYLIST.maxDuration * (PLAYLIST.maxDurationUnit == "m" ? 60 : 3600)) {
     if (playlist_open) {
-      elements.togglePlaylist.click();
+      togglePlaylist();
     }
     deleteRequest(request.id);
     botReply(`⛔ Your request was removed because the playlist's duration limit was reached (${PLAYLIST.maxDuration}${PLAYLIST.maxDurationUnit})`, msgid, false);
@@ -1201,7 +1200,7 @@ async function getRequestInfo(request, msgid) {
 
   if (PLAYLIST.maxSize !== "" && requests.size > PLAYLIST.maxSize) {
     if (playlist_open) {
-      elements.togglePlaylist.click();
+      togglePlaylist();
     }
     deleteRequest(request.id);
     botReply(`⛔ Your request was removed because the playlist's size limit was reached (${PLAYLIST.maxSize})`, msgid, false);
@@ -1988,35 +1987,36 @@ function changeVolume(slider) {
 
 function togglePlaylist() {
   if (!checkLogin()) {
-    elements.togglePlaylist.checked = false;
     return;
   }
-  playlist_open = elements.togglePlaylist.checked;
-  if (elements.togglePlaylist.checked) {
-    elements.togglePlaylistLabel.classList = "btn btn-danger";
-    elements.togglePlaylistLabel.innerHTML = "Close Playlist";
+  playlist_open = !playlist_open;
+  if (playlist_open) {
+    elements.togglePlaylist.classList = "btn btn-danger";
+    elements.togglePlaylist.innerHTML = "Close Playlist";
   } else {
-    elements.togglePlaylistLabel.classList = "btn btn-success";
-    elements.togglePlaylistLabel.innerHTML = "Open Playlist";
+    elements.togglePlaylist.classList = "btn btn-success";
+    elements.togglePlaylist.innerHTML = "Open Playlist";
   }
-}
+} //togglePlaylist
 
 function openPlaylist(reply) {
   if (!playlist_open) {
     playlist_open = true;
-    elements.togglePlaylist.click();
-    elements.togglePlaylistLabel.classList = "btn btn-danger";
-    elements.togglePlaylistLabel.innerHTML = "Close Playlist";
+    elements.togglePlaylist.classList = "btn btn-danger";
+    elements.togglePlaylist.innerHTML = "Close Playlist";
     botReply(`✅ The playlist is now open`, reply, false);
+  } else {
+    botReply(`✅ The playlist already open`, reply, false);
   }
 } //openPlaylist
 function closePlaylist(reply) {
   if (playlist_open) {
     playlist_open = false;
-    elements.togglePlaylist.click();
-    elements.togglePlaylistLabel.classList = "btn btn-success";
-    elements.togglePlaylistLabel.innerHTML = "Open Playlist";
+    elements.togglePlaylist.classList = "btn btn-success";
+    elements.togglePlaylist.innerHTML = "Open Playlist";
     botReply(`⛔ The playlist is now closed`, reply, false);
+  } else {
+    botReply(`⛔ The playlist already closed`, reply, false);
   }
 } //closePlaylist
 
@@ -2111,7 +2111,7 @@ window.onload = function () {
   clearPlaylistModal = new bootstrap.Modal(elements.clearPlaylistModal);
   settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
   copyLinkButton = new bootstrap.Popover(elements.copyLinkButton);
-  togglePlaylistPopover = new bootstrap.Popover(elements.togglePlaylistLabel);
+  togglePlaylistPopover = new bootstrap.Popover(elements.togglePlaylist);
 
   playlistTab = new bootstrap.Tab(elements.playlistTab);
   approvalTab = new bootstrap.Tab(elements.approvalTab);

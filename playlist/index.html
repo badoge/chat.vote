@@ -977,11 +977,12 @@
               <button class="btn btn-outline-warning" type="button" data-bs-toggle="modal" data-bs-target="#clearPlaylistModal">
                 <i class="material-icons notranslate">delete_forever</i>Clear playlist
               </button>
-              <input id="togglePlaylist" onchange="togglePlaylist()" type="checkbox" class="btn-check" autocomplete="off" />
-              <label
-                id="togglePlaylistLabel"
+
+              <button
+                type="button"
+                id="togglePlaylist"
+                onclick="togglePlaylist()"
                 class="btn btn-success"
-                for="togglePlaylist"
                 data-bs-container="body"
                 data-bs-trigger="manual"
                 data-bs-placement="top"
@@ -990,7 +991,7 @@
                 data-bs-content="A viewer is trying to request something but the playlist is closed"
               >
                 Open Playlist
-              </label>
+              </button>
             </div>
 
             <div class="vr"></div>
@@ -1028,7 +1029,7 @@
     <script src="/playlist/playlist.js"></script>
     <script src="/js/twitch-embed.min.js"></script>
     <script src="https://www.youtube.com/iframe_api"></script>
-    <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
+    <script src="https://open.spotify.com/embed/iframe-api/v1"></script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-H43YN7FSSP"></script>
     <script>
