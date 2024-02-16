@@ -90,3 +90,7 @@ section {
   justify-content: flex-start;
   overflow: hidden;
 }
+
+#animationSelect {
+  width: 150px;
+}

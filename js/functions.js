@@ -770,6 +770,9 @@ async function checkToken(access_token) {
 } //checkToken
 
 function spamTest(type, count, delay = 100, votes = null) {
+  if (!type && !count) {
+    return `spamTest("vote/suggest/join", count, optional max delay in ms, optional number of options for type vote)`;
+  }
   let badges = [
     {
       "badge-info": {
@@ -825,14 +828,14 @@ function spamTest(type, count, delay = 100, votes = null) {
     let message = "";
     switch (type) {
       case "suggest":
-        message = `!suggest  ${uuidv4()}`;
+        message = `!suggest ${uuidv4()}`;
         break;
       case "join":
-        message = `!join  ${uuidv4()}`;
+        message = `!join ${uuidv4()}`;
         break;
       case "vote":
         if (!votes) {
-          return `no number of options provided - spamTest("vote", count, number of options)`;
+          return `no number of options provided - spamTest("vote", count, delay, number of options)`;
         }
         message = (Math.floor(Math.random() * votes) + 1).toString();
         break;

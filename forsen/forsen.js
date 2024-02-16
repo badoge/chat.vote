@@ -23,6 +23,7 @@ let elements = {
   raffleOutput: document.getElementById("raffleOutput"),
   raffleOutputTier3: document.getElementById("raffleOutputTier3"),
   emotes: document.getElementById("emotes"),
+  animationSelect: document.getElementById("animationSelect"),
 };
 
 let client;
@@ -38,16 +39,18 @@ let color = "";
 let currentTime = 0;
 let restartRaffleModal, restartTier3RaffleModal, fancyRaffleModal;
 let winner = "";
-let winners = [];
+let raffleWinners = [];
 let winnerTier3 = "";
-let winnersTier3 = [];
+let raffleWinnersTier3 = [];
 let tickSound, revealSound;
 let thirdPartyEmotes = [];
+
+let paused = false;
 
 function restartRaffle() {
   raffle_users = [];
   winner = "";
-  winners = [];
+  raffleWinners = [];
   elements.raffleUsers.innerHTML = "";
   elements.raffleOutput.innerHTML = "";
   elements.entrants.innerHTML = "Entrants: 0";
@@ -56,7 +59,7 @@ function restartRaffle() {
 function restartTier3Raffle() {
   raffle_users_tier3 = [];
   winnerTier3 = "";
-  winnersTier3 = [];
+  raffleWinnersTier3 = [];
   elements.raffleUsersTier3.innerHTML = "";
   elements.raffleOutputTier3.innerHTML = "";
   elements.entrantsTier3.innerHTML = "Entrants: 0";
@@ -96,7 +99,7 @@ function connect() {
   client = new tmi.client(options);
 
   client.on("message", async (target, context, msg, self) => {
-    if (!context.subscriber) {
+    if (!context.subscriber || paused) {
       return;
     }
 
@@ -104,7 +107,7 @@ function connect() {
     let command = input[0].toLowerCase();
 
     if (command == raffle_command1 || command == raffle_command2) {
-      if (!raffle_users.some((e) => e.username === context.username) && !winners.includes(context.username)) {
+      if (!raffle_users.some((e) => e.username === context.username) && !raffleWinners.includes(context.username)) {
         let user = {
           id: context["user-id"],
           username: context.username,
@@ -121,7 +124,7 @@ function connect() {
     } //raffle
 
     if (context.username == winner) {
-      raffleWinnerChat(context, msg);
+      raffleWinnerChat(context, msg, false);
     } //raffle winner chat
 
     if (context.username == winnerTier3) {
@@ -131,7 +134,7 @@ function connect() {
     if (context?.emotes) {
       for (let index = 0; index < tier3Emotes.length; index++) {
         if (Object.hasOwn(context.emotes, tier3Emotes[index])) {
-          if (!raffle_users_tier3.some((e) => e.username === context.username) && !winnersTier3.includes(context.username)) {
+          if (!raffle_users_tier3.some((e) => e.username === context.username) && !raffleWinnersTier3.includes(context.username)) {
             let user = {
               id: context["user-id"],
               username: context.username,
@@ -226,7 +229,47 @@ async function drawRaffleWinner() {
     elements.raffleOutput.append(p);
     return;
   }
-  drawRaffleWinnerFancy();
+
+  paused = true;
+
+  if (elements.animationSelect.value == "on" || elements.animationSelect.value == "pfp") {
+    drawRaffleWinnerFancy();
+  } else {
+    let user_tickets = [];
+    for (let index = 0, j = raffle_users.length; index < j; index++) {
+      for (let i = raffle_users[index].tickets; i > 0; i--) {
+        user_tickets.push(raffle_users[index].username);
+      }
+    }
+    winner = user_tickets[Math.floor(Math.random() * user_tickets.length)];
+    raffleWinners.push(winner);
+    let winnerObject = raffle_users.find((e) => e.username == winner);
+
+    let p = document.createElement("p");
+    p.classList.add("h2");
+    p.innerHTML = `
+    Winner #${raffleWinners.length}: 
+    <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USERNAME}/viewercard/${winner}?popout=","_blank","width=340,height=800")>
+    ${winner}
+    </a>`;
+    elements.raffleOutput.append(p);
+    removeFromRaffle(winner);
+
+    raffleWinnerChat(
+      {
+        "user-id": winnerObject.id,
+        username: winnerObject.username,
+        "display-name": winnerObject.displayname,
+        color: winnerObject.color,
+        badges: winnerObject.badges,
+        emotes: winnerObject.emotes,
+        time: winnerObject.time,
+      },
+      winnerObject.msg,
+      false
+    );
+    paused = false;
+  }
 } //drawRaffleWinner
 
 async function drawRaffleWinnerTier3() {
@@ -236,7 +279,47 @@ async function drawRaffleWinnerTier3() {
     elements.raffleOutputTier3.append(p);
     return;
   }
-  drawRaffleWinnerFancyTier3(true);
+
+  paused = true;
+
+  if (elements.animationSelect.value == "on" || elements.animationSelect.value == "pfp") {
+    drawRaffleWinnerFancyTier3(true);
+  } else {
+    let user_tickets = [];
+    for (let index = 0, j = raffle_users_tier3.length; index < j; index++) {
+      for (let i = raffle_users_tier3[index].tickets; i > 0; i--) {
+        user_tickets.push(raffle_users_tier3[index].username);
+      }
+    }
+    winnerTier3 = user_tickets[Math.floor(Math.random() * user_tickets.length)];
+    raffleWinnersTier3.push(winnerTier3);
+    let winnerObject = raffle_users_tier3.find((e) => e.username == winnerTier3);
+
+    let p = document.createElement("p");
+    p.classList.add("h2");
+    p.innerHTML = `
+    Winner #${raffleWinners.length}: 
+    <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USERNAME}/viewercard/${winnerTier3}?popout=","_blank","width=340,height=800")>
+    ${winnerTier3}
+    </a>`;
+    elements.raffleOutput.append(p);
+    removeFromRaffleTier3(winnerTier3);
+
+    raffleWinnerChat(
+      {
+        "user-id": winnerObject.id,
+        username: winnerObject.username,
+        "display-name": winnerObject.displayname,
+        color: winnerObject.color,
+        badges: winnerObject.badges,
+        emotes: winnerObject.emotes,
+        time: winnerObject.time,
+      },
+      winnerObject.msg,
+      true
+    );
+    paused = false;
+  }
 } //drawRaffleWinnerTier3
 
 class Slot {
@@ -249,6 +332,24 @@ class Slot {
     this.left = 0;
     this.div = document.createElement("div");
     this.div.classList.add("slot-element");
+
+    if (elements.animationSelect.value == "pfp") {
+      this.div.innerHTML = `<span style="color:${this.color};"> ${this.username} </span>
+        <div style="height: 310px; width: 300px; border-bottom: 10px solid transparent; background: radial-gradient(circle, rgba(255,255,255,1) 0%, ${this.color} 100%);">
+          <img
+            style="background: linear-gradient(0deg, ${this.color} 1%, rgba(100,100,100,1) 40%); height: 300px; width: 300px;"
+            src="${this.pfp}"
+            alt="${this.username}"
+            title="${this.username}"
+          />
+        </div>`;
+    } else {
+      this.div.innerHTML = `<span style="color:${this.color};"> ${this.username} </span>
+      <div style="height: 310px; width: 300px; border-bottom: 10px solid transparent; background: radial-gradient(circle, rgba(255,255,255,1) 0%, ${this.color} 100%);">
+        <img style="background: ${this.color}; height: 300px; width: 300px;" src="${this.pfp}" alt="${this.username}" title="${this.username}" />
+      </div>`;
+    }
+
     this.div.innerHTML = `
     <span style="color:${this.color};"> ${this.username} </span>
     <div style="height: 310px; width: 300px; border-bottom: 10px solid transparent; background: radial-gradient(circle, rgba(255,255,255,1) 0%, ${this.color} 100%);">
@@ -309,14 +410,14 @@ const detectWinner = function () {
     const resultDiv = winnerSlot.cloneSelf();
     elements.gameWinner.appendChild(resultDiv.div);
     app.spinStarted = false;
-    winners.push(winnerSlot.username);
+    raffleWinners.push(winnerSlot.username);
     winner = winnerSlot.username;
 
     removeFromRaffle(winnerSlot.username);
 
     let p = document.createElement("p");
     p.classList.add("h2");
-    p.innerHTML = `Winner #${winners.length}: <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USERNAME}/viewercard/${winnerSlot.username}?popout=","_blank","width=340,height=800")>${winnerSlot.username}</a>`;
+    p.innerHTML = `Winner #${raffleWinners.length}: <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USERNAME}/viewercard/${winnerSlot.username}?popout=","_blank","width=340,height=800")>${winnerSlot.username}</a>`;
     elements.raffleOutput.append(p);
     setTimeout(() => {
       fancyRaffleModal.hide();
@@ -326,6 +427,7 @@ const detectWinner = function () {
   } else {
     window.alert("Could not determine winner FeelsDonkMan");
   }
+  paused = false;
 }; //detectWinner
 
 const detectWinnerTier3 = function () {
@@ -340,14 +442,14 @@ const detectWinnerTier3 = function () {
     const resultDiv = winnerSlot.cloneSelf();
     elements.gameWinner.appendChild(resultDiv.div);
     app.spinStarted = false;
-    winnersTier3.push(winnerSlot.username);
+    raffleWinnersTier3.push(winnerSlot.username);
     winnerTier3 = winnerSlot.username;
 
     removeFromRaffleTier3(winnerSlot.username);
 
     let p = document.createElement("p");
     p.classList.add("h2");
-    p.innerHTML = `Winner #${winnersTier3.length}: <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USERNAME}/viewercard/${winnerSlot.username}?popout=","_blank","width=340,height=800")>${winnerSlot.username}</a>`;
+    p.innerHTML = `Winner #${raffleWinnersTier3.length}: <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USERNAME}/viewercard/${winnerSlot.username}?popout=","_blank","width=340,height=800")>${winnerSlot.username}</a>`;
     elements.raffleOutputTier3.append(p);
     setTimeout(() => {
       fancyRaffleModal.hide();
@@ -357,6 +459,7 @@ const detectWinnerTier3 = function () {
   } else {
     window.alert("Could not determine winner FeelsDonkMan");
   }
+  paused = false;
 }; //detectWinnerTier3
 
 const animateRoll = function () {
@@ -427,8 +530,23 @@ async function drawRaffleWinnerFancy() {
     }
   }
   user_tickets = user_tickets.shuffle().slice(0, 100);
-  for (let index = 0, j = user_tickets.length; index < j; index++) {
-    user_tickets[index].pfp = "/pics/raffledonk.png";
+
+  if (elements.animationSelect.value == "pfp") {
+    let pfp = await getPFP(user_tickets.map((a) => a.username));
+    if (pfp != 0) {
+      for (let index = 0, j = user_tickets.length; index < j; index++) {
+        if (pfp.find((e) => e.login === user_tickets[index].username)) {
+          let url = pfp.find((e) => e.login === user_tickets[index].username).profile_image_url;
+          if (url) {
+            user_tickets[index].pfp = url;
+          }
+        }
+      }
+    }
+  } else {
+    for (let index = 0, j = user_tickets.length; index < j; index++) {
+      user_tickets[index].pfp = "/pics/raffledonk.png";
+    }
   }
 
   // destroy previous slots
@@ -488,8 +606,22 @@ async function drawRaffleWinnerFancyTier3() {
     }
   }
   user_tickets = user_tickets.shuffle().slice(0, 100);
-  for (let index = 0, j = user_tickets.length; index < j; index++) {
-    user_tickets[index].pfp = "/pics/raffledonk.png";
+  if (elements.animationSelect.value == "pfp") {
+    let pfp = await getPFP(user_tickets.map((a) => a.username));
+    if (pfp != 0) {
+      for (let index = 0, j = user_tickets.length; index < j; index++) {
+        if (pfp.find((e) => e.login === user_tickets[index].username)) {
+          let url = pfp.find((e) => e.login === user_tickets[index].username).profile_image_url;
+          if (url) {
+            user_tickets[index].pfp = url;
+          }
+        }
+      }
+    }
+  } else {
+    for (let index = 0, j = user_tickets.length; index < j; index++) {
+      user_tickets[index].pfp = "/pics/raffledonk.png";
+    }
   }
 
   // destroy previous slots
@@ -539,6 +671,27 @@ async function drawRaffleWinnerFancyTier3() {
   animateRollTier3();
 } //drawRaffleWinnerFancy
 
+async function getPFP(users) {
+  let requestOptions = {
+    method: "GET",
+    redirect: "follow",
+  };
+  let pfp = [];
+  return new Promise(async (resolve) => {
+    try {
+      let response = await fetch(`https://helper.donk.workers.dev/twitch/users?login=${users.join(",")}`, requestOptions);
+      let result = await response.json();
+      for (let index = 0, j = result.data.length; index < j; index++) {
+        pfp.push(result.data[index]);
+      }
+      return resolve(pfp);
+    } catch (error) {
+      console.log("getPFP", error);
+      return resolve(0);
+    }
+  });
+} //getPFP
+
 const fpsBenchmark = function () {
   // fps correction
   let timestamp = performance.now();
@@ -561,7 +714,7 @@ const fpsBenchmark = function () {
   }, 1000);
 };
 
-function raffleWinnerChat(context, msg, tier3 = false) {
+function raffleWinnerChat(context, msg, tier3) {
   let msg_s = validator.escape(msg);
   if (context.emotes) {
     let emotes = [];

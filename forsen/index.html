@@ -208,10 +208,20 @@
         <div class="col">
           <div class="card">
             <div class="card-body bg-body-tertiary rounded">
-              <a role="button" tabindex="0" onclick="drawRaffleWinner()" class="btn btn-lg btn-info defaultbtn me-3"><i class="material-icons notranslate">celebration</i> Draw A Winner</a>
-              <a role="button" tabindex="0" class="btn btn-sm btn-outline-warning defaultbtn" data-bs-toggle="modal" data-bs-target="#restartRaffleModal">
+              <a role="button" tabindex="0" onclick="drawRaffleWinner()" class="btn btn-lg btn-info me-3"><i class="material-icons notranslate">celebration</i> Draw A Winner</a>
+              <a role="button" tabindex="0" class="btn btn-sm btn-outline-warning me-5" data-bs-toggle="modal" data-bs-target="#restartRaffleModal">
                 <i class="material-icons notranslate">refresh</i>Restart raffle
               </a>
+
+              <div class="form-floating d-inline-flex">
+                <select class="form-select" id="animationSelect" aria-label="Animation settings">
+                  <option value="off">Off</option>
+                  <option selected value="on">On</option>
+                  <option value="pfp">On (Twitch profile pictures)</option>
+                </select>
+                <label for="animationSelect">Animation</label>
+              </div>
+
               <h2>Type <span class="notranslate text-success">!join</span> or <span class="notranslate text-success">!ticket 1</span> in chat to join</h2>
               <h4 id="entrants">Entrants: 0</h4>
 
@@ -228,14 +238,14 @@
         <div class="col">
           <div class="card">
             <div class="card-body bg-body-tertiary rounded">
-              <a role="button" tabindex="0" onclick="drawRaffleWinnerTier3()" class="btn btn-lg btn-info defaultbtn me-3">
+              <a role="button" tabindex="0" onclick="drawRaffleWinnerTier3()" class="btn btn-lg btn-info me-3">
                 <i class="material-icons notranslate">celebration</i> Draw A Winner (tier 3)
               </a>
-              <a role="button" tabindex="0" class="btn btn-sm btn-outline-warning defaultbtn" data-bs-toggle="modal" data-bs-target="#restartTier3RaffleModal">
+              <a role="button" tabindex="0" class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#restartTier3RaffleModal">
                 <i class="material-icons notranslate">refresh</i>Restart raffle (tier 3)
               </a>
               <h2>
-                Type a tier 3 emote (<span id="emotes"><span class="text-success">Loading...</span></span
+                Type a tier 3 emote (<span id="emotes"> <span class="text-success">Loading...</span></span
                 >) in chat to join
               </h2>
               <h4 id="entrantsTier3">Entrants: 0</h4>
