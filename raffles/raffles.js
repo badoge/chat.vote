@@ -951,18 +951,14 @@ const fpsBenchmark = function () {
 };
 
 async function getPFP(users) {
-  let myHeaders = new Headers();
-  myHeaders.append("Authorization", `Bearer ${USER.access_token}`);
-  myHeaders.append("Client-Id", CLIENT_ID);
   let requestOptions = {
     method: "GET",
-    headers: myHeaders,
     redirect: "follow",
   };
   let pfp = [];
   return new Promise(async (resolve) => {
     try {
-      let response = await fetch(`https://api.twitch.tv/helix/users?login=${users.join("&login=")}`, requestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/twitch/users?login=${users.join(",")}`, requestOptions);
       let result = await response.json();
       for (let index = 0, j = result.data.length; index < j; index++) {
         pfp.push(result.data[index]);
@@ -1318,15 +1314,12 @@ async function loadAndConnect() {
       loginExpiredModal.show();
       return;
     }
-    elements.useTwitchPFP.disabled = false;
     elements.announceWinner.disabled = false;
     elements.confirmJoin.disabled = false;
     document.querySelectorAll(".no-twitch-warn").forEach((e) => (e.style.display = "none"));
   } else {
-    elements.useTwitchPFP.disabled = true;
     elements.announceWinner.disabled = true;
     elements.confirmJoin.disabled = true;
-    elements.useTwitchPFP.checked = false;
     elements.announceWinner.checked = false;
     elements.confirmJoin.checked = false;
     document.querySelectorAll(".no-twitch-warn").forEach((e) => (e.style.display = "block"));
