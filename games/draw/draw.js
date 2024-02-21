@@ -108,7 +108,7 @@ let DRAW = {
   usedEmotes: [],
 }; //DRAW
 
-async function start(reroll = false) {
+async function start() {
   let selectedemotes = [];
   if (DRAW.twitchGlobal) {
     allEmotes.twitchGlobal.forEach((element) => {
@@ -185,9 +185,7 @@ async function start(reroll = false) {
   DRAW.correctUsers = 0;
   startTimer();
 
-  if (!reroll) {
-    DRAW.turn++;
-  }
+  DRAW.turn++;
   DRAW.gameActive = true;
 } //start
 

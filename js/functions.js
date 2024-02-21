@@ -176,7 +176,11 @@ async function getEmoji() {
     let response5 = await fetch(`/games/emoji.json`, GETrequestOptions);
     let json = await response5.json();
     for (let i = 0, j = json.length; i < j; i++) {
-      emoji.push({ name: json[i].emoji, desc: json[i].description, url: "emoji" });
+      if (!json[i].has_img_twitter) {
+        continue;
+      }
+      let codepoints = json[i].unified.split("-").map((c) => parseInt(c, 16));
+      emoji.push({ name: String.fromCodePoint(...codepoints), desc: json[i].name, url: "emoji" });
     }
     return emoji;
   } catch (error) {
