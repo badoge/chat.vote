@@ -3,7 +3,7 @@ let mode = 0;
 let level = 1;
 let multipleAnswersAllowed;
 let token;
-let copyTooltip;
+let copyPopover;
 let numberOfOptions = 2;
 
 let elements = {
@@ -196,9 +196,9 @@ function updateTimer(element) {
 
 function copyLink(link) {
   navigator.clipboard.writeText(link);
-  copyTooltip.show();
+  copyPopover.show();
   setTimeout(() => {
-    copyTooltip.hide();
+    copyPopover.hide();
   }, 1000);
 } //copyLink
 
@@ -401,18 +401,16 @@ async function createPoll() {
         type="button"
         id="copyLinkButton"
         class="btn btn-outline-secondary"
-        data-bs-toggle="tooltip"
+        data-bs-toggle="popover"
         data-bs-trigger="manual"
         data-bs-placement="bottom"
-        data-bs-title="Link copied :)"
+        data-bs-content="Link copied :)"
         onclick="copyLink('https://poll.chat.vote/${result.data.id}')">
         <i class="material-icons notranslate">content_copy</i>
       </button>
-    </div>
-    `;
-    copyTooltip = new bootstrap.Tooltip(document.getElementById("copyLinkButton"), {
-      trigger: "hover",
-    });
+    </div>`;
+
+    copyPopover = new bootstrap.Popover(document.getElementById("copyLinkButton"));
 
     //load title
     elements.pollTitleDiv.innerHTML = `
