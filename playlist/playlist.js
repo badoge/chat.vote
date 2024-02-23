@@ -1495,7 +1495,7 @@ function playItem(item) {
       break;
     case "twitch clip":
       elements.twitchClipsEmbed.style.display = "";
-      elements.twitchClipsEmbed.src = `https://clips.twitch.tv/embed?clip=${item.id}&parent=${window.location.hostname}&autoplay=true&muted=false`;
+      elements.twitchClipsEmbed.innerHTML = `<iframe src="https://clips.twitch.tv/embed?clip=${item.id}&parent=${window.location.hostname}&autoplay=true&muted=false" preload="auto" height="100%" width="100%"></iframe>`;
       break;
     case "streamable":
       elements.videoEmbed.style.display = "";
@@ -1564,7 +1564,7 @@ function resetPlayers() {
   youtubePlayer.loadVideoById("");
   spotifyPlayer.pause();
   twitchPlayer.setChannel("");
-  elements.twitchClipsEmbed.src = "";
+  elements.twitchClipsEmbed.innerHTML = "";
   elements.videoEmbed.src = "";
 } //resetPlayers
 
@@ -2166,7 +2166,6 @@ window.onload = function () {
   enableTooltips();
   enableTwitchEmbed();
   videoEmbedEventListeners();
-  elements.twitchClipsEmbed.src = "";
 }; //onload
 
 let youtubePlayer;

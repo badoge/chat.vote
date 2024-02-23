@@ -1333,7 +1333,7 @@ async function nextTierlistItem() {
 
   if (item.type == "twitch") {
     elements.twitchClipsEmbed_tierlist.style.display = "";
-    elements.twitchClipsEmbed_tierlist.src = `https://clips.twitch.tv/embed?clip=${item.id}&parent=${window.location.hostname}&autoplay=true&muted=false`;
+    elements.twitchClipsEmbed_tierlist.innerHTML = `<iframe src="https://clips.twitch.tv/embed?clip=${item.id}&parent=${window.location.hostname}&autoplay=true&muted=false" preload="auto" height="100%" width="100%" allowfullscreen></iframe>`;
   } //twitch
 
   if (item.type == "spotify") {
@@ -1568,9 +1568,9 @@ async function showOption(position, option) {
 
   if (option.type == "twitch") {
     elements[`twitchClipsEmbed_${position}`].style.display = "";
-    elements[`twitchClipsEmbed_${position}`].src = `https://clips.twitch.tv/embed?clip=${option.id}&parent=${window.location.hostname}&autoplay=${
+    elements[`twitchClipsEmbed_${position}`].innerHTML = `<iframe src="https://clips.twitch.tv/embed?clip=${option.id}&parent=${window.location.hostname}&autoplay=${
       position == "left" ? "true" : "false"
-    }&muted=false`;
+    }&muted=false" preload="auto" height="100%" width="100%" allowfullscreen></iframe>`;
   } //twitch
 
   if (option.type == "spotify") {
@@ -2737,7 +2737,7 @@ function resetPlayers(left = true, right = true) {
     elements.videoEmbed_left.style.display = "none";
     youtubePlayer_left.loadVideoById("");
     spotifyPlayer_left.pause();
-    elements.twitchClipsEmbed_left.src = "";
+    elements.twitchClipsEmbed_left.innerHTML = "";
     elements.videoEmbed_left.src = "";
   }
 
@@ -2749,7 +2749,7 @@ function resetPlayers(left = true, right = true) {
     elements.videoEmbed_right.style.display = "none";
     youtubePlayer_right.loadVideoById("");
     spotifyPlayer_right.pause();
-    elements.twitchClipsEmbed_right.src = "";
+    elements.twitchClipsEmbed_right.innerHTML = "";
     elements.videoEmbed_right.src = "";
   }
 
@@ -2760,7 +2760,7 @@ function resetPlayers(left = true, right = true) {
   elements.videoEmbed_tierlist.style.display = "none";
   youtubePlayer_tierlist.loadVideoById("");
   spotifyPlayer_tierlist.pause();
-  elements.twitchClipsEmbed_tierlist.src = "";
+  elements.twitchClipsEmbed_tierlist.innerHTML = "";
   elements.videoEmbed_tierlist.src = "";
 } //resetPlayers
 
@@ -2928,9 +2928,6 @@ window.onload = async function () {
   });
 
   dragElement();
-  elements.twitchClipsEmbed_left.src = "";
-  elements.twitchClipsEmbed_right.src = "";
-  elements.twitchClipsEmbed_tierlist.src = "";
 
   let code = location.hash?.replace("#", "")?.trim();
   if (code.length == 4) {
