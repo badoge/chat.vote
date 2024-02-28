@@ -548,12 +548,6 @@ window.onload = function () {
     showCountdown(timestamp);
   }
 
-  let options = document.querySelectorAll(".pollText");
-  for (let index = 0, j = options.length; index < j; index++) {
-    const doc = new DOMParser().parseFromString(options[index].innerHTML, "text/html");
-    options[index].innerHTML = doc.documentElement.textContent;
-  }
-
   let input = location.hash.replace("#", "").toLowerCase().trim();
   if (input == "r" || input == "result" || input == "results") {
     refresh();
