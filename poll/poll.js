@@ -1,14 +1,14 @@
-let deleteAllModal, pollModal, captchaModal;
-let mode = 0;
-let level = 1;
+let pollModal, captchaModal;
+let resultsVisibility = "everyone";
+let security = "high";
 let multipleAnswersAllowed;
 let token;
 let copyPopover;
-let numberOfOptions = 2;
+let numberOfOptions = 0;
+let startingHue = Math.random() * 360;
 
 let elements = {
   //modals
-  deleteAllModal: document.getElementById("deleteAllModal"),
   pollModal: document.getElementById("pollModal"),
   captchaModal: document.getElementById("captchaModal"),
 
@@ -44,8 +44,8 @@ let POLL = {
   multipleAnswersAllowed: false,
   pollTimerValue: 0,
   pollTimerUnit: "m",
-  mode: 0,
-  level: 1,
+  resultsVisibility: "everyone",
+  security: "high",
 };
 
 const ckey = "6LdzxrwdAAAAADyHX2t8ZS4U5QxTNLVWNrGOeNp0";
@@ -61,40 +61,40 @@ function load_localStorage() {
       elements.results_timer.disabled = false;
     }
     elements.pollTimerUnit.value = POLL.pollTimerUnit || "m";
-    switch (parseInt(POLL.mode, 10)) {
-      case 0:
+    switch (POLL.resultsVisibility) {
+      case "everyone":
         elements.results_anyone.checked = true;
-        mode = 0;
+        resultsVisibility = "everyone";
         break;
-      case 1:
+      case "voters":
         elements.results_voters.checked = true;
-        mode = 1;
+        resultsVisibility = "voters";
         break;
-      case 2:
+      case "timer":
         elements.results_timer.checked = true;
-        mode = 2;
+        resultsVisibility = "timer";
         break;
-      case 3:
+      case "creator":
         elements.results_creator.checked = true;
-        mode = 3;
+        resultsVisibility = "creator";
         break;
       default:
         elements.results_anyone.checked = true;
-        mode = 0;
+        resultsVisibility = "everyone";
         break;
     }
-    switch (parseInt(POLL.level, 10)) {
-      case 0:
+    switch (POLL.security) {
+      case "low":
         elements.detect_low.checked = true;
-        level = 0;
+        security = "low";
         break;
-      case 1:
+      case "high":
         elements.detect_high.checked = true;
-        level = 1;
+        security = "high";
         break;
       default:
         elements.detect_high.checked = true;
-        level = 1;
+        security = "high";
         break;
     }
   }
@@ -106,8 +106,8 @@ function refreshData() {
   POLL.multipleAnswersAllowed = elements.multipleAnswersAllowed.checked;
   POLL.pollTimerValue = parseFloat(elements.pollTimerValue.value);
   POLL.pollTimerUnit = elements.pollTimerUnit.value;
-  POLL.mode = parseInt(document.querySelector('input[name="resultsVisibility"]:checked').value, 10);
-  POLL.level = parseInt(document.querySelector('input[name="duplicateDetectionLevel"]:checked').value, 10);
+  POLL.resultsVisibility = document.querySelector('input[name="resultsVisibility"]:checked').value;
+  POLL.security = document.querySelector('input[name="duplicateDetectionLevel"]:checked').value;
 } //refreshData
 
 function saveSettings() {
@@ -116,42 +116,13 @@ function saveSettings() {
   localStorage.setItem("darkTheme", darkTheme);
 } //saveSettings
 
-function showDeleteAllModal() {
-  deleteAllModal.show();
-} //showDeleteAllModal
-
 function reset() {
-  numberOfOptions = 2;
+  numberOfOptions = 0;
+  startingHue = Math.random() * 360;
   resetPollModal();
-  elements.optionsDiv.innerHTML = `
-  <div class="card bg-body-tertiary option-card" data-option-id="1">
-  <div class="card-body">
-    <div class="input-group">
-      <input type="text" class="form-control poll-option" onkeydown="handleInput(event)" data-option-id="1" placeholder="Enter poll option" aria-label="Poll option" />
-      <span class="input-group-text poll-image" data-option-id="1" data-image-url="" style="display: none"> </span>
-      <button type="button" class="remove-image btn btn-warning" onclick="deleteImage(event)" data-option-id="1" style="display: none">
-        <i data-option-id="1" class="material-icons notranslate">hide_image</i>
-      </button>
-      <button type="button" class="remove-input btn btn-danger" onclick="deleteInput(event)" data-option-id="1">
-        <i class="material-icons notranslate" data-option-id="1">delete_forever</i>
-      </button>
-    </div>
-  </div>
-</div>
-<div class="card bg-body-tertiary option-card" data-option-id="2">
-  <div class="card-body">
-    <div class="input-group">
-      <input type="text" class="form-control poll-option" onkeydown="handleInput(event)" data-option-id="2" placeholder="Enter poll option" aria-label="Poll option" />
-      <span class="input-group-text poll-image" data-option-id="2" data-image-url="" style="display: none"> </span>
-      <button type="button" class="remove-image btn btn-warning" onclick="deleteImage(event)" data-option-id="2" style="display: none">
-        <i data-option-id="2" class="material-icons notranslate">hide_image</i>
-      </button>
-      <button type="button" class="remove-input btn btn-danger" onclick="deleteInput(event)" data-option-id="2">
-        <i class="material-icons notranslate" data-option-id="2">delete_forever</i>
-      </button>
-    </div>
-  </div>
-</div>`;
+  elements.optionsDiv.innerHTML = "";
+  addInput();
+  addInput();
   changeSiteLinkTarget("_self");
 } //reset
 
@@ -270,34 +241,53 @@ function checkSize() {
   let title = !elements.pollTitle.value ? "Untitled poll" : elements.pollTitle.value;
   let imageSpans = [...document.querySelectorAll(".poll-image")];
   let pollOptions = [...document.querySelectorAll(".poll-option")];
+  let optionsColors = [...document.querySelectorAll(".option-color")];
   let pollOptionsArray = [];
-  let imagesArray = [];
   let scores = [];
-  let colors = [];
   for (let index = 0, j = pollOptions.length; index < j; index++) {
     if (!pollOptions[index].value && !imageSpans[index].dataset.imageUrl) {
       continue;
     }
     if (!pollOptions[index].value && imageSpans[index].dataset.imageUrl) {
-      pollOptionsArray.push(`Option #${index + 1} with image`);
+      pollOptionsArray.push({
+        name: `Option #${index + 1} with image`,
+        type: "image",
+        image: imageSpans[index].dataset.imageUrl,
+        color: optionsColors[index].style.backgroundColor,
+      });
     } else {
-      pollOptionsArray.push(pollOptions[index].value);
+      pollOptionsArray.push({
+        name: pollOptions[index].value,
+        type: "text",
+        image: imageSpans[index].dataset.imageUrl,
+        color: optionsColors[index].style.backgroundColor,
+      });
     }
-    imagesArray.push(imageSpans[index].dataset.imageUrl);
     scores[index] = 1000000000;
-    colors[index] = [255, 255, 255];
   }
+
   let poll = {
-    title: title,
-    options: pollOptions,
-    images: imagesArray,
-    scores: scores,
-    votes: 1000000000,
-    colors: colors,
-    mode: 1,
-    endtime: 1678513462683,
-    multianswer: false,
-    creatorip: "123.456.789.123",
+    id: "XXXXXXXX",
+    title: "",
+    description: "",
+    questions: [
+      {
+        title: title,
+        description: "",
+        multipleChoice: multianswer,
+        type: "poll",
+        options: pollOptionsArray,
+      },
+    ],
+    scores: [scores],
+    votes: [[999999999999999]],
+    resultsVisibility: "everyone",
+    security: "high",
+    endTime: 999999999999999,
+    createdAt: 999999999999999,
+    createdUsing: "chat.vote/poll",
+    creatorip: "XXXX:XXXX:XXXX:XXXX:XXXX:XXXX:XXXX:XXXX",
+    pollVersion: 999999999999999,
   };
   const size = new TextEncoder().encode(JSON.stringify(poll)).length;
   const kiloBytes = size / 1024;
@@ -337,21 +327,42 @@ async function createPoll() {
   let title = !elements.pollTitle.value ? "Untitled poll" : elements.pollTitle.value;
   let imageSpans = [...document.querySelectorAll(".poll-image")];
   let pollOptions = [...document.querySelectorAll(".poll-option")];
+  let optionsColors = [...document.querySelectorAll(".option-color")];
 
   let pollOptionsArray = [];
-  let imagesArray = [];
   for (let index = 0, j = pollOptions.length; index < j; index++) {
     if (!pollOptions[index].value && !imageSpans[index].dataset.imageUrl) {
       continue;
     }
 
     if (!pollOptions[index].value && imageSpans[index].dataset.imageUrl) {
-      pollOptionsArray.push(`Option #${index + 1} with image`);
-    } else {
-      pollOptionsArray.push(pollOptions[index].value);
+      pollOptionsArray.push({
+        name: `Option #${index + 1} with image`,
+        type: "image",
+        image: imageSpans[index].dataset.imageUrl,
+        color: optionsColors[index].style.backgroundColor,
+      });
     }
-    imagesArray.push(imageSpans[index].dataset.imageUrl);
+
+    if (pollOptions[index].value && imageSpans[index].dataset.imageUrl) {
+      pollOptionsArray.push({
+        name: pollOptions[index].value,
+        type: "image",
+        image: imageSpans[index].dataset.imageUrl,
+        color: optionsColors[index].style.backgroundColor,
+      });
+    }
+
+    if (pollOptions[index].value && !imageSpans[index].dataset.imageUrl) {
+      pollOptionsArray.push({
+        name: pollOptions[index].value,
+        type: "text",
+        image: imageSpans[index].dataset.imageUrl,
+        color: optionsColors[index].style.backgroundColor,
+      });
+    }
   }
+
   if (pollOptionsArray.length < 2) {
     showToast("You can't create a poll with less than 2 options", "warning", 3000);
     return;
@@ -368,24 +379,32 @@ async function createPoll() {
     }
     let requestOptions = {
       method: "POST",
-      headers: {},
+      headers: { "Content-Type": "application/json" },
       redirect: "follow",
-      "Content-Type": "application/json",
       body: JSON.stringify({
         captchatoken: token,
-        title: title,
-        options: pollOptionsArray,
-        images: imagesArray,
-        mode: mode,
-        level: level,
-        endtime: polltimer,
-        multianswer: multianswer,
+        title: "",
+        description: "",
+        resultsVisibility: resultsVisibility,
+        security: security,
+        endAfter: polltimer,
+        createdUsing: "chat..vote/poll",
+        questions: [
+          {
+            title: title,
+            description: "",
+            multipleChoice: multianswer,
+            type: "poll",
+            options: pollOptionsArray,
+          },
+        ],
       }),
     };
-    let response = await fetch(`https://poll.chat.vote/api/create`, requestOptions);
+    let response = await fetch(`https://poll.chat.vote/api/create2`, requestOptions);
     //let response = await fetch(`http://127.0.0.1:8787/api/create`, requestOptions);
 
     let result = await response.json();
+    console.log(result);
     if (response.status != 200) {
       elements.errorDiv.innerHTML = `Failed to create poll.<br>Error: ${result.message}`;
       return;
@@ -416,66 +435,61 @@ async function createPoll() {
     elements.pollTitleDiv.innerHTML = `
     <ul class="list-unstyled">
       <li>
-      <ul>
-        <li>${result.data.title}</li>
-      </ul>
+        <ul>
+          <li>${validator.escape(result.data.questions[0].title)}</li>
+        </ul>
       </li>
     </ul>`;
 
     //load options
     let options = `
-            <ul class="list-unstyled">
-            <li>
-            <ul>`;
-    for (let index = 0, j = result.data.options.length; index < j; index++) {
-      options += `<li>${result.data.options[index]}</li>`;
+    <ul class="list-unstyled">
+      <li>
+        <ul>`;
+    for (let index = 0, j = result.data.questions[0].options.length; index < j; index++) {
+      options += `
+          <li>
+            ${validator.escape(result.data.questions[0].options[index].name)}
+          </li>`;
     }
     options += `
-            </ul>
-            </li>
-            </ul>`;
+        </ul>
+      </li>
+    </ul>`;
     elements.pollOptionsDiv.innerHTML = options;
 
     //load settings
-    let pollmode = "";
-    switch (result.data.mode) {
-      case 0:
-        pollmode = "Results visible to anyone";
+    let pollResultsVisibility = "";
+    switch (result.data.resultsVisibility) {
+      case "everyone":
+        pollResultsVisibility = "Results visible to anyone";
         break;
-      case 1:
-        pollmode = "Results visible voters only";
+      case "voters":
+        pollResultsVisibility = "Results visible voters only";
         break;
-      case 2:
-        pollmode = `Results will be revealed in ${Math.ceil((parseInt(result.data.endtime, 10) - Date.now() / 1000) / 60)} minutes`;
+      case "timer":
+        pollResultsVisibility = `Results will be revealed in ${Math.ceil((parseInt(result.data.endTime, 10) - Date.now() / 1000) / 60)} minutes`;
         break;
-      case 3:
-        pollmode = "Results visible to you only";
-        break;
-    }
-    let polllevel = "";
-    switch (result.data.level) {
-      case 0:
-        polllevel = "<li>Duplicate detection level: low</li>";
-        break;
-      case 1:
-        polllevel = "<li>Duplicate detection level: high</li>";
+      case "creator":
+        pollResultsVisibility = "Results visible to you only";
         break;
     }
-    let endtime = "No time limit";
-    if (result.data.endtime) {
-      endtime = `Poll will close in ${Math.ceil((parseInt(result.data.endtime, 10) - Date.now() / 1000) / 60)} minutes`;
+
+    let endTime = "No time limit";
+    if (result.data.endTime) {
+      endTime = `Poll will close in ${Math.ceil((parseInt(result.data.endTime, 10) - Date.now() / 1000) / 60)} minutes`;
     }
     elements.pollSettingsDiv.innerHTML = `
-      <ul class="list-unstyled">
-        <li>
+    <ul class="list-unstyled">
+      <li>
         <ul>
-          <li>${pollmode}</li>
-          <li>${result.data.multianswer ? "Multiple answers allowed" : "Multiple answers not allowed"}</li>
-          <li>${endtime}</li>
-          ${polllevel}
+          <li>${pollResultsVisibility}</li>
+          <li>${result.data.questions[0].multipleChoice ? "Multiple answers allowed" : "Multiple answers not allowed"}</li>
+          <li>${endTime}</li>
+          <li>Duplicate detection level: ${result.data.security}</li>
         </ul>
-        </li>
-      </ul>`;
+      </li>
+    </ul>`;
   } catch (error) {
     elements.errorDiv.innerHTML = `Failed to create poll.<br>Error: ${error}`;
   }
@@ -554,20 +568,22 @@ function selectNextInput(optionId) {
 function addInput(move = true) {
   elements.optionsDiv.insertAdjacentHTML(
     "beforeend",
-    `<div class="card bg-body-tertiary option-card" data-option-id="${++numberOfOptions}">
-    <div class="card-body">
-      <div class="input-group">
-        <input type="text" class="form-control poll-option" onkeydown="handleInput(event)" data-option-id="${numberOfOptions}" placeholder="Enter poll option" aria-label="Poll option" />
-        <span class="input-group-text poll-image" data-option-id="${numberOfOptions}" data-image-url="" style="display: none"> </span>
-        <button type="button" class="remove-image btn btn-warning" onclick="deleteImage(event)" data-option-id="${numberOfOptions}" style="display: none">
-          <i data-option-id="${numberOfOptions}" class="material-icons notranslate">hide_image</i>
-        </button>
-        <button type="button" class="remove-input btn btn-danger" onclick="deleteInput(event)" data-option-id="${numberOfOptions}">
-          <i class="material-icons notranslate" data-option-id="${numberOfOptions}">delete_forever</i>
-        </button>
+    `
+    <div class="card bg-body-tertiary option-card" data-option-id="${++numberOfOptions}">
+      <div class="card-body option-card-body">
+        <div class="option-color" data-option-id="${numberOfOptions}" style="background-color: hsla(${Math.round((startingHue += Math.random() * 60 + 40))}, 100%, 50%, 0.8)"></div>
+        <div class="input-group">
+          <input type="text" class="form-control poll-option" onkeydown="handleInput(event)" data-option-id="${numberOfOptions}" placeholder="Enter poll option" aria-label="Poll option" />
+          <span class="input-group-text poll-image" data-option-id="${numberOfOptions}" data-image-url="" style="display: none"></span>
+          <button type="button" class="remove-image btn btn-warning" onclick="deleteImage(event)" data-option-id="${numberOfOptions}" style="display: none">
+            <i data-option-id="${numberOfOptions}" class="material-icons notranslate">hide_image</i>
+          </button>
+          <button type="button" class="remove-input btn btn-danger" onclick="deleteInput(event)" data-option-id="${numberOfOptions}">
+           <i class="material-icons notranslate" data-option-id="${numberOfOptions}">delete_forever</i>
+         </button>
+        </div>
       </div>
-    </div>
-  </div>`
+    </div>`
   );
   if (move) {
     selectNextInput(numberOfOptions - 1);
@@ -617,10 +633,13 @@ window.onload = function () {
   elements.darkTheme.checked = darkTheme ?? true;
   switchTheme(elements.darkTheme.checked);
 
+  elements.optionsDiv.innerHTML = "";
+  addInput();
+  addInput();
+
   load_localStorage();
   refreshData();
 
-  deleteAllModal = new bootstrap.Modal(elements.deleteAllModal);
   pollModal = new bootstrap.Modal(elements.pollModal);
   captchaModal = new bootstrap.Modal(elements.captchaModal);
 
@@ -645,25 +664,25 @@ window.onload = function () {
 
   elements.results_anyone.onchange = function () {
     if (this.checked) {
-      mode = 0;
+      resultsVisibility = "everyone";
     }
     saveSettings();
   };
   elements.results_voters.onchange = function () {
     if (this.checked) {
-      mode = 1;
+      resultsVisibility = "voters";
     }
     saveSettings();
   };
   elements.results_timer.onchange = function () {
     if (this.checked) {
-      mode = 2;
+      resultsVisibility = "timer";
     }
     saveSettings();
   };
   elements.results_creator.onchange = function () {
     if (this.checked) {
-      mode = 3;
+      resultsVisibility = "creator";
     }
     saveSettings();
   };
@@ -679,13 +698,13 @@ window.onload = function () {
   };
   elements.detect_low.onchange = function () {
     if (this.checked) {
-      level = 0;
+      security = "low";
     }
     saveSettings();
   };
   elements.detect_high.onchange = function () {
     if (this.checked) {
-      level = 1;
+      security = "high";
     }
     saveSettings();
   };

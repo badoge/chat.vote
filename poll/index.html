@@ -299,34 +299,12 @@
           </div>
 
           <div id="optionsDiv">
-            <div class="card bg-body-tertiary option-card" data-option-id="1">
-              <div class="card-body">
-                <div class="input-group">
-                  <input type="text" class="form-control poll-option" onkeydown="handleInput(event)" data-option-id="1" placeholder="Enter poll option" aria-label="Poll option" />
-                  <span class="input-group-text poll-image" data-option-id="1" data-image-url="" style="display: none"> </span>
-                  <button type="button" class="remove-image btn btn-warning" onclick="deleteImage(event)" data-option-id="1" style="display: none">
-                    <i data-option-id="1" class="material-icons notranslate">hide_image</i>
-                  </button>
-                  <button type="button" class="remove-input btn btn-danger" onclick="deleteInput(event)" data-option-id="1">
-                    <i class="material-icons notranslate" data-option-id="1">delete_forever</i>
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="card bg-body-tertiary option-card" data-option-id="2">
-              <div class="card-body">
-                <div class="input-group">
-                  <input type="text" class="form-control poll-option" onkeydown="handleInput(event)" data-option-id="2" placeholder="Enter poll option" aria-label="Poll option" />
-                  <span class="input-group-text poll-image" data-option-id="2" data-image-url="" style="display: none"> </span>
-                  <button type="button" class="remove-image btn btn-warning" onclick="deleteImage(event)" data-option-id="2" style="display: none">
-                    <i data-option-id="2" class="material-icons notranslate">hide_image</i>
-                  </button>
-                  <button type="button" class="remove-input btn btn-danger" onclick="deleteInput(event)" data-option-id="2">
-                    <i class="material-icons notranslate" data-option-id="2">delete_forever</i>
-                  </button>
-                </div>
-              </div>
-            </div>
+            <p class="placeholder-wave">
+              <span class="placeholder col-12 rounded" style="height: 48px"></span>
+            </p>
+            <p class="placeholder-wave">
+              <span class="placeholder col-12 rounded" style="height: 48px"></span>
+            </p>
           </div>
 
           <div id="underOptions">
@@ -335,7 +313,7 @@
               <button type="button" class="btn btn-success btn-lg dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                 <i class="material-icons notranslate">settings</i><span class="visually-hidden">Poll settings</span>
               </button>
-              <form class="container-fluid dropdown-menu p-4 bg-body-tertiary" style="width: 30vw">
+              <form class="container-fluid dropdown-menu p-4 bg-body-tertiary" style="width: 35vw">
                 <div class="row">
                   <div class="col">
                     <div class="form-check form-switch">
@@ -360,19 +338,19 @@
                   <div class="col">
                     <h4>Results visibility</h4>
                     <div class="form-check">
-                      <input class="form-check-input" type="radio" name="resultsVisibility" value="0" id="results_anyone" checked />
+                      <input class="form-check-input" type="radio" name="resultsVisibility" value="everyone" id="results_anyone" checked />
                       <label class="form-check-label" for="results_anyone"><i class="material-icons notranslate">visibility</i>Visible to anyone</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="radio" name="resultsVisibility" value="1" id="results_voters" />
+                      <input class="form-check-input" type="radio" name="resultsVisibility" value="voters" id="results_voters" />
                       <label class="form-check-label" for="results_voters"><i class="material-icons notranslate">how_to_vote</i>Visible after voting</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="radio" name="resultsVisibility" value="2" id="results_timer" disabled />
+                      <input class="form-check-input" type="radio" name="resultsVisibility" value="timer" id="results_timer" disabled />
                       <label class="form-check-label" for="results_timer"><i class="material-icons notranslate">timer</i>Reveal after timer runs out</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="radio" name="resultsVisibility" value="3" id="results_creator" />
+                      <input class="form-check-input" type="radio" name="resultsVisibility" value="creator" id="results_creator" />
                       <label class="form-check-label" for="results_creator"><i class="material-icons notranslate">person</i>Visible to me only</label>
                     </div>
                     <hr />
@@ -381,12 +359,12 @@
                   <div class="col" style="display: none">
                     <h4>Duplicate detection level</h4>
                     <div class="form-check">
-                      <input class="form-check-input" type="radio" name="duplicateDetectionLevel" value="0" id="detect_low" />
+                      <input class="form-check-input" type="radio" name="duplicateDetectionLevel" value="low" id="detect_low" />
                       <label class="form-check-label" for="detect_low"><i class="material-icons notranslate">remove_moderator</i>Low</label>
                       <br /><small class="form-text text-body-secondary">Low protection against duplicate votes, only very obvious bots will be blocked.</small>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="radio" name="duplicateDetectionLevel" value="1" id="detect_high" checked />
+                      <input class="form-check-input" type="radio" name="duplicateDetectionLevel" value="high" id="detect_high" checked />
                       <label class="form-check-label" for="detect_high"><i class="material-icons notranslate">security</i>High</label>
                       <br /><small class="form-text text-body-secondary">Users on the same network might not be able to vote.</small>
                     </div>
@@ -396,18 +374,11 @@
             </div>
 
             <div class="float-end">
-              <div class="btn-group" role="group" aria-label="Delete all or restart buttons">
-                <button
-                  type="button"
-                  class="btn btn-outline-danger"
-                  onclick="showDeleteAllModal()"
-                  data-bs-toggle="tooltip"
-                  data-bs-placement="top"
-                  data-bs-title="Remove all options from the poll"
-                >
-                  <i class="material-icons notranslate">delete_forever</i>ALL
+              <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove all options from the poll">
+                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAllModal">
+                  <i class="material-icons notranslate">delete_forever</i>All
                 </button>
-              </div>
+              </span>
             </div>
           </div>
         </div>
