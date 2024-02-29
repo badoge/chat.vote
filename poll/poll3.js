@@ -101,8 +101,6 @@ async function report(id) {
       }),
     };
     let response = await fetch(`https://poll.chat.vote/api/report`, requestOptions);
-    //let response = await fetch(`http://127.0.0.1:8787/api/report`, requestOptions);
-
     let result = await response.json();
     if (result.status != 200) {
       showToast(result.message, "warning", 5000);
@@ -167,8 +165,6 @@ async function vote() {
       }),
     };
     let response = await fetch(`https://poll.chat.vote/api/vote2/${pollID}/${token}`, requestOptions);
-    //let response = await fetch(`http://127.0.0.1:8787/api/vote`, requestOptions);
-
     let result = await response.json();
     if (result.status != 200) {
       showToast(result.message, "warning", 5000);

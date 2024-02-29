@@ -399,9 +399,7 @@ async function createPoll() {
         ],
       }),
     };
-    let response = await fetch(`https://poll.chat.vote/api/create2`, requestOptions);
-    //let response = await fetch(`http://127.0.0.1:8787/api/create`, requestOptions);
-
+    let response = await fetch(`https://poll.chat.vote/api/create`, requestOptions);
     let result = await response.json();
     console.log(result);
     if (response.status != 200) {
