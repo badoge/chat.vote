@@ -28,32 +28,14 @@
   </head>
   <body>
     <noscript><div class="alert alert-danger" role="alert">JavaScript is disabled. This site will not work properly without it.</div></noscript>
-    <div class="modal fade" id="modal1" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Could not get userID</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body" id="modal1body">
-            Could not get user identification, maybe you are using some extension that is blocking the script?<br />
-            The server uses device fingerprints to identify users, and it might not be able to verify the legitimacy of your vote without it.<br />
-            Try disabling any extension that might blocking it and refresh :)<br />
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-warning" onclick="ignoreModal()" data-bs-dismiss="modal">Ignore</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="modal fade" id="modal2" tabindex="-1">
+    <div class="modal fade" id="captchaModal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Failed to run reCAPTCHA</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body" id="modal2body">
+          <div class="modal-body">
             It seems that you are blocking reCAPTCHA, the server won't accept any request that is not verified by reCAPTCHA.<br />
             Try disabling any extension that might blocking it and refresh :)<br />
           </div>
@@ -61,6 +43,7 @@
         </div>
       </div>
     </div>
+
     <div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -91,11 +74,12 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-primary" id="report" onclick="report('sadads')">Submit report</button>
+            <button type="button" class="btn btn-primary" id="report" onclick="report('asdasd')">Submit report</button>
           </div>
         </div>
       </div>
     </div>
+
     <nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
       <div class="container-fluid">
         <a class="navbar-brand notranslate" href="https://chat.vote/poll/"
@@ -247,6 +231,6 @@
     <script src="/js/linkify-plugin-mention.min.js"></script>
     <script src="/js/bootstrap.bundle.min.js"></script>
     <script src="/js/functions.min.js"></script>
-    <script src="/poll/poll2.min.js"></script>
+    <script src="/poll/poll3.js"></script>
   </body>
 </html>

@@ -166,6 +166,7 @@ async function vote() {
     };
     let response = await fetch(`https://poll.chat.vote/api/vote2/${pollID}/${token}`, requestOptions);
     let result = await response.json();
+    console.log(result);
     if (result.status != 200) {
       showToast(result.message, "warning", 5000);
       return;
@@ -173,8 +174,8 @@ async function vote() {
     unsortedData = structuredClone(result.data);
 
     let total = 0;
-    if (result.data.scores) {
-      total = result.data.scores.reduce((a, b) => a + b, 0) || 0;
+    if (result.data.votes) {
+      total = result.data.votes.reduce((a, b) => a + b, 0) || 0;
     }
     elements.mainrow.innerHTML = `
     <div class="col-xl-2"></div>
@@ -333,9 +334,9 @@ async function refresh() {
     if (result.data.endTime && parseInt(result.data.endTime, 10) - Date.now() / 1000 > 0) {
       showCountdown(result.data.endTime);
     }
-    if (result.data.questions) {
-      loadChart(result.data.questions, result.data.scores);
-    }
+
+    loadChart(result.data.questions, result.data.scores);
+
     document.getElementById("barChart").onchange = function () {
       barChart = this.checked;
       pieChart = !this.checked;
@@ -368,39 +369,48 @@ async function refresh() {
   linkifyElementID("mainrow", true);
 } //refresh
 
-function loadChart(options, scores, colors) {
+function loadChart(questions, scores) {
+  console.log(questions);
+  console.log(scores);
+
   let ctx = document.getElementById("chartCanvas").getContext("2d");
+  let options = [];
+
+  scores = scores[0];
+
   if (sorted) {
     let list = [];
-    for (let i = 0, j = options.length; i < j; i++) list.push({ options: options[i], scores: scores[i], colors: colors[i] });
+    for (let i = 0, j = questions[0].options.length; i < j; i++) {
+      list.push({ option: questions[0].options[i], score: scores[i] });
+    }
     list.sort(function (a, b) {
-      return a.scores > b.scores ? -1 : a.scores == b.scores ? 0 : 1;
+      return a.score > b.score ? -1 : a.score == b.score ? 0 : 1;
     });
-    for (let i = 0, j = options.length; i < j; i++) {
-      options[i] = list[i].options;
-      scores[i] = list[i].scores;
-      colors[i] = list[i].colors;
+    for (let i = 0, j = questions[0].options.length; i < j; i++) {
+      options[i] = list[i].option;
+      scores[i] = list[i].score;
     }
   } else {
-    options = unsortedData.options;
-    scores = unsortedData.scores;
-    colors = unsortedData.colors;
+    options = unsortedData.questions[0].options;
+    scores = unsortedData.scores[0];
   }
 
   let total = 0;
   if (scores) {
     total = scores.reduce((a, b) => a + b, 0) || 0;
-  }
-  let label = [];
-  if (!scores) {
+  } else {
     scores = [];
   }
-  for (let index = 0, j = options.length; index < j; index++) {
+
+  let labels = [];
+
+  for (let index = 0, j = questions[0].options.length; index < j; index++) {
     let score = !scores[index] ? 0 : scores[index];
-    label[index] = `${options[index]} - ${score} ${score == 1 ? "Vote" : "Votes"} (${Math.round((scores[index] / total) * 100) || 0}%)`;
+    labels[index] = `${options[index].name} - ${score} ${score == 1 ? "Vote" : "Votes"} (${Math.round((score / total) * 100) || 0}%)`;
   }
-  let c1 = colors.map((a) => `rgba(${a[0]},${a[1]},${a[2]},0.6)`);
-  let c2 = colors.map((a) => `rgba(${a[0]},${a[1]},${a[2]},0.9)`);
+
+  let colors = options.map((e) => e.color);
+
   if (myChart) {
     myChart.destroy();
   }
@@ -408,14 +418,14 @@ function loadChart(options, scores, colors) {
     myChart = new Chart(ctx, {
       type: "bar",
       data: {
-        labels: label,
+        labels: labels,
         datasets: [
           {
             label: "Score",
             data: scores,
             borderWidth: 2,
-            backgroundColor: c1,
-            borderColor: c2,
+            backgroundColor: colors,
+            borderColor: colors,
           },
         ],
       },
@@ -436,7 +446,7 @@ function loadChart(options, scores, colors) {
               color: "white",
               mirror: true,
               font: function (context) {
-                let count = options.length;
+                let count = questions[0].options.length;
                 let height = context.chart.height;
                 let size = Math.round(height / 14) - count * 1.5;
                 return {
@@ -462,14 +472,14 @@ function loadChart(options, scores, colors) {
     myChart = new Chart(ctx, {
       type: "pie",
       data: {
-        labels: label,
+        labels: labels,
         datasets: [
           {
             label: "Score",
             data: scores,
             borderWidth: 2,
-            backgroundColor: c1,
-            borderColor: c2,
+            backgroundColor: colors,
+            borderColor: colors,
           },
         ],
       },
@@ -484,7 +494,7 @@ function loadChart(options, scores, colors) {
             labels: {
               color: "white",
               font: function (context) {
-                let count = options.length;
+                let count = questions[0].options.length;
                 let size = Math.max(30 - count, 15);
                 return {
                   size: size,
