@@ -690,9 +690,7 @@ window.onload = function () {
     saveSettings();
   };
   elements.multipleAnswersAllowed.onchange = function () {
-    if (this.checked) {
-      multipleAnswersAllowed = true;
-    }
+    multipleAnswersAllowed = this.checked;
     saveSettings();
   };
   elements.detect_low.onchange = function () {
