@@ -317,7 +317,7 @@
                 <div class="row">
                   <div class="col">
                     <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" id="multipleAnswersAllowed" />
+                      <input class="form-check-input" type="checkbox" id="multipleAnswersAllowed" onchange="saveSettings()" />
                       <label class="form-check-label" for="multipleAnswersAllowed"><i class="material-icons notranslate">plus_one</i>Allow multiple answers</label>
                       <br /><small class="form-text text-body-secondary">Lets users vote for more than 1 option from the poll.</small>
                     </div>
@@ -338,19 +338,19 @@
                   <div class="col">
                     <h4>Results visibility</h4>
                     <div class="form-check">
-                      <input class="form-check-input" type="radio" name="resultsVisibility" value="everyone" id="results_anyone" checked />
+                      <input class="form-check-input" type="radio" name="resultsVisibility" value="everyone" id="results_anyone" onchange="saveSettings()" checked />
                       <label class="form-check-label" for="results_anyone"><i class="material-icons notranslate">visibility</i>Visible to anyone</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="radio" name="resultsVisibility" value="voters" id="results_voters" />
+                      <input class="form-check-input" type="radio" name="resultsVisibility" value="voters" id="results_voters" onchange="saveSettings()" />
                       <label class="form-check-label" for="results_voters"><i class="material-icons notranslate">how_to_vote</i>Visible after voting</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="radio" name="resultsVisibility" value="timer" id="results_timer" disabled />
+                      <input class="form-check-input" type="radio" name="resultsVisibility" value="timer" id="results_timer" onchange="saveSettings()" disabled />
                       <label class="form-check-label" for="results_timer"><i class="material-icons notranslate">timer</i>Reveal after timer runs out</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="radio" name="resultsVisibility" value="creator" id="results_creator" />
+                      <input class="form-check-input" type="radio" name="resultsVisibility" value="creator" id="results_creator" onchange="saveSettings()" />
                       <label class="form-check-label" for="results_creator"><i class="material-icons notranslate">person</i>Visible to me only</label>
                     </div>
                     <hr />

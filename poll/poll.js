@@ -1,7 +1,5 @@
 let pollModal, captchaModal;
-let resultsVisibility = "everyone";
 let security = "high";
-let multipleAnswersAllowed;
 let token;
 let copyPopover;
 let numberOfOptions = 0;
@@ -64,23 +62,19 @@ function load_localStorage() {
     switch (POLL.resultsVisibility) {
       case "everyone":
         elements.results_anyone.checked = true;
-        resultsVisibility = "everyone";
         break;
       case "voters":
         elements.results_voters.checked = true;
-        resultsVisibility = "voters";
         break;
       case "timer":
         elements.results_timer.checked = true;
-        resultsVisibility = "timer";
         break;
       case "creator":
         elements.results_creator.checked = true;
-        resultsVisibility = "creator";
         break;
       default:
+        POLL.resultsVisibility = "everyone";
         elements.results_anyone.checked = true;
-        resultsVisibility = "everyone";
         break;
     }
     switch (POLL.security) {
@@ -274,7 +268,7 @@ function checkSize() {
       {
         title: title,
         description: "",
-        multipleChoice: multipleAnswersAllowed,
+        multipleChoice: POLL.multipleAnswersAllowed,
         type: "poll",
         options: pollOptionsArray,
       },
@@ -384,7 +378,7 @@ async function createPoll() {
         captchatoken: token,
         title: "",
         description: "",
-        resultsVisibility: resultsVisibility,
+        resultsVisibility: POLL.resultsVisibility,
         security: security,
         endAfter: polltimer,
         createdUsing: "chat..vote/poll",
@@ -392,7 +386,7 @@ async function createPoll() {
           {
             title: title,
             description: "",
-            multipleChoice: multipleAnswersAllowed,
+            multipleChoice: POLL.multipleAnswersAllowed,
             type: "poll",
             options: pollOptionsArray,
           },
@@ -659,36 +653,8 @@ window.onload = function () {
     saveSettings();
   };
 
-  elements.results_anyone.onchange = function () {
-    if (this.checked) {
-      resultsVisibility = "everyone";
-    }
-    saveSettings();
-  };
-  elements.results_voters.onchange = function () {
-    if (this.checked) {
-      resultsVisibility = "voters";
-    }
-    saveSettings();
-  };
-  elements.results_timer.onchange = function () {
-    if (this.checked) {
-      resultsVisibility = "timer";
-    }
-    saveSettings();
-  };
-  elements.results_creator.onchange = function () {
-    if (this.checked) {
-      resultsVisibility = "creator";
-    }
-    saveSettings();
-  };
   elements.pollTimerValue.onchange = function () {
     updateTimer(this);
-    saveSettings();
-  };
-  elements.multipleAnswersAllowed.onchange = function () {
-    multipleAnswersAllowed = this.checked;
     saveSettings();
   };
   elements.detect_low.onchange = function () {
