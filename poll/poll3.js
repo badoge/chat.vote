@@ -285,7 +285,7 @@ async function refresh() {
       method: "GET",
       redirect: "follow",
     };
-    let response = await fetch(`https://poll.chat.vote/api/results/${pollID}/${token}`, requestOptions);
+    let response = await fetch(`https://poll.chat.vote/api/results2/${pollID}/${token}`, requestOptions);
     let result = await response.json();
     unsortedData = structuredClone(result.data);
 

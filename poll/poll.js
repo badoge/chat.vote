@@ -274,7 +274,7 @@ function checkSize() {
       {
         title: title,
         description: "",
-        multipleChoice: multianswer,
+        multipleChoice: multipleAnswersAllowed,
         type: "poll",
         options: pollOptionsArray,
       },
@@ -309,7 +309,6 @@ async function createPoll() {
     return;
   }
 
-  let multianswer = elements.multipleAnswersAllowed.checked;
   let polltimer;
   switch (elements.pollTimerUnit.value) {
     case "m":
@@ -393,7 +392,7 @@ async function createPoll() {
           {
             title: title,
             description: "",
-            multipleChoice: multianswer,
+            multipleChoice: multipleAnswersAllowed,
             type: "poll",
             options: pollOptionsArray,
           },
