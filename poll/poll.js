@@ -381,7 +381,7 @@ async function createPoll() {
         resultsVisibility: POLL.resultsVisibility,
         security: security,
         endAfter: polltimer,
-        createdUsing: "chat..vote/poll",
+        createdUsing: "chat.vote/poll",
         questions: [
           {
             title: title,
