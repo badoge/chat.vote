@@ -24,7 +24,7 @@ let elements = {
 
 const ckey = "6LdzxrwdAAAAADyHX2t8ZS4U5QxTNLVWNrGOeNp0";
 
-function showCountdown(endtime) {
+function showCountdown(endTime) {
   document.getElementById("countdowndiv").innerHTML = `
     <div class="card border-danger" id="countdown">
     <div class="card-body" style="padding: 0px">
@@ -33,7 +33,7 @@ function showCountdown(endtime) {
     </div>`;
 
   let timer = new easytimer.Timer();
-  timer.start({ countdown: true, startValues: { seconds: parseInt(endtime, 10) - Date.now() / 1000 } });
+  timer.start({ countdown: true, startValues: { seconds: parseInt(endTime, 10) - Date.now() / 1000 } });
   document.querySelector("#countdown .values").innerHTML = "Poll closes in " + timer.getTimeValues().toString();
   timer.addEventListener("secondsUpdated", function (e) {
     document.querySelector("#countdown .values").innerHTML = "Poll closes in " + timer.getTimeValues().toString();
@@ -44,7 +44,7 @@ function showCountdown(endtime) {
       elements.vote.disabled = true;
     }
   });
-  if (parseInt(endtime, 10) - Date.now() / 1000 < 0) {
+  if (parseInt(endTime, 10) - Date.now() / 1000 < 0) {
     document.querySelector("#countdown .values").innerHTML = "Poll closed";
     if (elements.vote) {
       elements.vote.disabled = true;
@@ -90,9 +90,8 @@ async function report(id) {
     }
     let requestOptions = {
       method: "POST",
-      headers: {},
+      headers: { "Content-Type": "application/json" },
       redirect: "follow",
-      "Content-Type": "application/json",
       body: JSON.stringify({
         id: id,
         reason: reason,
@@ -102,8 +101,6 @@ async function report(id) {
       }),
     };
     let response = await fetch(`https://poll.chat.vote/api/report`, requestOptions);
-    //let response = await fetch(`http://127.0.0.1:8787/api/report`, requestOptions);
-
     let result = await response.json();
     if (result.status != 200) {
       showToast(result.message, "warning", 5000);
@@ -129,30 +126,30 @@ async function report(id) {
 } //report
 
 async function vote() {
-  let vote = [];
+  let vote = [[]];
   let options = document.querySelectorAll(".polloption");
   let type = options[0].type;
-  let currecturl = new URL(window.location.href);
-  let path = currecturl.pathname.slice(1).split("/");
+  let currentURL = new URL(window.location.href);
+  let path = currentURL.pathname.slice(1).split("/");
   let pollID = path[0];
   if (type == "radio") {
     for (let i = 0, j = options.length; i < j; i++) {
       if (options[i].checked) {
-        vote.push(options[i].value);
+        vote[0].push(options[i].value);
         break;
       }
     }
   } else if (type == "checkbox") {
     for (let i = 0, j = options.length; i < j; i++) {
       if (options[i].checked) {
-        vote.push(options[i].value);
+        vote[0].push(options[i].value);
       }
     }
   }
-  if (vote.length == 0) {
+  if (vote[0].length == 0) {
+    showToast("You need to pick an option", "warning", 1500);
     return;
   }
-
   try {
     token = await grecaptcha.execute(ckey, { action: "submit" });
     if (!token) {
@@ -161,19 +158,15 @@ async function vote() {
     }
     let requestOptions = {
       method: "POST",
-      headers: {},
+      headers: { "Content-Type": "application/json" },
       redirect: "follow",
-      "Content-Type": "application/json",
       body: JSON.stringify({
-        id: pollID,
         vote: vote,
-        captchatoken: token,
       }),
     };
-    let response = await fetch(`https://poll.chat.vote/api/vote`, requestOptions);
-    //let response = await fetch(`http://127.0.0.1:8787/api/vote`, requestOptions);
-
+    let response = await fetch(`https://poll.chat.vote/api/vote/${pollID}/${token}`, requestOptions);
     let result = await response.json();
+    console.log(result);
     if (result.status != 200) {
       showToast(result.message, "warning", 5000);
       return;
@@ -181,8 +174,8 @@ async function vote() {
     unsortedData = structuredClone(result.data);
 
     let total = 0;
-    if (result.data.scores) {
-      total = result.data.scores.reduce((a, b) => a + b, 0) || 0;
+    if (result.data.votes) {
+      total = result.data.votes.reduce((a, b) => a + b, 0) || 0;
     }
     elements.mainrow.innerHTML = `
     <div class="col-xl-2"></div>
@@ -229,21 +222,21 @@ async function vote() {
       </div>
     </div>
     <div class="col-xl-2"></div>`;
-    if (result.data.endtime && parseInt(result.data.endtime, 10) - Date.now() / 1000 > 0) {
-      showCountdown(result.data.endtime);
+    if (result.data.endTime && parseInt(result.data.endTime, 10) - Date.now() / 1000 > 0) {
+      showCountdown(result.data.endTime);
     }
-    if (result.data.options) {
-      loadChart(result.data.options, result.data.scores, result.data.colors);
-    }
+
+    loadChart(result.data.questions, result.data.scores);
+
     document.getElementById("barChart").onchange = function () {
       barChart = this.checked;
       pieChart = !this.checked;
-      loadChart(result.data.options, result.data.scores, result.data.colors);
+      loadChart(result.data.questions, result.data.scores);
     };
     document.getElementById("pieChart").onchange = function () {
       pieChart = this.checked;
       barChart = !this.checked;
-      loadChart(result.data.options, result.data.scores, result.data.colors);
+      loadChart(result.data.questions, result.data.scores);
     };
     document.getElementById("sortChart").addEventListener(
       "click",
@@ -251,7 +244,7 @@ async function vote() {
         sorted = this.checked;
         const tooltip = bootstrap.Tooltip.getInstance("#sortChartLabel");
         tooltip.setContent({ ".tooltip-inner": this.checked ? "Unsort chart" : "Sort chart" });
-        loadChart(result.data.options, result.data.scores, result.data.colors);
+        loadChart(result.data.questions, result.data.scores);
       },
       false
     );
@@ -277,8 +270,8 @@ async function refresh() {
   }, 5000);
 
   try {
-    let currecturl = new URL(window.location.href);
-    let path = currecturl.pathname.slice(1).split("/");
+    let currentURL = new URL(window.location.href);
+    let path = currentURL.pathname.slice(1).split("/");
     let pollID = path[0];
     token = await grecaptcha.execute(ckey, { action: "submit" });
     if (!token) {
@@ -287,23 +280,12 @@ async function refresh() {
     }
     let requestOptions = {
       method: "GET",
-      headers: {},
       redirect: "follow",
-      "Content-Type": "application/json",
     };
-    let url = `id=${encodeURI(pollID)}&captchatoken=${token}`;
-    let response = await fetch(`https://poll.chat.vote/api/results/?${url}`, requestOptions);
-    //let response = await fetch(`http://127.0.0.1:8787/api/results/?${url}`, requestOptions);
-
+    let response = await fetch(`https://poll.chat.vote/api/results/${pollID}/${token}`, requestOptions);
     let result = await response.json();
     unsortedData = structuredClone(result.data);
 
-    let total = 0;
-    if (result.data.votes) {
-      total = result.data.votes || 0;
-    } else if (result.data.scores) {
-      total = result.data.scores.reduce((a, b) => a + b, 0) || 0;
-    }
     elements.mainrow.innerHTML = `
     <div class="col-xl-2"></div>
     <div class="col-xl-8">
@@ -333,7 +315,7 @@ async function refresh() {
                   }"
                     ><i class="material-icons notranslate">sort</i>
                   </label>
-                  <div class="totalVotesDiv">Total votes: <span id="totalVotes">${total}</span></div>
+                  <div class="totalVotesDiv">Total votes: <span id="totalVotes">${result.data.votes[0]}</span></div>
               </div>
               <div class="col">
               <button type="button" onclick="refresh()" class="float-end btn btn-info" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Refresh score">
@@ -349,21 +331,21 @@ async function refresh() {
       </div>
     </div>
     <div class="col-xl-2"></div>`;
-    if (result.data.endtime && parseInt(result.data.endtime, 10) - Date.now() / 1000 > 0) {
-      showCountdown(result.data.endtime);
+    if (result.data.endTime && parseInt(result.data.endTime, 10) - Date.now() / 1000 > 0) {
+      showCountdown(result.data.endTime);
     }
-    if (result.data.options) {
-      loadChart(result.data.options, result.data.scores, result.data.colors);
-    }
+
+    loadChart(result.data.questions, result.data.scores);
+
     document.getElementById("barChart").onchange = function () {
       barChart = this.checked;
       pieChart = !this.checked;
-      loadChart(result.data.options, result.data.scores, result.data.colors);
+      loadChart(result.data.questions, result.data.scores);
     };
     document.getElementById("pieChart").onchange = function () {
       pieChart = this.checked;
       barChart = !this.checked;
-      loadChart(result.data.options, result.data.scores, result.data.colors);
+      loadChart(result.data.questions, result.data.scores);
     };
     document.getElementById("sortChart").addEventListener(
       "click",
@@ -371,7 +353,7 @@ async function refresh() {
         sorted = this.checked;
         const tooltip = bootstrap.Tooltip.getInstance("#sortChartLabel");
         tooltip.setContent({ ".tooltip-inner": this.checked ? "Unsort chart" : "Sort chart" });
-        loadChart(result.data.options, result.data.scores, result.data.colors);
+        loadChart(result.data.questions, result.data.scores);
       },
       false
     );
@@ -387,39 +369,48 @@ async function refresh() {
   linkifyElementID("mainrow", true);
 } //refresh
 
-function loadChart(options, scores, colors) {
+function loadChart(questions, scores) {
+  console.log(questions);
+  console.log(scores);
+
   let ctx = document.getElementById("chartCanvas").getContext("2d");
+  let options = [];
+
+  scores = scores[0];
+
   if (sorted) {
     let list = [];
-    for (let i = 0, j = options.length; i < j; i++) list.push({ options: options[i], scores: scores[i], colors: colors[i] });
+    for (let i = 0, j = questions[0].options.length; i < j; i++) {
+      list.push({ option: questions[0].options[i], score: scores[i] });
+    }
     list.sort(function (a, b) {
-      return a.scores > b.scores ? -1 : a.scores == b.scores ? 0 : 1;
+      return a.score > b.score ? -1 : a.score == b.score ? 0 : 1;
     });
-    for (let i = 0, j = options.length; i < j; i++) {
-      options[i] = list[i].options;
-      scores[i] = list[i].scores;
-      colors[i] = list[i].colors;
+    for (let i = 0, j = questions[0].options.length; i < j; i++) {
+      options[i] = list[i].option;
+      scores[i] = list[i].score;
     }
   } else {
-    options = unsortedData.options;
-    scores = unsortedData.scores;
-    colors = unsortedData.colors;
+    options = unsortedData.questions[0].options;
+    scores = unsortedData.scores[0];
   }
 
   let total = 0;
   if (scores) {
     total = scores.reduce((a, b) => a + b, 0) || 0;
-  }
-  let label = [];
-  if (!scores) {
+  } else {
     scores = [];
   }
-  for (let index = 0, j = options.length; index < j; index++) {
+
+  let labels = [];
+
+  for (let index = 0, j = questions[0].options.length; index < j; index++) {
     let score = !scores[index] ? 0 : scores[index];
-    label[index] = `${options[index]} - ${score} ${score == 1 ? "Vote" : "Votes"} (${Math.round((scores[index] / total) * 100) || 0}%)`;
+    labels[index] = `${options[index].name} - ${score} ${score == 1 ? "Vote" : "Votes"} (${Math.round((score / total) * 100) || 0}%)`;
   }
-  let c1 = colors.map((a) => `rgba(${a[0]},${a[1]},${a[2]},0.6)`);
-  let c2 = colors.map((a) => `rgba(${a[0]},${a[1]},${a[2]},0.9)`);
+
+  let colors = options.map((e) => e.color);
+
   if (myChart) {
     myChart.destroy();
   }
@@ -427,14 +418,14 @@ function loadChart(options, scores, colors) {
     myChart = new Chart(ctx, {
       type: "bar",
       data: {
-        labels: label,
+        labels: labels,
         datasets: [
           {
             label: "Score",
             data: scores,
             borderWidth: 2,
-            backgroundColor: c1,
-            borderColor: c2,
+            backgroundColor: colors,
+            borderColor: colors,
           },
         ],
       },
@@ -455,7 +446,7 @@ function loadChart(options, scores, colors) {
               color: "white",
               mirror: true,
               font: function (context) {
-                let count = options.length;
+                let count = questions[0].options.length;
                 let height = context.chart.height;
                 let size = Math.round(height / 14) - count * 1.5;
                 return {
@@ -481,14 +472,14 @@ function loadChart(options, scores, colors) {
     myChart = new Chart(ctx, {
       type: "pie",
       data: {
-        labels: label,
+        labels: labels,
         datasets: [
           {
             label: "Score",
             data: scores,
             borderWidth: 2,
-            backgroundColor: c1,
-            borderColor: c2,
+            backgroundColor: colors,
+            borderColor: colors,
           },
         ],
       },
@@ -503,7 +494,7 @@ function loadChart(options, scores, colors) {
             labels: {
               color: "white",
               font: function (context) {
-                let count = options.length;
+                let count = questions[0].options.length;
                 let size = Math.max(30 - count, 15);
                 return {
                   size: size,
