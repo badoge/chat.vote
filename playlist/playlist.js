@@ -1096,7 +1096,7 @@ async function getRequestInfo(request, msgid) {
       request.duration = ISO8601ToSeconds(result.items[0].contentDetails.duration);
       request.views = result.items[0].statistics.viewCount;
 
-      if (Object.hasOwn(result.items[0], "liveStreamingDetails")) {
+      if (result.items[0].snippet.liveBroadcastContent !== "none") {
         if (request.duration == 0) {
           request.duration = -1;
         }
