@@ -98,6 +98,7 @@ let elements = {
   tableTabButton: document.getElementById("tableTabButton"),
   chartTabButton: document.getElementById("chartTabButton"),
   yesnoTabButton: document.getElementById("yesnoTabButton"),
+  overlayTabButton: document.getElementById("overlayTabButton"),
   options: document.getElementById("options"),
   chatiframe: document.getElementById("chatiframe"),
   chat: document.getElementById("chat"),
@@ -137,7 +138,7 @@ let loginButton;
 let optionField;
 let deleteAllModal, randomOptionModal, resetSettingsModal, timeOverModal, yesnoTimeOverModal, loginExpiredModal, tieModal, randomYesnoModal;
 let enableVotingDropdown, enableSuggestionsDropdown;
-let tableTab, chartTab, yesnoTab;
+let tableTab, chartTab, yesnoTab, overlayTab;
 let settingsOffcanvas;
 
 let thirdPartyEmotes = [];
@@ -1752,6 +1753,125 @@ function switchTheme(checkbox) {
   }
 } //switchTheme
 
+let overlayID;
+let peerConnection;
+let dataChannel;
+async function generateOverlay() {
+  document.getElementById("overlay").innerHTML = spinner;
+  let requestOptions = {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    redirect: "follow",
+  };
+  try {
+    let response = await fetch(`https://overlay.chat.vote/generate`, requestOptions);
+    let result = await response.json();
+    showToast(result.message, "info", 3000);
+    overlayID = result.data.id;
+    document.getElementById("overlay").innerHTML = `
+    https://chat.vote/overlay#${result.data.id}<br>
+    <button type="button" onclick="connectOverlay()" class="btn btn-success">Connect overlay</button>`;
+    console.log(result);
+  } catch (error) {
+    console.log(error);
+  }
+} //generateOverlay
+
+async function connectOverlay() {
+  document.getElementById("overlay").innerHTML = spinner;
+
+  let requestOptions = {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    redirect: "follow",
+  };
+  try {
+    let response = await fetch(`https://overlay.donk.workers.dev/${overlayID}/offer`, requestOptions);
+    let result = await response.json();
+    console.log(result);
+    let serverOffer = JSON.parse(result.data.offer);
+
+    console.log("clickremoteoffer");
+
+    peerConnection = new RTCPeerConnection();
+
+    peerConnection.onicecandidate = async (event) => {
+      if (event.candidate != null) {
+        console.log("new ice candidate");
+      } else {
+        console.log("last ice candidate");
+        let answer = peerConnection.localDescription;
+        await postAnswer(answer);
+      }
+    };
+
+    peerConnection.onconnectionstatechange = (event) => {
+      console.log("onconnectionstatechange");
+      console.log(event);
+    };
+
+    peerConnection.oniceconnectionstatechange = (event) => {
+      console.log("ice connection state: " + event.target.iceConnectionState);
+    };
+
+    peerConnection.ondatachannel = (event) => {
+      console.log("handledatachannel");
+      dataChannel = event.channel;
+
+      dataChannel.onopen = (event) => {
+        console.log("datachannel open");
+        document.getElementById("overlay").style.display = "none";
+        document.getElementById("overlayControls").style.display = "";
+      };
+
+      dataChannel.onmessage = (event) => {
+        console.log("datachannel message");
+        console.log(event);
+      };
+    };
+
+    await peerConnection.setRemoteDescription(serverOffer);
+    let answer = await peerConnection.createAnswer();
+    await peerConnection.setLocalDescription(answer);
+  } catch (error) {
+    console.log(error);
+  }
+} //connectOverlay
+
+async function postAnswer(answer) {
+  let body = JSON.stringify({ answer: answer });
+  let requestOptions = {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: body,
+    redirect: "follow",
+  };
+  try {
+    let response = await fetch(`https://overlay.donk.workers.dev/answer/${overlayID}`, requestOptions);
+    let result = await response.json();
+    console.log(result);
+  } catch (error) {
+    console.log(error);
+  }
+} //postAnswer
+
+function moveX(event) {
+  dataChannel.send(JSON.stringify({ axis: "x", value: parseInt(event.target.value, 10) }));
+} //moveX
+
+function moveY(event) {
+  dataChannel.send(JSON.stringify({ axis: "y", value: parseInt(event.target.value, 10) }));
+} //moveY
+
 async function loadAndConnect() {
   load_localStorage();
   refreshData();
@@ -1845,6 +1965,7 @@ window.onload = function () {
   tableTab = new bootstrap.Tab(elements.tableTabButton);
   chartTab = new bootstrap.Tab(elements.chartTabButton);
   yesnoTab = new bootstrap.Tab(elements.yesnoTabButton);
+  overlayTab = new bootstrap.Tab(elements.overlayTabButton);
 
   elements.tableTabButton.addEventListener("shown.bs.tab", (event) => {
     if (yesNoMode) {
@@ -1863,6 +1984,13 @@ window.onload = function () {
   elements.yesnoTabButton.addEventListener("shown.bs.tab", (event) => {
     yesNoMode = true;
     startYesNo();
+  });
+
+  elements.overlayTabButton.addEventListener("shown.bs.tab", (event) => {
+    if (yesNoMode) {
+      yesNoMode = false;
+      stopYesNo();
+    }
   });
 
   enableTooltips();

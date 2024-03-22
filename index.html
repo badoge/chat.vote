@@ -733,6 +733,11 @@
                     <img src="/pics/yeanay.webp" alt="yeanay" style="height: 20px" />Mode
                   </button>
                 </li>
+                <li class="nav-item" role="presentation" style="display: none">
+                  <button class="nav-link" id="overlayTabButton" data-bs-toggle="tab" data-bs-target="#overlayTab" type="button" role="tab" aria-controls="overlayTab" aria-selected="false">
+                    Overlay
+                  </button>
+                </li>
               </ul>
               <div class="tab-content">
                 <div class="tab-pane fade show active" id="tableTab" role="tabpanel" aria-labelledby="tableTabButton" tabindex="0">
@@ -798,6 +803,25 @@
                     <div class="row">
                       <div class="col">
                         <div class="totalVotesDiv">Total votes: <span id="yesnoTotalVotes">0</span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="overlayTab" role="tabpanel" aria-labelledby="overlayTabButton" tabindex="0">
+                  <div class="container-fluid text-center">
+                    <div class="row">
+                      <div class="col">
+                        <div id="overlay">
+                          <button type="button" onclick="generateOverlay()" class="btn btn-success">Get overlay link</button>
+                        </div>
+
+                        <div id="overlayControls" style="display: none">
+                          <label for="donkx" class="form-label">x</label>
+                          <input type="range" class="form-range" oninput="moveX(event)" id="donkx" value="50" min="0" max="100" />
+
+                          <label for="donky" class="form-label">y</label>
+                          <input type="range" class="form-range" oninput="moveY(event)" id="donky" value="50" min="0" max="100" />
+                        </div>
                       </div>
                     </div>
                   </div>
