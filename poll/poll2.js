@@ -208,7 +208,7 @@ async function vote() {
                     }"
                       ><i class="material-icons notranslate">sort</i>
                     </label>
-                    <div class="totalVotesDiv">Total votes: <span id="totalVotes">${total}</span></div>
+                    <div class="chartStatDiv">Total votes: <span id="totalVotes">${total}</span></div>
                 </div>
                 <div class="col">
                 <button type="button" onclick="refresh()" class="float-end btn btn-info" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Refresh score">
@@ -322,7 +322,7 @@ async function refresh() {
                     }"
                       ><i class="material-icons notranslate">sort</i>
                     </label>
-                    <div class="totalVotesDiv">Total votes: <span id="totalVotes">${total}</span></div>
+                    <div class="chartStatDiv">Total votes: <span id="totalVotes">${total}</span></div>
                 </div>
                 <div class="col">
                 <button type="button" onclick="refresh()" class="float-end btn btn-info" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Refresh score">

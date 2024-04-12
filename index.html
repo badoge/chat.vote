@@ -214,6 +214,21 @@
       </div>
     </div>
 
+    <div class="modal fade" id="overlayModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Overlay info</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">dank</div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
       <div class="container-fluid">
         <a
@@ -735,7 +750,7 @@
                 </li>
                 <li class="nav-item" role="presentation" style="display: none">
                   <button class="nav-link" id="overlayTabButton" data-bs-toggle="tab" data-bs-target="#overlayTab" type="button" role="tab" aria-controls="overlayTab" aria-selected="false">
-                    Overlay
+                    <i class="material-icons notranslate">picture_in_picture</i> Overlay
                   </button>
                 </li>
               </ul>
@@ -769,15 +784,19 @@
                             <i style="transform: rotateZ(90deg)" class="material-icons notranslate">stacked_bar_chart</i>
                           </label>
                           <input class="btn-check" type="radio" name="charttype" id="pieChart" autocomplete="off" />
-                          <label class="btn btn-outline-info" for="pieChart" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Pie chart"
-                            ><i class="material-icons notranslate">pie_chart</i></label
-                          >
+                          <label class="btn btn-outline-info" for="pieChart" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Pie chart">
+                            <i class="material-icons notranslate">pie_chart</i>
+                          </label>
                         </div>
                         <input type="checkbox" class="btn-check" id="sortChart" autocomplete="off" />
-                        <label class="btn btn-outline-success" for="sortChart" id="sortChartLabel" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Sort chart"
-                          ><i class="material-icons notranslate">sort</i></label
-                        >
-                        <div class="totalVotesDiv">Total votes: <span id="totalVotes">0</span></div>
+                        <label class="btn btn-outline-success" for="sortChart" id="sortChartLabel" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Sort chart">
+                          <i class="material-icons notranslate">sort</i>
+                        </label>
+                        <div class="chartStatDiv">Total votes: <span id="totalVotes">0</span></div>
+
+                        <div style="display: none" class="chartStatDiv ms-1" id="numberStats">
+                          <div class="me-1">Average: <span id="averageNumber">0</span> • Median: <span id="medianNumber">0</span></div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -802,7 +821,7 @@
                     </div>
                     <div class="row">
                       <div class="col">
-                        <div class="totalVotesDiv">Total votes: <span id="yesnoTotalVotes">0</span></div>
+                        <div class="chartStatDiv">Total votes: <span id="yesnoTotalVotes">0</span></div>
                       </div>
                     </div>
                   </div>
@@ -811,8 +830,21 @@
                   <div class="container-fluid text-center">
                     <div class="row">
                       <div class="col">
-                        <div id="overlay">
-                          <button type="button" onclick="generateOverlay()" class="btn btn-success">Get overlay link</button>
+                        <div class="input-group mt-3">
+                          <span class="input-group-text">Overlay URL</span>
+                          <button class="btn btn-outline-info" type="button" data-bs-toggle="modal" data-bs-target="#overlayModal"><i class="material-icons notranslate">help</i></button>
+                          <input
+                            id="overlayLink"
+                            type="password"
+                            readonly
+                            class="form-control"
+                            placeholder='Click "Generate new overlay link" to get your overlay URL'
+                            aria-label="Recipient's username with two button addons"
+                          />
+                          <button class="btn btn-outline-secondary" type="button"><i class="material-icons notranslate">content_copy</i></button>
+                          <button class="btn btn-outline-danger" id="generateOverlayButton" onclick="generateOverlay()" type="button">
+                            <i class="material-icons notranslate">restart_alt</i>Generate new overlay link
+                          </button>
                         </div>
 
                         <div id="overlayControls" style="display: none">
@@ -863,7 +895,7 @@
                     <div class="form-check mb-3">
                       <input class="form-check-input" type="radio" name="votingmode" id="voteWithNumbers" aria-describedby="voteWithNumbersdesc" checked />
                       <label class="form-check-label" for="voteWithNumbers">
-                        Vote with numbers
+                        Type number to vote
                         <i
                           class="material-icons notranslate cursor-pointer"
                           data-bs-toggle="tooltip"
@@ -874,12 +906,12 @@
                           >help
                         </i>
                       </label>
-                      <small id="voteWithNumbersdesc" class="text-body-secondary"> <br />Viewers vote by typing the number of the option ("1", "2")</small>
+                      <small id="voteWithNumbersdesc" class="text-body-secondary"> <br />Viewers vote by typing the number of the option (1, 2)</small>
                     </div>
                     <div class="form-check">
                       <input class="form-check-input" type="radio" name="votingmode" id="voteWithText" aria-describedby="voteWithTextdesc" />
                       <label class="form-check-label" for="voteWithText">
-                        Vote with text
+                        Type option to vote
                         <i
                           class="material-icons notranslate cursor-pointer"
                           data-bs-toggle="tooltip"
@@ -890,7 +922,7 @@
                           >help
                         </i>
                       </label>
-                      <small id="voteWithTextdesc" class="text-body-secondary"> <br />Viewers vote by typing the option ("option1", "option2").</small>
+                      <small id="voteWithTextdesc" class="text-body-secondary"> <br />Viewers vote by typing the option name (option1, option2).</small>
                     </div>
                     <hr />
 

@@ -91,6 +91,9 @@ let elements = {
   sortChart: document.getElementById("sortChart"),
   sortChartLabel: document.getElementById("sortChartLabel"),
   totalVotes: document.getElementById("totalVotes"),
+  numberStats: document.getElementById("numberStats"),
+  averageNumber: document.getElementById("averageNumber"),
+  medianNumber: document.getElementById("medianNumber"),
   questionLabel: document.getElementById("questionLabel"),
   pollOption: document.getElementById("pollOption"),
   pollOptionSpan: document.getElementById("pollOptionSpan"),
@@ -111,6 +114,10 @@ let elements = {
   yeaCount: document.getElementById("yeaCount"),
   nayCount: document.getElementById("nayCount"),
   yesnoTotalVotes: document.getElementById("yesnoTotalVotes"),
+
+  //overlay
+  overlayLink: document.getElementById("overlayLink"),
+  generateOverlayButton: document.getElementById("generateOverlayButton"),
 };
 
 let client;
@@ -131,6 +138,7 @@ let suggestionLimitReached = false;
 let table;
 let yesNoMode = false;
 let scoreHidden = false;
+let allNumbers = false;
 let timer;
 let currentTime = 0;
 let votePopover, suggestPopover;
@@ -325,12 +333,14 @@ function resetPoll() {
   suggestionLimitReached = false;
   startingHue = Math.random() * 360;
   elements.voteHint.innerHTML = "";
+  elements.totalVotes.innerHTML = "0";
   mainChart.destroy();
   table.clear().draw();
   loadChart();
   disableVoteButton();
   disableSuggestButton();
   changeSiteLinkTarget("_self");
+  checkNumbers();
 } //resetPoll
 
 function resetYesno() {
@@ -1229,6 +1239,7 @@ function pushVoteResults(id, option, option_emotes, by, score, context) {
     time: Date.now(),
   });
   updateHint();
+  checkNumbers();
 } //pushVoteResults
 
 function updateHint() {
@@ -1243,6 +1254,22 @@ function updateHint() {
       .substring(0, 20)}${vote_results.length > 3 ? "..." : ""} in chat to vote. ${CHATVOTE.multiChoice ? "Multiple choices allowed (separate by a space)" : ""}`;
   }
 } //updateHint
+
+function checkNumbers() {
+  let allOptions = "";
+
+  for (let index = 0; index < vote_results.length; index++) {
+    allOptions += vote_results[index].option;
+  }
+
+  if (/^\d+$/.test(allOptions)) {
+    allNumbers = true;
+    elements.numberStats.style.display = "";
+  } else {
+    allNumbers = false;
+    elements.numberStats.style.display = "none";
+  }
+} //checkNumbers
 
 function download() {
   if (yesNoMode) {
@@ -1463,6 +1490,40 @@ function updateChart() {
   mainChart.data.datasets[0].borderColor = colors;
   mainChart.update();
   elements.totalVotes.innerHTML = voters.length;
+
+  if (allNumbers) {
+    if (scoreHidden) {
+      elements.averageNumber.innerHTML = "🙈";
+      elements.medianNumber.innerHTML = "🙈";
+      return;
+    }
+
+    if (!CHATVOTE.sortChart) {
+      vote_results_copy.sort(function (a, b) {
+        return a.score > b.score ? -1 : a.score == b.score ? 0 : 1;
+      });
+    }
+
+    let allNumbers = [];
+    for (let index = 0; index < vote_results_copy.length; index++) {
+      for (let index2 = 0; index2 < vote_results_copy[index].score; index2++) {
+        allNumbers.push(parseInt(vote_results_copy[index].option, 10));
+      }
+    }
+    if (allNumbers.length) {
+      let middle = Math.floor(allNumbers.length / 2);
+      if (allNumbers.length % 2 === 0) {
+        elements.medianNumber.innerHTML = (allNumbers[middle - 1] + allNumbers[middle]) / 2 || 0;
+      } else {
+        elements.medianNumber.innerHTML = allNumbers[middle] || 0;
+      }
+    } else {
+      elements.medianNumber.innerHTML = "0";
+    }
+
+    let sum = vote_results_copy.reduce((accumulator, currentValue) => accumulator + parseInt(currentValue.option, 10) * currentValue.score, 0);
+    elements.averageNumber.innerHTML = roundToTwo(sum / total) || 0;
+  }
 } //updateChart
 
 function removeData(rowid) {
@@ -1476,6 +1537,7 @@ function removeData(rowid) {
     changeSiteLinkTarget("_self");
   }
   updateChart();
+  checkNumbers();
 } //removeData
 
 function hideScore() {

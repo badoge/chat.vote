@@ -21,7 +21,7 @@ body {
   text-align: center;
 }
 
-.totalVotesDiv {
+.chartStatDiv {
   height: 40px;
   box-sizing: border-box;
   display: inline-block;

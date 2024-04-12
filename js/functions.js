@@ -447,7 +447,11 @@ function showConfetti(level) {
   confetti.maxCount = c;
   confetti.speed = s;
   confetti.start(d);
-}
+} //showConfetti
+
+function roundToTwo(num) {
+  return +(Math.round(num + "e+2") + "e-2");
+} //roundToTwo
 
 async function getChannelBadges(channel) {
   return new Promise(async function (resolve, reject) {
