@@ -383,8 +383,7 @@ function loadChart() {
 
   let scores = structuredClone(unsortedData.scores);
   let questions = structuredClone(unsortedData.questions);
-
-  let total = scores.reduce((a, b) => a + b, 0) || 0;
+  let total = unsortedData.votes.reduce((a, b) => a + b, 0) || 0;
 
   if (sorted) {
     let list = [];
