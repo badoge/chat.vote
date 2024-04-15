@@ -330,6 +330,7 @@ function resetPoll() {
   voters_options = [];
   vote_changed = [];
   oid = 0;
+  numberOfSuggestions = 0;
   suggestionLimitReached = false;
   startingHue = Math.random() * 360;
   elements.voteHint.innerHTML = "";
@@ -817,6 +818,7 @@ function connect() {
 
       if (suggestionLimitReached) {
         showToast("Viewer suggestion limit reached", "warning", 5000);
+        disableSuggestButton();
         return;
       }
 
@@ -918,6 +920,7 @@ function connect() {
         vote_results.splice(i, 1);
         updateChart();
         showToast(`Removed ${username}'s suggestions because they got timed out`, "warning", 2000);
+        numberOfSuggestions--;
       }
     }
   }); //timeout
@@ -1528,6 +1531,9 @@ function updateChart() {
 
 function removeData(rowid) {
   for (let i = vote_results.length - 1; i >= 0; i--) {
+    if (vote_results[i].by != USER.channel) {
+      numberOfSuggestions--;
+    }
     if (vote_results[i].id === rowid) {
       vote_results.splice(i, 1);
     }
