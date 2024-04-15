@@ -1531,10 +1531,10 @@ function updateChart() {
 
 function removeData(rowid) {
   for (let i = vote_results.length - 1; i >= 0; i--) {
-    if (vote_results[i].by != USER.channel) {
-      numberOfSuggestions--;
-    }
     if (vote_results[i].id === rowid) {
+      if (vote_results[i].by != USER.channel) {
+        numberOfSuggestions--;
+      }
       vote_results.splice(i, 1);
     }
   }
