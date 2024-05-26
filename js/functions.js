@@ -588,9 +588,9 @@ function replaceEmotes(input, thirdPartyEmotes) {
         if (input[i] == thirdPartyEmotes[index].name) {
           if (thirdPartyEmotes[index].zerowidth) {
             input[i] = `<img title="${thirdPartyEmotes[index].name}" alt="${thirdPartyEmotes[index].name}" src="${thirdPartyEmotes[index].url}" 
-            style="height:1.5em; margin-left:${i == 0 ? "0px" : "-24px"}">`;
+            style="margin-left:${i == 0 ? "0px" : "-24px"}" class="emote">`;
           } else {
-            input[i] = `<img title="${thirdPartyEmotes[index].name}" alt="${thirdPartyEmotes[index].name}" src="${thirdPartyEmotes[index].url}" style="height:1.5em;">`;
+            input[i] = `<img title="${thirdPartyEmotes[index].name}" alt="${thirdPartyEmotes[index].name}" src="${thirdPartyEmotes[index].url}" class="emote">`;
           }
         }
       }

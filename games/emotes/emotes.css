@@ -47,7 +47,7 @@ body {
   opacity: 1;
 }
 
-.emote {
+.emotes-emote {
   height: 166px;
   width: 166px;
   margin: 5px;
@@ -59,7 +59,7 @@ body {
   max-width: 250px;
 }
 
-.emote > img {
+.emotes-emote > img {
   height: 85%;
 }
 

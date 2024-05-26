@@ -232,7 +232,7 @@ function start() {
     for (let i = 0; i < randomemotes.length; i++) {
       let name = `<div class="text-body-secondary text-center">${!EMOTEBENCHMARK.hideName ? randomemotes[i].name : "🤔"}</div>`;
       elements.emotes.innerHTML += `
-      <div class="border border-secondary rounded bg-body-tertiary emote">
+      <div class="border border-secondary rounded bg-body-tertiary emotes-emote">
       <img src="${randomemotes[i].url}" alt="${randomemotes[i].name}" ${EMOTEBENCHMARK.blurEmote ? `class="blur"` : ""} title="${randomemotes[i].name}">
       ${name}
       </div>`;

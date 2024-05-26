@@ -805,7 +805,7 @@ function connect() {
           }
         }
         for (let index = 0, j = emotes.length; index < j; index++) {
-          let e = `<img src="https://static-cdn.jtvnw.net/emoticons/v2/${emotes[index].id}/default/dark/1.0" title="${emotes[index].emote}" alt="${emotes[index].emote}" style="height:1.5em;">`;
+          let e = `<img src="https://static-cdn.jtvnw.net/emoticons/v2/${emotes[index].id}/default/dark/1.0" title="${emotes[index].emote}" alt="${emotes[index].emote}" class="emote">`;
           suggestion_emotes = suggestion_emotes.replaceAll(emotes[index].emote, e);
         }
       } //emotes

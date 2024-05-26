@@ -169,7 +169,7 @@ async function start() {
   //pick a random emote
   let randomEmote = selectedemotes[Math.floor(Math.random() * selectedemotes.length)];
   elements.drawemotecardbody.innerHTML = `
-  ${randomEmote.url == "emoji" ? randomEmote.name : `<img src="${randomEmote.url}" alt="${randomEmote.name}" title="${randomEmote.name}" class="emote">`}<br>
+  ${randomEmote.url == "emoji" ? randomEmote.name : `<img src="${randomEmote.url}" alt="${randomEmote.name}" title="${randomEmote.name}" class="draw-emote">`}<br>
   ${randomEmote.url == "emoji" ? randomEmote.desc : randomEmote.name}`;
   if (randomEmote.url == "emoji") {
     twemoji.parse(elements.drawemotecardbody);
@@ -256,7 +256,7 @@ function correct(user) {
       <div class="card border-success">
       <div class="card-body">
       <h4>${user.username} was the first to get it right</h4><br>
-      ${DRAW.answerURL == "emoji" ? DRAW.answer : `<img src="${DRAW.answerURL}" alt="${DRAW.answer}" title="${DRAW.answer}" class="emote">`}<br>
+      ${DRAW.answerURL == "emoji" ? DRAW.answer : `<img src="${DRAW.answerURL}" alt="${DRAW.answer}" title="${DRAW.answer}" class="draw-emote">`}<br>
       ${DRAW.answerURL == "emoji" ? DRAW.answerDesc : DRAW.answer}<br>
       <button type="button" onclick="start()" class="btn btn-success"><i class="material-icons notranslate">navigate_next</i>Next round</button>
       </div>
@@ -273,7 +273,7 @@ function correct(user) {
   <div class="card border-success">
   <div class="card-body">
   <h4>Game over! ${user.username} Won by reaching the points target (${DRAW.pointsTarget})</h4><br>
-  ${DRAW.answerURL == "emoji" ? DRAW.answer : `<img src="${DRAW.answerURL}" alt="${DRAW.answer}" title="${DRAW.answer}" class="emote">`}<br>
+  ${DRAW.answerURL == "emoji" ? DRAW.answer : `<img src="${DRAW.answerURL}" alt="${DRAW.answer}" title="${DRAW.answer}" class="draw-emote">`}<br>
   ${DRAW.answerURL == "emoji" ? DRAW.answerDesc : DRAW.answer}<br>
   <button type="button" onclick="reset(true)" class="btn btn-warning"><i class="material-icons notranslate">replay</i>Play again</button>
   </div>
@@ -418,7 +418,7 @@ function startTimer() {
       <div class="card border-success">
       <div class="card-body">
       <h4>${DRAW.winner} was the first to get it right</h4><br>
-      ${DRAW.answerURL == "emoji" ? DRAW.answer : `<img src="${DRAW.answerURL}" alt="${DRAW.answer}" title="${DRAW.answer}" class="emote">`}<br>
+      ${DRAW.answerURL == "emoji" ? DRAW.answer : `<img src="${DRAW.answerURL}" alt="${DRAW.answer}" title="${DRAW.answer}" class="draw-emote">`}<br>
       ${DRAW.answerURL == "emoji" ? DRAW.answerDesc : DRAW.answer}<br>
       <button type="button" onclick="start()" class="btn btn-success"><i class="material-icons notranslate">navigate_next</i>Next round</button>
       </div>
@@ -434,7 +434,7 @@ function startTimer() {
       <div class="card border-danger">
       <div class="card-body">
       <h4>No one got the emote</h4><br>
-      ${DRAW.answerURL == "emoji" ? DRAW.answer : `<img src="${DRAW.answerURL}" alt="${DRAW.answer}" title="${DRAW.answer}" class="emote">`}<br>
+      ${DRAW.answerURL == "emoji" ? DRAW.answer : `<img src="${DRAW.answerURL}" alt="${DRAW.answer}" title="${DRAW.answer}" class="draw-emote">`}<br>
       ${DRAW.answerURL == "emoji" ? DRAW.answerDesc : DRAW.answer}<br>
       <button type="button" onclick="start()" class="btn btn-success"><i class="material-icons notranslate">navigate_next</i>Next round</button>
       </div>

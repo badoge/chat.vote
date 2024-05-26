@@ -22,6 +22,11 @@
   padding-bottom: 0;
 }
 
+.emote {
+  max-height: 1.5em;
+  max-width: 384px;
+}
+
 .wide-tooltip > div.tooltip-inner {
   max-width: 1200px;
 }
