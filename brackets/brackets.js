@@ -2444,9 +2444,8 @@ async function importApproved(id) {
 
 let chatBracket = [];
 function loadPlaylist() {
-  let playlist = JSON.parse(localStorage.getItem("PLAYLIST_REQUESTS"));
-
-  if (!playlist || playlist.length < 2) {
+  let playlist = JSON.parse(localStorage.getItem("PLAYLIST_REQUESTS"), reviver);
+  if (!playlist || playlist.size < 2) {
     elements.playlist.innerHTML = `<span class="text-warning">Playlist needs to have at least 2 videos</span>`;
     return;
   }
@@ -2454,14 +2453,15 @@ function loadPlaylist() {
   let count = 0;
   chatBracket = [];
   let html = `<ul class="list-group">`;
-  for (let index = 0; index < playlist.length; index++) {
-    let type = playlist[index].type;
+
+  for (let [key, req] of playlist) {
+    let type = req.type;
     if (type == "twitch stream" || type == "twitch vod") {
       //skip streams and vods bcz they are not supported in the brackets site
       continue;
     }
 
-    if (!playlist[index].title || !playlist[index].id || !playlist[index].type || !playlist[index].thumbnail || (playlist[index].type == "streamable" && !playlist[index].video)) {
+    if (!req.title || !req.id || !req.type || !req.thumbnail || (req.type == "streamable" && !req.video)) {
       //skip broken requests
       continue;
     }
@@ -2480,28 +2480,31 @@ function loadPlaylist() {
 
     count++;
 
-    let link = getItemLink(type, playlist[index].id);
+    let link = getItemLink(type, req.id);
 
     chatBracket.push({
-      name: playlist[index].title,
-      id: playlist[index].id,
+      name: req.title,
+      id: req.id,
       type: type,
       value: link,
-      thumbnail: playlist[index].thumbnail,
-      video: playlist[index]?.video,
+      thumbnail: req.thumbnail,
+      video: req?.video,
     });
     html += `
-    <li class="list-group-item">
-    <a target="_blank" rel="noopener noreferrer" href="${link}">
-    ${validator.escape(playlist[index].title)}
-    </a>
-    </li>`;
+  <li class="list-group-item">
+  <a target="_blank" rel="noopener noreferrer" href="${link}">
+  ${validator.escape(req.title)}
+  </a>
+  </li>`;
   }
+
   html += `</ul>`;
   let diff = playlist.length - count;
   elements.playlist.innerHTML = `
   Playlist has ${count} videos ${diff ? ` (${diff} unsupported/broken ${diff == 1 ? "video" : "videos"} skipped)` : ""}
   ${html}`;
+
+  communityModal.hide();
 
   console.log(playlist);
 } //loadPlaylist
