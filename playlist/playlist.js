@@ -597,48 +597,41 @@ function connect() {
           botReply(`You can view the playlist here: https://playlist.chat.vote/${USER.channel}`, context.id, true);
         }
         break;
-      case PLAYLIST.openCommand:
-        if (context.username == USER.channel || (PLAYLIST.modCommands && context.mod)) {
-          openPlaylist(context.id);
-        }
-        break;
-      case PLAYLIST.closeCommand:
-        if (context.username == USER.channel || (PLAYLIST.modCommands && context.mod)) {
-          closePlaylist(context.id);
-        }
-        break;
-      case PLAYLIST.playCommand:
-        if (context.username == USER.channel || (PLAYLIST.modCommands && context.mod)) {
-          playPlaylist(context.id);
-        }
-        break;
-      case PLAYLIST.pauseCommand:
-        if (context.username == USER.channel || (PLAYLIST.modCommands && context.mod)) {
-          pausePlaylist(context.id);
-        }
-        break;
-      case PLAYLIST.autoplayCommand:
-        if (context.username == USER.channel || (PLAYLIST.modCommands && context.mod)) {
-          toggleAutoplay(context.id);
-        }
-        break;
-      case PLAYLIST.skipCommand:
-        if (context.username == USER.channel || (PLAYLIST.modCommands && context.mod)) {
-          nextItem(context.id);
-        }
-        break;
-      case PLAYLIST.rewindCommand:
-        if (context.username == USER.channel || (PLAYLIST.modCommands && context.mod)) {
-          previousItem(context.id);
-        }
-        break;
-      case PLAYLIST.deleteCommand:
-        if (context.username == USER.channel || (PLAYLIST.modCommands && context.mod)) {
-          deleteItem(input[1], context.id);
-        }
-        break;
       default:
         break;
+    } //normal commands
+
+    if ((Date.now() - botCooldown) / 1000 > PLAYLIST.botCooldown && (context.username == USER.channel || (PLAYLIST.modCommands && context.mod))) {
+      botCooldown = Date.now();
+
+      switch (command) {
+        case PLAYLIST.openCommand:
+          openPlaylist(context.id);
+          break;
+        case PLAYLIST.closeCommand:
+          closePlaylist(context.id);
+          break;
+        case PLAYLIST.playCommand:
+          playPlaylist(context.id);
+          break;
+        case PLAYLIST.pauseCommand:
+          pausePlaylist(context.id);
+          break;
+        case PLAYLIST.autoplayCommand:
+          toggleAutoplay(context.id);
+          break;
+        case PLAYLIST.skipCommand:
+          nextItem(context.id);
+          break;
+        case PLAYLIST.rewindCommand:
+          previousItem(context.id);
+          break;
+        case PLAYLIST.deleteCommand:
+          deleteItem(input[1], context.id);
+          break;
+        default:
+          break;
+      } //mod/streamer commands
     }
   }); //message
 
@@ -1761,7 +1754,7 @@ async function loadAndConnect() {
   }
 } //loadAndConnect
 
-let botCooldown = 0;
+let botCooldown = Date.now();
 async function botReply(msg, id, followCooldown) {
   if (!USER.access_token || !PLAYLIST.enableBot || !id) {
     return;
