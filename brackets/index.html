@@ -179,7 +179,7 @@
               <button type="button" class="btn btn-primary btn-lg" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#communityModal">
                 <div class="hstack"><i class="material-icons notranslate">search</i> Import bracket</div>
               </button>
-              Download brackets created by other users or browse your published brackets
+              Download brackets created by other users
             </div>
           </div>
           <div class="modal-footer">
@@ -208,7 +208,7 @@
                   class="material-icons notranslate text-warning cursor-pointer"
                   data-bs-toggle="tooltip"
                   data-bs-placement="top"
-                  data-bs-title="Twitch streams and VODs are not supported here"
+                  data-bs-title="Brackets don't support Twitch streams and VODs"
                 >
                   warning_amber
                 </i>
@@ -377,10 +377,10 @@
               <input type="text" class="form-control" placeholder="XXXX" id="shareCode" />
               <button class="btn btn-outline-success" type="button" onclick="importCode()"><i class="material-icons notranslate">download</i>Import</button>
             </div>
-            <hr />
+            <!-- <hr />
             <button type="button" class="btn btn-info" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#myBracketsModal">
               <i class="material-icons notranslate">person</i> My published brackets
-            </button>
+            </button> -->
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#createBracketModal">
@@ -467,7 +467,7 @@
               <select class="form-select" id="formatSelect">
                 <option value="tierlist">Tier list</option>
                 <option value="single" selected>Single elimination</option>
-                <option value="double" disabled>Double elimination - not working yet :)</option>
+                <!-- <option value="double" disabled>Double elimination - not working yet :)</option> -->
               </select>
             </div>
 
