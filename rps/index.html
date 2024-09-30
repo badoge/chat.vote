@@ -117,15 +117,64 @@
       <img src="https://cdn.7tv.app/emote/6154ecd36251d7e000db18a0/1x.webp" />
     </div>
 
-    <div class="text-center">
-      <img src="/pics/donk.png" alt="left donk " style="height: 100px; width: 100px" />
-      <img id="left_rock" src="/rps/left_rock.png" alt="left rock" class="left-hand-img" />
-      <img id="left_paper" src="/rps/left_paper.png" alt="left paper" style="display: none" class="left-hand-img" />
-      <img id="left_scissors" src="/rps/left_scissors.png" alt="left scissors" style="display: none" class="left-hand-img" />
-      <img id="right_rock" src="/rps/right_rock.png" alt="right rock" class="right-hand-img" />
-      <img id="right_paper" src="/rps/right_paper.png" alt="right paper" style="display: none" class="right-hand-img" />
-      <img id="right_scissors" src="/rps/right_scissors.png" alt="right scissors" style="display: none" class="right-hand-img" />
-      <img src="/pics/donk.png" alt="right donk" style="height: 100px; width: 100px" class="mirror-img" />
+    <div class="container-fluid text-center" id="game">
+      <div class="row">
+        <div class="col d-inline-flex">
+          <div class="p-2">
+            <img src="/pics/donk.png" alt="left donk" style="height: 100px; width: 100px" />
+            <img id="left_rock" src="/rps/left_rock.png" alt="left rock" class="left-hand-img" />
+            <img id="left_paper" src="/rps/left_paper.png" alt="left paper" style="display: none" class="left-hand-img" />
+            <img id="left_scissors" src="/rps/left_scissors.png" alt="left scissors" style="display: none" class="left-hand-img" />
+          </div>
+          <div class="p-2">
+            <img id="right_rock" src="/rps/right_rock.png" alt="right rock" class="right-hand-img" />
+            <img id="right_paper" src="/rps/right_paper.png" alt="right paper" style="display: none" class="right-hand-img" />
+            <img id="right_scissors" src="/rps/right_scissors.png" alt="right scissors" style="display: none" class="right-hand-img" />
+            <img src="/pics/donk.png" alt="right donk" style="height: 100px; width: 100px" class="mirror-img" />
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="card w-75 mb-5">
+            <div class="card-header"><i class="material-icons notranslate">tune</i>Game controls</div>
+            <div class="card-body">
+              <button type="button" class="btn btn-primary mb-3"><i class="material-icons notranslate">rocket_launch</i>Start new game</button>
+              <br />
+              <button type="button" class="btn btn-info mb-3"><i class="material-icons notranslate">arrow_forward_ios</i>Next round</button>
+              <br />
+              <div class="input-group">
+                <span class="input-group-text">Game link</span>
+                <input disabled type="text" class="form-control" id="gameLink" onclick="copyLink()" value="https://chat.vote/rps/play#username" />
+                <button
+                  type="button"
+                  id="copyLinkButton"
+                  class="btn btn-outline-secondary"
+                  data-bs-toggle="popover"
+                  data-bs-trigger="manual"
+                  data-bs-placement="top"
+                  data-bs-content="Link copied :)"
+                  onclick="copyLink()"
+                >
+                  <i class="material-icons notranslate">content_copy</i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card w-75">
+            <div class="card-header"><i class="material-icons notranslate">info</i>Info</div>
+            <div class="card-body text-start">
+              <span class="text-body-secondary">What is this?</span><br />
+              This is an interactive Rock Paper Scissors game that you can play with your Twitch chat.<br />
+              <span class="text-body-secondary">How to play?</span><br />
+              Start a new game then share the link above with your viewers. After your viewers log in start the first round by clicking next round, after everyone makes a move click next
+              round again to eliminate the losers and advance the winners to the next round. Game ends once the bracket is finished.
+              <br /><br />
+              Made for <a href="https://nympts.com/gamejam" target="_blank" rel="noopener noreferrer">NymN's Game Jam</a> &
+              <a href="https://twitchstreamertools.devpost.com/" target="_blank" rel="noopener noreferrer">Twitch Streamer Tools Hackathon 2024</a> :)
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script src="/js/bootstrap.bundle.min.js"></script>

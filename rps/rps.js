@@ -10,10 +10,13 @@ let elements = {
   right_paper: document.getElementById("right_paper"),
   right_scissors: document.getElementById("right_scissors"),
   toastContainer: document.getElementById("toastContainer"),
+  gameLink: document.getElementById("gameLink"),
+  copyLinkButton: document.getElementById("copyLinkButton"),
 };
 
 let darkTheme = true;
 let loginExpiredModal;
+let copyLinkButton;
 
 let USER = {
   channel: "",
@@ -142,6 +145,7 @@ async function loadAndConnect() {
   }
   if (USER.channel) {
     connect();
+    elements.gameLink.value = `https://chat.vote/rps/play#${USER.channel || ""}`;
   }
 } //loadAndConnect
 
@@ -151,6 +155,7 @@ window.onload = function () {
   switchTheme(elements.darkTheme.checked);
 
   loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
+  copyLinkButton = new bootstrap.Popover(elements.copyLinkButton);
 
   loadAndConnect();
 
@@ -197,3 +202,11 @@ function randomAnimations() {
 let randomAnimationsInterval = setInterval(() => {
   randomAnimations();
 }, 4000);
+
+function copyLink() {
+  navigator.clipboard.writeText(`https://chat.vote/rps/play#${USER.channel || ""}`);
+  copyLinkButton.show();
+  setTimeout(() => {
+    copyLinkButton.hide();
+  }, 1000);
+} //copyLink
