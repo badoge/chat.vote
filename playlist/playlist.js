@@ -1287,7 +1287,7 @@ function parseLink(link) {
   } //spotify
 
   if (link.includes("i.supa.codes") || link.includes("gachi.gay") || link.includes("kappa.lol") || link.includes("femboy.beauty")) {
-    const match = link.match(/\/([0-9a-zA-Z_-]{5})(?:\.\w+)?(?:\?.*)?(?:\/)?$/);
+    const match = link.match(/\/([0-9a-zA-Z_-]{5,})(?:[?/.].*)?$/);
     console.log(match);
     if (!match[1]) {
       return null;
