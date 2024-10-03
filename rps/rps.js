@@ -12,11 +12,15 @@ let elements = {
   toastContainer: document.getElementById("toastContainer"),
   gameLink: document.getElementById("gameLink"),
   copyLinkButton: document.getElementById("copyLinkButton"),
+  bracket: document.getElementById("bracket"),
+  start: document.getElementById("start"),
+  next: document.getElementById("next"),
 };
 
 let darkTheme = true;
 let loginExpiredModal;
 let copyLinkButton;
+let webSocket;
 
 let USER = {
   channel: "",
@@ -129,7 +133,133 @@ function connect() {
   loadBadges(USER.channel);
   loadPFP();
   sendUsername(`chat.vote/rps`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
+
+  //webSocket = new WebSocket("ws://localhost:9001");
+  webSocket = new WebSocket("ws://ws.chat.vote");
+
+  webSocket.onopen = function (event) {
+    console.log(event);
+    if (event.type == "open") {
+      showToast("Connected to server", "success", 1000);
+    }
+  };
+
+  webSocket.onmessage = function (event) {
+    let data = JSON.parse(event.data);
+
+    switch (data.id) {
+      case "toast":
+        showToast(data.message, data.type, 2000);
+        break;
+      case "start":
+        //sent when the game starts/resets after clicking the start new game button
+        showToast(data.message, data.type, 2000);
+        resetBracket();
+        break;
+
+      case "update":
+        //sent when a viewer joins
+        addUser(data.username);
+        break;
+
+      case "update_move":
+        //sent when a viewer sends their move
+        updateUser(data.username);
+        break;
+
+      case "first_round":
+        //sent after clicking next round for the first time after clicking start new game
+        showToast(data.message, data.type, 2000);
+        createBracket(data.bracket);
+        break;
+
+      case "next_round":
+        showToast(data.message, data.type, 2000);
+
+        break;
+
+      case "game_over":
+        showToast(data.message, data.type, 2000);
+
+        break;
+
+      default:
+        break;
+    }
+
+    console.log(event);
+  };
+
+  webSocket.onclose = function (event) {
+    if (event.type == "close") {
+      showToast("disconnected from server", "danger", 2000);
+    }
+    console.log(event);
+  };
+
+  webSocket.onerror = function (error) {
+    console.log(error);
+  };
 } //connect
+
+function start() {
+  elements.start.disabled = true;
+  setTimeout(() => {
+    elements.start.disabled = false;
+  }, 2000);
+  webSocket.send(JSON.stringify({ command: "start", username: USER.channel, userid: USER.userID, access_token: USER.access_token }));
+} //start
+
+function next() {
+  elements.next.disabled = true;
+  setTimeout(() => {
+    elements.next.disabled = false;
+  }, 2000);
+  webSocket.send(JSON.stringify({ command: "next", username: USER.channel, userid: USER.userID, access_token: USER.access_token }));
+} //next
+
+function resetBracket() {
+  elements.bracket.innerHTML = `
+  <div class="card">
+    <div class="card-header">Players</div>
+    <div class="card-body" id="players"></div>
+  </div>`;
+} //resetBracket
+
+function addUser(username) {
+  document.getElementById("players").insertAdjacentHTML("afterbegin", `<span class="badge text-bg-secondary m-2" id="${username}_badge">⏳${validator.escape(username)}</span>`);
+} //addUser
+
+function updateUser(username) {
+  document.getElementById(`${username}_badge`).innerHTML = `✔${validator.escape(username)}`;
+} //addUser
+
+function createBracket(bracket) {
+  for (let index = 0; index < Object.keys(bracket).length; index++) {
+    let roundName = "";
+    switch (bracket[`round${index}`].length) {
+      case 2:
+        roundName = `Finals`;
+        break;
+      case 4:
+        roundName = `Semifinals`;
+        break;
+      case 8:
+        roundName = `Quarterfinals`;
+        break;
+      default:
+        roundName = `Round of ${currentBracket[`round${currentRound}`].length}`;
+        break;
+    }
+    elements.bracket.insertAdjacentHTML(
+      "beforeend",
+      `<div class="card">
+      <div class="card-header">${roundName}</div>
+      <div class="card-body" id="round${index}"></div>
+      </div>`
+    );
+  }
+} //createBracket
 
 async function loadAndConnect() {
   load_localStorage();
@@ -201,7 +331,7 @@ function randomAnimations() {
 
 let randomAnimationsInterval = setInterval(() => {
   randomAnimations();
-}, 4000);
+}, 4500);
 
 function copyLink() {
   navigator.clipboard.writeText(`https://chat.vote/rps/play#${USER.channel || ""}`);

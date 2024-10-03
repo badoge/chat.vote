@@ -136,12 +136,13 @@ function connect() {
     </div>
     </div>`;
   refreshData();
-  loadBadges(USER.channel);
+  loadBadges(streamer);
   loadPFP();
 
   elements.game.style.display = "";
 
-  webSocket = new WebSocket("ws://localhost:9001");
+  //webSocket = new WebSocket("ws://localhost:9001");
+  webSocket = new WebSocket("ws://ws.chat.vote");
 
   webSocket.onopen = function (event) {
     console.log(event);
@@ -149,6 +150,45 @@ function connect() {
   };
 
   webSocket.onmessage = function (event) {
+    let data = JSON.parse(event.data);
+
+    switch (data.id) {
+      case "toast":
+        showToast(data.message, data.type, 2000);
+        break;
+      case "starting":
+        //sent when the game starts/resets after the streamer clicks the start new game button
+        showToast(data.message, data.type, 2000);
+        resetGame();
+        break;
+
+      case "round":
+        //sent when the a new round starts
+        showToast(data.message, data.type, 2000);
+        startRound(data.opponent);
+        break;
+
+      case "moved":
+        //sent if the move was accepted
+        showToast(data.message, data.type, 2000);
+        break;
+
+      case "won":
+      case "lost":
+        //sent if the move was accepted
+        showToast(data.message, data.type, 2000);
+        showReset();
+        break;
+
+      case "game_ended":
+        showToast(data.message, data.type, 2000);
+        resetGame();
+        break;
+
+      default:
+        break;
+    }
+
     console.log(event);
   };
 
@@ -160,6 +200,33 @@ function connect() {
     console.log(error);
   };
 } //connect
+
+function resetGame() {
+  elements.rock.disabled = true;
+  elements.paper.disabled = true;
+  elements.scissors.disabled = true;
+  elements.opponent.innerHTML = `<img src="/pics/donk.png" alt="profile pic" class="rounded-circle" style="height:2em;"> Your opponent`;
+} //resetGame
+
+function startRound(opponent) {
+  elements.rock.disabled = false;
+  elements.paper.disabled = false;
+  elements.scissors.disabled = false;
+  elements.opponent.innerHTML = `<img src="/pics/donk.png" alt="profile pic" class="rounded-circle" style="height:2em;"> ${validator.escape(opponent)}`;
+} //startRound
+
+function sendMove(move) {
+  elements.rock.disabled = true;
+  elements.paper.disabled = true;
+  elements.scissors.disabled = true;
+  webSocket.send(JSON.stringify({ command: "move", streamer: streamer, userid: USER.userid, move: move }));
+} //sendMove
+
+function showReset() {
+  elements.rock.disabled = true;
+  elements.paper.disabled = true;
+  elements.scissors.disabled = true;
+} //showReset
 
 async function loadAndConnect() {
   load_localStorage();

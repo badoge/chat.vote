@@ -1064,8 +1064,8 @@ function startBracket() {
 } //startBracket
 
 function startSingleElimination(bracket) {
-  let numberOfRounds = Math.ceil(Math.log2(bracket.options.length));
   let numberOfOptions = bracket.options.length;
+  let numberOfRounds = Math.ceil(Math.log2(numberOfOptions));
 
   //change numberOfOptions to be the next power of 2
   if ((numberOfOptions & (numberOfOptions - 1)) !== 0) {
