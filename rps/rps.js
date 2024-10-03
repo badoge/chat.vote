@@ -135,7 +135,7 @@ function connect() {
   sendUsername(`chat.vote/rps`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
 
   //webSocket = new WebSocket("ws://localhost:9001");
-  webSocket = new WebSocket("ws://ws.chat.vote");
+  webSocket = new WebSocket("wss://ws.chat.vote");
 
   webSocket.onopen = function (event) {
     console.log(event);
