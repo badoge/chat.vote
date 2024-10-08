@@ -33,6 +33,7 @@ let elements = {
   maxLength: document.getElementById("maxLength"),
   maxSize: document.getElementById("maxSize"),
   minViewCount: document.getElementById("minViewCount"),
+  skipHistory: document.getElementById("skipHistory"),
   whoCanRequest: document.getElementById("whoCanRequest"),
   allowPlebs: document.getElementById("allowPlebs"),
   allowSubs: document.getElementById("allowSubs"),
@@ -94,6 +95,7 @@ let elements = {
   mainList: document.getElementById("mainList"),
   approvalList: document.getElementById("approvalList"),
   historyTab: document.getElementById("historyTab"),
+  historyCount: document.getElementById("historyCount"),
   historyList: document.getElementById("historyList"),
 
   //bottom row
@@ -153,6 +155,7 @@ let PLAYLIST = {
   maxLength: "",
   maxSize: "",
   minViewCount: "",
+  skipHistory: false,
   allowPlebs: true,
   allowSubs: true,
   allowMods: true,
@@ -214,6 +217,7 @@ async function refreshData() {
   PLAYLIST.maxLength = parseInt(elements.maxLength.value, 10) || "";
   PLAYLIST.maxSize = parseInt(elements.maxSize.value, 10) || "";
   PLAYLIST.minViewCount = parseInt(elements.minViewCount.value, 10) || "";
+  PLAYLIST.skipHistory = elements.skipHistory.checked;
   PLAYLIST.allowPlebs = elements.allowPlebs.checked;
   PLAYLIST.allowSubs = elements.allowSubs.checked;
   PLAYLIST.allowMods = elements.allowMods.checked;
@@ -316,6 +320,7 @@ function load_localStorage() {
     elements.maxLength.value = PLAYLIST.maxLength || "";
     elements.maxSize.value = PLAYLIST.maxSize || "";
     elements.minViewCount.value = PLAYLIST.minViewCount || "";
+    elements.skipHistory.checked = PLAYLIST.skipHistory ?? false;
     elements.allowPlebs.checked = PLAYLIST.allowPlebs ?? true;
     elements.allowSubs.checked = PLAYLIST.allowSubs ?? true;
     elements.allowMods.checked = PLAYLIST.allowMods ?? true;
@@ -401,6 +406,7 @@ function load_localStorage() {
     for (let index = 0; index < history.length; index++) {
       addToHistory(history[index], true);
     }
+    elements.historyCount.innerHTML = `${history.length} ${history.length == 1 ? "item" : "items"}`;
   }
 } //load_localStorage
 
@@ -438,6 +444,7 @@ function resetSettings(logout = false) {
       maxLength: "",
       maxSize: "",
       minViewCount: "",
+      skipHistory: false,
       allowPlebs: true,
       allowSubs: true,
       allowMods: true,
@@ -1206,6 +1213,12 @@ async function getRequestInfo(request, msgid) {
     return;
   }
 
+  if (PLAYLIST.skipHistory && history.some((e) => e.id === request.id)) {
+    deleteRequest(request.id);
+    botReply(`⛔ Your request was removed because we've already seen it before`, msgid, false);
+    return;
+  }
+
   if (request.duration !== -1) {
     total_duration += request.duration;
   }
@@ -1452,6 +1465,7 @@ function nextItem(reply) {
     if (currentItem) {
       addToHistory(currentItem);
       deleteRequest(currentItem.id, false);
+      elements.historyCount.innerHTML = `${history.length} ${history.length == 1 ? "item" : "items"}`;
     }
   }
   if (!currentItem) {

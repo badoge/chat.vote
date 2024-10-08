@@ -248,6 +248,15 @@
               Videos/songs that have a view count lower than the limit will be blocked
               <span class="text-warning">Does not apply to Streamable, Spotify, live streams, and i.supa.codes links</span>
             </small>
+            <br />
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" role="switch" id="skipHistory" onchange="saveSettings()" />
+              <label class="form-check-label" for="skipHistory"><i class="material-icons notranslate">history_toggle_off</i>Skip already seen videos/songs</label>
+              <br />
+              <small class="text-body-secondary">
+                Any video/song found in the <span class="text-info"><i class="material-icons notranslate">history</i>History</span> tab will be skipped
+              </small>
+            </div>
           </div>
         </div>
 
@@ -908,7 +917,7 @@
                 </div>
                 <div class="tab-pane fade" id="history-tab-pane" role="tabpanel" aria-labelledby="historyTab" tabindex="0">
                   <button class="btn btn-outline-warning mt-2" type="button" data-bs-toggle="modal" data-bs-target="#clearHistoryModal">
-                    <i class="material-icons notranslate">delete_forever</i>Clear history
+                    <i class="material-icons notranslate">delete_forever</i>Clear history (<span id="historyCount">0 items</span>)
                   </button>
                   <div class="mt-2" id="historyList"></div>
                 </div>
