@@ -286,12 +286,13 @@
                 onchange="saveSettings()"
               />
             </div>
-            <div class="form-check form-switch mb-5">
+            <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" role="switch" id="noCommand" onchange="saveSettings()" />
               <label class="form-check-label" for="noCommand"><i class="material-icons notranslate">link</i>Allow requests without a command</label>
             </div>
+            <small class="text-body-secondary">Viewers can make YouTube search requests by requesting <kbd>youtube search [query]</kbd></small>
 
-            <div class="form-check form-switch">
+            <div class="form-check form-switch mt-5">
               <input class="form-check-input" type="checkbox" role="switch" id="allowVoteSkip" onchange="saveSettings()" />
               <label class="form-check-label" for="allowVoteSkip"><i class="material-icons notranslate">how_to_vote</i>Allow viewers to vote skip</label>
             </div>

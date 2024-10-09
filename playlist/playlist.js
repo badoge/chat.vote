@@ -540,7 +540,11 @@ function connect() {
     let input = msg.split(" ").filter(Boolean);
 
     if (PLAYLIST.noCommand && playlist_open) {
-      let link = parseLink(input[0]);
+      let request = input[0];
+      if (input[0].toLowerCase() == "youtube" && input[1].toLowerCase() == "search") {
+        request = input.join(" ");
+      }
+      let link = await parseLink(request);
       if (link && linkTypeAllowed(link.type)) {
         addRequest(context, link, context.id);
         return;
@@ -571,7 +575,12 @@ function connect() {
           return;
         }
 
-        let link = parseLink(input[1]);
+        let request = input[1];
+        if (input[1].toLowerCase() == "youtube" && input[2].toLowerCase() == "search") {
+          request = input.slice(1).join(" ");
+        }
+
+        let link = await parseLink(request);
         if (!link) {
           return;
         }
@@ -1244,7 +1253,7 @@ async function getRequestInfo(request, msgid) {
  * @param {string} link
  * @returns {Object}
  */
-function parseLink(link) {
+async function parseLink(link) {
   if (link.includes("twitch.tv")) {
     if (link.includes("/clip/") || link.includes("clips.twitch.tv")) {
       let clipURL = new URL(link);
@@ -1281,6 +1290,24 @@ function parseLink(link) {
     }
     return { type: link.includes("/shorts/") ? "youtube short" : "youtube", id: videoID[3] };
   } //youtube
+
+  if (link.toLowerCase().startsWith("youtube search")) {
+    if (!link.toLowerCase().replace("youtube search", "").trim()) {
+      return null;
+    }
+    try {
+      let response = await fetch(`https://helper.donk.workers.dev/youtube/search?query=${encodeURIComponent(link.toLowerCase().replace("youtube search", "").trim())}`, GETrequestOptions);
+      let result = await response.json();
+      console.log(result);
+      if (result.items.length == 0) {
+        return null;
+      }
+
+      return { type: "youtube", id: result.items[0].id.videoId };
+    } catch (error) {
+      return null;
+    }
+  } //youtube search
 
   if (link.includes("spotify.com")) {
     const spotifyURLRegex = /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:(album|track|playlist)\/|\?uri=spotify:track:)((\w|-){22})/;
@@ -1366,19 +1393,30 @@ function getItemLink(type, id) {
   }
 } //getItemLink
 
-function addLink() {
+async function addLink() {
   if (!checkLogin()) {
     return;
   }
-  let link = parseLink(elements.link.value?.replace(/\s+/g, ""));
-  if (!link || !linkTypeAllowed(link.type)) {
-    showToast("Could not parse the provided link", "warning", 3000);
+  let request = elements.link.value?.replace(/\s+/g, "");
+  if (elements.link.value.toLowerCase().startsWith("youtube search")) {
+    request = elements.link.value.trim();
+  }
+  let link = await parseLink(request);
+
+  console.log(link);
+  if (!link) {
+    showToast("Could not parse your request", "warning", 3000);
+    elements.link.value = "";
+    return;
+  }
+  if (!linkTypeAllowed(link.type)) {
+    showToast(`${link.type} links are not enabled`, "warning", 3000);
     elements.link.value = "";
     return;
   }
   addRequest(
     {
-      id: null,
+      id: "toast",
       "user-id": USER.userID,
       username: USER.channel,
       displayName: USER.channel,
@@ -1770,6 +1808,11 @@ async function loadAndConnect() {
 
 let botCooldown = Date.now();
 async function botReply(msg, id, followCooldown) {
+  if (id == "toast") {
+    showToast(msg, "info", 2000);
+    return;
+  }
+
   if (!USER.access_token || !PLAYLIST.enableBot || !id) {
     return;
   }
@@ -2149,9 +2192,9 @@ window.onload = function () {
     saveSettings();
   });
 
-  elements.link.addEventListener("keydown", (event) => {
+  elements.link.addEventListener("keydown", async (event) => {
     if (event.key === "Enter") {
-      addLink();
+      await addLink();
     }
   });
 
