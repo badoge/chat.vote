@@ -406,7 +406,7 @@ function load_localStorage() {
     for (let index = 0; index < history.length; index++) {
       addToHistory(history[index], true);
     }
-    elements.historyCount.innerHTML = `${history.length} ${history.length == 1 ? "item" : "items"}`;
+    elements.historyCount.innerHTML = `${history.length.toLocaleString()} ${history.length == 1 ? "item" : "items"}`;
   }
 } //load_localStorage
 
@@ -861,6 +861,7 @@ function clearPlaylist() {
 function clearHistory() {
   history = [];
   elements.historyList.innerHTML = "";
+  elements.historyCount.innerHTML = `${history.length.toLocaleString()} ${history.length == 1 ? "item" : "items"}`;
   saveSettings();
 } //clearPlaylist
 
@@ -1504,7 +1505,7 @@ function nextItem(reply) {
     if (currentItem) {
       addToHistory(currentItem);
       deleteRequest(currentItem.id, false);
-      elements.historyCount.innerHTML = `${history.length} ${history.length == 1 ? "item" : "items"}`;
+      elements.historyCount.innerHTML = `${history.length.toLocaleString()} ${history.length == 1 ? "item" : "items"}`;
     }
   }
   if (!currentItem) {
