@@ -1020,14 +1020,15 @@ async function getRequestInfo(request, msgid) {
   }
   if (request.type == "twitch clip") {
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/twitch/clips?id=${request.id}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/twitch/clipsxd?id=${request.id}`, GETrequestOptions);
       let result = await response.json();
       console.log(result);
-      request.title = result.data[0].title || "(untitled)";
-      request.channel = result.data[0].broadcaster_name || "(unknown)";
-      request.thumbnail = result.data[0].thumbnail_url;
-      request.duration = result.data[0].duration;
-      request.views = result.data[0].view_count;
+      request.title = result.data.data[0].title || "(untitled)";
+      request.channel = result.data.data[0].broadcaster_name || "(unknown)";
+      request.thumbnail = result.data.data[0].thumbnail_url;
+      request.duration = result.data.data[0].duration;
+      request.views = result.data.data[0].view_count;
+      request.mp4 = `${result?.extra?.clip?.videoQualities[0]?.sourceURL}${result?.extra?.clipKey}`;
     } catch (error) {
       deleteRequest(request.id);
       botReply("⚠ Your clip was removed because I could not find its info", msgid, false);
@@ -1539,8 +1540,13 @@ function playItem(item) {
       twitchPlayer.setVideo(item.id);
       break;
     case "twitch clip":
-      elements.twitchClipsEmbed.style.display = "";
-      elements.twitchClipsEmbed.innerHTML = `<iframe src="https://clips.twitch.tv/embed?clip=${item.id}&parent=${window.location.hostname}&autoplay=true&muted=false" preload="auto" height="100%" width="100%"></iframe>`;
+      if (item?.mp4 && Date.now() - item.time < 19 * 60 * 60 * 1000) {
+        elements.videoEmbed.style.display = "";
+        elements.videoEmbed.src = item.mp4;
+      } else {
+        elements.twitchClipsEmbed.style.display = "";
+        elements.twitchClipsEmbed.innerHTML = `<iframe src="https://clips.twitch.tv/embed?clip=${item.id}&parent=${window.location.hostname}&autoplay=true&muted=false" preload="auto" height="100%" width="100%"></iframe>`;
+      }
       break;
     case "streamable":
       elements.videoEmbed.style.display = "";
@@ -2088,6 +2094,11 @@ function playPlaylist(reply) {
     case "twitch vod":
       twitchPlayer.play();
       break;
+    case "twitch clip":
+      if (currentItem?.mp4 && Date.now() - currentItem.time < 19 * 60 * 60 * 1000) {
+        elements.videoEmbed.play();
+      }
+      break;
     case "streamable":
     case "supa video":
     case "supa audio":
@@ -2123,6 +2134,11 @@ function pausePlaylist(reply) {
     case "twitch stream":
     case "twitch vod":
       twitchPlayer.pause();
+      break;
+    case "twitch clip":
+      if (currentItem?.mp4 && Date.now() - currentItem.time < 19 * 60 * 60 * 1000) {
+        elements.videoEmbed.pause();
+      }
       break;
     case "streamable":
     case "supa video":
