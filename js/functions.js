@@ -293,7 +293,7 @@ function showToast(msg, type, timeout) {
   let id = Date.now();
   let toast = `<div id="${id}" class="toast align-items-center text-bg-${type} border-0" role="alert" data-bs-autohide="false" aria-live="assertive" aria-atomic="true">
       <div class="d-flex">
-      <div class="toast-body" style="font-size:1.2em">${validator.escape(msg)}</div>
+      <div class="toast-body" style="font-size:1.2em">${msg}</div>
       <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
       </div>`;
