@@ -2,17 +2,17 @@
 <html lang="en" prefix="og: https://ogp.me/ns#" data-bs-theme="dark">
   <head>
     <meta charset="utf-8" />
-    <title>chat.vote Brackets</title>
+    <title>chat.vote Brackets, (tier)Lists & Trivia</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="Brackets" />
-    <meta name="keywords" content="brackets, chatvote, chat.vote" />
-    <meta property="og:title" content="chat.vote Brackets" />
-    <meta property="og:site_name" content="chat.vote Brackets" />
+    <meta name="description" content="Brackets, (tier)Lists & Trivia" />
+    <meta name="keywords" content="brackets, tierlists, trivia, chatvote, chat.vote" />
+    <meta property="og:title" content="chat.vote Brackets, (tier)Lists & Trivia" />
+    <meta property="og:site_name" content="chat.vote Brackets, (tier)Lists & Trivia" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://chat.vote/brackets/" />
+    <meta property="og:url" content="https://chat.vote/blt/" />
     <meta property="og:image" content="https://chat.vote/pics/ogimage.png" />
     <meta property="og:locale" content="en_US" />
-    <meta property="og:description" content="Brackets" />
+    <meta property="og:description" content="Brackets, (tier)Lists & Trivia" />
 
     <link rel="apple-touch-icon" sizes="152x152" href="/pics/icon/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/pics/icon/favicon-32x32.png" />
@@ -82,6 +82,22 @@
       </div>
     </div>
 
+    <div class="modal fade" id="deleteTriviaModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Are you sure?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="deleteTriviaModalBody"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger" id="deleteTriviaButton"><i class="material-icons notranslate">delete_forever</i>Delete trivia</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="modal fade" id="quitBracketModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -121,7 +137,7 @@
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Option preview</h5>
+            <h5 class="modal-title">Preview</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body text-center" id="previewModalBody"></div>
@@ -180,6 +196,42 @@
                 <div class="hstack"><i class="material-icons notranslate">search</i> Import bracket</div>
               </button>
               Download brackets created by other users
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="createTriviaModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Create a trivia</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="hstack gap-3 mb-5">
+              <button type="button" class="btn btn-info btn-lg" data-bs-dismiss="modal" id="importTrivia" disabled>
+                <div class="hstack"><i class="material-icons notranslate">auto_awesome</i> Generate trivia</div>
+              </button>
+              not working yet :) - Automatically generates trivia from 3rd party sources
+            </div>
+
+            <div class="hstack gap-3 mb-5">
+              <button type="button" class="btn btn-success btn-lg" data-bs-dismiss="modal" onclick="createTrivia()">
+                <div class="hstack"><i class="material-icons notranslate">create</i> Create empty trivia</div>
+              </button>
+              Creates an empty trivia that you have to fill out manually
+            </div>
+
+            <div class="hstack gap-3">
+              <button type="button" class="btn btn-primary btn-lg" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#communityModal" disabled>
+                <div class="hstack"><i class="material-icons notranslate">search</i> Import trivia</div>
+              </button>
+              not working yet :) - Download trivia created by other users
             </div>
           </div>
           <div class="modal-footer">
@@ -542,6 +594,60 @@
       </div>
     </div>
 
+    <div class="modal fade" id="startTriviaModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Start Trivia</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="form-floating">
+              <input type="number" class="form-control" id="triviaPoints" value="10" min="1" />
+              <label for="triviaPoints">Question points value</label>
+            </div>
+            <small class="text-body-secondary"> How many points each question is worth </small>
+
+            <div class="form-floating mt-3">
+              <select class="form-select" id="triviaScoring" aria-label="trivia scoring">
+                <option value="first" selected>First answer only</option>
+                <option value="decay">Points decay</option>
+                <option value="everyone">Everyone</option>
+              </select>
+              <label for="floatingSelect">Scoring</label>
+            </div>
+            <small class="text-body-secondary">
+              First answer only: first viewer to answer correctly gets the full points<br />
+              Points decay: first viewer to answer correctly gets the full points, 2nd viewer gets 1 point less 3rd viewer gets 2 points less...<br />
+              Everyone: anyone that answers correctly will get the full points
+            </small>
+
+            <div class="form-check form-switch mt-3">
+              <input class="form-check-input" type="checkbox" role="switch" id="oneChance" />
+              <label class="form-check-label" for="oneChance">Take first message as the answer</label>
+            </div>
+            <small class="text-body-secondary">
+              The first message each viewer types will be considered as their answer and they won't be able to answer again till next round. Prevents viewers from spamming answers till they
+              get the corrent one
+            </small>
+
+            <div class="form-check form-switch mt-3">
+              <input class="form-check-input" type="checkbox" role="switch" id="showHint" checked />
+              <label class="form-check-label" for="showHint">Show hint</label>
+            </div>
+            <small class="text-body-secondary">
+              Shows a hint that reveals the number of characters <br />
+              (the answer → _ _ _ &nbsp; _ _ _ _ _ ) <br />
+              Does not work for multiple choice questions
+            </small>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="startTrivia()">Start Trivia</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
       <div class="container-fluid">
         <a
@@ -556,7 +662,9 @@
         >
           <img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" />
         </a>
-        <a class="navbar-brand notranslate site-link" href="/brackets/" target="_self" rel="noopener noreferrer"> chat.vote Brackets <span class="text-danger">BETA</span></a>
+        <a class="navbar-brand notranslate site-link" href="/brackets/" target="_self" rel="noopener noreferrer">
+          chat.vote Brackets, (tier)Lists & Trivia <span class="text-danger">BETA</span>
+        </a>
 
         <div class="collapse navbar-collapse">
           <ul class="navbar-nav">
@@ -622,13 +730,13 @@
                 data-bs-toggle="tooltip"
                 data-bs-delay="200"
                 data-bs-placement="bottom"
-                data-bs-title="Brackets and tier lists with chat interaction"
+                data-bs-title="Brackets, (tier)Lists & Trivia"
                 aria-current="page"
                 target="_self"
                 rel="noopener noreferrer"
                 href="/brackets/"
               >
-                <i class="material-icons notranslate">emoji_events</i> Brackets
+                <i class="material-icons notranslate">breakfast_dining</i> BLT
               </a>
             </li>
             <li class="nav-item">
@@ -967,40 +1075,131 @@
       </div>
     </div>
 
-    <div class="container-fluid" id="brackets_editor">
+    <div class="container-fluid" id="trivia" style="display: none">
+      <div class="row align-items-start text-center" style="height: 8vh">
+        <div class="col">
+          <div class="card bg-body-secondary" id="triviaQuestion">
+            <div class="card-header" id="triviaTitleCard"></div>
+            <div class="card-body p-2">
+              <small class="text-body-secondary" id="triviaDescriptionCard"></small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row align-items-center text-center" style="height: 77vh">
+        <div class="col-xl-2"></div>
+        <div class="col-xl-5">
+          <div class="card mb-3" style="width: 40vw">
+            <div class="card-header" id="questionNumber">Question 0/0</div>
+
+            <div class="card-body" id="triviaMedia">
+              <div id="image_trivia" style="display: none"></div>
+              <div id="youtubeEmbedContainer_trivia" style="display: none"><div id="youtubeEmbed_trivia"></div></div>
+              <div id="spotifyEmbedContainer_trivia" style="display: none"><div id="spotifyEmbed_trivia"></div></div>
+              <div id="twitchClipsEmbed_trivia" style="display: none" height="100%" width="100%"></div>
+              <video id="videoEmbed_trivia" style="display: none" controls autoplay></video>
+            </div>
+            <div id="question"></div>
+            <div id="triviaAnswer"></div>
+          </div>
+        </div>
+        <div class="col-xl-3">
+          <div class="card" id="scoreCard">
+            <div class="card-body">
+              <h4 class="card-title"><i class="material-icons notranslate">leaderboard</i>Scores</h4>
+              <div id="triviaUsersDiv">
+                <ul class="list-group" id="triviaUsers"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-2"></div>
+      </div>
+
+      <div class="row fixed-bottom text-center mb-2">
+        <div class="col">
+          <button type="button" id="showAnswer" class="btn btn-lg btn-warning" onclick="showAnswer()"><i class="material-icons notranslate">visibility</i>Show answer</button>
+          <button type="button" id="nextQuestion" class="btn btn-lg btn-primary" onclick="nextQuestion()"><i class="material-icons notranslate">arrow_forward_ios</i>Next question</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid" id="editor">
       <div class="row">
         <div class="col-md-1"></div>
-        <div class="col-md-5">
+        <div class="col-md-5" id="lists">
           <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#createBracketModal">
-            <i class="material-icons notranslate">add_circle_outline</i> Create new bracket
+            <i class="material-icons notranslate">add_circle_outline</i> Create new bracket/tierlist
           </button>
 
-          <h1 class="display-3">My brackets</h1>
+          <h1 class="display-3">My brackets/tierlists</h1>
           <div id="myBrackets">
-            <span class="text-body-secondary">Nothing here</span>
+            <span class="text-body-secondary">Loading...</span>
+          </div>
+          <hr />
+          <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#createTriviaModal">
+            <i class="material-icons notranslate">add_circle_outline</i> Create new trivia
+          </button>
+
+          <h1 class="display-3">My trivia</h1>
+          <div id="myTrivia">
+            <span class="text-body-secondary">Loading...</span>
           </div>
         </div>
         <div class="col-md-5">
           <div class="card mt-3" id="bracketEditor" style="display: none">
             <div class="card-header">
-              Editing bracket <span id="bracketEditorHeader"></span><i class="material-icons notranslate float-end" style="cursor: pointer" onclick="closeEditor()">close</i>
+              Editing bracket <span id="bracketEditorHeader"></span><i class="material-icons notranslate float-end" style="cursor: pointer" onclick="closeBracketEditor()">close</i>
             </div>
             <div class="card-body" id="bracketEditorBody">
               <div class="mb-3">
                 <label for="bracketTitle" class="form-label">Bracket title</label>
                 <input type="text" class="form-control" id="bracketTitle" onchange="saveBracket(true)" placeholder="Bracket title" />
-                <small class="text-body-secondary">Bracket title</small>
               </div>
 
               <div class="mb-3">
                 <label for="bracketDescription" class="form-label">Bracket description</label>
                 <textarea class="form-control" id="bracketDescription" onchange="saveBracket(true)" rows="2" placeholder="Bracket description"></textarea>
-                <small class="text-body-secondary">Bracket description</small>
               </div>
 
-              <button type="button" class="btn btn-secondary btn-sm" id="addOption"><i class="material-icons notranslate">add</i>Add option</button>
+              <button type="button" class="btn btn-secondary btn-sm" id="addBracketOption"><i class="material-icons notranslate">add</i>Add option</button>
               <br /><small class="text-body-secondary">Tip: Preview the option to automatically populate the name and thumbnail if both are empty</small>
-              <div id="optionContainer" class="mb-3 mt-3"></div>
+              <div id="bracketOptionsContainer" class="mb-3 mt-3"></div>
+            </div>
+          </div>
+
+          <div class="card mt-3" id="triviaEditor" style="display: none">
+            <div class="card-header">
+              Editing trivia <span id="triviaEditorHeader"></span><i class="material-icons notranslate float-end" style="cursor: pointer" onclick="closeTriviaEditor()">close</i>
+            </div>
+            <div class="card-body" id="triviaEditorBody">
+              <div class="mb-3">
+                <label for="triviaTitle" class="form-label">Trivia title</label>
+                <input type="text" class="form-control" id="triviaTitle" onchange="saveTrivia(true)" placeholder="Trivia title" />
+              </div>
+
+              <div class="mb-3">
+                <label for="triviaDescription" class="form-label">Trivia description</label>
+                <textarea class="form-control" id="triviaDescription" onchange="saveTrivia(true)" rows="2" placeholder="Trivia description"></textarea>
+              </div>
+
+              <p>
+                If multiple choice is checked you have to write the answer like this:<br />
+                <strong>
+                  <span class="text-success">correct answer</span> | <span class="text-danger">choice 2</span> | <span class="text-danger">choice 3</span> |
+                  <span class="text-danger">choice 4</span>
+                </strong>
+                <br />
+                If multiple choice is unchecked you can add an alias for the answer:<br />
+                <strong>
+                  <span class="text-success">correct answer</span> | <span class="text-success">alias</span> | <span class="text-success">alias</span> |
+                  <span class="text-success">alias</span> | <span class="text-success">alias</span>
+                </strong>
+              </p>
+
+              <button type="button" class="btn btn-secondary btn-sm" id="addTriviaQuestion"><i class="material-icons notranslate">add</i>Add question</button>
+              <div id="triviaQuestionsContainer" class="mb-3 mt-3"></div>
             </div>
           </div>
         </div>
@@ -1013,19 +1212,8 @@
     <script src="/js/validator.min.js"></script>
     <script src="/js/anime.min.js"></script>
     <script src="/js/functions.min.js"></script>
-    <script src="/brackets/brackets.min.js"></script>
+    <script src="/brackets/brackets.js"></script>
     <script src="https://www.youtube.com/iframe_api"></script>
     <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H43YN7FSSP"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-
-      gtag("config", "G-H43YN7FSSP");
-    </script>
   </body>
 </html>

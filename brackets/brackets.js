@@ -5,6 +5,9 @@ let elements = {
   deleteBracketModal: document.getElementById("deleteBracketModal"),
   deleteBracketModalBody: document.getElementById("deleteBracketModalBody"),
   deleteBracketButton: document.getElementById("deleteBracketButton"),
+  deleteTriviaModal: document.getElementById("deleteTriviaModal"),
+  deleteTriviaModalBody: document.getElementById("deleteTriviaModalBody"),
+  deleteTriviaButton: document.getElementById("deleteTriviaButton"),
   quitBracketModal: document.getElementById("quitBracketModal"),
   tierlistEditorModal: document.getElementById("tierlistEditorModal"),
   tierlistEditor: document.getElementById("tierlistEditor"),
@@ -62,6 +65,8 @@ let elements = {
   disableAnimations: document.getElementById("disableAnimations"),
   spotifyWarning: document.getElementById("spotifyWarning"),
 
+  startTriviaModal: document.getElementById("startTriviaModal"),
+
   //navbar
   vtsLink: document.getElementById("vtsLink"),
   status: document.getElementById("status"),
@@ -71,18 +76,30 @@ let elements = {
   darkTheme: document.getElementById("darkTheme"),
 
   myBrackets: document.getElementById("myBrackets"),
+  myTrivia: document.getElementById("myTrivia"),
   importBracket: document.getElementById("importBracket"),
+  importTrivia: document.getElementById("importTrivia"),
+
   bracketEditor: document.getElementById("bracketEditor"),
   bracketEditorHeader: document.getElementById("bracketEditorHeader"),
   bracketTitle: document.getElementById("bracketTitle"),
   bracketDescription: document.getElementById("bracketDescription"),
-  optionContainer: document.getElementById("optionContainer"),
-  addOption: document.getElementById("addOption"),
+  bracketOptionsContainer: document.getElementById("bracketOptionsContainer"),
+
+  triviaEditor: document.getElementById("triviaEditor"),
+  triviaEditorHeader: document.getElementById("triviaEditorHeader"),
+  triviaTitle: document.getElementById("triviaTitle"),
+  triviaDescription: document.getElementById("triviaDescription"),
+  triviaQuestionsContainer: document.getElementById("triviaQuestionsContainer"),
+
+  addBracketOption: document.getElementById("addBracketOption"),
+  addTriviaQuestion: document.getElementById("addTriviaQuestion"),
+
+  editor: document.getElementById("editor"),
 
   //bracket
   toastContainer: document.getElementById("toastContainer"),
   bracket: document.getElementById("bracket"),
-  brackets_editor: document.getElementById("brackets_editor"),
 
   centerTitle: document.getElementById("centerTitle"),
   title: document.getElementById("title"),
@@ -172,6 +189,31 @@ let elements = {
   spotifyEmbed_tierlist: document.getElementById("spotifyEmbed_tierlist"),
   twitchClipsEmbed_tierlist: document.getElementById("twitchClipsEmbed_tierlist"),
   videoEmbed_tierlist: document.getElementById("videoEmbed_tierlist"),
+
+  //trivia
+
+  triviaPoints: document.getElementById("triviaPoints"),
+  triviaScoring: document.getElementById("triviaScoring"),
+  oneChance: document.getElementById("oneChance"),
+  showHint: document.getElementById("showHint"),
+  trivia: document.getElementById("trivia"),
+  triviaTitleCard: document.getElementById("triviaTitleCard"),
+  triviaDescriptionCard: document.getElementById("triviaDescriptionCard"),
+  questionNumber: document.getElementById("questionNumber"),
+  question: document.getElementById("question"),
+  triviaAnswer: document.getElementById("triviaAnswer"),
+
+  triviaUsersDiv: document.getElementById("triviaUsersDiv"),
+  triviaUsers: document.getElementById("triviaUsers"),
+
+  triviaMedia: document.getElementById("triviaMedia"),
+  image_trivia: document.getElementById("image_trivia"),
+  youtubeEmbedContainer_trivia: document.getElementById("youtubeEmbedContainer_trivia"),
+  youtubeEmbed_trivia: document.getElementById("youtubeEmbed_trivia"),
+  spotifyEmbedContainer_trivia: document.getElementById("spotifyEmbedContainer_trivia"),
+  spotifyEmbed_trivia: document.getElementById("spotifyEmbed_trivia"),
+  twitchClipsEmbed_trivia: document.getElementById("twitchClipsEmbed_trivia"),
+  videoEmbed_trivia: document.getElementById("videoEmbed_trivia"),
 };
 
 const icons = {
@@ -189,7 +231,19 @@ let darkTheme = true;
 
 let client;
 let loginButton;
-let loginExpiredModal, deleteBracketModal, quitBracketModal, tierlistEditorModal, previewModal, generateChatModal, generateModal, communityModal, startModal, publishedModal, importModal;
+let loginExpiredModal,
+  deleteBracketModal,
+  deleteTriviaModal,
+  quitBracketModal,
+  tierlistEditorModal,
+  previewModal,
+  generateChatModal,
+  generateModal,
+  communityModal,
+  startModal,
+  startTriviaModal,
+  publishedModal,
+  importModal;
 let votePopover, votePopoverTierlist;
 let currentBracket = {};
 let currentTierlist = {};
@@ -212,6 +266,10 @@ let BRACKETS = {
   brackets: [],
 };
 
+let TRIVIA = {
+  trivia: [],
+};
+
 function resetSettings() {
   localStorage.setItem(
     "USER",
@@ -227,6 +285,12 @@ function resetSettings() {
     "BRACKETS",
     JSON.stringify({
       brackets: [],
+    })
+  );
+  localStorage.setItem(
+    "TRIVIA",
+    JSON.stringify({
+      trivia: [],
     })
   );
   location.reload();
@@ -249,6 +313,7 @@ function saveSettings() {
   refreshData();
   localStorage.setItem("USER", JSON.stringify(USER));
   localStorage.setItem("BRACKETS", JSON.stringify(BRACKETS));
+  localStorage.setItem("TRIVIA", JSON.stringify(TRIVIA));
   localStorage.setItem("darkTheme", darkTheme);
 } //saveSettings
 
@@ -284,10 +349,19 @@ function load_localStorage() {
   }
 
   if (!localStorage.getItem("BRACKETS")) {
-    console.log("localStorage brackets settings not found");
+    console.log("localStorage brackets not found");
+    elements.myBrackets.innerHTML = `<span class="text-body-secondary">Nothing here</span>`;
   } else {
     BRACKETS = JSON.parse(localStorage.getItem("BRACKETS"));
     loadBrackets();
+  }
+
+  if (!localStorage.getItem("TRIVIA")) {
+    console.log("localStorage trivia not found");
+    elements.myTrivia.innerHTML = `<span class="text-body-secondary">Nothing here</span>`;
+  } else {
+    TRIVIA = JSON.parse(localStorage.getItem("TRIVIA"));
+    loadTrivia();
   }
 } //load_localStorage
 
@@ -456,6 +530,58 @@ function connect() {
     let input = msg.split(" ").filter(Boolean);
     let command = input[0].toLowerCase();
 
+    if (triviaStarted) {
+      if (triviaUsersAnswered.includes(context.username)) {
+        return;
+      }
+      if (triviaPoints < 1) {
+        return;
+      }
+
+      if (elements.oneChance.checked) {
+        triviaUsersAnswered.push(context.username);
+      }
+
+      if (answerTypes[questionNumber - 1] == "multipleChoice") {
+        if (msg.trim().toLowerCase() !== correctChoice) {
+          return;
+        }
+      } else {
+        if (!triviaAnswer.includes(msg.trim().toLowerCase())) {
+          return;
+        }
+      }
+
+      let pos = triviaUsers.findIndex((element) => element.username === context.username);
+      if (pos != -1) {
+        triviaUsers[pos].points += triviaPoints;
+        updateTriviaLeaderboard();
+      } else {
+        let user = {
+          points: triviaPoints,
+          id: context["user-id"],
+          username: context.username,
+          displayname: context["display-name"],
+          color: context.color,
+          firstmsg: context["first-msg"],
+          badges: context.badges,
+        };
+        addTriviaUser(user);
+      }
+
+      triviaUsersAnswered.push(context.username);
+
+      if (elements.triviaScoring.value == "decay") {
+        triviaPoints--;
+      }
+
+      if (elements.triviaScoring.value == "first") {
+        triviaPoints = 0;
+      }
+
+      return;
+    } //trivia
+
     if (!voting_enabled) {
       if (currentFormat == "single") {
         if ((command == "1" || command == "a" || command == "2" || command == "b") && (Date.now() - currentTime) / 1000 > 10) {
@@ -545,7 +671,31 @@ function switchTheme(checkbox) {
   }
 } //switchTheme
 
-function addOption(name = "", type = "", value = "", thumbnail = "", video = "") {
+function addTriviaUser(user) {
+  user.badgeshtml = addBadges(user.badges, user.id, user.firstmsg);
+  user.name = user.username == user.displayname.toLowerCase() ? `${user.displayname}` : `${user.displayname} (${user.username})`;
+  user.color = !user.color ? "#FFFFFF" : user.color;
+  triviaUsers.push(user);
+  updateTriviaLeaderboard();
+} //addTriviaUser
+
+function updateTriviaLeaderboard() {
+  triviaUsers.sort(function (a, b) {
+    return a.points > b.points ? -1 : a.points == b.points ? 0 : 1;
+  });
+  elements.triviaUsers.innerHTML = "";
+  let html = "";
+  for (let index = 0, j = triviaUsers.length; index < j; index++) {
+    html += `
+    <li class="list-group-item">
+    ${triviaUsers[index].badgeshtml}<span style="color:${triviaUsers[index].color};">${triviaUsers[index].name}:</span>
+    ${triviaUsers[index].points} ${triviaUsers[index].points == 1 ? "point" : "points"}
+    </li>`;
+  }
+  elements.triviaUsers.innerHTML = html;
+} //updateTriviaLeaderboard
+
+function addBracketOption(name = "", type = "", value = "", thumbnail = "", video = "") {
   let optionNumber = ++document.querySelectorAll(".option-name").length;
   let optionType = "text";
   if (optionNumber > 1) {
@@ -556,16 +706,16 @@ function addOption(name = "", type = "", value = "", thumbnail = "", video = "")
     optionType = type;
   }
 
-  elements.optionContainer.insertAdjacentHTML(
+  elements.bracketOptionsContainer.insertAdjacentHTML(
     "beforeend",
     `<div class="card mb-2" data-option-id="${optionNumber}">
       <div class="card-header">
       Option #${optionNumber}
-      <i class="material-icons notranslate deletebtn float-end" onclick="deleteOption('${optionNumber}')">delete_forever</i>
+      <i class="material-icons notranslate deletebtn float-end" onclick="deleteBracketOption('${optionNumber}')">delete_forever</i>
       </div>
       <div class="card-body">
         <div class="input-group mb-3">
-          <span class="input-group-text option-value-label">Value/Link</span>
+          <span class="input-group-text">Value/Link</span>
           <input type="text" class="form-control option-value" data-option-id="${optionNumber}" onchange="saveBracket(true)" value="${value}" ${
       optionType == "streamable" ? `data-video="${video}"` : ""
     } placeholder="Option Value/Link" aria-label="Option Value" />
@@ -597,9 +747,83 @@ function addOption(name = "", type = "", value = "", thumbnail = "", video = "")
       </div>
     </div>`
   );
-} //addOption
+} //addBracketOption
 
-function deleteOption(id) {
+function addTriviaQuestion(multipleChoice = null, type = "", question = "", answer = [], url = "") {
+  let questionNumber = ++document.querySelectorAll(".trivia-question").length;
+  let questionType = "text";
+  let checkMultipleChoice = false;
+  if (questionNumber > 1) {
+    let previousQuestion = Array.from(document.getElementsByClassName("question-type")).find((e) => parseInt(e.dataset.questionId, 10) === questionNumber - 1);
+    let previousQuestionMC = Array.from(document.getElementsByClassName("multiple-choice")).find((e) => parseInt(e.dataset.questionId, 10) === questionNumber - 1);
+
+    questionType = previousQuestion.value || "text";
+    checkMultipleChoice = previousQuestionMC.checked;
+  }
+
+  if (type) {
+    questionType = type;
+  }
+
+  if (multipleChoice !== null) {
+    checkMultipleChoice = multipleChoice;
+  }
+
+  elements.triviaQuestionsContainer.insertAdjacentHTML(
+    "beforeend",
+    `<div class="card mb-2" data-question-id="${questionNumber}">
+      <div class="card-header">
+      Question #${questionNumber}
+      <i class="material-icons notranslate deletebtn float-end" onclick="deleteTriviaQuestion('${questionNumber}')">delete_forever</i>
+      </div>
+      <div class="card-body">
+
+
+          <div class="form-check form-switch">
+            <input class="form-check-input multiple-choice" onchange="saveTrivia(true)" data-question-id="${questionNumber}" type="checkbox" role="switch" id="multipleChoice${questionNumber}" ${
+      checkMultipleChoice ? "checked" : ""
+    }/>
+            <label class="form-check-label" for="multipleChoice${questionNumber}">Multiple choice question</label>
+          </div>
+
+
+        <div class="input-group mb-3">
+          <label class="input-group-text">Question type</label>
+          <select class="form-select question-type" data-question-id="${questionNumber}" onchange="saveTrivia(true)">
+            <option value="text" ${questionType == "text" ? "selected" : ""}>Text only</option>
+            <option value="image" ${questionType == "image" ? "selected" : ""}>Image</option>
+            <option value="youtube" ${questionType == "youtube" ? "selected" : ""}>YouTube video</option>
+            <option value="twitch" ${questionType == "twitch" ? "selected" : ""}>Twitch clip</option>
+            <option value="spotify" ${questionType == "spotify" ? "selected" : ""}>Spotify song</option>
+            <option value="streamable" ${questionType == "streamable" ? "selected" : ""}>Streamable video</option>
+            <option value="supa video/audio" ${questionType == "supa video/audio" ? "selected" : ""}>supa video/audio file</option>
+          </select>
+        </div>
+
+        <div class="input-group mb-3">
+          <span class="input-group-text">Question</span>
+          <input type="text" class="form-control trivia-question" data-question-id="${questionNumber}" onchange="saveTrivia(true)" value="${question}"  placeholder="Question" aria-label="Question" />
+        </div>
+
+        <div class="input-group mb-3">
+          <span class="input-group-text">Answer</span>
+          <input type="text" class="form-control trivia-answer" data-question-id="${questionNumber}" onchange="saveTrivia(true)" value="${answer}"  placeholder="Answer" aria-label="Answer" />
+        </div>
+
+        <div class="input-group mb-3">
+          <span class="input-group-text">Media</span>
+          <input type="text" class="form-control trivia-media" data-question-id="${questionNumber}" onchange="saveTrivia(true)" value="${url}" ${
+      questionType == "streamable" ? `data-video="${url}"` : ""
+    } placeholder="Question media URL" aria-label="Question media URL" />
+          <button class="btn btn-outline-secondary" onclick="previewQuestion(${questionNumber},this)" type="button"><i class="material-icons notranslate">preview</i>Preview</button>
+        </div>
+
+      </div>
+    </div>`
+  );
+} //addTriviaQuestion
+
+function deleteBracketOption(id) {
   id = parseInt(id, 10);
   let bracketID = parseInt(elements.bracketTitle.dataset.bracketId, 10);
   let bracketIndex = BRACKETS.brackets.findIndex((e) => e.id === bracketID);
@@ -607,7 +831,17 @@ function deleteOption(id) {
 
   editBracket(bracketID);
   saveBracket(true);
-} //deleteOption
+} //deleteBracketOption
+
+function deleteTriviaQuestion(id) {
+  id = parseInt(id, 10);
+  let triviaID = parseInt(elements.triviaTitle.dataset.triviaId, 10);
+  let triviaIndex = TRIVIA.trivia.findIndex((e) => e.id === triviaID);
+  TRIVIA.trivia[triviaIndex].questions.splice(id - 1, 1);
+
+  editTrivia(triviaID);
+  saveTrivia(true);
+} //deleteTriviaQuestion
 
 async function previewOption(id, button) {
   button.innerHTML = spinner;
@@ -624,6 +858,7 @@ async function previewOption(id, button) {
 
   let link = parseLink(option?.value?.replace(/\s+/g, ""));
 
+  //parseLink doesnt parse image links
   if (!link && type.value != "image") {
     type.value = "text";
   }
@@ -761,8 +996,143 @@ async function previewOption(id, button) {
   saveBracket();
 } //previewOption
 
+async function previewQuestion(id, button) {
+  button.innerHTML = spinner;
+  id = parseInt(id, 10);
+
+  let questionTypes = document.querySelectorAll(".question-type");
+  let questions = document.querySelectorAll(".trivia-question");
+  let answers = document.querySelectorAll(".trivia-answer");
+  let media = document.querySelectorAll(".trivia-media");
+
+  let questionType = Array.from(questionTypes).find((e) => e.dataset.questionId == id);
+  let question = Array.from(questions).find((e) => e.dataset.questionId == id);
+  let answer = Array.from(answers).find((e) => e.dataset.questionId == id);
+  let questionMedia = Array.from(media).find((e) => e.dataset.questionId == id);
+
+  let link = parseLink(questionMedia?.value?.replace(/\s+/g, ""));
+
+  //parseLink doesnt parse image links
+  if (!link && questionType.value != "image") {
+    questionType.value = "text";
+  }
+
+  if (questionType.value == "text") {
+    elements.previewModalBody.innerHTML = `
+    <div class="card">
+    <div class="card-body">
+    ${validator.escape(question?.value) || `<span class="text-body-secondary">Empty question</span>`}
+    </div>
+    </div>`;
+    previewModal.show();
+  } //text
+
+  if (questionType.value == "image") {
+    let image = questionMedia?.value.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g) || null;
+    if (!image) {
+      showToast("Invalid image URL", "warning", 3000);
+      button.innerHTML = `<i class="material-icons notranslate">preview</i>Preview`;
+      return;
+    }
+    elements.previewModalBody.innerHTML = `
+    <div class="card">
+    <div class="card-body">
+    <img src="https://proxy.donk.workers.dev/?url=${encodeURI(questionMedia.value)}" alt="${question.value}" title="${question.value}" class="option-image">
+    </div>
+    </div>`;
+    previewModal.show();
+  } //image
+
+  if (link?.type == "youtube") {
+    questionType.value = "youtube";
+    elements.previewModalBody.innerHTML = `
+    <div class="card">
+    <div class="card-body">
+    <iframe 
+    type="text/html" 
+    width="100%" height="480" 
+    src="https://www.youtube.com/embed/${link.id}?autoplay=1&origin=${window.location.hostname}" 
+    frameborder="0">
+    </iframe>
+    </div>
+    </div>`;
+    previewModal.show();
+  } //youtube
+
+  if (link?.type == "twitch") {
+    questionType.value = "twitch";
+    elements.previewModalBody.innerHTML = `
+      <div class="card">
+      <div class="card-body">
+      <iframe 
+      src="https://clips.twitch.tv/embed?clip=${link.id}&parent=${window.location.hostname}&autoplay=true" 
+      height="480" 
+      width="100%" 
+      preload="auto" 
+      >
+      </iframe>
+      </div>
+      </div>`;
+    previewModal.show();
+  } //twitch
+
+  if (link?.type == "spotify") {
+    questionType.value = "spotify";
+    elements.previewModalBody.innerHTML = `
+      <div class="card">
+      <div class="card-body">
+      <iframe 
+      style="border-radius:12px" src="https://open.spotify.com/embed/track/${link.id}${darkTheme ? "?theme=0" : ""}" 
+      width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture">
+      </iframe>
+      </div>
+      </div>`;
+    previewModal.show();
+  } //spotify
+
+  if (link?.type == "streamable") {
+    link = await getRequestInfo(link);
+    questionType.value = "streamable";
+    question.dataset.video = link.video;
+    elements.previewModalBody.innerHTML = `
+      <div class="card">
+      <div class="card-body">
+      <video src="${link.video}" controls autoplay height="480" width="100%"></video>
+      </div>
+      </div>`;
+    previewModal.show();
+  } else {
+    question.dataset.video = "";
+  } //streamable
+
+  if (link?.type == "supa video/audio") {
+    link = await getRequestInfo(link);
+    questionType.value = link.type;
+    if (link.type == "image") {
+      elements.previewModalBody.innerHTML = `
+      <div class="card">
+      <div class="card-body">
+      <img src="https://i.supa.codes/${link.id}" alt="${question.value}" title="${question.value}" class="option-image">
+      </div>
+      </div>`;
+    } else {
+      elements.previewModalBody.innerHTML = `
+      <div class="card">
+      <div class="card-body">
+      <video src="https://i.supa.codes/${link.id}" controls autoplay height="480" width="100%"></video>
+      </div>
+      </div>`;
+    }
+
+    previewModal.show();
+  }
+
+  button.innerHTML = `<i class="material-icons notranslate">preview</i>Preview`;
+  saveTrivia();
+} //previewQuestion
+
 /**
- * @description gets the video/track/clip id from a url string
+ * @description gets the video/track/clip id and type from a url string
  * @param {string} link
  * @returns {Object}
  */
@@ -944,6 +1314,25 @@ function createBracket(generated = false, type = "single") {
   saveBracket();
 } //createBracket
 
+function createTrivia(generated = false) {
+  let maxID = 0;
+  if (TRIVIA?.trivia?.length !== 0) {
+    maxID = TRIVIA.trivia.reduce((prev, current) => (prev.id > current.id ? prev : current)).id;
+  }
+  TRIVIA.trivia.push({
+    id: ++maxID,
+    title: "",
+    description: "",
+    options: [],
+    generated: generated,
+    published: false,
+    time: Date.now(),
+  });
+
+  editTrivia(maxID);
+  saveTrivia();
+} //createTrivia
+
 function saveBracket(edited = false) {
   let id = parseInt(elements.bracketTitle.dataset.bracketId, 10);
   let bracket = BRACKETS.brackets.find((x) => x.id === id);
@@ -1004,6 +1393,70 @@ function saveBracket(edited = false) {
   saveSettings();
 } //saveBracket
 
+function saveTrivia(edited = false) {
+  let id = parseInt(elements.triviaTitle.dataset.triviaId, 10);
+  let trivia = TRIVIA.trivia.find((x) => x.id === id);
+
+  trivia.title = elements.triviaTitle.value || "Untitled trivia";
+  trivia.description = elements.triviaDescription.value || "No description";
+
+  if (edited) {
+    //let user publish generated trivia if they edit them or republish already published trivia
+    trivia.generated = false;
+    trivia.published = false;
+  }
+
+  let choiceTypes = document.querySelectorAll(".multiple-choice");
+  let questionTypes = document.querySelectorAll(".question-type");
+  let questions = document.querySelectorAll(".trivia-question");
+  let answers = document.querySelectorAll(".trivia-answer");
+  let media = document.querySelectorAll(".trivia-media");
+
+  trivia.questions = [];
+
+  for (let index = 0; index < questions.length; index++) {
+    let link = parseLink(media[index].value?.replace(/\s+/g, ""));
+    switch (link?.type) {
+      case "youtube":
+      case "twitch":
+      case "spotify":
+      case "supa video/audio":
+        trivia.questions.push({
+          multipleChoice: choiceTypes[index].checked,
+          type: questionTypes[index].value,
+          question: questions[index].value,
+          answer: answers[index].value,
+          media: media[index].value,
+          id: link.id,
+        });
+        break;
+      case "streamable":
+        trivia.questions.push({
+          multipleChoice: choiceTypes[index].checked,
+          type: questionTypes[index].value,
+          question: questions[index].value,
+          answer: answers[index].value,
+          media: media[index].value,
+          id: link.id,
+          video: media[index].dataset?.video || "",
+        });
+        break;
+      default:
+        trivia.questions.push({
+          multipleChoice: choiceTypes[index].checked,
+          type: questionTypes[index].value,
+          question: questions[index].value,
+          answer: answers[index].value,
+          media: media[index].value,
+        });
+        break;
+    }
+  }
+
+  loadTrivia();
+  saveSettings();
+} //saveTrivia
+
 let startID;
 function showStartModal(id) {
   startID = id;
@@ -1029,6 +1482,19 @@ function showStartModal(id) {
   }
   startModal.show();
 } //showStartModal
+
+function showStartTriviaModal(id) {
+  startID = id;
+  let triviaID = parseInt(startID, 10);
+  let trivia = TRIVIA.trivia.find((x) => x.id === triviaID);
+
+  if (trivia.questions.flatMap((e) => e.type).includes("spotify")) {
+    elements.spotifyWarning.style.display = "";
+  } else {
+    elements.spotifyWarning.style.display = "none";
+  }
+  startTriviaModal.show();
+} //showStartTriviaModal
 
 function startBracket() {
   if (!checkLogin()) {
@@ -1092,7 +1558,7 @@ function startSingleElimination(bracket) {
     currentBracket[`round${index + 1}`] = [...Array(currentBracket[`round${index}`].length / 2)];
   }
 
-  elements.brackets_editor.style.display = "none";
+  elements.editor.style.display = "none";
   elements.bracket.style.display = "";
   elements.title.innerText = bracket.title;
   elements.winner.innerHTML = `Winner of ${validator.escape(bracket.title)}<br>`;
@@ -1145,7 +1611,7 @@ function startTierlist(bracket) {
 
   updateScores();
 
-  elements.brackets_editor.style.display = "none";
+  elements.editor.style.display = "none";
   elements.tierlist.style.display = "";
   elements.tierlistItem.style.display = "";
   elements.upcoming.style.display = "";
@@ -1154,6 +1620,143 @@ function startTierlist(bracket) {
   currentTierlistCommands = currentTierlistData.map((e) => e.command);
   nextTierlistItem();
 } //startTierlist
+
+let triviaPoints;
+let questionNumber = 1;
+let triviaAnswer = [];
+let triviaStarted = false;
+let triviaUsersAnswered = [];
+let triviaUsers = [];
+let questionsArray = [];
+let answersArrays = [];
+let mediaArray = [];
+let answerTypes = [];
+function startTrivia() {
+  if (!checkLogin()) {
+    return;
+  }
+
+  let id = parseInt(startID, 10);
+
+  questionNumber = 0;
+  triviaUsersAnswered = [];
+  triviaUsers = [];
+  elements.triviaUsers.innerHTML = "";
+
+  let selectedTrivia = structuredClone(TRIVIA.trivia.find((x) => x.id === id));
+
+  questionsArray = [];
+  answersArrays = [];
+  mediaArray = [];
+  answerTypes = [];
+
+  for (let index = 0, j = selectedTrivia.questions.length; index < j; index++) {
+    if (!selectedTrivia.questions[index].question && !selectedTrivia.questions[index].media) {
+      continue;
+    }
+
+    if (!selectedTrivia.questions[index].question && selectedTrivia.questions[index].media) {
+      questionsArray.push(`Question #${index + 1}`);
+    } else {
+      questionsArray.push(selectedTrivia.questions[index].question);
+    }
+    mediaArray.push(selectedTrivia.questions[index].media);
+    answerTypes.push(selectedTrivia.questions[index].multipleChoice ? "multipleChoice" : "alias");
+
+    let options = selectedTrivia.questions[index].answer.split("|");
+
+    for (let index2 = 0; index2 < options.length; index2++) {
+      options[index2] = options[index2].trim().toLowerCase();
+    }
+
+    answersArrays.push(options);
+  }
+
+  elements.triviaTitleCard.innerText = selectedTrivia.title || "";
+  elements.triviaDescriptionCard.innerText = selectedTrivia.description || "";
+  elements.editor.style.display = "none";
+  elements.trivia.style.display = "";
+  changeSiteLinkTarget("_blank");
+
+  nextQuestion();
+} //startTrivia
+
+function nextQuestion() {
+  //check if trivia is done
+  if (questionNumber == questionsArray.length) {
+    showToast("No more questions", "warning", 2000);
+    return;
+  }
+  questionNumber++;
+  triviaPoints = parseInt(elements.triviaPoints.value, 10);
+  triviaUsersAnswered = [];
+
+  triviaAnswer = answersArrays[questionNumber - 1];
+  elements.questionNumber.innerText = `Question ${questionNumber}/${questionsArray.length}`;
+  elements.question.innerText = `Question: ${questionsArray[questionNumber - 1]}`;
+  elements.triviaAnswer.innerHTML = getHint();
+
+  resetPlayers();
+  showTriviaMedia(mediaArray[questionNumber - 1]);
+  triviaStarted = true;
+} //nextQuestion
+
+let triviaChoices = ["a", "b", "c", "d"];
+let correctChoice;
+let correctAnswer;
+function getHint() {
+  if (answerTypes[questionNumber - 1] == "multipleChoice") {
+    if (triviaAnswer.length < 4) {
+      showToast("Question has less than 4 choices", "danger", 3000);
+    }
+
+    correctAnswer = triviaAnswer[0];
+    let shuffled = shuffle(structuredClone(triviaAnswer));
+    let index = shuffled.findIndex((element) => element === correctAnswer);
+    correctChoice = triviaChoices[index];
+
+    return `Choices: 
+    <button type="button" class="btn btn-lg btn-primary mb-2"><span class="float-start">A • </span> ${validator.escape(shuffled[0])}</button>
+    <button type="button" class="btn btn-lg btn-danger mb-2"><span class="float-start">B • </span> ${validator.escape(shuffled[1])}</button>
+    <button type="button" class="btn btn-lg btn-warning mb-2"><span class="float-start">C • </span> ${validator.escape(shuffled[2])}</button>
+    <button type="button" class="btn btn-lg btn-info mb-2"><span class="float-start">D • </span> ${validator.escape(shuffled[3])}</button>`;
+  }
+
+  if (!elements.showHint.checked) {
+    return "Answer: ❔";
+  }
+
+  let hint = "";
+  for (let index = 0; index < triviaAnswer[0].length; index++) {
+    if (triviaAnswer[0].charAt(index).match(/^[0-9a-z]+$/)) {
+      hint += "_ ";
+    }
+    if (triviaAnswer[0].charAt(index) == " ") {
+      hint += "&nbsp; ";
+    }
+  }
+  return `Answer: ${hint}`;
+} //getHint
+
+function showAnswer() {
+  triviaStarted = false;
+  if (answerTypes[questionNumber - 1] == "multipleChoice") {
+    elements.triviaAnswer.innerText = `Answer: ${correctAnswer}`;
+  } else {
+    elements.triviaAnswer.innerText = `Answer: ${triviaAnswer[0]}`;
+  }
+} //showAnswer
+
+function shuffle(array) {
+  let currentIndex = array.length;
+  let randomIndex;
+  while (currentIndex > 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+  }
+  return array;
+} //shuffle
 
 let currentRound = 1;
 let currentOption = 0;
@@ -1609,6 +2212,68 @@ async function showOption(position, option) {
   } //supa
 } //showOption
 
+async function showTriviaMedia(mediaLink) {
+  if (!mediaLink) {
+    elements.triviaMedia.style.display = "none";
+    return;
+  } else {
+    elements.triviaMedia.style.display = "";
+  } //text
+
+  let option = parseLink(mediaLink.replace(/\s+/g, ""));
+  if (!option) {
+    let image = mediaLink.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g) || null;
+    if (image) {
+      elements.image_trivia.style.display = "";
+      elements.image_trivia.innerHTML = `<img src="https://proxy.donk.workers.dev/?url=${encodeURI(mediaLink)}" class="option-image">`;
+      return;
+    } //image
+    showToast("Could not load media", "warning", 3000);
+  }
+
+  if (option.type == "youtube") {
+    elements.youtubeEmbedContainer_trivia.style.display = "";
+    youtubePlayer_trivia.loadVideoById(option.id);
+  } //youtube
+
+  if (option.type == "twitch") {
+    elements.twitchClipsEmbed_trivia.style.display = "";
+    elements.twitchClipsEmbed_trivia.innerHTML = `<iframe 
+    src="https://clips.twitch.tv/embed?clip=${option.id}&parent=${window.location.hostname}&autoplay=true&muted=false" preload="auto" height="100%" width="100%" allowfullscreen>
+    </iframe>`;
+  } //twitch
+
+  if (option.type == "spotify") {
+    elements.spotifyEmbedContainer_trivia.style.display = "";
+    spotifyPlayer_trivia.loadUri(`spotify:track:${option.id}`);
+    spotifyPlayer_trivia.play();
+  } //spotify
+
+  if (option.type == "streamable") {
+    let video = option?.video;
+    //check if video link expired
+    if (video) {
+      const url = new URL(video);
+      const params = url.searchParams;
+      if (parseInt(params.get("Expires"), 10) * 1000 < Date.now()) {
+        video = null;
+      }
+    }
+    //get video link if it was never fetched or expired
+    if (!video) {
+      let info = await getRequestInfo(option);
+      video = info.video;
+    }
+    elements.videoEmbed_trivia.style.display = "";
+    elements.videoEmbed_trivia.src = video;
+  } //streamable
+
+  if (option.type == "supa video/audio") {
+    elements.videoEmbed_trivia.style.display = "";
+    elements.videoEmbed_trivia.src = `https://i.supa.codes/${option.id}`;
+  } //supa
+} //showTriviaMedia
+
 function updateScores() {
   if (currentFormat == "single") {
     if (!scoreHidden) {
@@ -1808,7 +2473,8 @@ function disableVoteButton() {
 function quitBracket() {
   elements.bracket.style.display = "none";
   elements.tierlist.style.display = "none";
-  elements.brackets_editor.style.display = "";
+  elements.trivia.style.display = "none";
+  elements.editor.style.display = "";
   resetPlayers();
   disableVoteButton();
   changeSiteLinkTarget("_self");
@@ -1819,8 +2485,9 @@ function showQuitBracketModal() {
 } //showQuitBracketModal
 
 function editBracket(id) {
+  elements.triviaEditor.style.display = "none";
   elements.bracketEditor.style.display = "";
-  elements.optionContainer.innerHTML = "";
+  elements.bracketOptionsContainer.innerHTML = "";
   id = parseInt(id, 10);
   let bracket = BRACKETS.brackets.find((x) => x.id === id);
   if (bracket) {
@@ -1832,9 +2499,35 @@ function editBracket(id) {
   elements.bracketEditorHeader.innerHTML = `ID${id}`;
 
   for (let index = 0; index < bracket.options.length; index++) {
-    addOption(bracket.options[index].name, bracket.options[index].type, bracket.options[index].value, bracket.options[index].thumbnail, bracket.options[index]?.video);
+    addBracketOption(bracket.options[index].name, bracket.options[index].type, bracket.options[index].value, bracket.options[index].thumbnail, bracket.options[index]?.video);
   }
 } //editBracket
+
+function editTrivia(id) {
+  elements.bracketEditor.style.display = "none";
+  elements.triviaEditor.style.display = "";
+  elements.triviaQuestionsContainer.innerHTML = "";
+  id = parseInt(id, 10);
+  let trivia = TRIVIA.trivia.find((x) => x.id === id);
+  if (trivia) {
+    elements.triviaTitle.value = trivia.title;
+    elements.triviaTitle.dataset.triviaId = id;
+    elements.triviaDescription.value = trivia.description;
+  }
+
+  elements.triviaEditorHeader.innerHTML = `ID${id}`;
+
+  for (let index = 0; index < trivia.questions.length; index++) {
+    addTriviaQuestion(
+      trivia.questions[index].multipleChoice,
+      trivia.questions[index].type,
+      trivia.questions[index].question,
+      trivia.questions[index].answer,
+      trivia.questions[index].media,
+      trivia.questions[index]?.video
+    );
+  }
+} //editTrivia
 
 function deleteBracket(id) {
   id = parseInt(id, 10);
@@ -1843,6 +2536,14 @@ function deleteBracket(id) {
   elements.deleteBracketButton.dataset.bracketId = id;
   deleteBracketModal.show();
 } //deleteBracket
+
+function deleteTrivia(id) {
+  id = parseInt(id, 10);
+  let trivia = TRIVIA.trivia.find((x) => x.id === id);
+  elements.deleteTriviaModalBody.innerText = `Delete "${trivia.title}"?`;
+  elements.deleteTriviaButton.dataset.triviaId = id;
+  deleteTriviaModal.show();
+} //deleteTrivia
 
 function loadBrackets() {
   if (!BRACKETS?.brackets?.length) {
@@ -1890,10 +2591,58 @@ function loadBrackets() {
   enableTooltips();
 } //loadBrackets
 
-function closeEditor() {
+function loadTrivia() {
+  if (!TRIVIA?.trivia?.length) {
+    elements.myTrivia.innerHTML = `<span class="text-body-secondary">Nothing here</span>`;
+    return;
+  }
+
+  let html = ``;
+
+  for (let index = TRIVIA.trivia.length - 1; index >= 0; index--) {
+    let warning = TRIVIA.trivia[index].questions.some((e) => !e.answer)
+      ? `<i class="material-icons notranslate text-danger cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Some of the questions have no answer">warning</i>`
+      : "";
+    html += `<div class="card mb-3">
+    <div class="card-header">
+      ${validator.escape(TRIVIA.trivia[index].title) || "Untitled trivia"} ${warning}
+      <div class="btn-group btn-group-sm float-end" role="group" aria-label="trivia controls">
+        <button type="button" class="btn btn-success" onclick="showStartTriviaModal(${TRIVIA.trivia[index].id})">
+          <i class="material-icons notranslate">play_arrow</i> Start trivia
+        </button>
+        <button type="button" class="btn btn-secondary" ${TRIVIA.trivia[index]?.generated || TRIVIA.trivia[index]?.published ? `style="display: none"` : `style="display: none"`}
+        data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Publish trivia" onclick="publishTrivia(${TRIVIA.trivia[index].id},this)">
+         <i class="material-icons notranslate">cloud_upload</i>
+       </button>
+        <button type="button" class="btn btn-primary"
+         data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit trivia" onclick="editTrivia(${TRIVIA.trivia[index].id})">
+        <i class="material-icons notranslate">edit</i>
+        </button>
+        <button type="button" class="btn btn-danger"
+         data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Delete trivia" onclick="deleteTrivia(${TRIVIA.trivia[index].id})">
+          <i class="material-icons notranslate">delete_forever</i>
+        </button>
+      </div>
+    </div>
+    <div class="card-body my-trivia-body">
+      <h5 class="card-title">${TRIVIA.trivia[index].description || "No description"}</h5>
+      <p class="card-text">${TRIVIA.trivia[index].questions.map((e) => `${icons[e.type]} ${validator.escape(e.question)}`).join(" • ") || "No questions"}</p>
+    </div>
+  </div>`;
+  }
+  elements.myTrivia.innerHTML = html;
+  enableTooltips();
+} //loadTrivia
+
+function closeBracketEditor() {
   saveBracket();
   elements.bracketEditor.style.display = "none";
-} //closeEditor
+} //closeBracketEditor
+
+function closeTriviaEditor() {
+  saveTrivia();
+  elements.triviaEditor.style.display = "none";
+} //closeTriviaEditor
 
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -2295,7 +3044,7 @@ async function generateBracket() {
   elements.bracketTitle.value = previewedBracketTitle;
   elements.bracketDescription.value = previewedBracketDescription;
   for (let index = 0; index < previewedBracket.length; index++) {
-    addOption(previewedBracket[index].name, previewedBracket[index].type, previewedBracket[index].value, previewedBracket[index].thumbnail, previewedBracket[index]?.video);
+    addBracketOption(previewedBracket[index].name, previewedBracket[index].type, previewedBracket[index].value, previewedBracket[index].thumbnail, previewedBracket[index]?.video);
   }
 
   saveBracket();
@@ -2412,7 +3161,7 @@ function importPreviewed() {
   elements.bracketTitle.value = importPreviewedBracket.bracket.title;
   elements.bracketDescription.value = `${importPreviewedBracket.bracket.description} - Bracket by @${importPreviewedBracket.username} - bracket ID: ${importPreviewedBracket.id}`;
   for (let index = 0; index < importPreviewedBracket.bracket.options.length; index++) {
-    addOption(
+    addBracketOption(
       importPreviewedBracket.bracket.options[index].name,
       importPreviewedBracket.bracket.options[index].type,
       importPreviewedBracket.bracket.options[index].value,
@@ -2430,7 +3179,7 @@ async function importApproved(id) {
   elements.bracketTitle.value = bracket.bracket.title;
   elements.bracketDescription.value = `${bracket.bracket.description} - Bracket by @${bracket.username} - bracket ID: ${bracket.id}`;
   for (let index = 0; index < bracket.bracket.options.length; index++) {
-    addOption(
+    addBracketOption(
       bracket.bracket.options[index].name,
       bracket.bracket.options[index].type,
       bracket.bracket.options[index].value,
@@ -2518,7 +3267,7 @@ function generateChatBracket() {
   elements.bracketTitle.value = "Chat bracket";
   elements.bracketDescription.value = "Bracket with chat's requests";
   for (let index = 0; index < chatBracket.length; index++) {
-    addOption(chatBracket[index].name, chatBracket[index].type, chatBracket[index].value, chatBracket[index].thumbnail, chatBracket[index]?.video);
+    addBracketOption(chatBracket[index].name, chatBracket[index].type, chatBracket[index].value, chatBracket[index].thumbnail, chatBracket[index]?.video);
   }
 
   saveBracket();
@@ -2765,6 +3514,16 @@ function resetPlayers(left = true, right = true) {
   spotifyPlayer_tierlist.pause();
   elements.twitchClipsEmbed_tierlist.innerHTML = "";
   elements.videoEmbed_tierlist.src = "";
+
+  elements.image_trivia.style.display = "none";
+  elements.youtubeEmbedContainer_trivia.style.display = "none";
+  elements.spotifyEmbedContainer_trivia.style.display = "none";
+  elements.twitchClipsEmbed_trivia.style.display = "none";
+  elements.videoEmbed_trivia.style.display = "none";
+  youtubePlayer_trivia.loadVideoById("");
+  spotifyPlayer_trivia.pause();
+  elements.twitchClipsEmbed_trivia.innerHTML = "";
+  elements.videoEmbed_trivia.src = "";
 } //resetPlayers
 
 function getItemLink(type, id) {
@@ -2824,6 +3583,7 @@ window.onload = async function () {
 
   loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
   deleteBracketModal = new bootstrap.Modal(elements.deleteBracketModal);
+  deleteTriviaModal = new bootstrap.Modal(elements.deleteTriviaModal);
   quitBracketModal = new bootstrap.Modal(elements.quitBracketModal);
   tierlistEditorModal = new bootstrap.Modal(elements.tierlistEditorModal);
   previewModal = new bootstrap.Modal(elements.previewModal);
@@ -2831,6 +3591,7 @@ window.onload = async function () {
   generateModal = new bootstrap.Modal(elements.generateModal);
   communityModal = new bootstrap.Modal(elements.communityModal);
   startModal = new bootstrap.Modal(elements.startModal);
+  startTriviaModal = new bootstrap.Modal(elements.startTriviaModal);
   publishedModal = new bootstrap.Modal(elements.publishedModal);
   importModal = new bootstrap.Modal(elements.importModal);
 
@@ -2912,9 +3673,14 @@ window.onload = async function () {
     generateModal.show();
   });
 
-  elements.addOption.addEventListener("click", function () {
-    addOption();
+  elements.addBracketOption.addEventListener("click", function () {
+    addBracketOption();
     saveBracket(true);
+  });
+
+  elements.addTriviaQuestion.addEventListener("click", function () {
+    addTriviaQuestion();
+    saveTrivia(true);
   });
 
   elements.deleteBracketButton.addEventListener("click", function () {
@@ -2930,6 +3696,19 @@ window.onload = async function () {
     enableTooltips();
   });
 
+  elements.deleteTriviaButton.addEventListener("click", function () {
+    let id = parseInt(this.dataset.triviaId, 10);
+    TRIVIA.trivia.splice(
+      TRIVIA.trivia.findIndex((e) => e.id === id),
+      1
+    );
+    loadTrivia();
+    saveSettings();
+    elements.triviaEditor.style.display = "none";
+    deleteTriviaModal.hide();
+    enableTooltips();
+  });
+
   dragElement();
 
   let code = location.hash?.replace("#", "")?.trim();
@@ -2942,6 +3721,7 @@ window.onload = async function () {
 let youtubePlayer_left;
 let youtubePlayer_right;
 let youtubePlayer_tierlist;
+let youtubePlayer_trivia;
 
 function onYouTubeIframeAPIReady() {
   //youtubePlayer.loadVideoById("id")
@@ -3020,6 +3800,22 @@ function onYouTubeIframeAPIReady() {
       onAutoplayBlocked: youtubePlayerOnAutoplayBlocked,
     },
   });
+
+  youtubePlayer_trivia = new YT.Player("youtubeEmbed_trivia", {
+    height: "100%",
+    width: "100%",
+    playerVars: {
+      autoplay: 1,
+      enablejsapi: 1,
+      playsinline: 1,
+      rel: 0,
+      origin: "chat.vote",
+    },
+    events: {
+      onError: youtubePlayerOnError,
+      onAutoplayBlocked: youtubePlayerOnAutoplayBlocked,
+    },
+  });
 } //onYouTubeIframeAPIReady
 
 function youtubePlayerOnError(event) {
@@ -3033,6 +3829,7 @@ function youtubePlayerOnAutoplayBlocked(event) {
 let spotifyPlayer_left;
 let spotifyPlayer_right;
 let spotifyPlayer_tierlist;
+let spotifyPlayer_trivia;
 window.onSpotifyIframeApiReady = (IFrameAPI) => {
   console.log("onSpotifyIframeApiReady");
 
@@ -3049,7 +3846,11 @@ window.onSpotifyIframeApiReady = (IFrameAPI) => {
   const callback_tierlist = (EmbedController) => {
     spotifyPlayer_tierlist = EmbedController;
   };
+  const callback_trivia = (EmbedController) => {
+    spotifyPlayer_trivia = EmbedController;
+  };
   IFrameAPI.createController(elements.spotifyEmbed_left, {}, callback_left);
   IFrameAPI.createController(elements.spotifyEmbed_right, {}, callback_right);
   IFrameAPI.createController(elements.spotifyEmbed_tierlist, {}, callback_tierlist);
+  IFrameAPI.createController(elements.spotifyEmbed_trivia, {}, callback_trivia);
 }; //onSpotifyIframeApiReady

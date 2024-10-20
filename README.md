@@ -18,7 +18,7 @@ donk site :) incomplete readme
 
 :)
 
-## [Brackets](https://chat.vote/brackets)
+## [BLT](https://chat.vote/blt)
 
 :)
 

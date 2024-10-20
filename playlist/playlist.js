@@ -2151,11 +2151,7 @@ function pausePlaylist(reply) {
   }
 
   if (reply) {
-    if (currentItem.type == "twitch clip") {
-      botReply(`⚠ Twitch clip playback can't be controlled`, reply, false);
-    } else {
-      botReply(`⏸ Playlist is now paused`, reply, false);
-    }
+    botReply(`⏸ Playlist is now paused`, reply, false);
   }
 } //pausePlaylist
 

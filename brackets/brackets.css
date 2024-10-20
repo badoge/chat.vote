@@ -14,19 +14,66 @@ body {
   font-size: 1.5em;
 }
 
-#myBrackets {
-  max-height: 75vh;
+#myBrackets,
+#mytrivia {
+  max-height: 50vh;
   overflow: auto;
 }
 
-#bracketEditorBody {
+#lists {
+  max-height: 90vh;
+  overflow: auto;
+  margin-bottom: 300px;
+}
+
+#bracketEditorBody,
+#triviaEditorBody {
   height: 85vh;
   overflow: auto;
 }
 
-#optionContainer {
+#bracketOptionsContainer,
+#triviaQuestionsContainer {
   height: 50vh;
   overflow: auto;
+}
+
+#scoreCard {
+  height: 70vh;
+  overflow-y: auto;
+}
+
+#questionNumber {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+#triviaUsers {
+  word-wrap: break-word;
+}
+
+#question,
+#triviaAnswer {
+  text-align: center;
+  font-size: 2rem;
+}
+
+.resizable {
+  display: inline-block;
+  resize: both;
+  overflow: hidden;
+  line-height: 0;
+  vertical-align: middle;
+}
+
+.resizable img {
+  height: 100%;
+}
+
+.custom-popover {
+  --bs-popover-border-color: var(--bs-warning);
+  --bs-popover-header-bg: var(--bs-warning);
+  --bs-popover-header-color: var(--bs-white);
 }
 
 .deletebtn {
@@ -55,7 +102,8 @@ body {
   overflow: auto;
 }
 
-.my-bracket-body {
+.my-bracket-body,
+.my-trivia-body {
   max-height: 20vh;
   overflow: auto;
 }
@@ -71,18 +119,22 @@ body {
   z-index: 100;
 }
 
-#left_title > .card-body {
+#left_title > .card-body,
+#centerTitle > .card-body,
+#right_title > .card-body {
   padding: 5px;
 }
 
-#centerTitle {
+#centertitle {
   width: 10vw;
   display: inline-flex;
   font-size: 1.1rem;
 }
 
-#centerTitle > .card-body {
-  padding: 5px;
+#triviaQuestion {
+  width: 15vw;
+  display: inline-flex;
+  font-size: 1.2rem;
 }
 
 #winnerTitle {
@@ -99,10 +151,6 @@ body {
   font-size: 1.4rem;
   margin-bottom: 5px;
   z-index: 100;
-}
-
-#right_title > .card-body {
-  padding: 5px;
 }
 
 #left_card.zoomed {
@@ -131,6 +179,25 @@ body {
 #right_value > * > * {
   border-bottom-left-radius: 6px;
   border-bottom-right-radius: 6px;
+}
+
+#image_trivia {
+  height: 100%;
+}
+
+#youtubeEmbedContainer_trivia,
+#twitchClipsEmbed_trivia,
+#videoEmbed_trivia {
+  height: 50vh;
+  width: 100%;
+}
+
+#spotifyEmbedContainer_trivia {
+  width: 100%;
+}
+
+#spotifyEmbedContainer_trivia > * {
+  border-radius: 12px;
 }
 
 #hideScore {
