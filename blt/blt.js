@@ -642,7 +642,7 @@ function connect() {
     console.log(`Connected to ${address}:${port}`);
     elements.status.innerHTML = `<h4><span class="badge bg-success">Connected :)</span></h4>`;
     saveSettings();
-    sendUsername(`chat.vote/brackets`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
+    sendUsername(`chat.vote/blt`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
     if (await checkTags(USER.userID, USER.access_token)) {
       elements.vtsLink.style.display = "";
     }
@@ -3080,14 +3080,14 @@ async function publishBracket(id, e) {
     redirect: "follow",
   };
   try {
-    let response = await fetch(`https://brackets.donk.workers.dev/publish`, requestOptions);
+    let response = await fetch(`https://blt.donk.workers.dev/publish`, requestOptions);
     let result = await response.json();
     console.log(result);
     showToast(result.message, "info", 3000);
     if (response.status == 200) {
       BRACKETS.brackets[bracketIndex].published = true;
       elements.bracketCode.innerHTML = result.id;
-      elements.bracketLink.innerHTML = `https://chat.vote/brackets#${result.id}`;
+      elements.bracketLink.innerHTML = `https://chat.vote/blt#${result.id}`;
       publishedModal.show();
       saveSettings();
       loadBrackets();
@@ -3117,7 +3117,7 @@ async function importCode(hashCode = "") {
   communityModal.hide();
   importModal.show();
   try {
-    let response = await fetch(`https://brackets.donk.workers.dev/id/${code}`, GETrequestOptions);
+    let response = await fetch(`https://blt.donk.workers.dev/id/${code}`, GETrequestOptions);
     if (response.status !== 200) {
       elements.importModalBody.innerHTML = "Bracket not found :(";
       return;

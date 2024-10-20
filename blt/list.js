@@ -55,7 +55,7 @@ async function blacklistSubmit() {
     redirect: "follow",
   };
   try {
-    let response = await fetch(`https://brackets.donk.workers.dev/blacklist`, requestOptions);
+    let response = await fetch(`https://blt.donk.workers.dev/blacklist`, requestOptions);
     let result = await response.json();
     showToast(result.message, "info", 3000);
     blacklistModal.hide();
@@ -80,7 +80,7 @@ async function unblacklist(id) {
     redirect: "follow",
   };
   try {
-    let response = await fetch(`https://brackets.donk.workers.dev/unblacklist`, requestOptions);
+    let response = await fetch(`https://blt.donk.workers.dev/unblacklist`, requestOptions);
     let result = await response.json();
     showToast(result.message, "info", 3000);
     loadList();
@@ -104,7 +104,7 @@ async function loadList() {
     redirect: "follow",
   };
   try {
-    let response = await fetch(`https://brackets.donk.workers.dev/list`, requestOptions);
+    let response = await fetch(`https://blt.donk.workers.dev/list`, requestOptions);
     let result = await response.json();
     for (let index = 0; index < result.length; index++) {
       result[index] = JSON.parse(result[index]);
@@ -173,7 +173,7 @@ window.onload = async function () {
     redirect: "follow",
   };
   try {
-    let response = await fetch(`https://brackets.donk.workers.dev/check`, requestOptions);
+    let response = await fetch(`https://blt.donk.workers.dev/check`, requestOptions);
     let result = await response.json();
     if (response.status !== 200 || result.message !== "OK") {
       elements.main.innerHTML = "You don't have permission to view this page";
