@@ -286,7 +286,7 @@ function saveSettings() {
   localStorage.setItem("USER", JSON.stringify(USER));
   localStorage.setItem("PLAYLIST", JSON.stringify(PLAYLIST));
   localStorage.setItem("PLAYLIST_REQUESTS", JSON.stringify(requests, replacer));
-  localStorage.setItem("PLAYLIST_HISTORY", JSON.stringify(history));
+  //localStorage.setItem("PLAYLIST_HISTORY", JSON.stringify(history));
   localStorage.setItem("darkTheme", darkTheme);
   updateSite();
 } //saveSettings
@@ -399,15 +399,15 @@ function load_localStorage() {
     updateLength();
   }
 
-  if (!localStorage.getItem("PLAYLIST_HISTORY")) {
-    console.log("localStorage playlist history not found");
-  } else {
-    history = JSON.parse(localStorage.getItem("PLAYLIST_HISTORY"));
-    for (let index = 0; index < history.length; index++) {
-      addToHistory(history[index], true);
-    }
-    elements.historyCount.innerHTML = `${history.length.toLocaleString()} ${history.length == 1 ? "item" : "items"}`;
-  }
+  // if (!localStorage.getItem("PLAYLIST_HISTORY")) {
+  //   console.log("localStorage playlist history not found");
+  // } else {
+  //   history = JSON.parse(localStorage.getItem("PLAYLIST_HISTORY"));
+  //   for (let index = 0; index < history.length; index++) {
+  //     addToHistory(history[index], true);
+  //   }
+  //   elements.historyCount.innerHTML = `${history.length.toLocaleString()} ${history.length == 1 ? "item" : "items"}`;
+  // }
 } //load_localStorage
 
 function resetSettings(logout = false) {
@@ -1503,7 +1503,7 @@ function nextItem(reply) {
 
     historyIndex = -1;
     if (currentItem) {
-      addToHistory(currentItem);
+      //addToHistory(currentItem);
       deleteRequest(currentItem.id, false);
       elements.historyCount.innerHTML = `${history.length.toLocaleString()} ${history.length == 1 ? "item" : "items"}`;
     }
