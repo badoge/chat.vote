@@ -285,13 +285,13 @@ function saveSettings() {
   refreshData();
   localStorage.setItem("USER", JSON.stringify(USER));
   localStorage.setItem("PLAYLIST", JSON.stringify(PLAYLIST));
-  localStorage.setItem("PLAYLIST_REQUESTS", JSON.stringify(requests, replacer));
-  //localStorage.setItem("PLAYLIST_HISTORY", JSON.stringify(history));
+  localforage.setItem("PLAYLIST_REQUESTS", JSON.stringify(requests, replacer));
+  localforage.setItem("PLAYLIST_HISTORY", JSON.stringify(history));
   localStorage.setItem("darkTheme", darkTheme);
   updateSite();
 } //saveSettings
 
-function load_localStorage() {
+async function load_localStorage() {
   if (!localStorage.getItem("USER")) {
     console.log("localStorage user info not found");
   } else {
@@ -384,30 +384,52 @@ function load_localStorage() {
     checkCommands();
   }
 
-  if (!localStorage.getItem("PLAYLIST_REQUESTS")) {
-    console.log("localStorage playlist requests not found");
-  } else {
-    requests = JSON.parse(localStorage.getItem("PLAYLIST_REQUESTS"), reviver);
-    if (requests instanceof Map !== true) {
-      //reset localstorage for users that have the old array localstorage
-      requests = new Map();
+  localforage.config({
+    driver: localforage.INDEXEDDB,
+    name: "chat.vote/playlist",
+    version: 1.0,
+    storeName: "playlist",
+    description: "playlist requests and history",
+  });
+  localStorage.removeItem("PLAYLIST_REQUESTS");
+  localStorage.removeItem("PLAYLIST_HISTORY");
+
+  try {
+    const storedRequests = await localforage.getItem("PLAYLIST_REQUESTS");
+
+    if (!storedRequests) {
+      console.log("localStorage playlist requests not found");
+    } else {
+      requests = JSON.parse(storedRequests, reviver);
+      if (requests instanceof Map !== true) {
+        //reset localstorage for users that have the old array localstorage
+        requests = new Map();
+      }
+      for (let request of requests.values()) {
+        addToPlaylist(request);
+        updatePlaylist(request, true);
+      }
+      updateLength();
     }
-    for (let request of requests.values()) {
-      addToPlaylist(request);
-      updatePlaylist(request, true);
-    }
-    updateLength();
+  } catch (error) {
+    console.log(error);
   }
 
-  // if (!localStorage.getItem("PLAYLIST_HISTORY")) {
-  //   console.log("localStorage playlist history not found");
-  // } else {
-  //   history = JSON.parse(localStorage.getItem("PLAYLIST_HISTORY"));
-  //   for (let index = 0; index < history.length; index++) {
-  //     addToHistory(history[index], true);
-  //   }
-  //   elements.historyCount.innerHTML = `${history.length.toLocaleString()} ${history.length == 1 ? "item" : "items"}`;
-  // }
+  try {
+    const storedHistory = await localforage.getItem("PLAYLIST_HISTORY");
+
+    if (!storedHistory) {
+      console.log("localStorage playlist history not found");
+    } else {
+      history = JSON.parse(storedHistory);
+      for (let index = 0; index < history.length; index++) {
+        addToHistory(history[index], true);
+      }
+      elements.historyCount.innerHTML = `${history.length.toLocaleString()} ${history.length == 1 ? "item" : "items"}`;
+    }
+  } catch (error) {
+    console.log(error);
+  }
 } //load_localStorage
 
 function resetSettings(logout = false) {
@@ -422,8 +444,8 @@ function resetSettings(logout = false) {
         platform: "",
       })
     );
-    localStorage.setItem("PLAYLIST_REQUESTS", JSON.stringify(new Map(), replacer));
-    localStorage.setItem("PLAYLIST_HISTORY", JSON.stringify([]));
+    localforage.setItem("PLAYLIST_REQUESTS", JSON.stringify(new Map(), replacer));
+    localforage.setItem("PLAYLIST_HISTORY", JSON.stringify([]));
   }
   localStorage.setItem(
     "PLAYLIST",
@@ -1503,7 +1525,7 @@ function nextItem(reply) {
 
     historyIndex = -1;
     if (currentItem) {
-      //addToHistory(currentItem);
+      addToHistory(currentItem);
       deleteRequest(currentItem.id, false);
       elements.historyCount.innerHTML = `${history.length.toLocaleString()} ${history.length == 1 ? "item" : "items"}`;
     }
@@ -1791,7 +1813,7 @@ function logout() {
 } //logout
 
 async function loadAndConnect() {
-  load_localStorage();
+  await load_localStorage();
   refreshData();
   const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
