@@ -118,7 +118,8 @@ let elements = {
 
   //navbar
   VTSstatus: document.getElementById("VTSstatus"),
-  streamStatus: document.getElementById("streamStatus"),
+  chatStatus: document.getElementById("chatStatus"),
+  eventsubStatus: document.getElementById("eventsubStatus"),
   topright1: document.getElementById("topright1"),
   topright2: document.getElementById("topright2"),
   topright3: document.getElementById("topright3"),
@@ -148,7 +149,7 @@ let elements = {
 };
 
 let client;
-let PubSub;
+let EventSub;
 let apiClient;
 let loginButton;
 let cooldowns = { global: 0 };
@@ -1612,7 +1613,8 @@ function selectStream(streamID, chatID, streamTitle) {
   YT_STREAM_ID = streamID;
   YT_CHAT_ID = chatID;
   readYTChat();
-  elements.streamStatus.innerHTML = `<h4>
+  elements.eventsubStatus.style.display = "none";
+  elements.chatStatus.innerHTML = `<h4>
   <span class="badge bg-success">
   Connected to chat: <a class="truncate" style="display: inline-block;" target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/watch?v=${streamID}">${streamTitle}</a>
   <button type="button" onclick="loadYTStreams(true)" class="btn btn-primary change-stream">Change</button>
@@ -1806,14 +1808,14 @@ function connectVTS() {
   }
 } //connectVTS
 
-function connectTwitch() {
+function connectTwitchChat() {
   refreshData();
   if (!VTS.channel) {
     return;
   }
   loadBadges(VTS.channel);
 
-  elements.streamStatus.innerHTML = `
+  elements.chatStatus.innerHTML = `
   <h4><span class="badge bg-warning">
   Chat connecting... <div class="spinner-border" style="width:18px;height:18px;" role="status"><span class="visually-hidden">Loading...</span></div>
   </span></h4>`;
@@ -1841,7 +1843,7 @@ function connectTwitch() {
 
   client.on("connected", (address, port) => {
     console.log(`Connected to ${address}:${port}`);
-    elements.streamStatus.innerHTML = `<h4><span class="badge bg-success">Chat connected :)</span></h4>`;
+    elements.chatStatus.innerHTML = `<h4><span class="badge bg-success">Chat connected :)</span></h4>`;
     saveSettings();
     sendUsername(`chat.vote/vts`, VTS.channel, VTS.platform, YT_STREAM_ID);
     sendData("chat.vote/vts", VTS.channel, VTS.platform, { commands: VTS.commands, rewards: VTS.rewards, subs: VTS.subs, gifts: VTS.gifts, bits: VTS.bits }, YT_STREAM_ID);
@@ -1849,11 +1851,11 @@ function connectTwitch() {
   }); //connected
 
   client.on("disconnected", (reason) => {
-    elements.streamStatus.innerHTML = `<h4><span class="badge bg-danger">Chat disconnected: ${reason}</span></h4>`;
+    elements.chatStatus.innerHTML = `<h4><span class="badge bg-danger">Chat disconnected: ${reason}</span></h4>`;
   }); //disconnected
 
   client.on("notice", (channel, msgid, message) => {
-    elements.streamStatus.innerHTML = `<h4><span class="badge bg-danger">Chat disconnected: ${message}</span></h4>`;
+    elements.chatStatus.innerHTML = `<h4><span class="badge bg-danger">Chat disconnected: ${message}</span></h4>`;
   }); //notice
 
   client.on("message", (target, context, message, self) => {
@@ -2029,7 +2031,7 @@ function connectTwitch() {
       });
     }
   }); //cheer
-} //connectTwitch
+} //connectTwitchChat
 
 async function readYTChat(page = null) {
   if (!YT_STREAM_ID || !YT_CHAT_ID) {
@@ -2208,11 +2210,8 @@ async function loadAndConnect() {
   loadLists();
   if (VTS.channel || VTS.access_token) {
     if (VTS.platform == "twitch") {
-      connectTwitch();
-      PubSubconnect();
-      setTimeout(() => {
-        PubSublisten();
-      }, 2000);
+      connectTwitchChat();
+      connectTwitchEventSub();
     }
     if (VTS.platform == "youtube") {
       loadYTPFP();
@@ -2312,73 +2311,52 @@ function importBackup() {
   }
 } //importBackup
 
-function PubSubheartbeat() {
-  let message = {
-    type: "PING",
-  };
-  PubSub.send(JSON.stringify(message));
-} //PubSubheartbeat
-
-function PubSublisten() {
-  let message = {
-    type: "LISTEN",
-    data: {
-      topics: [`channel-points-channel-v1.${VTS.userID}`],
-      auth_token: VTS.access_token,
-    },
-  };
-  //console.log(`PubSublisten: ${JSON.stringify(message)}`);
-  PubSub.send(JSON.stringify(message));
-} //PubSublisten
-
-function PubSubconnect() {
-  let heartbeatInterval = 1000 * 60; //ms between PINGs
-  let reconnectInterval = 1000 * 3; //ms to wait before reconnect
-  let heartbeatHandle;
-
-  PubSub = new WebSocket("wss://pubsub-edge.twitch.tv");
-
-  PubSub.onopen = function (event) {
-    console.log("PubSub Socket Opened");
-    PubSubheartbeat();
-    heartbeatHandle = setInterval(PubSubheartbeat, heartbeatInterval);
-  };
-
-  PubSub.onerror = function (error) {
-    console.log(`PubSub.onerror: ${JSON.stringify(error)}`);
-  };
-
-  PubSub.onmessage = function (event) {
-    let message = JSON.parse(event.data);
-    //console.log(`PubSub.onmessage: ${JSON.stringify(message)}`);
-    if (message.type == "RECONNECT") {
-      console.log("PubSub Reconnecting...");
-      setTimeout(PubSubconnect, reconnectInterval);
+async function connectTwitchEventSub() {
+  try {
+    elements.eventsubStatus.innerHTML = `
+  <h4><span class="badge bg-warning">
+  Channel points connecting... <div class="spinner-border" style="width:18px;height:18px;" role="status"><span class="visually-hidden">Loading...</span></div>
+  </span></h4>`;
+    EventSub = new TES({
+      identity: {
+        id: CLIENT_ID,
+        accessToken: VTS.access_token,
+      },
+      listener: { type: "websocket" },
+    });
+    const subs = await EventSub.getSubscriptions();
+    console.log(subs);
+    for (let index = 0; index < subs.data.length; index++) {
+      await EventSub.unsubscribe(subs.data[index].id);
     }
-    if (message.data) {
-      let data = JSON.parse(message.data.message);
-      let rewardID = data.data.redemption.reward.id;
-      let rewardtitle = data.data.redemption.reward.title;
-      // let rewardColor = data.data.redemption.reward.background_color;
-      let rewardImage = `<img src="${data.data.redemption.reward.default_image.url_1x}" alt="reward image" style="height:1.2em;">`;
-      if (data.data.redemption.reward.image) {
-        rewardImage = `<img src="${data.data.redemption.reward.image.url_1x}" alt="reward image" style="height:1.2em;">`;
-      }
-      let redeemerId = data.data.redemption.user.id;
-      let redeemerLogin = data.data.redemption.user.login;
-      let redeemerDisplayName = data.data.redemption.user.display_name;
-      let userInput = "";
-      if (data.data.redemption.user_input) {
-        userInput = data.data.redemption.user_input;
-      }
+    const sub = await EventSub.subscribe("channel.channel_points_custom_reward_redemption.add", { broadcaster_user_id: VTS.userID });
+    console.log(sub);
+
+    if (sub.status == "enabled") {
+      elements.eventsubStatus.innerHTML = `<h4><span class="badge bg-success">Channel points connected :)</span></h4>`;
+    }
+
+    EventSub.on("channel.channel_points_custom_reward_redemption.add", (event, subscription) => {
+      console.log(event);
+      console.log(subscription);
+      let rewardID = event.reward.id;
+      let rewardtitle = event.reward.title;
+      // let rewardImage = `<img src="${data.data.redemption.reward.default_image.url_1x}" alt="reward image" style="height:1.2em;">`;
+      // if (data.data.redemption.reward.image) {
+      //   rewardImage = `<img src="${data.data.redemption.reward.image.url_1x}" alt="reward image" style="height:1.2em;">`;
+      // }
+      let rewardImage = `<img src="/pics/donk.png" alt="reward image" style="height:1.2em;">`;
+      let redeemerId = event.user_id;
+      let redeemerLogin = event.user_login;
+      let redeemerDisplayName = event.user_name;
       if (!VTS.rewards) {
         return;
       }
       if (VTS.rewards[rewardID]) {
         triggerHotkey(VTS.rewards[rewardID]);
         log({
-          action: `Redeemed ${rewardtitle} ${rewardImage} ${userInput ? "| Message: " + userInput + '"' : ""} | ${data.data.redemption.reward.cost.toLocaleString()} ${
-            data.data.redemption.reward.cost == 1 ? "point" : "points"
+          action: `Redeemed ${rewardtitle} ${rewardImage} ${event?.user_input ? "| Message: " + event.user_input + '"' : ""} | ${event.reward.cost.toLocaleString()} ${
+            event.reward.cost == 1 ? "point" : "points"
           }`,
           id: redeemerId,
           username: redeemerLogin,
@@ -2388,16 +2366,23 @@ function PubSubconnect() {
           badges: null,
         });
       }
-    }
-  }; //onmessage
+    });
 
-  PubSub.onclose = function () {
-    console.log("PubSub Socket Closed");
-    clearInterval(heartbeatHandle);
-    console.log("PubSub Reconnecting...");
-    setTimeout(PubSubconnect, reconnectInterval);
-  };
-} //PubSubconnect
+    EventSub.on("revocation", (subscriptionData) => {
+      elements.eventsubStatus.innerHTML = `<h4><span class="badge bg-danger">Channel points disconnected :(</span></h4>`;
+      console.log(subscriptionData);
+    });
+
+    EventSub.on("connection_lost", (subscriptions) => {
+      elements.eventsubStatus.innerHTML = `<h4><span class="badge bg-danger">Channel points disconnected :(</span></h4>`;
+      console.log(subscriptions);
+      connectTwitchChat();
+    });
+  } catch (error) {
+    console.log(error);
+    elements.eventsubStatus.innerHTML = `<h4><span class="badge bg-danger">Channel points disconnected :(</span></h4>`;
+  }
+} //connectTwitchEventSub
 
 function switchTheme(checkbox) {
   document.documentElement.setAttribute("data-bs-theme", checkbox ? "dark" : "light");

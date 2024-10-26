@@ -25,7 +25,8 @@
 }
 
 #VTSstatus,
-#streamStatus {
+#chatStatus,
+#eventsubStatus {
   margin-right: 5px;
 }
 
