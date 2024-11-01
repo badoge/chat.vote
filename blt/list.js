@@ -26,10 +26,10 @@ function showOptions(id) {
       let option = brackets[i].bracket.options[index];
       html += `
       <li class="list-group-item">
-      ${validator.escape(option.name) || `<span class="text-body-secondary">no name</span>`} - 
-      ${validator.escape(option.value) || `<span class="text-body-secondary">no value</span>`} - 
-      ${validator.escape(option.type) || `<span class="text-body-secondary">no type</span>`} - 
-      ${validator.escape(option.thumbnail) || `<span class="text-body-secondary">no thumbnail</span>`}
+      ${escapeString(option.name) || `<span class="text-body-secondary">no name</span>`} - 
+      ${escapeString(option.value) || `<span class="text-body-secondary">no value</span>`} - 
+      ${escapeString(option.type) || `<span class="text-body-secondary">no type</span>`} - 
+      ${escapeString(option.thumbnail) || `<span class="text-body-secondary">no thumbnail</span>`}
       </li>`;
     }
     html += `</ul>`;
@@ -122,8 +122,8 @@ async function loadList() {
       }
       list += `
       <li class="list-group-item">
-      ${bracket.id} - ${validator.escape(bracket.username)} - 
-      ${validator.escape(bracket.bracket.title)} - ${validator.escape(bracket.bracket.description)} - ${bracket.bracket.options.length} options 
+      ${bracket.id} - ${escapeString(bracket.username)} - 
+      ${escapeString(bracket.bracket.title)} - ${escapeString(bracket.bracket.description)} - ${bracket.bracket.options.length} options 
       <br><button type="button" class="btn btn-danger float-end me-2" onclick="blacklist('${bracket.id}')">Blacklist</button>
       <button type="button" class="btn btn-info float-end me-2" onclick="showOptions('${bracket.id}')">Options</button>
       </li>`;
@@ -144,8 +144,8 @@ async function loadList() {
       }
       blacklisted += `
     <li class="list-group-item">
-    ${bracket.reason || "no reason"} - ${bracket.id} - ${validator.escape(bracket.username)} - 
-    ${validator.escape(bracket.bracket.title)} - ${validator.escape(bracket.bracket.description)} - ${bracket.bracket.options.length} options 
+    ${bracket.reason || "no reason"} - ${bracket.id} - ${escapeString(bracket.username)} - 
+    ${escapeString(bracket.bracket.title)} - ${escapeString(bracket.bracket.description)} - ${bracket.bracket.options.length} options 
     <br><button type="button" class="btn btn-danger float-end me-2" onclick="unblacklist('${bracket.id}')">Unblacklist</button>
     <button type="button" class="btn btn-info float-end me-2" onclick="showOptions('${bracket.id}')">Options</button>
     </li>`;

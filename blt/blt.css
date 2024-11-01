@@ -38,7 +38,7 @@ body {
   overflow: auto;
 }
 
-#scoreCard {
+#scoreAccordion {
   height: 70vh;
   overflow-y: auto;
 }

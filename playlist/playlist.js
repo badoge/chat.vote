@@ -194,7 +194,7 @@ let PLAYLIST = {
 async function refreshData() {
   darkTheme = elements.darkTheme.checked ?? true;
   if (!USER.twitchLogin) {
-    USER.channel = validator.escape(elements.channelName.value.replace(/\s+/g, "").toLowerCase());
+    USER.channel = escapeString(elements.channelName.value.replace(/\s+/g, "").toLowerCase());
     USER.platform = "twitch";
   }
   if (!USER.userID && USER.channel) {
@@ -391,8 +391,6 @@ async function load_localStorage() {
     storeName: "playlist",
     description: "playlist requests and history",
   });
-  localStorage.removeItem("PLAYLIST_REQUESTS");
-  localStorage.removeItem("PLAYLIST_HISTORY");
 
   try {
     const storedRequests = await localforage.getItem("PLAYLIST_REQUESTS");
@@ -964,11 +962,11 @@ function addToHistory(request, localStorageLoad = false) {
                 href="${getItemLink(request.type, request.id)}" 
                 target="_blank" 
                 rel="noopener noreferrer"> 
-                ${validator.escape(request.title)}
+                ${escapeString(request.title)}
                 </a>
               </div>
               <small class="request-info text-body-secondary">
-              ${validator.escape(request.channel)} ${request.views > -1 ? ` · ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}
+              ${escapeString(request.channel)} ${request.views > -1 ? ` · ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}
               </small>
               <small class="requested-by text-body-secondary" title="Requested by @${request.by.map((u) => u.username).join(" & ")}">
               Requested by 
@@ -999,13 +997,13 @@ function updatePlaylist(request, localStorageLoad = false) {
     href="${getItemLink(request.type, request.id)}"
     target="_blank"
     rel="noopener noreferrer">
-    ${validator.escape(request.title)}
+    ${escapeString(request.title)}
     </a>`;
     document.getElementById(`id${request.id}_title`).title = request.title;
     document.getElementById(`id${request.id}_info`).innerHTML = `
-    ${validator.escape(request.channel)} ${request.views > -1 ? ` · ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}`;
+    ${escapeString(request.channel)} ${request.views > -1 ? ` · ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}`;
     document.getElementById(`id${request.id}_info`).title = `
-    ${validator.escape(request.channel)} ${request.views > -1 ? ` · ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}`;
+    ${escapeString(request.channel)} ${request.views > -1 ? ` · ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}`;
     document.getElementById(`id${request.id}_duration`).innerText = request.duration == -1 ? "🔴live" : secondsToTimeString(Math.round(request.duration));
     document.getElementById(`id${request.id}_by`).innerHTML = `
     Requested by 
@@ -1594,7 +1592,7 @@ function playItem(item) {
   href="${getItemLink(currentItem.type, currentItem.id)}"
   target="_blank"
   rel="noopener noreferrer">
-  ${validator.escape(currentItem.title)}
+  ${escapeString(currentItem.title)}
   </a>`;
   elements.nowPlaying.title = currentItem.title;
   elements.nowPlayingRequester.innerHTML = `

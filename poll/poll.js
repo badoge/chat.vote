@@ -427,7 +427,7 @@ async function createPoll() {
     <ul class="list-unstyled">
       <li>
         <ul>
-          <li>${validator.escape(result.data.questions[0].title)}</li>
+          <li>${escapeString(result.data.questions[0].title)}</li>
         </ul>
       </li>
     </ul>`;
@@ -440,7 +440,7 @@ async function createPoll() {
     for (let index = 0, j = result.data.questions[0].options.length; index < j; index++) {
       options += `
           <li>
-            ${validator.escape(result.data.questions[0].options[index].name)}
+            ${escapeString(result.data.questions[0].options[index].name)}
           </li>`;
     }
     options += `

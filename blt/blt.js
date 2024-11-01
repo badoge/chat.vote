@@ -8,7 +8,6 @@ let elements = {
   deleteTriviaModal: document.getElementById("deleteTriviaModal"),
   deleteTriviaModalBody: document.getElementById("deleteTriviaModalBody"),
   deleteTriviaButton: document.getElementById("deleteTriviaButton"),
-  quitBracketModal: document.getElementById("quitBracketModal"),
   tierlistEditorModal: document.getElementById("tierlistEditorModal"),
   tierlistEditor: document.getElementById("tierlistEditor"),
 
@@ -59,10 +58,13 @@ let elements = {
   bracketSettings: document.getElementById("bracketSettings"),
   tierlistSettings: document.getElementById("tierlistSettings"),
   changeCommand: document.getElementById("changeCommand"),
+  changeCommandCopy: document.getElementById("changeCommandCopy"),
   highestTier: document.getElementById("highestTier"),
   averageTier: document.getElementById("averageTier"),
   keepVotingEnabled: document.getElementById("keepVotingEnabled"),
+  keepVotingEnabledCopy: document.getElementById("keepVotingEnabledCopy"),
   disableAnimations: document.getElementById("disableAnimations"),
+  disableAnimationsCopy: document.getElementById("disableAnimationsCopy"),
   spotifyWarning: document.getElementById("spotifyWarning"),
 
   startTriviaModal: document.getElementById("startTriviaModal"),
@@ -144,8 +146,6 @@ let elements = {
   left_info: document.getElementById("left_info"),
   right_info: document.getElementById("right_info"),
 
-  quitBracket: document.getElementById("quitBracket"),
-  settings: document.getElementById("settings"),
   restart: document.getElementById("restart"),
   hideScore: document.getElementById("hideScore"),
   hideScoreIcon: document.getElementById("hideScoreIcon"),
@@ -193,9 +193,13 @@ let elements = {
   //trivia
 
   triviaPoints: document.getElementById("triviaPoints"),
+  triviaPointsCopy: document.getElementById("triviaPointsCopy"),
   triviaScoring: document.getElementById("triviaScoring"),
+  triviaScoringCopy: document.getElementById("triviaScoringCopy"),
   oneChance: document.getElementById("oneChance"),
+  oneChanceCopy: document.getElementById("oneChanceCopy"),
   showHint: document.getElementById("showHint"),
+  showHintCopy: document.getElementById("showHintCopy"),
   trivia: document.getElementById("trivia"),
   triviaTitleCard: document.getElementById("triviaTitleCard"),
   triviaDescriptionCard: document.getElementById("triviaDescriptionCard"),
@@ -234,7 +238,6 @@ let loginButton;
 let loginExpiredModal,
   deleteBracketModal,
   deleteTriviaModal,
-  quitBracketModal,
   tierlistEditorModal,
   previewModal,
   generateChatModal,
@@ -281,18 +284,9 @@ function resetSettings() {
       platform: "",
     })
   );
-  localStorage.setItem(
-    "BRACKETS",
-    JSON.stringify({
-      brackets: [],
-    })
-  );
-  localStorage.setItem(
-    "TRIVIA",
-    JSON.stringify({
-      trivia: [],
-    })
-  );
+  localforage.setItem("BRACKETS_TIERLISTS", JSON.stringify([]));
+  localforage.setItem("TRIVIA", JSON.stringify([]));
+
   location.reload();
   return false;
 } //resetSettings
@@ -301,7 +295,7 @@ async function refreshData() {
   darkTheme = elements.darkTheme.checked ?? true;
 
   if (!USER.twitchLogin) {
-    USER.channel = validator.escape(elements.channelName.value.replace(/\s+/g, "").toLowerCase());
+    USER.channel = escapeString(elements.channelName.value.replace(/\s+/g, "").toLowerCase());
     USER.platform = "twitch";
   }
   if (!USER.userID && USER.channel) {
@@ -312,13 +306,13 @@ async function refreshData() {
 function saveSettings() {
   refreshData();
   localStorage.setItem("USER", JSON.stringify(USER));
-  localStorage.setItem("BRACKETS", JSON.stringify(BRACKETS));
-  localStorage.setItem("TRIVIA", JSON.stringify(TRIVIA));
+  localforage.setItem("BRACKETS_TIERLISTS", JSON.stringify(BRACKETS));
+  localforage.setItem("TRIVIA", JSON.stringify(TRIVIA));
   localStorage.setItem("darkTheme", darkTheme);
 } //saveSettings
 
 async function loadAndConnect() {
-  load_localStorage();
+  await load_localStorage();
   refreshData();
   const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
@@ -340,7 +334,7 @@ async function loadAndConnect() {
   }
 } //loadAndConnect
 
-function load_localStorage() {
+async function load_localStorage() {
   if (!localStorage.getItem("USER")) {
     console.log("localStorage user info not found");
   } else {
@@ -348,20 +342,38 @@ function load_localStorage() {
     elements.channelName.value = USER.channel;
   }
 
-  if (!localStorage.getItem("BRACKETS")) {
-    console.log("localStorage brackets not found");
-    elements.myBrackets.innerHTML = `<span class="text-body-secondary">Nothing here</span>`;
-  } else {
-    BRACKETS = JSON.parse(localStorage.getItem("BRACKETS"));
-    loadBrackets();
+  localforage.config({
+    driver: localforage.INDEXEDDB,
+    name: "chat.vote/blt",
+    version: 1.0,
+    storeName: "blt",
+    description: "brackets, tierlists and trivia",
+  });
+
+  try {
+    const storedBracketsTierlists = await localforage.getItem("BRACKETS_TIERLISTS");
+    if (!storedBracketsTierlists) {
+      console.log("localStorage brackets/tierlists not found");
+      elements.myBrackets.innerHTML = `<span class="text-body-secondary">Nothing here</span>`;
+    } else {
+      BRACKETS = JSON.parse(storedBracketsTierlists);
+      loadBrackets();
+    }
+  } catch (error) {
+    console.log(error);
   }
 
-  if (!localStorage.getItem("TRIVIA")) {
-    console.log("localStorage trivia not found");
-    elements.myTrivia.innerHTML = `<span class="text-body-secondary">Nothing here</span>`;
-  } else {
-    TRIVIA = JSON.parse(localStorage.getItem("TRIVIA"));
-    loadTrivia();
+  try {
+    const storedTrivia = await localforage.getItem("TRIVIA");
+    if (!storedTrivia) {
+      console.log("localStorage trivia not found");
+      elements.myTrivia.innerHTML = `<span class="text-body-secondary">Nothing here</span>`;
+    } else {
+      TRIVIA = JSON.parse(storedTrivia);
+      loadTrivia();
+    }
+  } catch (error) {
+    console.log(error);
   }
 } //load_localStorage
 
@@ -513,6 +525,8 @@ function connect() {
     </div>
     </div>`;
   refreshData();
+  loadBadges(USER.channel);
+
   let options = {
     options: {
       clientId: CLIENT_ID,
@@ -563,8 +577,7 @@ function connect() {
           username: context.username,
           displayname: context["display-name"],
           color: context.color,
-          firstmsg: context["first-msg"],
-          badges: context.badges,
+          badges: addBadges(context.badges, context["user-id"], context["first-msg"]),
         };
         addTriviaUser(user);
       }
@@ -672,7 +685,6 @@ function switchTheme(checkbox) {
 } //switchTheme
 
 function addTriviaUser(user) {
-  user.badgeshtml = addBadges(user.badges, user.id, user.firstmsg);
   user.name = user.username == user.displayname.toLowerCase() ? `${user.displayname}` : `${user.displayname} (${user.username})`;
   user.color = !user.color ? "#FFFFFF" : user.color;
   triviaUsers.push(user);
@@ -688,8 +700,8 @@ function updateTriviaLeaderboard() {
   for (let index = 0, j = triviaUsers.length; index < j; index++) {
     html += `
     <li class="list-group-item">
-    ${triviaUsers[index].badgeshtml}<span style="color:${triviaUsers[index].color};">${triviaUsers[index].name}:</span>
-    ${triviaUsers[index].points} ${triviaUsers[index].points == 1 ? "point" : "points"}
+    ${triviaUsers[index].badges}<span style="color:${triviaUsers[index].color};">${triviaUsers[index].name}:</span>
+    ${triviaUsers[index].points.toLocaleString()} ${triviaUsers[index].points == 1 ? "point" : "points"}
     </li>`;
   }
   elements.triviaUsers.innerHTML = html;
@@ -867,7 +879,7 @@ async function previewOption(id, button) {
     elements.previewModalBody.innerHTML = `
     <div class="card">
     <div class="card-body">
-    ${validator.escape(option?.value) || `<span class="text-body-secondary">Empty option</span>`}
+    ${escapeString(option?.value) || `<span class="text-body-secondary">Empty option</span>`}
     </div>
     </div>`;
     previewModal.show();
@@ -1021,7 +1033,7 @@ async function previewQuestion(id, button) {
     elements.previewModalBody.innerHTML = `
     <div class="card">
     <div class="card-body">
-    ${validator.escape(question?.value) || `<span class="text-body-secondary">Empty question</span>`}
+    ${escapeString(question?.value) || `<span class="text-body-secondary">Empty question</span>`}
     </div>
     </div>`;
     previewModal.show();
@@ -1561,7 +1573,7 @@ function startSingleElimination(bracket) {
   elements.editor.style.display = "none";
   elements.bracket.style.display = "";
   elements.title.innerText = bracket.title;
-  elements.winner.innerHTML = `Winner of ${validator.escape(bracket.title)}<br>`;
+  elements.winner.innerHTML = `Winner of ${escapeString(bracket.title)}<br>`;
   elements.pickWinner.innerHTML = `<i class="material-icons notranslate">navigate_next</i>Next match`;
 
   console.log(currentBracket);
@@ -1571,7 +1583,6 @@ function startSingleElimination(bracket) {
   currentScores = { left: 0, right: 0 };
   currentCommand = { left: "a", right: "b" };
 
-  elements.settings.disabled = false;
   elements.restart.disabled = false;
   elements.hideScore.disabled = false;
   elements.enableVoting.disabled = false;
@@ -1716,10 +1727,10 @@ function getHint() {
     correctChoice = triviaChoices[index];
 
     return `Choices: 
-    <button type="button" class="btn btn-lg btn-primary mb-2"><span class="float-start">A • </span> ${validator.escape(shuffled[0])}</button>
-    <button type="button" class="btn btn-lg btn-danger mb-2"><span class="float-start">B • </span> ${validator.escape(shuffled[1])}</button>
-    <button type="button" class="btn btn-lg btn-warning mb-2"><span class="float-start">C • </span> ${validator.escape(shuffled[2])}</button>
-    <button type="button" class="btn btn-lg btn-info mb-2"><span class="float-start">D • </span> ${validator.escape(shuffled[3])}</button>`;
+    <button type="button" class="btn btn-lg btn-primary mb-2"><span class="float-start">A • </span> ${escapeString(shuffled[0])}</button>
+    <button type="button" class="btn btn-lg btn-danger mb-2"><span class="float-start">B • </span> ${escapeString(shuffled[1])}</button>
+    <button type="button" class="btn btn-lg btn-warning mb-2"><span class="float-start">C • </span> ${escapeString(shuffled[2])}</button>
+    <button type="button" class="btn btn-lg btn-info mb-2"><span class="float-start">D • </span> ${escapeString(shuffled[3])}</button>`;
   }
 
   if (!elements.showHint.checked) {
@@ -1916,7 +1927,7 @@ async function nextTierlistItem() {
 
   if (item.type == "text") {
     elements.text_image_tierlist.style.display = "";
-    elements.text_image_tierlist.innerHTML = validator.escape(item.value) || `<span class="text-body-secondary">Empty option</span>`;
+    elements.text_image_tierlist.innerHTML = escapeString(item.value) || `<span class="text-body-secondary">Empty option</span>`;
   } //text
 
   if (item.type == "image") {
@@ -2141,11 +2152,11 @@ async function showOption(position, option) {
     }
   }
 
-  elements[`${position}_name`].innerHTML = validator.escape(option.name) || `<span class="text-body-secondary">Untitled option</span>`;
+  elements[`${position}_name`].innerHTML = escapeString(option.name) || `<span class="text-body-secondary">Untitled option</span>`;
 
   if (option.type == "text") {
     elements[`text_image_${position}`].style.display = "";
-    elements[`text_image_${position}`].innerHTML = validator.escape(option.value) || `<span class="text-body-secondary">Empty option</span>`;
+    elements[`text_image_${position}`].innerHTML = escapeString(option.value) || `<span class="text-body-secondary">Empty option</span>`;
   } //text
 
   if (option.type == "image") {
@@ -2327,9 +2338,8 @@ function updateScores() {
 } //updateScores
 
 function showWinner(first, firstAndSecond) {
-  elements.winner.innerHTML += `<strong>${validator.escape(first[0].name)}</strong>`;
+  elements.winner.innerHTML += `<strong>${escapeString(first[0].name)}</strong>`;
 
-  elements.settings.disabled = true;
   elements.restart.disabled = true;
   elements.hideScore.disabled = true;
   elements.enableVoting.disabled = true;
@@ -2470,7 +2480,7 @@ function disableVoteButton() {
   voting_enabled = false;
 } //disableVoteButton
 
-function quitBracket() {
+function quit() {
   elements.bracket.style.display = "none";
   elements.tierlist.style.display = "none";
   elements.trivia.style.display = "none";
@@ -2478,11 +2488,7 @@ function quitBracket() {
   resetPlayers();
   disableVoteButton();
   changeSiteLinkTarget("_self");
-} //quitBracket
-
-function showQuitBracketModal() {
-  quitBracketModal.show();
-} //showQuitBracketModal
+} //quit
 
 function editBracket(id) {
   elements.triviaEditor.style.display = "none";
@@ -2517,7 +2523,7 @@ function editTrivia(id) {
 
   elements.triviaEditorHeader.innerHTML = `ID${id}`;
 
-  for (let index = 0; index < trivia.questions.length; index++) {
+  for (let index = 0; index < trivia.questions?.length; index++) {
     addTriviaQuestion(
       trivia.questions[index].multipleChoice,
       trivia.questions[index].type,
@@ -2562,7 +2568,7 @@ function loadBrackets() {
       : "";
     html += `<div class="card mb-3">
     <div class="card-header">
-      ${validator.escape(BRACKETS.brackets[index].title) || "Untitled bracket"} ${warning}
+      ${escapeString(BRACKETS.brackets[index].title) || "Untitled bracket"} ${warning}
       <div class="btn-group btn-group-sm float-end" role="group" aria-label="bracket controls">
         <button type="button" class="btn btn-success" onclick="showStartModal(${BRACKETS.brackets[index].id})">
           <i class="material-icons notranslate">play_arrow</i> Start bracket
@@ -2583,7 +2589,7 @@ function loadBrackets() {
     </div>
     <div class="card-body my-bracket-body">
       <h5 class="card-title">${BRACKETS.brackets[index].description || "No description"}</h5>
-      <p class="card-text">${BRACKETS.brackets[index].options.map((e) => `${icons[e.type]} ${validator.escape(e.name)}`).join(" • ") || "No options"}</p>
+      <p class="card-text">${BRACKETS.brackets[index].options.map((e) => `${icons[e.type]} ${escapeString(e.name)}`).join(" • ") || "No options"}</p>
     </div>
   </div>`;
   }
@@ -2600,12 +2606,14 @@ function loadTrivia() {
   let html = ``;
 
   for (let index = TRIVIA.trivia.length - 1; index >= 0; index--) {
-    let warning = TRIVIA.trivia[index].questions.some((e) => !e.answer)
-      ? `<i class="material-icons notranslate text-danger cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Some of the questions have no answer">warning</i>`
-      : "";
+    let warning = "";
+    if (!TRIVIA.trivia[index]?.questions || TRIVIA.trivia[index]?.questions.some((e) => !e.answer)) {
+      warning = `<i class="material-icons notranslate text-danger cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Some of the questions have no answer">warning</i>`;
+    }
+
     html += `<div class="card mb-3">
     <div class="card-header">
-      ${validator.escape(TRIVIA.trivia[index].title) || "Untitled trivia"} ${warning}
+      ${escapeString(TRIVIA.trivia[index].title) || "Untitled trivia"} ${warning}
       <div class="btn-group btn-group-sm float-end" role="group" aria-label="trivia controls">
         <button type="button" class="btn btn-success" onclick="showStartTriviaModal(${TRIVIA.trivia[index].id})">
           <i class="material-icons notranslate">play_arrow</i> Start trivia
@@ -2626,7 +2634,7 @@ function loadTrivia() {
     </div>
     <div class="card-body my-trivia-body">
       <h5 class="card-title">${TRIVIA.trivia[index].description || "No description"}</h5>
-      <p class="card-text">${TRIVIA.trivia[index].questions.map((e) => `${icons[e.type]} ${validator.escape(e.question)}`).join(" • ") || "No questions"}</p>
+      <p class="card-text">${TRIVIA.trivia[index]?.questions?.map((e) => `${icons[e.type]} ${escapeString(e.question)}`).join(" • ") || "No questions"}</p>
     </div>
   </div>`;
   }
@@ -2694,13 +2702,13 @@ async function previewSpotifyPlaylist() {
       });
       html += `
       <li class="list-group-item">
-      <a target="_blank" rel="noopener noreferrer" href="${tracks[index].track.preview_url}">${validator.escape(tracks[index].track.name)} - ${tracks[index].track.artists
+      <a target="_blank" rel="noopener noreferrer" href="${tracks[index].track.preview_url}">${escapeString(tracks[index].track.name)} - ${tracks[index].track.artists
         .map((a) => a.name)
         .join(", ")}</a>
       </li>`;
     }
     html += `</ul>`;
-    elements.spotifyPlaylistPreview.innerHTML = `<p>${validator.escape(result[0].name) || "Untitled playlist"} - ${validator.escape(result[0].description) || "No description"} - ${
+    elements.spotifyPlaylistPreview.innerHTML = `<p>${escapeString(result[0].name) || "Untitled playlist"} - ${escapeString(result[0].description) || "No description"} - ${
       previewedBracket.length == 0 ? "Playlist has no tracks" : `${previewedBracket.length} ${previewedBracket.length == 1 ? "track" : "tracks"}`
     } </p>${html}`;
   } catch (error) {
@@ -2760,7 +2768,7 @@ async function previewTiermaker() {
       html += `
         <li class="list-group-item">
         <a target="_blank" rel="noopener noreferrer" href="https://proxy.donk.workers.dev/?url=${encodeURI(link)}">
-        ${validator.escape(name) || "Untitled option"}
+        ${escapeString(name) || "Untitled option"}
         </a>
         </li>`;
       images++;
@@ -2814,7 +2822,7 @@ async function previewClips() {
       html += `
       <li class="list-group-item">
       <a target="_blank" rel="noopener noreferrer" href="${clips[index].url}">
-      ${validator.escape(clips[index].title)} - ${clips[index].view_count.toLocaleString()} ${clips[index].view_count == 1 ? "view" : "views"}
+      ${escapeString(clips[index].title)} - ${clips[index].view_count.toLocaleString()} ${clips[index].view_count == 1 ? "view" : "views"}
       </a>
       </li>`;
     }
@@ -2918,7 +2926,7 @@ async function previewUwufufu() {
         html += `
         <li class="list-group-item">
         <a target="_blank" rel="noopener noreferrer" href="https://proxy.donk.workers.dev/?url=${encodeURI(previewedBracket[index].value)}">
-        ${validator.escape(previewedBracket[index].name) || "Untitled option"}
+        ${escapeString(previewedBracket[index].name) || "Untitled option"}
         </a>
         </li>`;
         images++;
@@ -2970,7 +2978,7 @@ async function previewYTChannel() {
       html += `
       <li class="list-group-item">
       <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/watch?v=${videos[index].id.videoId}">
-      ${validator.escape(videos[index].snippet.title)}
+      ${escapeString(videos[index].snippet.title)}
       </a>
       </li>`;
     }
@@ -3016,7 +3024,7 @@ async function previewYTPlaylist() {
       html += `
       <li class="list-group-item">
       <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/watch?v=${videos[index].snippet.resourceId.videoId}">
-      ${validator.escape(videos[index].snippet.title)}
+      ${escapeString(videos[index].snippet.title)}
       </a>
       </li>`;
     }
@@ -3133,13 +3141,13 @@ async function importCode(hashCode = "") {
 
     let html = `
     <div class="card">
-    <div class="card-header">${validator.escape(result.bracket.title)} <span class="text-body-secondary">by @${result.username}</span></div>
+    <div class="card-header">${escapeString(result.bracket.title)} <span class="text-body-secondary">by @${result.username}</span></div>
     <div class="card-body">
-    <p class="card-text">${validator.escape(result.bracket.description)}</p>
+    <p class="card-text">${escapeString(result.bracket.description)}</p>
     Options (${result.bracket.options.length}):
     <ul class="list-group" style="max-height: 400px; overflow: auto">`;
     for (let index = 0; index < result.bracket.options.length; index++) {
-      html += `<li class="list-group-item">${validator.escape(result.bracket.options[index].name)} - ${validator.escape(result.bracket.options[index].value)}</li>`;
+      html += `<li class="list-group-item">${escapeString(result.bracket.options[index].name)} - ${escapeString(result.bracket.options[index].value)}</li>`;
     }
     html += `
     </ul>
@@ -3192,70 +3200,89 @@ async function importApproved(id) {
 } //importApproved
 
 let chatBracket = [];
-function loadPlaylist() {
-  let playlist = JSON.parse(localStorage.getItem("PLAYLIST_REQUESTS"), reviver);
-  if (!playlist || playlist.size < 2) {
-    elements.playlist.innerHTML = `<span class="text-warning">Playlist needs to have at least 2 videos</span>`;
-    return;
+async function loadPlaylist() {
+  let playlistLocalforage = localforage.createInstance({
+    driver: localforage.INDEXEDDB,
+    name: "chat.vote/playlist",
+    version: 1.0,
+    storeName: "playlist",
+    description: "playlist requests and history",
+  });
+
+  try {
+    const playlist = await playlistLocalforage.getItem("PLAYLIST_REQUESTS");
+    if (!playlist) {
+      console.log("localStorage playlist requests not found");
+    } else {
+      requests = JSON.parse(playlist, reviver);
+      console.log(requests);
+
+      if (!requests || requests.size < 2) {
+        elements.playlist.innerHTML = `<span class="text-warning">Playlist needs to have at least 2 videos</span>`;
+        return;
+      }
+
+      let count = 0;
+      chatBracket = [];
+      let html = `<ul class="list-group">`;
+
+      for (let [key, req] of requests) {
+        let type = req.type;
+        if (type == "twitch stream" || type == "twitch vod") {
+          //skip streams and vods bcz they are not supported in the brackets site
+          continue;
+        }
+
+        if (!req.title || !req.id || !req.type || !req.thumbnail || (req.type == "streamable" && !req.video)) {
+          //skip broken requests
+          continue;
+        }
+
+        if (type == "youtube short") {
+          type = "youtube";
+        }
+
+        if (type == "twitch clip") {
+          type = "twitch";
+        }
+
+        if (type == "supa video" || type == "supa audio") {
+          type = "supa video/audio";
+        }
+
+        count++;
+
+        let link = getItemLink(type, req.id);
+
+        chatBracket.push({
+          name: req.title,
+          id: req.id,
+          type: type,
+          value: link,
+          thumbnail: req.thumbnail,
+          video: req?.video,
+        });
+        html += `
+        <li class="list-group-item">
+        <a target="_blank" rel="noopener noreferrer" href="${link}">
+        ${escapeString(req.title)}
+        </a>
+        </li>`;
+      }
+
+      html += `</ul>`;
+      let diff = playlist.length - count;
+      elements.playlist.innerHTML = `
+        Playlist has ${count} videos ${diff ? ` (${diff} unsupported/broken ${diff == 1 ? "video" : "videos"} skipped)` : ""}
+        ${html}`;
+
+      communityModal.hide();
+
+      console.log(playlist);
+    }
+  } catch (error) {
+    console.log(error);
   }
-
-  let count = 0;
-  chatBracket = [];
-  let html = `<ul class="list-group">`;
-
-  for (let [key, req] of playlist) {
-    let type = req.type;
-    if (type == "twitch stream" || type == "twitch vod") {
-      //skip streams and vods bcz they are not supported in the brackets site
-      continue;
-    }
-
-    if (!req.title || !req.id || !req.type || !req.thumbnail || (req.type == "streamable" && !req.video)) {
-      //skip broken requests
-      continue;
-    }
-
-    if (type == "youtube short") {
-      type = "youtube";
-    }
-
-    if (type == "twitch clip") {
-      type = "twitch";
-    }
-
-    if (type == "supa video" || type == "supa audio") {
-      type = "supa video/audio";
-    }
-
-    count++;
-
-    let link = getItemLink(type, req.id);
-
-    chatBracket.push({
-      name: req.title,
-      id: req.id,
-      type: type,
-      value: link,
-      thumbnail: req.thumbnail,
-      video: req?.video,
-    });
-    html += `
-  <li class="list-group-item">
-  <a target="_blank" rel="noopener noreferrer" href="${link}">
-  ${validator.escape(req.title)}
-  </a>
-  </li>`;
-  }
-
-  html += `</ul>`;
-  let diff = playlist.length - count;
-  elements.playlist.innerHTML = `
-  Playlist has ${count} videos ${diff ? ` (${diff} unsupported/broken ${diff == 1 ? "video" : "videos"} skipped)` : ""}
-  ${html}`;
-
-  communityModal.hide();
-
-  console.log(playlist);
 } //loadPlaylist
 
 function generateChatBracket() {
@@ -3584,7 +3611,6 @@ window.onload = async function () {
   loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
   deleteBracketModal = new bootstrap.Modal(elements.deleteBracketModal);
   deleteTriviaModal = new bootstrap.Modal(elements.deleteTriviaModal);
-  quitBracketModal = new bootstrap.Modal(elements.quitBracketModal);
   tierlistEditorModal = new bootstrap.Modal(elements.tierlistEditorModal);
   previewModal = new bootstrap.Modal(elements.previewModal);
   generateChatModal = new bootstrap.Modal(elements.generateChatModal);
@@ -3644,6 +3670,57 @@ window.onload = async function () {
       elements.bracketSettings.style.display = "";
       elements.tierlistSettings.style.display = "none";
     }
+  };
+
+  elements.changeCommand.onchange = function () {
+    elements.changeCommandCopy.checked = this.checked;
+  };
+  elements.changeCommandCopy.onchange = function () {
+    elements.changeCommand.checked = this.checked;
+  };
+
+  elements.keepVotingEnabled.onchange = function () {
+    elements.keepVotingEnabledCopy.checked = this.checked;
+  };
+  elements.keepVotingEnabledCopy.onchange = function () {
+    elements.keepVotingEnabled.checked = this.checked;
+  };
+
+  elements.disableAnimations.onchange = function () {
+    elements.disableAnimationsCopy.checked = this.checked;
+  };
+  elements.disableAnimationsCopy.onchange = function () {
+    elements.disableAnimations.checked = this.checked;
+  };
+
+  elements.triviaPoints.onchange = function () {
+    triviaPoints = parseInt(elements.triviaPoints.value, 10);
+    elements.triviaPointsCopy.value = triviaPoints;
+  };
+  elements.triviaPointsCopy.onchange = function () {
+    triviaPoints = parseInt(elements.triviaPointsCopy.value, 10);
+    elements.triviaPoints.value = triviaPoints;
+  };
+
+  elements.triviaScoring.onchange = function () {
+    elements.triviaScoringCopy.value = this.value;
+  };
+  elements.triviaScoringCopy.onchange = function () {
+    elements.triviaScoring.value = this.value;
+  };
+
+  elements.oneChance.onchange = function () {
+    elements.oneChanceCopy.checked = this.checked;
+  };
+  elements.oneChanceCopy.onchange = function () {
+    elements.oneChance.checked = this.checked;
+  };
+
+  elements.showHint.onchange = function () {
+    elements.showHintCopy.checked = this.checked;
+  };
+  elements.showHintCopy.onchange = function () {
+    elements.showHint.checked = this.checked;
   };
 
   elements.hideScore.addEventListener("click", function () {

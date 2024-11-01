@@ -98,7 +98,7 @@
       </div>
     </div>
 
-    <div class="modal fade" id="quitBracketModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="quitModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -108,7 +108,7 @@
           <div class="modal-body">Results will be lost if you quit</div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="quitBracket()">Quit</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="quit()">Quit</button>
           </div>
         </div>
       </div>
@@ -614,7 +614,7 @@
                 <option value="decay">Points decay</option>
                 <option value="everyone">Everyone</option>
               </select>
-              <label for="floatingSelect">Scoring</label>
+              <label for="triviaScoring">Scoring</label>
             </div>
             <small class="text-body-secondary">
               First answer only: first viewer to answer correctly gets the full points<br />
@@ -643,6 +643,94 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="startTrivia()">Start Trivia</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="changeBracketSettingsModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Bracket settings</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="form-check form-switch mt-3">
+              <input class="form-check-input" type="checkbox" role="switch" id="changeCommandCopy" />
+              <label class="form-check-label" for="changeCommandCopy">Alternate voting command</label><br />
+              <small class="text-body-secondary"> Switches the voting command from 1/2 to a/b every other round to get around the Twitch 30s same message cooldown </small>
+            </div>
+
+            <div class="form-check form-switch mt-3">
+              <input class="form-check-input" type="checkbox" role="switch" id="keepVotingEnabledCopy" />
+              <label class="form-check-label" for="keepVotingEnabledCopy">Keep voting enabled after round ends</label><br />
+              <small class="text-body-secondary">
+                If this is off then voting will be automatically disabled after a round ends so viewers don't accidentally vote too soon if they have a long stream delay
+              </small>
+            </div>
+
+            <div class="form-check form-switch mt-3">
+              <input class="form-check-input" type="checkbox" role="switch" id="disableAnimationsCopy" />
+              <label class="form-check-label" for="disableAnimationsCopy">Disable animations</label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="changeTriviaSettingsModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Trivia settings</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="form-floating">
+              <input type="number" class="form-control" id="triviaPointsCopy" value="10" min="1" />
+              <label for="triviaPointsCopy">Question points value</label>
+            </div>
+            <small class="text-body-secondary"> How many points each question is worth </small>
+
+            <div class="form-floating mt-3">
+              <select class="form-select" id="triviaScoringCopy" aria-label="trivia scoring">
+                <option value="first" selected>First answer only</option>
+                <option value="decay">Points decay</option>
+                <option value="everyone">Everyone</option>
+              </select>
+              <label for="triviaScoringCopy">Scoring</label>
+            </div>
+            <small class="text-body-secondary">
+              First answer only: first viewer to answer correctly gets the full points<br />
+              Points decay: first viewer to answer correctly gets the full points, 2nd viewer gets 1 point less 3rd viewer gets 2 points less...<br />
+              Everyone: anyone that answers correctly will get the full points
+            </small>
+
+            <div class="form-check form-switch mt-3">
+              <input class="form-check-input" type="checkbox" role="switch" id="oneChanceCopy" />
+              <label class="form-check-label" for="oneChanceCopy">Take first message as the answer</label>
+            </div>
+            <small class="text-body-secondary">
+              The first message each viewer types will be considered as their answer and they won't be able to answer again till next round. Prevents viewers from spamming answers till they
+              get the corrent one
+            </small>
+
+            <div class="form-check form-switch mt-3">
+              <input class="form-check-input" type="checkbox" role="switch" id="showHintCopy" checked />
+              <label class="form-check-label" for="showHintCopy">Show hint</label>
+            </div>
+            <small class="text-body-secondary">
+              Shows a hint that reveals the number of characters <br />
+              (the answer → _ _ _ &nbsp; _ _ _ _ _ ) <br />
+              Does not work for multiple choice questions
+            </small>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
           </div>
         </div>
       </div>
@@ -950,10 +1038,10 @@
 
       <div class="row fixed-bottom text-center mb-2">
         <div class="col">
-          <button type="button" id="quitBracket" class="btn btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Quit bracket" onclick="showQuitBracketModal()">
+          <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#quitModal">
             <i class="material-icons notranslate">close</i>
           </button>
-          <button type="button" id="settings" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Settings">
+          <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#changeBracketSettingsModal">
             <i class="material-icons notranslate">settings</i>
           </button>
           <button type="button" id="restart" class="btn btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Restart match" onclick="restartMatch()">
@@ -982,9 +1070,6 @@
     </div>
 
     <div class="container-fluid" id="tierlist" style="display: none">
-      <i class="material-icons notranslate float-end" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#quitBracketModal">close</i>
-      <i class="material-icons notranslate float-start" style="cursor: pointer; display: none" data-bs-toggle="modal" data-bs-target="#tierlistEditorModal">settings</i>
-
       <div id="tierlistItem" class="container-fluid border border-secondary rounded-3 float-end">
         <i id="tierlistItemDrag" class="material-icons notranslate mt-2" style="cursor: move; position: fixed">drag_indicator</i>
 
@@ -1053,7 +1138,13 @@
             <button type="button" class="btn btn-warning mb-3" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Restart round" onclick="restartMatch()">
               <i class="material-icons notranslate">refresh</i>
             </button>
-
+            <button type="button" style="display: none" class="btn btn-secondary mb-3" data-bs-toggle="modal" data-bs-target="#tierlistEditorModal">
+              <i class="material-icons notranslate">settings</i>
+            </button>
+            <br />
+            <button type="button" class="btn btn-danger mb-3" data-bs-toggle="modal" data-bs-target="#quitModal">
+              <i class="material-icons notranslate">close</i>
+            </button>
             <br />
             <button type="button" id="pickWinnerTierlist" class="btn btn-info mb-3" onclick="pickWinnerTierlist()"><i class="material-icons notranslate">navigate_next</i>Next item</button>
           </div>
@@ -1105,11 +1196,17 @@
           </div>
         </div>
         <div class="col-xl-3">
-          <div class="card" id="scoreCard">
-            <div class="card-body">
-              <h4 class="card-title"><i class="material-icons notranslate">leaderboard</i>Scores</h4>
-              <div id="triviaUsersDiv">
-                <ul class="list-group" id="triviaUsers"></ul>
+          <div class="accordion" id="scoreAccordion">
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#scoreCollapse" aria-expanded="true" aria-controls="scoreCollapse">
+                  <i class="material-icons notranslate">leaderboard</i>Scores
+                </button>
+              </h2>
+              <div id="scoreCollapse" class="accordion-collapse collapse show" data-bs-parent="#scoreAccordion">
+                <div class="accordion-body" id="triviaUsersDiv">
+                  <ul class="list-group text-start" id="triviaUsers"></ul>
+                </div>
               </div>
             </div>
           </div>
@@ -1119,8 +1216,14 @@
 
       <div class="row fixed-bottom text-center mb-2">
         <div class="col">
-          <button type="button" id="showAnswer" class="btn btn-lg btn-warning" onclick="showAnswer()"><i class="material-icons notranslate">visibility</i>Show answer</button>
-          <button type="button" id="nextQuestion" class="btn btn-lg btn-primary" onclick="nextQuestion()"><i class="material-icons notranslate">arrow_forward_ios</i>Next question</button>
+          <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#quitModal">
+            <i class="material-icons notranslate">close</i>
+          </button>
+          <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#changeTriviaSettingsModal">
+            <i class="material-icons notranslate">settings</i>
+          </button>
+          <button type="button" id="showAnswer" class="btn btn-warning" onclick="showAnswer()"><i class="material-icons notranslate">visibility</i>Show answer</button>
+          <button type="button" id="nextQuestion" class="btn btn-primary" onclick="nextQuestion()"><i class="material-icons notranslate">arrow_forward_ios</i>Next question</button>
         </div>
       </div>
     </div>
@@ -1207,9 +1310,9 @@
       </div>
     </div>
 
+    <script src="/js/localforage.min.js"></script>
     <script src="/js/tmi.min.js"></script>
     <script src="/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/validator.min.js"></script>
     <script src="/js/anime.min.js"></script>
     <script src="/js/functions.min.js"></script>
     <script src="/blt/blt.js"></script>

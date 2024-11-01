@@ -212,7 +212,7 @@ function startRound(opponent) {
   elements.rock.disabled = false;
   elements.paper.disabled = false;
   elements.scissors.disabled = false;
-  elements.opponent.innerHTML = `<img src="/pics/donk.png" alt="profile pic" class="rounded-circle" style="height:2em;"> ${validator.escape(opponent)}`;
+  elements.opponent.innerHTML = `<img src="/pics/donk.png" alt="profile pic" class="rounded-circle" style="height:2em;"> ${escapeString(opponent)}`;
 } //startRound
 
 function sendMove(move) {

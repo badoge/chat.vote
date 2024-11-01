@@ -185,7 +185,7 @@ async function vote() {
         <div class="card bg-dark-subtle">
           <div class="card-body">
             <div id="countdowndiv"></div>
-            ${result.data.title == "Untitled poll" ? "" : "<h1 class='display-5'>" + validator.escape(result.data.title) + "</h1>"}
+            ${result.data.title == "Untitled poll" ? "" : "<h1 class='display-5'>" + escapeString(result.data.title) + "</h1>"}
             <div id="chartdiv" class="chart-container">
               <canvas id="chartCanvas"></canvas>
             </div>
@@ -299,7 +299,7 @@ async function refresh() {
         <div class="card bg-dark-subtle">
           <div class="card-body">
             <div id="countdowndiv"></div>
-            ${result.data.title == "Untitled poll" ? "" : "<h1 class='display-5'>" + validator.escape(result.data.title) + "</h1>"}
+            ${result.data.title == "Untitled poll" ? "" : "<h1 class='display-5'>" + escapeString(result.data.title) + "</h1>"}
             <div id="chartdiv" class="chart-container">
               <canvas id="chartCanvas"></canvas>
             </div>

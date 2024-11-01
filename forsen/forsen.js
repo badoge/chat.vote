@@ -715,7 +715,7 @@ const fpsBenchmark = function () {
 };
 
 function raffleWinnerChat(context, msg, tier3) {
-  let msg_s = validator.escape(msg);
+  let msg_s = escapeString(msg);
   if (context.emotes) {
     let emotes = [];
     for (const [key, value] of Object.entries(context.emotes)) {

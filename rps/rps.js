@@ -227,11 +227,11 @@ function resetBracket() {
 } //resetBracket
 
 function addUser(username) {
-  document.getElementById("players").insertAdjacentHTML("afterbegin", `<span class="badge text-bg-secondary m-2" id="${username}_badge">⏳${validator.escape(username)}</span>`);
+  document.getElementById("players").insertAdjacentHTML("afterbegin", `<span class="badge text-bg-secondary m-2" id="${username}_badge">⏳${escapeString(username)}</span>`);
 } //addUser
 
 function updateUser(username) {
-  document.getElementById(`${username}_badge`).innerHTML = `✔${validator.escape(username)}`;
+  document.getElementById(`${username}_badge`).innerHTML = `✔${escapeString(username)}`;
 } //addUser
 
 function createBracket(bracket) {

@@ -110,7 +110,7 @@ let WORDLE = {
 }; //WORDLE
 
 function addWord(word, username) {
-  word = validator.escape(word).toLowerCase();
+  word = escapeString(word).toLowerCase();
   if (word.length != WORDLE.wordlength) {
     return;
   }

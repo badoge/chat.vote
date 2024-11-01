@@ -183,7 +183,7 @@ let CHATVOTE = {
 async function refreshData() {
   darkTheme = elements.darkTheme.checked ?? true;
   if (!USER.twitchLogin) {
-    USER.channel = validator.escape(elements.channelName.value.replace(/\s+/g, "").toLowerCase());
+    USER.channel = escapeString(elements.channelName.value.replace(/\s+/g, "").toLowerCase());
     USER.platform = "twitch";
   }
   if (!USER.userID && USER.channel) {
@@ -783,8 +783,8 @@ function connect() {
         return;
       }
       let suggestion = input.slice(1).join(" ");
-      let suggestion_emotes = validator.escape(suggestion);
-      let suggestion_unchanged = validator.escape(suggestion);
+      let suggestion_emotes = escapeString(suggestion);
+      let suggestion_unchanged = escapeString(suggestion);
 
       let suggestion_clean = suggestion_unchanged.toLowerCase().replace(/\W/g, "");
       if (CHATVOTE.votingMode == "text") {
@@ -1150,7 +1150,7 @@ async function addOptionBulk() {
   let f1 = og.filter(Boolean);
   let f2 = [];
   for (let i = 0, j = f1.length; i < j; i++) {
-    f2[i] = validator.escape(f1[i]);
+    f2[i] = escapeString(f1[i]);
     if (f1[i].startsWith("http")) {
       try {
         let requestOptions = {
@@ -1222,7 +1222,7 @@ function pushTable(id, suggestion, by, score, context) {
 let startingHue = Math.random() * 360;
 function pushVoteResults(id, option, option_emotes, by, score, context) {
   let color = `hsla(${(startingHue += Math.random() * 60 + 20)}, 100%, 50%, 0.8)`;
-  let label = `${id} • "${validator.unescape(option)}"`;
+  let label = `${id} • "${unescapeString(option)}"`;
   let option_clean = option.toLowerCase().replace(/\W/g, "");
   if (CHATVOTE.votingMode == "text") {
     option = option.replace(/[^a-zA-Z0-9]+/g, "-");

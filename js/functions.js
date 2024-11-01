@@ -945,7 +945,7 @@ function replacer(key, value) {
   } else {
     return value;
   }
-}
+} //replacer
 function reviver(key, value) {
   if (typeof value === "object" && value !== null) {
     if (value.dataType === "Map") {
@@ -953,4 +953,53 @@ function reviver(key, value) {
     }
   }
   return value;
-}
+} //reviver
+
+/**
+ * @description replace <, >, &, ', ", `, \ and / with HTML entities. - from https://github.com/validatorjs/validator.js
+ * @param {*} str
+ * @returns {*}
+ */
+function escapeString(str) {
+  assertString(str);
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\//g, "&#x2F;")
+    .replace(/\\/g, "&#x5C;")
+    .replace(/`/g, "&#96;");
+} //escapeString
+
+/**
+ * @description replace HTML encoded entities with <, >, &, ', ", `, \ and /. - from https://github.com/validatorjs/validator.js
+ * @param {*} str
+ * @returns {*}
+ */
+function unescapeString(str) {
+  assertString(str);
+  return str
+    .replace(/&quot;/g, '"')
+    .replace(/&#x27;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&#x2F;/g, "/")
+    .replace(/&#x5C;/g, "\\")
+    .replace(/&#96;/g, "`")
+    .replace(/&amp;/g, "&");
+  // &amp; replacement has to be the last one to prevent
+  // bugs with intermediate strings containing escape sequences
+  // See: https://github.com/validatorjs/validator.js/issues/1827
+} //unescapeString
+
+function assertString(input) {
+  let isString = typeof input === "string" || input instanceof String;
+  if (!isString) {
+    let invalidType = _typeof(input);
+    if (input === null) invalidType = "null";
+    else if (invalidType === "object") invalidType = input.constructor.name;
+    throw new TypeError("Expected a string but received a ".concat(invalidType));
+  }
+} //assertString

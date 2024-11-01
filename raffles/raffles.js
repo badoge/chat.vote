@@ -170,7 +170,7 @@ async function refreshData() {
   darkTheme = elements.darkTheme.checked ?? true;
 
   if (!USER.twitchLogin) {
-    USER.channel = validator.escape(elements.channelName.value.replace(/\s+/g, "").toLowerCase());
+    USER.channel = escapeString(elements.channelName.value.replace(/\s+/g, "").toLowerCase());
     USER.platform = "twitch";
   }
   if (!USER.userID && USER.channel) {
@@ -980,7 +980,7 @@ function relativeTime(timestamp) {
 } //relativeTime
 
 function raffleWinnerChat(context, msg, joinMessage = false) {
-  let msg_s = validator.escape(msg);
+  let msg_s = escapeString(msg);
   if (context.emotes) {
     let emotes = [];
     for (const [key, value] of Object.entries(context.emotes)) {
