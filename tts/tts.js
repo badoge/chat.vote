@@ -26,11 +26,10 @@ function connect() {
 
   function onMessageHandler(target, context, msg, self) {
     let text = msg.trim();
-    let text_s = DOMPurify.sanitize(text, { ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp|xxx):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i });
-
+    let text_s = escapeString(text);
     let text2 = text_s.substring(5);
 
-    if (text_s.startsWith("!donk")) {
+    if (text_s.startsWith("!tts")) {
       speakMessage(text2);
     }
   } //onMessageHandler

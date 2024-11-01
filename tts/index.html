@@ -124,18 +124,6 @@
             </div>
           </div>
         </div>
-
-        <div id="topright" class="navbar-nav">
-          <div class="btn-group" role="group" aria-label="log in button group">
-            <button type="button" onclick="login()" class="btn btn-twitch"><span class="twitch-icon"></span>Sign in with Twitch</button>
-            <div class="btn-group" role="group">
-              <button id="btnGroupDroplogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
-              <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="btnGroupDroplogin">
-                <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal1" href="#">Connect manually</a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
       </div>
     </nav>
 
@@ -143,18 +131,17 @@
       <div class="card">
         <div class="card-body">
           super lidl early test <br />
-          connect to your chat then type "!donk [message]" in chat
+          connect to your chat then type "!tts [message]" in chat
         </div>
       </div>
 
-      <div class="input-group mb-3">
+      <div class="input-group mt-3">
         <input type="text" id="username" class="form-control" placeholder="username" aria-label="username text" aria-describedby="usernamebtn" />
         <button class="btn btn-outline-primary" type="button" onclick="connect()" id="usernamebtn">connect</button>
       </div>
     </div>
 
     <script src="/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/purify.min.js"></script>
     <script src="/js/tmi.min.js"></script>
     <script src="/js/functions.min.js"></script>
     <script src="/tts/tts.min.js"></script>
