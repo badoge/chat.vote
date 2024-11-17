@@ -561,12 +561,14 @@ function connect() {
 
     if (PLAYLIST.noCommand && playlist_open) {
       let request = input[0];
-      if (input[0].toLowerCase() == "youtube" && input[1].toLowerCase() == "search") {
+      let search = false;
+      if ((input[0].toLowerCase() == "youtube" || input[0].toLowerCase() == "spotify") && input[1].toLowerCase() == "search") {
         request = input.join(" ");
+        search = true;
       }
       let link = await parseLink(request);
       if (link && linkTypeAllowed(link.type)) {
-        addRequest(context, link, context.id);
+        addRequest(context, link, context.id, search);
         return;
       }
       if (link && !linkTypeAllowed(link.type)) {
@@ -596,8 +598,10 @@ function connect() {
         }
 
         let request = input[1];
-        if (input[1].toLowerCase() == "youtube" && input[2].toLowerCase() == "search") {
+        let search = false;
+        if ((input[1].toLowerCase() == "youtube" || input[1].toLowerCase() == "spotify") && input[2].toLowerCase() == "search") {
           request = input.slice(1).join(" ");
+          search = true;
         }
 
         let link = await parseLink(request);
@@ -608,7 +612,7 @@ function connect() {
           botReply(`⛔ ${link.type} links are not enabled`, context.id, false);
           return;
         }
-        addRequest(context, link, context.id);
+        addRequest(context, link, context.id, search);
         break;
 
       case PLAYLIST.voteskipCommand:
@@ -785,7 +789,7 @@ function findRequestKey(requestProperty, lookupValue) {
   return null;
 } //findRequestKey
 
-function addRequest(context, link, msgid = 0) {
+function addRequest(context, link, msgid, search) {
   const userIndex = getUser(context);
   const limit = checkRequestLimit(userIndex);
 
@@ -829,6 +833,7 @@ function addRequest(context, link, msgid = 0) {
       duration: 0,
       views: -1,
       thumbnail: "",
+      search: search,
       time: Date.now(),
       by: [users[userIndex]],
     };
@@ -1256,17 +1261,33 @@ async function getRequestInfo(request, msgid) {
   updatePlaylist(request);
   updateLength();
   if (currentItem && request) {
-    botReply(
-      `✅ Your request has been added to the playlist ${
-        requests.size == 1
-          ? `| Playing right after the current request (<${secondsToTimeString(currentItem.duration)})`
-          : `| ${requests.size - 1} ${requests.size - 1 == 1 ? "request" : "requests"} ahead of you (${secondsToTimeString(total_duration + currentItem.duration - request.duration)})`
-      }`,
-      msgid,
-      false
-    );
+    if (request.search) {
+      botReply(
+        `✅ Added ${getItemLink(request.type, request.id)} to the playlist ${
+          requests.size == 1
+            ? `| Playing right after the current request (<${secondsToTimeString(currentItem.duration)})`
+            : `| ${requests.size - 1} ${requests.size - 1 == 1 ? "request" : "requests"} ahead of you (${secondsToTimeString(total_duration + currentItem.duration - request.duration)})`
+        }`,
+        msgid,
+        false
+      );
+    } else {
+      botReply(
+        `✅ Your request has been added to the playlist ${
+          requests.size == 1
+            ? `| Playing right after the current request (<${secondsToTimeString(currentItem.duration)})`
+            : `| ${requests.size - 1} ${requests.size - 1 == 1 ? "request" : "requests"} ahead of you (${secondsToTimeString(total_duration + currentItem.duration - request.duration)})`
+        }`,
+        msgid,
+        false
+      );
+    }
   } else {
-    botReply(`✅ Your request has been added to the playlist`, msgid, false);
+    if (request.search) {
+      botReply(`✅ Added ${getItemLink(request.type, request.id)} to the playlist`, msgid, false);
+    } else {
+      botReply(`✅ Your request has been added to the playlist`, msgid, false);
+    }
   }
 } //getRequestInfo
 
@@ -1339,6 +1360,24 @@ async function parseLink(link) {
     }
     return { type: "spotify", id: id[2] };
   } //spotify
+
+  if (link.toLowerCase().startsWith("spotify search")) {
+    if (!link.toLowerCase().replace("spotify search", "").trim()) {
+      return null;
+    }
+    try {
+      let response = await fetch(`https://helper.donk.workers.dev/spotify/search?q=${encodeURIComponent(link.toLowerCase().replace("spotify search", "").trim())}`, GETrequestOptions);
+      let result = await response.json();
+      console.log(result);
+      if (result.tracks.items.length == 0) {
+        return null;
+      }
+
+      return { type: "spotify", id: result.tracks.items[0].id };
+    } catch (error) {
+      return null;
+    }
+  } //spotify search
 
   if (link.includes("streamable.com")) {
     const match = link.match(/streamable\.com\/([a-zA-Z0-9]+)/);
@@ -1420,8 +1459,10 @@ async function addLink() {
     return;
   }
   let request = elements.link.value?.replace(/\s+/g, "");
-  if (elements.link.value.toLowerCase().startsWith("youtube search")) {
+  let search = false;
+  if (elements.link.value.toLowerCase().startsWith("youtube search") || elements.link.value.toLowerCase().startsWith("spotify search")) {
     request = elements.link.value.trim();
+    search = true;
   }
   let link = await parseLink(request);
 
@@ -1449,7 +1490,9 @@ async function addLink() {
       badges: "streamer",
       color: streamerColor,
     },
-    link
+    link,
+    0,
+    search
   );
   elements.link.value = "";
 } //addLink

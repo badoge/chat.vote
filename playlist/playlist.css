@@ -30,6 +30,10 @@
   font-weight: bold;
 }
 
+.toast {
+  width: 100%;
+}
+
 #toastContainer > div > div {
   font-size: 1.5em;
 }
