@@ -52,7 +52,6 @@ async function blacklistSubmit() {
       "Content-Type": "application/json",
     },
     body: body,
-    redirect: "follow",
   };
   try {
     let response = await fetch(`https://blt.donk.workers.dev/blacklist`, requestOptions);
@@ -77,7 +76,6 @@ async function unblacklist(id) {
       "Content-Type": "application/json",
     },
     body: body,
-    redirect: "follow",
   };
   try {
     let response = await fetch(`https://blt.donk.workers.dev/unblacklist`, requestOptions);
@@ -96,12 +94,10 @@ async function loadList() {
   elements.blacklisted.innerHTML = spinner;
 
   let requestOptions = {
-    method: "GET",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
     },
-    redirect: "follow",
   };
   try {
     let response = await fetch(`https://blt.donk.workers.dev/list`, requestOptions);
@@ -165,12 +161,10 @@ async function loadList() {
 
 window.onload = async function () {
   let requestOptions = {
-    method: "GET",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
     },
-    redirect: "follow",
   };
   try {
     let response = await fetch(`https://blt.donk.workers.dev/check`, requestOptions);

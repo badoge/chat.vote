@@ -672,14 +672,10 @@ async function drawRaffleWinnerFancyTier3() {
 } //drawRaffleWinnerFancy
 
 async function getPFP(users) {
-  let requestOptions = {
-    method: "GET",
-    redirect: "follow",
-  };
   let pfp = [];
   return new Promise(async (resolve) => {
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/twitch/users?login=${users.join(",")}`, requestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/twitch/users?login=${users.join(",")}`);
       let result = await response.json();
       for (let index = 0, j = result.data.length; index < j; index++) {
         pfp.push(result.data[index]);
@@ -773,11 +769,7 @@ async function getEmotes() {
 
 async function loadTier3Emotes() {
   try {
-    let requestOptions = {
-      method: "GET",
-      redirect: "follow",
-    };
-    let response = await fetch(`https://helper.donk.workers.dev/twitch/chat/emotes?broadcaster_id=${userid}`, requestOptions);
+    let response = await fetch(`https://helper.donk.workers.dev/twitch/chat/emotes?broadcaster_id=${userid}`);
     let result = await response.json();
     elements.emotes.innerHTML = "";
     for (let index = 0; index < result.data.length; index++) {

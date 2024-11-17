@@ -2671,12 +2671,10 @@ async function previewSpotifyPlaylist() {
   try {
     elements.spotifyPlaylistPreview.innerHTML = spinner;
     let requestOptions = {
-      method: "GET",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      redirect: "follow",
     };
     let response = await fetch(`https://helper.donk.workers.dev/spotify/playlist?id=${playlist[2]}`, requestOptions);
     let result = await response.json();
@@ -2731,12 +2729,10 @@ async function previewTiermaker() {
   try {
     elements.tiermakerPreview.innerHTML = spinner;
     let requestOptions = {
-      method: "GET",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      redirect: "follow",
     };
     let response = await fetch(`https://helper.donk.workers.dev/tiermaker?id=${id}`, requestOptions);
     let result = await response.json();
@@ -2792,12 +2788,10 @@ async function previewClips() {
   try {
     elements.clipsPreview.innerHTML = spinner;
     let requestOptions = {
-      method: "GET",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      redirect: "follow",
     };
     let response = await fetch(`https://helper.donk.workers.dev/twitch/clips?broadcaster_id=${id}`, requestOptions);
     let result = await response.json();
@@ -2887,12 +2881,10 @@ async function previewUwufufu() {
     }
     elements.uwufufuPreview.innerHTML = spinner;
     let requestOptions = {
-      method: "GET",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      redirect: "follow",
     };
     let response = await fetch(`https://helper.donk.workers.dev/uwufufu?id=${id}`, requestOptions);
     let result = await response.json();
@@ -3085,7 +3077,6 @@ async function publishBracket(id, e) {
       "Content-Type": "application/json",
     },
     body: body,
-    redirect: "follow",
   };
   try {
     let response = await fetch(`https://blt.donk.workers.dev/publish`, requestOptions);
@@ -3398,12 +3389,8 @@ const rgba2hex = (rgba) =>
     .join("")}`;
 
 async function getYTPlaylist(id) {
-  let requestOptions = {
-    method: "GET",
-    redirect: "follow",
-  };
   try {
-    let response = await fetch(`https://helper.donk.workers.dev/youtube/playlist?id=${encodeURIComponent(id)}`, requestOptions);
+    let response = await fetch(`https://helper.donk.workers.dev/youtube/playlist?id=${encodeURIComponent(id)}`);
     let result = await response.json();
     return result;
   } catch (error) {
@@ -3413,12 +3400,8 @@ async function getYTPlaylist(id) {
 } //getYTPlaylist
 
 async function getYTChannelVideos(id, length = 1) {
-  let requestOptions = {
-    method: "GET",
-    redirect: "follow",
-  };
   try {
-    let response = await fetch(`https://helper.donk.workers.dev/youtube/channelvideos?id=${encodeURIComponent(id)}&length=${length}`, requestOptions);
+    let response = await fetch(`https://helper.donk.workers.dev/youtube/channelvideos?id=${encodeURIComponent(id)}&length=${length}`);
     let result = await response.json();
     return result;
   } catch (error) {
@@ -3428,12 +3411,8 @@ async function getYTChannelVideos(id, length = 1) {
 } //getYTChannelVideos
 
 async function getYTPlaylistInfo(id) {
-  let requestOptions = {
-    method: "GET",
-    redirect: "follow",
-  };
   try {
-    let response = await fetch(`https://helper.donk.workers.dev/youtube/playlistinfo?id=${encodeURIComponent(id)}`, requestOptions);
+    let response = await fetch(`https://helper.donk.workers.dev/youtube/playlistinfo?id=${encodeURIComponent(id)}`);
     let result = await response.json();
     return result;
   } catch (error) {
@@ -3443,12 +3422,8 @@ async function getYTPlaylistInfo(id) {
 } //getYTPlaylistInfo
 
 async function getYTChannelID(handle) {
-  let requestOptions = {
-    method: "GET",
-    redirect: "follow",
-  };
   try {
-    let response = await fetch(`https://helper.donk.workers.dev/youtube/id?handle=${encodeURIComponent(handle)}`, requestOptions);
+    let response = await fetch(`https://helper.donk.workers.dev/youtube/id?handle=${encodeURIComponent(handle)}`);
     let result = await response.json();
     return result;
   } catch (error) {

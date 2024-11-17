@@ -72,7 +72,6 @@ async function postOffer(offer) {
       "Content-Type": "application/json",
     },
     body: body,
-    redirect: "follow",
   };
   try {
     let response = await fetch(`https://overlay.donk.workers.dev/offer/${overlayID}`, requestOptions);
@@ -85,12 +84,10 @@ async function postOffer(offer) {
 
 async function getAnswer() {
   let requestOptions = {
-    method: "GET",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
     },
-    redirect: "follow",
   };
   try {
     let response = await fetch(`https://overlay.donk.workers.dev/${overlayID}/answer`, requestOptions);

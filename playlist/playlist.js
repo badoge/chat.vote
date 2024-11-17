@@ -1905,7 +1905,6 @@ async function botReply(msg, id, followCooldown) {
       "Content-Type": "application/json",
     },
     body: body,
-    redirect: "follow",
   };
   try {
     let response = await fetch(`https://api.chat.vote/reply`, requestOptions);
@@ -1948,7 +1947,6 @@ async function updateSiteSend() {
       "Content-Type": "application/json",
     },
     body: body,
-    redirect: "follow",
   };
   try {
     let response = await fetch(`https://playlist.chat.vote/update`, requestOptions);

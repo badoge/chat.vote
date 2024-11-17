@@ -193,13 +193,8 @@ async function addOptionBulk() {
     options.shift();
     pollOptions[i].value = text;
     if (text.startsWith("http")) {
-      let requestOptions = {
-        method: "GET",
-        headers: {},
-        redirect: "follow",
-      };
       try {
-        let response = await fetch(`https://helper.donk.workers.dev/cors/?${text.split(" ")[0]}`, requestOptions);
+        let response = await fetch(`https://helper.donk.workers.dev/cors/?${text.split(" ")[0]}`);
         if (response.headers.get("Content-Type").startsWith("image")) {
           imageSpans[i].innerHTML = `<div class="resizable"><img src="${text.split(" ")[0]}"></div>`;
           imageSpans[i].dataset.imageUrl = text.split(" ")[0];
@@ -373,7 +368,6 @@ async function createPoll() {
     let requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      redirect: "follow",
       body: JSON.stringify({
         captchatoken: token,
         title: "",
@@ -501,13 +495,8 @@ async function handleInput(event) {
 
     if (event.target.value.startsWith("http")) {
       let input = event.target.value;
-      let requestOptions = {
-        method: "GET",
-        headers: {},
-        redirect: "follow",
-      };
       try {
-        let response = await fetch(`https://helper.donk.workers.dev/cors/?${input.split(" ")[0]}`, requestOptions);
+        let response = await fetch(`https://helper.donk.workers.dev/cors/?${input.split(" ")[0]}`);
         if (response.headers.get("Content-Type").startsWith("image")) {
           let imageSpans = [...document.querySelectorAll(".poll-image")];
           let pollOptions = [...document.querySelectorAll(".poll-option")];

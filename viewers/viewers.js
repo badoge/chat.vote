@@ -66,13 +66,8 @@ function saveSettings() {
 let oldCount = 0;
 
 async function getViewCount() {
-  let myHeaders = new Headers();
-  myHeaders.append("Authorization", `Bearer ${USER.access_token}`);
-  myHeaders.append("Client-Id", CLIENT_ID);
   let requestOptions = {
-    method: "GET",
-    headers: myHeaders,
-    redirect: "follow",
+    headers: { Authorization: `Bearer ${USER.access_token}`, "Client-Id": CLIENT_ID },
   };
 
   try {

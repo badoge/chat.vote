@@ -951,14 +951,10 @@ const fpsBenchmark = function () {
 };
 
 async function getPFP(users) {
-  let requestOptions = {
-    method: "GET",
-    redirect: "follow",
-  };
   let pfp = [];
   return new Promise(async (resolve) => {
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/twitch/users?login=${users.join(",")}`, requestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/twitch/users?login=${users.join(",")}`);
       let result = await response.json();
       for (let index = 0, j = result.data.length; index < j; index++) {
         pfp.push(result.data[index]);
@@ -1103,7 +1099,6 @@ async function botSay(msg, joinMsg = false) {
       "Content-Type": "application/json",
     },
     body: body,
-    redirect: "follow",
   };
   try {
     let response = await fetch(`https://api.chat.vote/say`, requestOptions);

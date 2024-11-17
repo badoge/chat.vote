@@ -62,14 +62,9 @@
           gifts: {},
           bits: {},
         };
-        let myHeaders = new Headers();
-        myHeaders.append("Authorization", "Bearer " + access_token);
-        myHeaders.append("Client-Id", "qn0wimnszbqlwfnszdz3wwfz430eqr");
 
         let requestOptions = {
-          method: "GET",
-          headers: myHeaders,
-          redirect: "follow",
+          headers: { Authorization: `Bearer ${access_token}`, "Client-Id": "qn0wimnszbqlwfnszdz3wwfz430eqr" },
         };
         try {
           let response = await fetch("https://api.twitch.tv/helix/users", requestOptions);

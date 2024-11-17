@@ -1110,11 +1110,7 @@ async function addOption() {
   let extraoption = elements.pollOption.value;
   if (extraoption.startsWith("http")) {
     try {
-      let requestOptions = {
-        method: "GET",
-        redirect: "follow",
-      };
-      let response = await fetch(`https://helper.donk.workers.dev/cors/?${extraoption.split(" ")[0]}`, requestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/cors/?${extraoption.split(" ")[0]}`);
       if (response.headers.get("Content-Type").startsWith("image")) {
         extraoption = `<div class='resizable'><img src="${extraoption.split(" ")[0]}"></div> ${extraoption.split(" ").slice(1).join("")}`;
       }
@@ -1153,11 +1149,7 @@ async function addOptionBulk() {
     f2[i] = escapeString(f1[i]);
     if (f1[i].startsWith("http")) {
       try {
-        let requestOptions = {
-          method: "GET",
-          redirect: "follow",
-        };
-        let response = await fetch(`https://helper.donk.workers.dev/cors/?${f1[i].split(" ")[0]}`, requestOptions);
+        let response = await fetch(`https://helper.donk.workers.dev/cors/?${f1[i].split(" ")[0]}`);
         if (response.headers.get("Content-Type").startsWith("image")) {
           f2[i] = `<div class='resizable'><img src="${f1[i].split(" ")[0]}"></div> ${f1[i].split(" ").slice(1).join("")}`;
         }
@@ -1832,7 +1824,6 @@ async function generateOverlay() {
       Accept: "application/json",
       "Content-Type": "application/json",
     },
-    redirect: "follow",
   };
   try {
     let response = await fetch(`https://overlay.chat.vote/generate`, requestOptions);
@@ -1852,12 +1843,10 @@ async function connectOverlay() {
   document.getElementById("overlay").innerHTML = spinner;
 
   let requestOptions = {
-    method: "GET",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
     },
-    redirect: "follow",
   };
   try {
     let response = await fetch(`https://overlay.donk.workers.dev/${overlayID}/offer`, requestOptions);
@@ -1921,7 +1910,6 @@ async function postAnswer(answer) {
       "Content-Type": "application/json",
     },
     body: body,
-    redirect: "follow",
   };
   try {
     let response = await fetch(`https://overlay.donk.workers.dev/answer/${overlayID}`, requestOptions);

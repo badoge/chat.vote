@@ -91,7 +91,6 @@ async function report(id) {
     let requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      redirect: "follow",
       body: JSON.stringify({
         id: id,
         reason: reason,
@@ -159,7 +158,6 @@ async function vote() {
     let requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      redirect: "follow",
       body: JSON.stringify({
         vote: vote,
       }),
@@ -280,11 +278,8 @@ async function refresh() {
       captchaModal.show();
       return;
     }
-    let requestOptions = {
-      method: "GET",
-      redirect: "follow",
-    };
-    let response = await fetch(`https://poll.chat.vote/api/results/${pollID}/${token}`, requestOptions);
+
+    let response = await fetch(`https://poll.chat.vote/api/results/${pollID}/${token}`);
     let result = await response.json();
     console.log(result);
     showToast(result.message, "primary", 5000);

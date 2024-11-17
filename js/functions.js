@@ -2,11 +2,6 @@ const CLIENT_ID = "qn0wimnszbqlwfnszdz3wwfz430eqr";
 const CLIENT_ID_YT = "975425654977-2ckljuapg94eukqrnm1rgqup5npo95m9.apps.googleusercontent.com";
 const API_KEY_YT = "AIzaSyAMCaIslOwxlmotLsNN4NB2ia949h4GLP0";
 
-const GETrequestOptions = {
-  method: "GET",
-  redirect: "follow",
-};
-
 const spinner = `<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`;
 
 let channelBadges = { subscriber: [], bits: [] };
@@ -19,7 +14,7 @@ async function get7TVPFP(userID) {
   }
   return new Promise(async function (resolve, reject) {
     try {
-      let response = await fetch(`https://7tv.io/v3/users/twitch/${userID}`, GETrequestOptions);
+      let response = await fetch(`https://7tv.io/v3/users/twitch/${userID}`);
       if (response.status !== 200) {
         resolve("/pics/donk.png");
       }
@@ -37,13 +32,8 @@ async function get7TVPFP(userID) {
 } //get7TVPFP
 
 async function getTwitchPFP(username, access_token) {
-  let myHeaders = new Headers();
-  myHeaders.append("client-id", CLIENT_ID);
-  myHeaders.append("Authorization", `Bearer ${access_token}`);
   let requestOptions = {
-    method: "GET",
-    headers: myHeaders,
-    redirect: "follow",
+    headers: { "client-id": CLIENT_ID, Authorization: `Bearer ${access_token}` },
   };
   return new Promise(async function (resolve, reject) {
     try {
@@ -60,7 +50,7 @@ async function getTwitchPFP(username, access_token) {
 async function getGlobalTwitchEmotes(largeEmotes = false) {
   let emotes = [];
   try {
-    let response1 = await fetch(`https://api.okayeg.com/emotes/global`, GETrequestOptions);
+    let response1 = await fetch(`https://api.okayeg.com/emotes/global`);
     let globalTwitch = await response1.json();
     let filter = [
       "R-)",
@@ -115,7 +105,7 @@ async function getGlobalBTTVEmotes(largeEmotes = false) {
   let emotes = [];
   let zerowidth = ["SoSnowy", "IceCold", "SantaHat", "TopHat", "ReinDeer", "CandyCane", "cvMask", "cvHazmat"];
   try {
-    let response1 = await fetch(`https://api.betterttv.net/3/cached/emotes/global`, GETrequestOptions);
+    let response1 = await fetch(`https://api.betterttv.net/3/cached/emotes/global`);
     let globalBTTV = await response1.json();
     for (let i = 0, j = globalBTTV.length; i < j; i++) {
       emotes.push({ name: globalBTTV[i].code, url: `https://cdn.betterttv.net/emote/${globalBTTV[i].id}/${largeEmotes ? "3x" : "1x"}`, zerowidth: zerowidth.includes(globalBTTV[i].code) });
@@ -130,7 +120,7 @@ async function getGlobalBTTVEmotes(largeEmotes = false) {
 async function getGlobalFFZEmotes(largeEmotes = false) {
   let emotes = [];
   try {
-    let response2 = await fetch(`https://api.frankerfacez.com/v1/set/global`, GETrequestOptions);
+    let response2 = await fetch(`https://api.frankerfacez.com/v1/set/global`);
     let globalFFZ = await response2.json();
     for (let index = 0; index < globalFFZ.default_sets.length; index++) {
       let set = globalFFZ.default_sets[index];
@@ -153,7 +143,7 @@ async function getGlobalFFZEmotes(largeEmotes = false) {
 async function getGlobal7TVEmotes(largeEmotes = false) {
   let emotes = [];
   try {
-    let response3 = await fetch(`https://7tv.io/v3/emote-sets/global`, GETrequestOptions);
+    let response3 = await fetch(`https://7tv.io/v3/emote-sets/global`);
     let global7TV = await response3.json();
     for (let i = 0, j = global7TV.emotes.length; i < j; i++) {
       let files = global7TV.emotes[i].data.host.files.filter((e) => e.format == "AVIF");
@@ -173,7 +163,7 @@ async function getGlobal7TVEmotes(largeEmotes = false) {
 async function getEmoji() {
   let emoji = [];
   try {
-    let response5 = await fetch(`/games/emoji.json`, GETrequestOptions);
+    let response5 = await fetch(`/games/emoji.json`);
     let json = await response5.json();
     for (let i = 0, j = json.length; i < j; i++) {
       if (!json[i].has_img_twitter) {
@@ -192,7 +182,7 @@ async function getEmoji() {
 async function getChannelTwitchEmotes(channel, largeEmotes = false) {
   let emotes = [];
   try {
-    let response1 = await fetch(`https://api.okayeg.com/emotes?channel=${channel}`, GETrequestOptions);
+    let response1 = await fetch(`https://api.okayeg.com/emotes?channel=${channel}`);
     let channelTwitch = await response1.json();
     if (channelTwitch.data.id) {
       if (channelTwitch.data.emotes.length > 0) {
@@ -217,7 +207,7 @@ async function getChannelBTTVEmotes(userID, largeEmotes = false) {
   }
   let emotes = [];
   try {
-    let response1 = await fetch(`https://api.betterttv.net/3/cached/users/twitch/${userID}`, GETrequestOptions);
+    let response1 = await fetch(`https://api.betterttv.net/3/cached/users/twitch/${userID}`);
     if (response1.status !== 200) {
       return [];
     }
@@ -242,7 +232,7 @@ async function getChannelBTTVEmotes(userID, largeEmotes = false) {
 async function getChannelFFZEmotes(userID, largeEmotes = false) {
   let emotes = [];
   try {
-    let response2 = await fetch(`https://api.frankerfacez.com/v1/room/id/${userID}`, GETrequestOptions);
+    let response2 = await fetch(`https://api.frankerfacez.com/v1/room/id/${userID}`);
     if (response2.status !== 200) {
       return [];
     }
@@ -269,7 +259,7 @@ async function getChannel7TVEmotes(userID, largeEmotes = false) {
   }
   let emotes = [];
   try {
-    let response3 = await fetch(`https://7tv.io/v3/users/twitch/${userID}`, GETrequestOptions);
+    let response3 = await fetch(`https://7tv.io/v3/users/twitch/${userID}`);
     if (response3.status !== 200) {
       return [];
     }
@@ -317,13 +307,9 @@ async function checkTags(userID, access_token) {
   if (!access_token || !userID) {
     return false;
   }
-  let myHeaders = new Headers();
-  myHeaders.append("client-id", CLIENT_ID);
-  myHeaders.append("Authorization", `Bearer ${access_token}`);
+
   let requestOptions = {
-    method: "GET",
-    headers: myHeaders,
-    redirect: "follow",
+    headers: { "client-id": CLIENT_ID, Authorization: `Bearer ${access_token}` },
   };
   return new Promise(async function (resolve, reject) {
     try {
@@ -352,7 +338,7 @@ async function checkTags(userID, access_token) {
 
 async function getUserID(username) {
   try {
-    let response = await fetch(`https://helper.donk.workers.dev/twitch/users?login=${username}`, GETrequestOptions);
+    let response = await fetch(`https://helper.donk.workers.dev/twitch/users?login=${username}`);
     let result = await response.json();
     return result?.data[0]?.id || "";
   } catch (error) {
@@ -362,7 +348,7 @@ async function getUserID(username) {
 
 async function getStreamerColor(channelId) {
   try {
-    let response = await fetch(`https://helper.donk.workers.dev/twitch/chat/color?user_id=${channelId}`, GETrequestOptions);
+    let response = await fetch(`https://helper.donk.workers.dev/twitch/chat/color?user_id=${channelId}`);
     let result = await response.json();
     return result?.data[0]?.color || "#FFFFFF";
   } catch (error) {
@@ -380,7 +366,6 @@ async function sendUsername(site, channel, platform, stream = null) {
       "Content-Type": "application/json",
     },
     body: body,
-    redirect: "follow",
   };
   try {
     let response = await fetch(`https://helper.donk.workers.dev/log/username`, requestOptions);
@@ -408,7 +393,6 @@ async function sendData(site, channel, platform, data, stream = null) {
       "Content-Type": "application/json",
     },
     body: body,
-    redirect: "follow",
   };
   try {
     let response = await fetch(`https://helper.donk.workers.dev/log/data`, requestOptions);
@@ -456,7 +440,7 @@ function roundToTwo(num) {
 async function getChannelBadges(channel) {
   return new Promise(async function (resolve, reject) {
     try {
-      let response = await fetch(`https://api.okayeg.com/emotes?channel=${channel}`, GETrequestOptions);
+      let response = await fetch(`https://api.okayeg.com/emotes?channel=${channel}`);
       let result = await response.json();
       if (!result.data.badges || result.data.badges.length == 0) {
         resolve({ subscriber: [], bits: [] });
@@ -499,7 +483,7 @@ async function getChannelBadges(channel) {
 async function getGlobalBadges() {
   return new Promise(async function (resolve, reject) {
     try {
-      let response = await fetch(`https://api.okayeg.com/badges/global`, GETrequestOptions);
+      let response = await fetch(`https://api.okayeg.com/badges/global`);
       let result = await response.json();
       if (!result.data || result.data.length == 0) {
         resolve({});
@@ -521,7 +505,7 @@ async function getGlobalBadges() {
 async function getCustomBadges() {
   return new Promise(async function (resolve, reject) {
     try {
-      let response = await fetch(`https://badges.donk.workers.dev`, GETrequestOptions);
+      let response = await fetch(`https://badges.donk.workers.dev`);
       let result = await response.json();
       if (!result || result.length == 0) {
         resolve([]);
@@ -655,7 +639,7 @@ async function getLinkInfo(element, allowThumbnails) {
     url = `LINKPREVIEW${encodeURIComponent(url)}`;
     let tooltip = bootstrap.Tooltip.getInstance(element);
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/cors/?${url}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/cors/?${url}`);
       let result = await response.json();
       if (result?.status != 200 && result?.message) {
         element.setAttribute("data-bs-title", result.message);
@@ -751,12 +735,8 @@ function enablePopovers() {
 } //enablePopovers
 
 async function checkToken(access_token) {
-  let myHeaders = new Headers();
-  myHeaders.append("Authorization", `OAuth ${access_token}`);
   let requestOptions = {
-    method: "GET",
-    headers: myHeaders,
-    redirect: "follow",
+    headers: { Authorization: `OAuth ${access_token}` },
   };
   return new Promise(async function (resolve, reject) {
     try {

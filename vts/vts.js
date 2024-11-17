@@ -249,10 +249,7 @@ async function createReward() {
       showToast("No reward action selected", "warning", 5000);
       return;
     }
-    let myHeaders = new Headers();
-    myHeaders.append("Authorization", `Bearer ${VTS.access_token}`);
-    myHeaders.append("Client-Id", CLIENT_ID);
-    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
     let urlencoded = new URLSearchParams();
     urlencoded.append("title", newRewardName);
     urlencoded.append("cost", newRewardCost);
@@ -285,9 +282,12 @@ async function createReward() {
     }
     let requestOptions = {
       method: "POST",
-      headers: myHeaders,
+      headers: {
+        Authorization: `Bearer ${VTS.access_token}`,
+        "Client-Id": CLIENT_ID,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
       body: urlencoded,
-      redirect: "follow",
     };
     try {
       let response = await fetch(`https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${VTS.userID}`, requestOptions);
@@ -328,14 +328,12 @@ async function createReward() {
 } //createReward
 
 async function updateRewards() {
-  let myHeaders = new Headers();
-  myHeaders.append("Authorization", `Bearer ${VTS.access_token}`);
-  myHeaders.append("Client-Id", CLIENT_ID);
-  myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
   let requestOptions = {
-    method: "GET",
-    headers: myHeaders,
-    redirect: "follow",
+    headers: {
+      Authorization: `Bearer ${VTS.access_token}`,
+      "Client-Id": CLIENT_ID,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
   };
   try {
     let response = await fetch(`https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${VTS.userID}`, requestOptions);
@@ -1416,14 +1414,8 @@ async function loadYTPFP() {
     return;
   }
 
-  let myHeaders = new Headers();
-  myHeaders.append("Authorization", `Bearer ${VTS.access_token}`);
-  myHeaders.append("Accept", `application/json`);
-
   let requestOptions = {
-    method: "GET",
-    headers: myHeaders,
-    redirect: "follow",
+    headers: { Authorization: `Bearer ${VTS.access_token}`, Accept: `application/json` },
   };
   try {
     let response = await fetch(`https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&maxResults=50&mine=true&key=${API_KEY_YT}`, requestOptions);
@@ -1493,7 +1485,7 @@ async function refreshYTtoken() {
     access_token: VTS.access_token,
     refresh_token: VTS.refresh_token,
   });
-  let requestOptions = { method: "POST", headers: myHeaders, body: raw, redirect: "follow" };
+  let requestOptions = { method: "POST", headers: myHeaders, body: raw };
   try {
     let response = await fetch(`https://helper.donk.workers.dev/youtube/refresh`, requestOptions);
     let result = await response.json();
@@ -1514,14 +1506,8 @@ async function refreshYTtoken() {
 async function loadYTStreams(manual = false) {
   clearTimeout(readChatTimeout);
 
-  let myHeaders = new Headers();
-  myHeaders.append("Authorization", `Bearer ${VTS.access_token}`);
-  myHeaders.append("Accept", `application/json`);
-
   let requestOptions = {
-    method: "GET",
-    headers: myHeaders,
-    redirect: "follow",
+    headers: { Authorization: `Bearer ${VTS.access_token}`, Accept: `application/json` },
   };
   try {
     let response = await fetch(
@@ -1735,9 +1721,7 @@ function logout() {
 } //logout
 
 async function revokeYT() {
-  let myHeaders = new Headers();
-  myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-  let requestOptions = { method: "POST", headers: myHeaders, redirect: "follow" };
+  let requestOptions = { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" } };
   try {
     let response = await fetch(`https://oauth2.googleapis.com/revoke?token=${VTS.access_token}`, requestOptions);
     console.log("revokeYT response code", response.status);
@@ -2043,14 +2027,8 @@ async function readYTChat(page = null) {
     return;
   }
 
-  var myHeaders = new Headers();
-  myHeaders.append("Accept", "application/json");
-  myHeaders.append("Authorization", `Bearer ${VTS.access_token}`);
-
-  var requestOptions = {
-    method: "GET",
-    headers: myHeaders,
-    redirect: "follow",
+  let requestOptions = {
+    headers: { Accept: "application/json", Authorization: `Bearer ${VTS.access_token}` },
   };
   try {
     let response = await fetch(
