@@ -1204,7 +1204,7 @@ function parseLink(link) {
 async function getRequestInfo(link) {
   if (link.type == "twitch") {
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/twitch/clips?id=${link.id}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/twitch/clips?id=${link.id}`);
       let result = await response.json();
       console.log(result);
       link.title = result.data[0].title || "(untitled)";
@@ -1221,7 +1221,7 @@ async function getRequestInfo(link) {
 
   if (link.type == "spotify") {
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/spotify/tracks?ids=${link.id}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/spotify/tracks?ids=${link.id}`);
       let result = await response.json();
       console.log(result);
       link.title = result.tracks[0].name || "(untitled)";
@@ -1241,7 +1241,7 @@ async function getRequestInfo(link) {
 
   if (link.type == "youtube") {
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/youtube/videos?id=${link.id}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/youtube/videos?id=${link.id}`);
       let result = await response.json();
       console.log(result);
       link.title = result.items[0].snippet.title || "(untitled)";
@@ -1262,7 +1262,7 @@ async function getRequestInfo(link) {
 
   if (link.type == "streamable") {
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/streamable/videos?id=${link.id}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/streamable/videos?id=${link.id}`);
       let result = await response.json();
       console.log(result);
       link.title = result.title || "(untitled)";
@@ -1279,7 +1279,7 @@ async function getRequestInfo(link) {
 
   if (link.type == "supa video/audio") {
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/supa/info?id=${link.id}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/supa/info?id=${link.id}`);
       let result = await response.json();
       console.log(result);
       if (!result.type.startsWith("audio") && !result.type.startsWith("video") && !result.type.startsWith("image")) {
@@ -3116,7 +3116,7 @@ async function importCode(hashCode = "") {
   communityModal.hide();
   importModal.show();
   try {
-    let response = await fetch(`https://blt.donk.workers.dev/id/${code}`, GETrequestOptions);
+    let response = await fetch(`https://blt.donk.workers.dev/id/${code}`);
     if (response.status !== 200) {
       elements.importModalBody.innerHTML = "Bracket not found :(";
       return;

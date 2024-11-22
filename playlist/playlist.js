@@ -1046,7 +1046,7 @@ async function getRequestInfo(request, msgid) {
   }
   if (request.type == "twitch clip") {
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/twitch/clipsxd?id=${request.id}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/twitch/clipsxd?id=${request.id}`);
       let result = await response.json();
       console.log(result);
       request.title = result.data.data[0].title || "(untitled)";
@@ -1065,7 +1065,7 @@ async function getRequestInfo(request, msgid) {
 
   if (request.type == "twitch vod") {
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/twitch/videos?id=${request.id}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/twitch/videos?id=${request.id}`);
       let result = await response.json();
       console.log(result);
       request.title = result.data[0].title || "(untitled)";
@@ -1083,7 +1083,7 @@ async function getRequestInfo(request, msgid) {
 
   if (request.type == "twitch stream") {
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/twitch/streams?user_login=${request.id}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/twitch/streams?user_login=${request.id}`);
       let result = await response.json();
       console.log(result);
       request.title = result.data[0].title || "(untitled)";
@@ -1100,7 +1100,7 @@ async function getRequestInfo(request, msgid) {
 
   if (request.type == "spotify") {
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/spotify/tracks?ids=${request.id}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/spotify/tracks?ids=${request.id}`);
       let result = await response.json();
       console.log(result);
       request.title = result.tracks[0].name || "(untitled)";
@@ -1123,7 +1123,7 @@ async function getRequestInfo(request, msgid) {
 
   if (request.type == "youtube" || request.type == "youtube short") {
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/youtube/videos?id=${request.id}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/youtube/videos?id=${request.id}`);
       let result = await response.json();
       console.log(result);
       request.title = result.items[0].snippet.title || "(untitled)";
@@ -1158,7 +1158,7 @@ async function getRequestInfo(request, msgid) {
 
   if (request.type == "streamable") {
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/streamable/videos?id=${request.id}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/streamable/videos?id=${request.id}`);
       let result = await response.json();
       console.log(result);
       request.title = result.title || "(untitled)";
@@ -1176,7 +1176,7 @@ async function getRequestInfo(request, msgid) {
 
   if (request.type == "supa video/audio" || request.type == "supa video" || request.type == "supa audio") {
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/supa/info?id=${request.id}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/supa/info?id=${request.id}`);
       let result = await response.json();
       console.log(result);
       request.title = result?.name?.split(".")[0] || "(untitled)";
@@ -1339,7 +1339,7 @@ async function parseLink(link) {
       return null;
     }
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/youtube/search?query=${encodeURIComponent(link.toLowerCase().replace("youtube search", "").trim())}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/youtube/search?query=${encodeURIComponent(link.toLowerCase().replace("youtube search", "").trim())}`);
       let result = await response.json();
       console.log(result);
       if (result.items.length == 0) {
@@ -1366,7 +1366,7 @@ async function parseLink(link) {
       return null;
     }
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/spotify/search?q=${encodeURIComponent(link.toLowerCase().replace("spotify search", "").trim())}`, GETrequestOptions);
+      let response = await fetch(`https://helper.donk.workers.dev/spotify/search?q=${encodeURIComponent(link.toLowerCase().replace("spotify search", "").trim())}`);
       let result = await response.json();
       console.log(result);
       if (result.tracks.items.length == 0) {
