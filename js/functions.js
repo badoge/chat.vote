@@ -303,39 +303,6 @@ function showToast(msg, type, timeout) {
   }, timeout);
 } //showToast
 
-async function checkTags(userID, access_token) {
-  if (!access_token || !userID) {
-    return false;
-  }
-
-  let requestOptions = {
-    headers: { "client-id": CLIENT_ID, Authorization: `Bearer ${access_token}` },
-  };
-  return new Promise(async function (resolve, reject) {
-    try {
-      let response = await fetch(`https://api.twitch.tv/helix/channels?broadcaster_id=${userID}`, requestOptions);
-      let result = await response.json();
-      if (!result.data[0].tags || result.data[0].tags.length == 0) {
-        return;
-      }
-      let taglist = ["브이튜버", "pngtuber", "버튜버", "버츄얼", "vstreamer", "ｖtuber", "live2d"];
-      for (let i = 0; i < result.data[0].tags.length; i++) {
-        let tag = result.data[0].tags[i].toLowerCase();
-        if (tag.includes("vtube")) {
-          resolve(true);
-        }
-        if (taglist.includes(tag)) {
-          resolve(true);
-        }
-      }
-      resolve(false);
-    } catch (error) {
-      resolve(false);
-      console.log("checkTags error", error);
-    }
-  });
-} //checkTags
-
 async function getUserID(username) {
   try {
     let response = await fetch(`https://helper.donk.workers.dev/twitch/users?login=${username}`);

@@ -26,10 +26,6 @@ donk site :) incomplete readme
 
 :)
 
-## [VTS](https://chat.vote/vts)
-
-:)
-
 ## Other pages
 
 Work in progress/test pages/proof of concepts that are not being worked on and are probably broken :)
@@ -43,6 +39,8 @@ Work in progress/test pages/proof of concepts that are not being worked on and a
 - [chat.vote/viewers](https://chat.vote/viewers) A graph that shows the view count of a channel over time
 
 - [chat.vote/forsen](https://chat.vote/forsen) A raffles site for forsen that works with 1 click only :)
+
+- [chat.vote/vts](https://chat.vote/vts) A site that lets viewers control your VTube Studio model using chat commands or channel points. Deprecated since VTS has this functionality built-in now.
 
 # Contact
 

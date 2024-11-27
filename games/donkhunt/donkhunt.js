@@ -9,7 +9,6 @@ let elements = {
   aboutModal: document.getElementById("aboutModal"),
 
   //navbar
-  vtsLink: document.getElementById("vtsLink"),
   status: document.getElementById("status"),
   topRight: document.getElementById("topRight"),
   loginButton: document.getElementById("loginButton"),

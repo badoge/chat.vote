@@ -70,7 +70,6 @@ let elements = {
   startTriviaModal: document.getElementById("startTriviaModal"),
 
   //navbar
-  vtsLink: document.getElementById("vtsLink"),
   status: document.getElementById("status"),
   topRight: document.getElementById("topRight"),
   loginButton: document.getElementById("loginButton"),
@@ -656,9 +655,6 @@ function connect() {
     elements.status.innerHTML = `<h4><span class="badge bg-success">Connected :)</span></h4>`;
     saveSettings();
     sendUsername(`chat.vote/blt`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
-    if (await checkTags(USER.userID, USER.access_token)) {
-      elements.vtsLink.style.display = "";
-    }
     loadPFP();
   }); //connected
 
