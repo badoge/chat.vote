@@ -249,7 +249,7 @@ let loginExpiredModal,
 let votePopover, votePopoverTierlist;
 let currentBracket = {};
 let currentTierlist = {};
-let currentFormat = "single";
+let currentFormat;
 let voters = [];
 let voting_enabled = false;
 let currentTime = 0;
