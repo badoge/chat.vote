@@ -561,7 +561,7 @@ function connect() {
     if (PLAYLIST.noCommand && playlist_open) {
       let request = input[0];
       let search = false;
-      if ((input[0].toLowerCase() == "youtube" || input[0].toLowerCase() == "spotify") && input[1].toLowerCase() == "search") {
+      if (input[0].toLowerCase() == "youtube" || input[0].toLowerCase() == "spotify") {
         request = input.join(" ");
         search = true;
       }
@@ -598,7 +598,7 @@ function connect() {
 
         let request = input[1];
         let search = false;
-        if ((input[1].toLowerCase() == "youtube" || input[1].toLowerCase() == "spotify") && input[2].toLowerCase() == "search") {
+        if (input[1].toLowerCase() == "youtube" || input[1].toLowerCase() == "spotify") {
           request = input.slice(1).join(" ");
           search = true;
         }
@@ -1330,12 +1330,12 @@ async function parseLink(link) {
     return { type: link.includes("/shorts/") ? "youtube short" : "youtube", id: videoID[3] };
   } //youtube
 
-  if (link.toLowerCase().startsWith("youtube search")) {
-    if (!link.toLowerCase().replace("youtube search", "").trim()) {
+  if (link.toLowerCase().startsWith("youtube")) {
+    if (!link.toLowerCase().replace("youtube", "").trim()) {
       return null;
     }
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/youtube/search?query=${encodeURIComponent(link.toLowerCase().replace("youtube search", "").trim())}`);
+      let response = await fetch(`https://helper.donk.workers.dev/youtube/search?query=${encodeURIComponent(link.toLowerCase().replace("youtube", "").trim())}`);
       let result = await response.json();
       console.log(result);
       if (result.items.length == 0) {
@@ -1357,12 +1357,12 @@ async function parseLink(link) {
     return { type: "spotify", id: id[2] };
   } //spotify
 
-  if (link.toLowerCase().startsWith("spotify search")) {
-    if (!link.toLowerCase().replace("spotify search", "").trim()) {
+  if (link.toLowerCase().startsWith("spotify")) {
+    if (!link.toLowerCase().replace("spotify", "").trim()) {
       return null;
     }
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/spotify/search?q=${encodeURIComponent(link.toLowerCase().replace("spotify search", "").trim())}`);
+      let response = await fetch(`https://helper.donk.workers.dev/spotify/search?q=${encodeURIComponent(link.toLowerCase().replace("spotify", "").trim())}`);
       let result = await response.json();
       console.log(result);
       if (result.tracks.items.length == 0) {
@@ -1456,7 +1456,7 @@ async function addLink() {
   }
   let request = elements.link.value?.replace(/\s+/g, "");
   let search = false;
-  if (elements.link.value.toLowerCase().startsWith("youtube search") || elements.link.value.toLowerCase().startsWith("spotify search")) {
+  if (elements.link.value.toLowerCase().startsWith("youtube") || elements.link.value.toLowerCase().startsWith("spotify")) {
     request = elements.link.value.trim();
     search = true;
   }
