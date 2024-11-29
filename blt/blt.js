@@ -1649,6 +1649,7 @@ function startTrivia() {
   triviaUsersAnswered = [];
   triviaUsers = [];
   elements.triviaUsers.innerHTML = "";
+  currentFormat = "trivia";
 
   let selectedTrivia = structuredClone(TRIVIA.trivia.find((x) => x.id === id));
 
