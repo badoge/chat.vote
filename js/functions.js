@@ -12,39 +12,35 @@ async function get7TVPFP(userID) {
   if (!userID) {
     return "/pics/donk.png";
   }
-  return new Promise(async function (resolve, reject) {
-    try {
-      let response = await fetch(`https://7tv.io/v3/users/twitch/${userID}`);
-      if (response.status !== 200) {
-        resolve("/pics/donk.png");
-      }
-      let result = await response.json();
-      if (!result?.user?.avatar_url) {
-        resolve("/pics/donk.png");
-      } else {
-        resolve(result.user.avatar_url);
-      }
-    } catch (error) {
-      resolve("/pics/donk.png");
-      console.log("getprofilepic 7tv error", error);
+  try {
+    let response = await fetch(`https://7tv.io/v3/users/twitch/${userID}`);
+    if (response.status !== 200) {
+      return "/pics/donk.png";
     }
-  });
+    let result = await response.json();
+    if (!result?.user?.avatar_url) {
+      return "/pics/donk.png";
+    } else {
+      return result.user.avatar_url;
+    }
+  } catch (error) {
+    console.log("getprofilepic 7tv error", error);
+    return "/pics/donk.png";
+  }
 } //get7TVPFP
 
 async function getTwitchPFP(username, access_token) {
   let requestOptions = {
     headers: { "client-id": CLIENT_ID, Authorization: `Bearer ${access_token}` },
   };
-  return new Promise(async function (resolve, reject) {
-    try {
-      let response = await fetch(`https://api.twitch.tv/helix/users?login=${username}`, requestOptions);
-      let result = await response.json();
-      resolve(result.data[0].profile_image_url);
-    } catch (error) {
-      resolve("/pics/donk.png");
-      console.log("getprofilepic twitch error", error);
-    }
-  });
+  try {
+    let response = await fetch(`https://api.twitch.tv/helix/users?login=${username}`, requestOptions);
+    let result = await response.json();
+    return result.data[0].profile_image_url;
+  } catch (error) {
+    console.log("getprofilepic twitch error", error);
+    return "/pics/donk.png";
+  }
 } //getTwitchPFP
 
 async function getGlobalTwitchEmotes(largeEmotes = false) {
@@ -405,84 +401,78 @@ function roundToTwo(num) {
 } //roundToTwo
 
 async function getChannelBadges(channel) {
-  return new Promise(async function (resolve, reject) {
-    try {
-      let response = await fetch(`https://api.okayeg.com/emotes?channel=${channel}`);
-      let result = await response.json();
-      if (!result.data.badges || result.data.badges.length == 0) {
-        resolve({ subscriber: [], bits: [] });
-      }
-      let badges = { subscriber: [], bits: [] };
-      if (result.data.badges.length > 0) {
-        let subBadges = [];
-        let bitBadges = [];
-        if (result.data.badges[0]) {
-          if (result.data.badges[0].set_id == "subscriber") {
-            subBadges = result.data.badges[0].versions;
-          }
-          if (result.data.badges[0].set_id == "bits") {
-            bitBadges = result.data.badges[0].versions;
-          }
-        }
-        if (result.data.badges[1]) {
-          if (result.data.badges[1].set_id == "subscriber") {
-            subBadges = result.data.badges[1].versions;
-          }
-          if (result.data.badges[1].set_id == "bits") {
-            bitBadges = result.data.badges[1].versions;
-          }
-        }
-        for (let index = 0, j = subBadges.length; index < j; index++) {
-          badges.subscriber.push({ id: subBadges[index].id, url: subBadges[index].image_url_4x });
-        }
-        for (let index = 0, j = bitBadges.length; index < j; index++) {
-          badges.bits.push({ id: bitBadges[index].id, url: bitBadges[index].image_url_4x });
-        }
-        resolve(badges);
-      }
-    } catch (error) {
-      console.log("getChannelBadges error", error);
-      resolve({ subscriber: [], bits: [] });
+  try {
+    let response = await fetch(`https://api.okayeg.com/emotes?channel=${channel}`);
+    let result = await response.json();
+    if (!result.data.badges || result.data.badges.length == 0) {
+      return { subscriber: [], bits: [] };
     }
-  });
+    let badges = { subscriber: [], bits: [] };
+    if (result.data.badges.length > 0) {
+      let subBadges = [];
+      let bitBadges = [];
+      if (result.data.badges[0]) {
+        if (result.data.badges[0].set_id == "subscriber") {
+          subBadges = result.data.badges[0].versions;
+        }
+        if (result.data.badges[0].set_id == "bits") {
+          bitBadges = result.data.badges[0].versions;
+        }
+      }
+      if (result.data.badges[1]) {
+        if (result.data.badges[1].set_id == "subscriber") {
+          subBadges = result.data.badges[1].versions;
+        }
+        if (result.data.badges[1].set_id == "bits") {
+          bitBadges = result.data.badges[1].versions;
+        }
+      }
+      for (let index = 0, j = subBadges.length; index < j; index++) {
+        badges.subscriber.push({ id: subBadges[index].id, url: subBadges[index].image_url_4x });
+      }
+      for (let index = 0, j = bitBadges.length; index < j; index++) {
+        badges.bits.push({ id: bitBadges[index].id, url: bitBadges[index].image_url_4x });
+      }
+      return badges;
+    }
+  } catch (error) {
+    console.log("getChannelBadges error", error);
+    return { subscriber: [], bits: [] };
+  }
 } //getChannelBadges
 
 async function getGlobalBadges() {
-  return new Promise(async function (resolve, reject) {
-    try {
-      let response = await fetch(`https://api.okayeg.com/badges/global`);
-      let result = await response.json();
-      if (!result.data || result.data.length == 0) {
-        resolve({});
-      }
-      if (result.data.length > 0) {
-        let badges = {};
-        for (let index = 0, j = result.data.length; index < j; index++) {
-          badges[result.data[index].set_id] = result.data[index].versions;
-        }
-        resolve(badges);
-      }
-    } catch (error) {
-      console.log("getGlobalBadges error", error);
-      resolve({});
+  try {
+    let response = await fetch(`https://api.okayeg.com/badges/global`);
+    let result = await response.json();
+    if (!result.data || result.data.length == 0) {
+      return {};
     }
-  });
+    if (result.data.length > 0) {
+      let badges = {};
+      for (let index = 0, j = result.data.length; index < j; index++) {
+        badges[result.data[index].set_id] = result.data[index].versions;
+      }
+      return badges;
+    }
+  } catch (error) {
+    console.log("getGlobalBadges error", error);
+    return {};
+  }
 } //getGlobalBadges
 
 async function getCustomBadges() {
-  return new Promise(async function (resolve, reject) {
-    try {
-      let response = await fetch(`https://badges.donk.workers.dev`);
-      let result = await response.json();
-      if (!result || result.length == 0) {
-        resolve([]);
-      }
-      resolve(result);
-    } catch (error) {
-      console.log("getCustomBadges error", error);
-      resolve([]);
+  try {
+    let response = await fetch(`https://badges.donk.workers.dev`);
+    let result = await response.json();
+    if (!result || result.length == 0) {
+      return [];
     }
-  });
+    return result;
+  } catch (error) {
+    console.log("getCustomBadges error", error);
+    return [];
+  }
 } //getCustomBadges
 
 async function loadBadges(channel) {
@@ -705,23 +695,21 @@ async function checkToken(access_token) {
   let requestOptions = {
     headers: { Authorization: `OAuth ${access_token}` },
   };
-  return new Promise(async function (resolve, reject) {
-    try {
-      let response = await fetch("https://id.twitch.tv/oauth2/validate", requestOptions);
-      if (!response.ok) {
-        resolve(false);
-      }
-      let result = await response.json();
-      if (result.expires_in < 600) {
-        resolve(false);
-      } else {
-        resolve(true);
-      }
-    } catch (error) {
-      console.log("checkToken error", error);
-      resolve(false);
+  try {
+    let response = await fetch("https://id.twitch.tv/oauth2/validate", requestOptions);
+    if (!response.ok) {
+      return false;
     }
-  });
+    let result = await response.json();
+    if (result.expires_in < 600) {
+      return false;
+    } else {
+      return true;
+    }
+  } catch (error) {
+    console.log("checkToken error", error);
+    return false;
+  }
 } //checkToken
 
 function spamTest(type, count, delay = 100, votes = null) {

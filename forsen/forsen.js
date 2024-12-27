@@ -673,19 +673,17 @@ async function drawRaffleWinnerFancyTier3() {
 
 async function getPFP(users) {
   let pfp = [];
-  return new Promise(async (resolve) => {
-    try {
-      let response = await fetch(`https://helper.donk.workers.dev/twitch/users?login=${users.join(",")}`);
-      let result = await response.json();
-      for (let index = 0, j = result.data.length; index < j; index++) {
-        pfp.push(result.data[index]);
-      }
-      return resolve(pfp);
-    } catch (error) {
-      console.log("getPFP", error);
-      return resolve(0);
+  try {
+    let response = await fetch(`https://helper.donk.workers.dev/twitch/users?login=${users.join(",")}`);
+    let result = await response.json();
+    for (let index = 0, j = result.data.length; index < j; index++) {
+      pfp.push(result.data[index]);
     }
-  });
+    return pfp;
+  } catch (error) {
+    console.log("getPFP", error);
+    return 0;
+  }
 } //getPFP
 
 const fpsBenchmark = function () {
