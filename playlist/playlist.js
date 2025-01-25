@@ -1266,13 +1266,13 @@ async function getRequestInfo(request, msgid) {
 
     switch (requests.size) {
       case 0:
-        reply += `| Playing right now!`;
+        reply += ` | Playing right now!`;
         break;
       case 1:
-        reply += `| Playing right after the current request (<${secondsToTimeString(currentItem.duration)})`;
+        reply += ` | Playing right after the current request (<${secondsToTimeString(currentItem.duration)})`;
         break;
       default:
-        reply += `| ${requests.size - 1} ${requests.size - 1 == 1 ? "request" : "requests"} ahead of you (${secondsToTimeString(total_duration + currentItem.duration - request.duration)})`;
+        reply += ` | ${requests.size - 1} ${requests.size - 1 == 1 ? "request" : "requests"} ahead of you (${secondsToTimeString(total_duration + currentItem.duration - request.duration)})`;
         break;
     }
 
