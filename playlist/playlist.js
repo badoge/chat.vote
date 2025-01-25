@@ -1257,27 +1257,26 @@ async function getRequestInfo(request, msgid) {
   updatePlaylist(request);
   updateLength();
   if (currentItem && request) {
+    let reply = "";
     if (request.search) {
-      botReply(
-        `✅ Added ${getItemLink(request.type, request.id)} to the playlist ${
-          requests.size == 1
-            ? `| Playing right after the current request (<${secondsToTimeString(currentItem.duration)})`
-            : `| ${requests.size - 1} ${requests.size - 1 == 1 ? "request" : "requests"} ahead of you (${secondsToTimeString(total_duration + currentItem.duration - request.duration)})`
-        }`,
-        msgid,
-        false
-      );
+      reply += `✅ Added ${getItemLink(request.type, request.id)} to the playlist`;
     } else {
-      botReply(
-        `✅ Your request has been added to the playlist ${
-          requests.size == 1
-            ? `| Playing right after the current request (<${secondsToTimeString(currentItem.duration)})`
-            : `| ${requests.size - 1} ${requests.size - 1 == 1 ? "request" : "requests"} ahead of you (${secondsToTimeString(total_duration + currentItem.duration - request.duration)})`
-        }`,
-        msgid,
-        false
-      );
+      reply += `✅ Your request has been added to the playlist`;
     }
+
+    switch (requests.size) {
+      case 0:
+        reply += `| Playing right now!`;
+        break;
+      case 1:
+        reply += `| Playing right after the current request (<${secondsToTimeString(currentItem.duration)})`;
+        break;
+      default:
+        reply += `| ${requests.size - 1} ${requests.size - 1 == 1 ? "request" : "requests"} ahead of you (${secondsToTimeString(total_duration + currentItem.duration - request.duration)})`;
+        break;
+    }
+
+    botReply(reply, msgid, false);
   } else {
     if (request.search) {
       botReply(`✅ Added ${getItemLink(request.type, request.id)} to the playlist`, msgid, false);
