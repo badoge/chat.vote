@@ -32,7 +32,7 @@ let elements = {
   maxLength: document.getElementById("maxLength"),
   maxSize: document.getElementById("maxSize"),
   minViewCount: document.getElementById("minViewCount"),
-  skipHistory: document.getElementById("skipHistory"),
+  uniqueOnly: document.getElementById("uniqueOnly"),
   whoCanRequest: document.getElementById("whoCanRequest"),
   allowPlebs: document.getElementById("allowPlebs"),
   allowSubs: document.getElementById("allowSubs"),
@@ -154,7 +154,7 @@ let PLAYLIST = {
   maxLength: "",
   maxSize: "",
   minViewCount: "",
-  skipHistory: false,
+  uniqueOnly: false,
   allowPlebs: true,
   allowSubs: true,
   allowMods: true,
@@ -216,7 +216,7 @@ async function refreshData() {
   PLAYLIST.maxLength = parseInt(elements.maxLength.value, 10) || "";
   PLAYLIST.maxSize = parseInt(elements.maxSize.value, 10) || "";
   PLAYLIST.minViewCount = parseInt(elements.minViewCount.value, 10) || "";
-  PLAYLIST.skipHistory = elements.skipHistory.checked;
+  PLAYLIST.uniqueOnly = elements.uniqueOnly.checked;
   PLAYLIST.allowPlebs = elements.allowPlebs.checked;
   PLAYLIST.allowSubs = elements.allowSubs.checked;
   PLAYLIST.allowMods = elements.allowMods.checked;
@@ -319,7 +319,7 @@ async function load_localStorage() {
     elements.maxLength.value = PLAYLIST.maxLength || "";
     elements.maxSize.value = PLAYLIST.maxSize || "";
     elements.minViewCount.value = PLAYLIST.minViewCount || "";
-    elements.skipHistory.checked = PLAYLIST.skipHistory ?? false;
+    elements.uniqueOnly.checked = PLAYLIST.uniqueOnly ?? false;
     elements.allowPlebs.checked = PLAYLIST.allowPlebs ?? true;
     elements.allowSubs.checked = PLAYLIST.allowSubs ?? true;
     elements.allowMods.checked = PLAYLIST.allowMods ?? true;
@@ -463,7 +463,7 @@ function resetSettings(logout = false) {
       maxLength: "",
       maxSize: "",
       minViewCount: "",
-      skipHistory: false,
+      uniqueOnly: false,
       allowPlebs: true,
       allowSubs: true,
       allowMods: true,
@@ -571,7 +571,7 @@ function connect() {
         return;
       }
       if (link && !linkTypeAllowed(link.type)) {
-        botReply(`⛔ ${link.type} links are not enabled`, context.id, false);
+        botReply(`🚫 ${link.type} links are not enabled`, context.id, false);
         return;
       }
     }
@@ -608,7 +608,7 @@ function connect() {
           return;
         }
         if (!linkTypeAllowed(link.type)) {
-          botReply(`⛔ ${link.type} links are not enabled`, context.id, false);
+          botReply(`🚫 ${link.type} links are not enabled`, context.id, false);
           return;
         }
         addRequest(context, link, context.id, search);
@@ -622,9 +622,9 @@ function connect() {
       case PLAYLIST.songCommandAlias:
         if (currentItem) {
           botReply(
-            `Current song/video: ${currentItem.title} | Requested by @${currentItem.by[0].username} ${
+            `Now playing: ${getItemLink(currentItem.type, currentItem.id)} | Requested by @${currentItem.by[0].username} ${
               currentItem.by.length > 1 ? `and ${currentItem.by.length - 1} other ${currentItem.by.length - 1 == 1 ? "user" : "users"}` : ""
-            } | ${getItemLink(currentItem.type, currentItem.id)}`,
+            }`,
             context.id,
             true
           );
@@ -803,7 +803,7 @@ function addRequest(context, link, msgid, search) {
 
   //check if user already requested this link id
   if (users[userIndex].requests.some((id) => id === link.id)) {
-    botReply("🚫 You already requested this", context.id, false);
+    botReply("⚠ You already requested this", context.id, false);
     return;
   }
 
@@ -1053,7 +1053,7 @@ async function getRequestInfo(request, msgid) {
       request.mp4 = `${result?.extra?.clip?.videoQualities[0]?.sourceURL}${result?.extra?.clipKey}`;
     } catch (error) {
       deleteRequest(request.id);
-      botReply("⚠ Your clip was removed because I could not find its info", msgid, false);
+      botReply("⛔ Could not find this clip's info", msgid, false);
       console.log("getRequestInfo twitch clip error", error);
       return;
     }
@@ -1071,7 +1071,7 @@ async function getRequestInfo(request, msgid) {
       request.views = result.data[0].view_count;
     } catch (error) {
       deleteRequest(request.id);
-      botReply("⚠ Your video was removed because I could not find its info", msgid, false);
+      botReply("⛔ Could not find this video's info", msgid, false);
       console.log("getRequestInfo twitch vod error", error);
       return;
     }
@@ -1088,7 +1088,7 @@ async function getRequestInfo(request, msgid) {
       request.duration = -1;
     } catch (error) {
       deleteRequest(request.id);
-      botReply("⚠ Your stream was removed because I could not find its info", msgid, false);
+      botReply("⛔ Could not find this stream's info", msgid, false);
       console.log("getRequestInfo twitch stream error", error);
       return;
     }
@@ -1106,12 +1106,12 @@ async function getRequestInfo(request, msgid) {
       request.uri = result.tracks[0].uri;
       if (!result.tracks[0].is_playable) {
         deleteRequest(request.id);
-        botReply("⛔ Your song was removed because it is not playable", msgid, false);
+        botReply("⛔ Your song is not playable", msgid, false);
         return;
       }
     } catch (error) {
       deleteRequest(request.id);
-      botReply("⚠ Your song was removed because I could not find its info", msgid, false);
+      botReply("⛔ Could not find this song's info", msgid, false);
       console.log("getRequestInfo spotify error", error);
       return;
     }
@@ -1134,19 +1134,19 @@ async function getRequestInfo(request, msgid) {
         }
         if (!PLAYLIST.allowYTStreams) {
           deleteRequest(request.id);
-          botReply("⛔ YouTube streams are not allowed", msgid, false);
+          botReply("🚫 YouTube streams are not allowed", msgid, false);
           return;
         }
       }
 
       if (result.items[0].contentDetails?.contentRating?.ytRating == "ytAgeRestricted" || !result.items[0].status?.embeddable) {
         deleteRequest(request.id);
-        botReply("⛔ Your video was removed because it is age restricted or not embeddable", msgid, false);
+        botReply("⛔ Your video is age restricted or not embeddable", msgid, false);
         return;
       }
     } catch (error) {
       deleteRequest(request.id);
-      botReply("⚠ Your video was removed because I could not find its info", msgid, false);
+      botReply("⛔ Could not find this video's info", msgid, false);
       console.log("getRequestInfo youtube error", error);
       return;
     }
@@ -1164,7 +1164,7 @@ async function getRequestInfo(request, msgid) {
       request.video = result.files.mp4.url;
     } catch (error) {
       deleteRequest(request.id);
-      botReply("⚠ Your video was removed because I could not find its info", msgid, false);
+      botReply("⛔ Could not find this video's info", msgid, false);
       console.log("getRequestInfo streamable error", error);
       return;
     }
@@ -1187,7 +1187,7 @@ async function getRequestInfo(request, msgid) {
       //update type here bcz video and audio links are the same and checking file extension is not reliable
       if (result.type.startsWith("video")) {
         if (!PLAYLIST.allowSupaVideo) {
-          botReply(`⛔ supa video links are not enabled`, msgid, false);
+          botReply(`🚫 supa video links are not enabled`, msgid, false);
           deleteRequest(request.id);
           return;
         }
@@ -1195,7 +1195,7 @@ async function getRequestInfo(request, msgid) {
       }
       if (result.type.startsWith("audio")) {
         if (!PLAYLIST.allowSupaVideo) {
-          botReply(`⛔ supa audio links are not enabled`, msgid, false);
+          botReply(`🚫 supa audio links are not enabled`, msgid, false);
           deleteRequest(request.id);
           return;
         }
@@ -1204,12 +1204,12 @@ async function getRequestInfo(request, msgid) {
 
       if (!result.type.startsWith("audio") && !result.type.startsWith("video")) {
         deleteRequest(request.id);
-        botReply("⚠ Only video and audio files are allowed", msgid, false);
+        botReply("🚫 Only video and audio files are allowed", msgid, false);
         return;
       }
     } catch (error) {
       deleteRequest(request.id);
-      botReply("⚠ Your video was removed because I could not find its info", msgid, false);
+      botReply("⛔ Could not find this link's info", msgid, false);
       console.log("getRequestInfo supa error", error);
       return;
     }
@@ -1220,13 +1220,13 @@ async function getRequestInfo(request, msgid) {
       togglePlaylist();
     }
     deleteRequest(request.id);
-    botReply(`⛔ Your request was removed because the playlist's duration limit was reached (${PLAYLIST.maxDuration}${PLAYLIST.maxDurationUnit})`, msgid, false);
+    botReply(`⛔ The playlist's duration limit was reached (${PLAYLIST.maxDuration}${PLAYLIST.maxDurationUnit})`, msgid, false);
     return;
   }
 
   if (PLAYLIST.maxLength !== "" && request.duration !== -1 && request.duration > PLAYLIST.maxLength * 60) {
     deleteRequest(request.id);
-    botReply(`⛔ Your request was removed because it's too long (${PLAYLIST.maxLength}m max)`, msgid, false);
+    botReply(`⛔ Your request is too long (${PLAYLIST.maxLength}m max)`, msgid, false);
     return;
   }
 
@@ -1235,19 +1235,19 @@ async function getRequestInfo(request, msgid) {
       togglePlaylist();
     }
     deleteRequest(request.id);
-    botReply(`⛔ Your request was removed because the playlist's size limit was reached (${PLAYLIST.maxSize})`, msgid, false);
+    botReply(`⛔ The playlist's size limit was reached (${PLAYLIST.maxSize})`, msgid, false);
     return;
   }
 
   if (PLAYLIST.minViewCount !== "" && request.views !== -1 && request.views < PLAYLIST.minViewCount) {
     deleteRequest(request.id);
-    botReply(`⛔ Your request was removed because it does not meet the minimum view count (${PLAYLIST.minViewCount.toLocaleString()})`, msgid, false);
+    botReply(`⛔ Your request does not meet the minimum view count (${PLAYLIST.minViewCount.toLocaleString()})`, msgid, false);
     return;
   }
 
-  if (PLAYLIST.skipHistory && history.some((e) => e.id === request.id)) {
+  if (PLAYLIST.uniqueOnly && history.some((e) => e.id === request.id)) {
     deleteRequest(request.id);
-    botReply(`⛔ Your request was removed because we've already seen it before`, msgid, false);
+    botReply(`⛔ Your request is not unique`, msgid, false);
     return;
   }
 
@@ -1535,7 +1535,7 @@ function deleteItem(id, reply) {
   }
 
   deleteRequest(id, false);
-  botReply(`✅ Request deleted`, reply, false);
+  botReply(`🗑️ Request deleted`, reply, false);
 
   updateLength();
   saveSettings();
@@ -2139,7 +2139,7 @@ function playPlaylist(reply) {
     botReply(`⚠ Nothing is playing`, reply, false);
     return;
   }
-
+  let twitchClipMP4 = false;
   switch (currentItem.type) {
     case "youtube":
     case "youtube short":
@@ -2155,6 +2155,7 @@ function playPlaylist(reply) {
     case "twitch clip":
       if (currentItem?.mp4 && Date.now() - currentItem.time < 19 * 60 * 60 * 1000) {
         elements.videoEmbed.play();
+        twitchClipMP4 = true;
       }
       break;
     case "streamable":
@@ -2167,7 +2168,7 @@ function playPlaylist(reply) {
   }
 
   if (reply) {
-    if (currentItem.type == "twitch clip") {
+    if (!twitchClipMP4) {
       botReply(`⚠ Twitch clip playback can't be controlled`, reply, false);
     } else {
       botReply(`▶ Playlist is now playing`, reply, false);
@@ -2180,7 +2181,7 @@ function pausePlaylist(reply) {
     botReply(`⚠ Nothing is playing`, reply, false);
     return;
   }
-
+  let twitchClipMP4 = false;
   switch (currentItem.type) {
     case "youtube":
     case "youtube short":
@@ -2196,6 +2197,7 @@ function pausePlaylist(reply) {
     case "twitch clip":
       if (currentItem?.mp4 && Date.now() - currentItem.time < 19 * 60 * 60 * 1000) {
         elements.videoEmbed.pause();
+        twitchClipMP4 = true;
       }
       break;
     case "streamable":
@@ -2208,14 +2210,18 @@ function pausePlaylist(reply) {
   }
 
   if (reply) {
-    botReply(`⏸ Playlist is now paused`, reply, false);
+    if (!twitchClipMP4) {
+      botReply(`⚠ Twitch clip playback can't be controlled`, reply, false);
+    } else {
+      botReply(`⏸ Playlist is now paused`, reply, false);
+    }
   }
 } //pausePlaylist
 
 function toggleAutoplay(reply) {
   let enabled = elements.autoplay.checked;
   elements.autoplay.checked = !enabled;
-  botReply(`${enabled ? "🚫" : "✅"} autoplay is now ${enabled ? "disabled" : "enabled"}`, reply, false);
+  botReply(`${enabled ? "❌" : "✅"} autoplay is now ${enabled ? "disabled" : "enabled"}`, reply, false);
   saveSettings();
 } //toggleAutoplay
 
