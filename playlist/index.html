@@ -118,6 +118,89 @@
       </div>
     </div>
 
+    <div class="modal modal-lg fade" id="platformsInfoModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Platform support details</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">Platform</th>
+                  <th scope="col">Autoplay</th>
+                  <th scope="col">Duration filters</th>
+                  <th scope="col">View count filters</th>
+                  <th scope="col">Volume controls</th>
+                  <th scope="col">Moderated platform<sup>[1]</sup></th>
+                </tr>
+              </thead>
+              <tbody class="table-group-divider">
+                <tr>
+                  <th scope="row">YouTube</th>
+                  <td>✔</td>
+                  <td>✔</td>
+                  <td>✔</td>
+                  <td>✔</td>
+                  <td>✔</td>
+                </tr>
+                <tr>
+                  <th scope="row">Twitch</th>
+                  <td>✔<sup>[2]</sup></td>
+                  <td>✔</td>
+                  <td>✔</td>
+                  <td>✔</td>
+                  <td>✔</td>
+                </tr>
+                <tr>
+                  <th scope="row">Spotify</th>
+                  <td>✔</td>
+                  <td>✔</td>
+                  <td>❌</td>
+                  <td>❌</td>
+                  <td>✔</td>
+                </tr>
+                <tr>
+                  <th scope="row">Streamable</th>
+                  <td>✔</td>
+                  <td>✔</td>
+                  <td>❌</td>
+                  <td>✔</td>
+                  <td>❌</td>
+                </tr>
+                <tr>
+                  <th scope="row">i.supa.codes</th>
+                  <td>✔</td>
+                  <td>✔</td>
+                  <td>❌</td>
+                  <td>✔</td>
+                  <td>❌</td>
+                </tr>
+                <tr>
+                  <th scope="row">TikTok</th>
+                  <td>✔</td>
+                  <td>❌</td>
+                  <td>❌</td>
+                  <td>✔</td>
+                  <td>✔</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="text-body-secondary">
+              [1]: Platforms that are marked as moderated might have some automated filters to remove unsafe content. Platforms like Streamable and i.supa.codes don't require an account, so
+              anyone can upload unsafe videos quickly then request them. This however does not mean that the other platforms will always have safe content.<br />
+              [2]: Twitch clips autoplay might break sometimes, especially if you keep the clips in the playlist for more than a day.
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="voteSkipDiv" class="bg-body-tertiary" style="display: none">
       <small class="text-body-secondary">
         Vote skip using <span id="voteSkipHint"><strong>!voteskip</strong> or <strong>!vs</strong></span>
@@ -133,17 +216,15 @@
       </div>
       <div class="offcanvas-body">
         <div class="card mb-3">
-          <div class="card-header"><i class="material-icons notranslate">checklist</i>Enabled Platforms</div>
+          <div class="card-header">
+            <span class="align-middle"><i class="material-icons notranslate">checklist</i>Enabled Platforms</span>
+            <button type="button" class="btn btn-sm btn-primary float-end" data-bs-toggle="modal" data-bs-target="#platformsInfoModal">Platform support details</button>
+          </div>
           <div class="card-body">
             <div class="container-fluid">
               <div class="row">
                 <div class="col-xl-4">
-                  <h6>
-                    Spotify
-                    <i class="material-icons notranslate text-warning cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Spotify embed has no volume controls"
-                      >warning
-                    </i>
-                  </h6>
+                  <h6>Spotify</h6>
 
                   <div class="form-check form-switch mb-3">
                     <input class="form-check-input" type="checkbox" role="switch" id="allowSpotifySongs" onchange="saveSettings()" checked />
@@ -175,14 +256,7 @@
                   <h6>Twitch</h6>
                   <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchClips" onchange="saveSettings()" checked />
-                    <label class="form-check-label" for="allowTwitchClips">Clips </label>
-                    <i
-                      class="material-icons notranslate text-warning cursor-pointer"
-                      data-bs-toggle="tooltip"
-                      data-bs-placement="top"
-                      data-bs-title="Autoplay won't work after a Twitch clip is done because the embed is not interactive"
-                      >warning
-                    </i>
+                    <label class="form-check-label" for="allowTwitchClips">Clips</label>
                   </div>
                   <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchStreams" onchange="saveSettings()" checked />
@@ -197,13 +271,6 @@
                   <div class="form-check form-switch mb-3">
                     <input class="form-check-input" type="checkbox" role="switch" id="allowTiktokVideos" onchange="saveSettings()" checked />
                     <label class="form-check-label" for="allowTiktokVideos">Videos</label>
-                    <i
-                      class="material-icons notranslate text-warning cursor-pointer"
-                      data-bs-toggle="tooltip"
-                      data-bs-placement="top"
-                      data-bs-title="TikTok requests don't support the view count and duration filters"
-                      >warning
-                    </i>
                   </div>
                 </div>
                 <div class="col-xl-4">
@@ -256,10 +323,12 @@
               <span class="input-group-text"><i class="material-icons notranslate">person</i>Minimum view count</span>
               <input type="number" aria-label="Minimum view count" id="minViewCount" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
             </div>
-            <small class="form-text text-body-secondary">
-              Videos/songs that have a view count lower than the limit will be blocked
-              <span class="text-warning">Does not apply to Streamable, Spotify, live streams, and i.supa.codes links</span>
-            </small>
+            <small class="form-text text-body-secondary"> Videos/songs that have a view count lower than the limit will be blocked </small>
+            <br /><span class="text-warning"
+              >See <span class="cursor-pointer text-info" data-bs-toggle="modal" data-bs-target="#platformsInfoModal">Platform support details</span> for info about which platforms work with
+              these filters</span
+            >
+
             <br />
             <div class="form-check form-switch mt-3">
               <input class="form-check-input" type="checkbox" role="switch" id="uniqueOnly" onchange="saveSettings()" />
