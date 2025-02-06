@@ -24,6 +24,12 @@ function copyCommand(command) {
   showToast("Command copied :)", "info", 1000);
 } //copyLink
 
+function openLink(event, link) {
+  if (event.button < 2) {
+    window.open(link, "_blank").focus();
+  }
+} //openLink
+
 window.onload = function () {
   darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
   elements.darkTheme.checked = darkTheme ?? true;

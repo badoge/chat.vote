@@ -499,7 +499,7 @@ function addBadges(badges, userid, firstmsg = null) {
       }
     }
     if (badges == "streamer") {
-      badgesHTML += `<img src="https://static-cdn.jtvnw.net/badges/v1/5527c58c-fb7d-422d-b71b-f309dcb85cc1/3" class="chat-badge" title="Broadcaster"/>`;
+      badgesHTML += `<img src="https://chat.vote/pics/streamer.png" class="chat-badge" title="Broadcaster"/>`;
       return badgesHTML;
     }
     for (const badge in badges) {

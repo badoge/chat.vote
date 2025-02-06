@@ -998,7 +998,12 @@ function addToHistory(request, localStorageLoad = false) {
 function updatePlaylist(request, localStorageLoad = false) {
   //check if request info has been fetched
   if (request.thumbnail && request.title) {
-    document.getElementById(`id${request.id}_thumbnail`).innerHTML = `<img src="${request.thumbnail}" alt="thumbnail" class="rounded" />`;
+    document.getElementById(`id${request.id}_thumbnail`).innerHTML = `
+    <img 
+    onmouseup="openLink(event, '${getItemLink(request)}')" 
+    src="${request.thumbnail}" 
+    alt="thumbnail" 
+    class="rounded cursor-pointer" />`;
     document.getElementById(`id${request.id}_title`).innerHTML = `
     <a 
     class="link-body-emphasis link-underline-opacity-0"
@@ -1486,6 +1491,12 @@ function getItemLink(request) {
       return "";
   }
 } //getItemLink
+
+function openLink(event, link) {
+  if (event.button < 2) {
+    window.open(link, "_blank").focus();
+  }
+} //openLink
 
 async function addLink() {
   if (!checkLogin()) {

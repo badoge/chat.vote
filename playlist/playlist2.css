@@ -1,5 +1,11 @@
-body {
-  margin-bottom: 300px;
+#playlistCard,
+#settingsCard {
+  max-height: 85vh;
+}
+
+#playlistCard > .card-body,
+#settingsCard > .card-body {
+  overflow: auto;
 }
 
 .request-title {
