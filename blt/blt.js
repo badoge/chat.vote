@@ -228,7 +228,7 @@ const icons = {
   streamable: `<i class="material-icons notranslate">play_arrow</i>`,
   "supa video/audio": `<i class="material-icons notranslate">play_arrow</i>`,
 };
-const spotifyURLRegex = /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:(album|track|playlist)\/|\?uri=spotify:track:)((\w|-){22})/;
+const spotifyURLRegex = /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:(album|track|playlist|episode)\/|\?uri=spotify:track:)((\w|-){22})/;
 
 let darkTheme = true;
 
@@ -1169,9 +1169,8 @@ function parseLink(link) {
   } //youtube
 
   if (link.includes("spotify.com")) {
-    const spotifyURLRegex = /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:(album|track|playlist)\/|\?uri=spotify:track:)((\w|-){22})/;
     let id = link.match(spotifyURLRegex);
-    if (!id[2] || id[1] !== "track") {
+    if (!id[2] || (id[1] !== "track" && id[1] !== "episode")) {
       return null;
     }
     return { type: "spotify", id: id[2] };

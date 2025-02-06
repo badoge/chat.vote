@@ -1377,9 +1377,10 @@ async function parseLink(link) {
   } //youtube search
 
   if (link.includes("spotify.com")) {
-    const spotifyURLRegex = /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:(album|track|playlist)\/|\?uri=spotify:track:)((\w|-){22})/;
+    const spotifyURLRegex = /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:(album|track|playlist|episode)\/|\?uri=spotify:track:)((\w|-){22})/;
     let id = link.match(spotifyURLRegex);
-    if (!id[2] || id[1] !== "track") {
+    console.log(id);
+    if (!id[2] || (id[1] !== "track" && id[1] !== "episode")) {
       return null;
     }
     return { type: "spotify", id: id[2] };
@@ -1637,7 +1638,7 @@ function playItem(item) {
       break;
     case "spotify":
       elements.spotifyEmbedContainer.style.display = "";
-      spotifyPlayer.loadUri(item.uri);
+      spotifyPlay(item.uri);
       break;
     case "twitch stream":
       elements.twitchEmbed.style.display = "";
@@ -1726,7 +1727,8 @@ function resetPlayers() {
   elements.videoEmbed.style.display = "none";
 
   youtubePlayer.loadVideoById("");
-  spotifyPlayer.pause();
+  spotifyPlayer.destroy();
+  elements.spotifyEmbedContainer.innerHTML = `<div id="spotifyEmbed"></div>`;
   twitchPlayer.setChannel("");
   elements.twitchClipsEmbed.innerHTML = "";
   elements.tiktokEmbed.innerHTML = "";
@@ -2200,7 +2202,7 @@ function playPlaylist(reply) {
       youtubePlayer.playVideo();
       break;
     case "spotify":
-      spotifyPlayer.play();
+      spotifyPlayer.resume();
       break;
     case "twitch stream":
     case "twitch vod":
@@ -2405,28 +2407,35 @@ function youtubePlayerOnAutoplayBlocked(event) {
   console.log(event);
 } //youtubePlayerOnAutoplayBlocked
 
-let spotifyPlayer;
+let spotifyPlayer, spotifyIFrameAPI;
 window.onSpotifyIframeApiReady = (IFrameAPI) => {
+  spotifyIFrameAPI = IFrameAPI;
   console.log("onSpotifyIframeApiReady");
-
-  //spotifyPlayer.loadUri('spotify:episode:7makk4oTQel546B0PZlDM5');
-  //spotifyPlayer.play()
-  //spotifyPlayer.pause();
-
   const callback = (EmbedController) => {
     spotifyPlayer = EmbedController;
-    //breaks if user skips too fast and keeps playing after the embed gets hidden
-    // EmbedController.addListener("ready", () => {
-    //   EmbedController.play();
-    // });
     EmbedController.addListener("playback_update", (event) => {
       if (event.data.position == event.data.duration && event.data.duration > 0 && PLAYLIST.autoplay) {
         nextItem();
       }
     });
   };
-  IFrameAPI.createController(elements.spotifyEmbed, {}, callback);
+  spotifyIFrameAPI.createController(elements.spotifyEmbed, {}, callback);
 }; //onSpotifyIframeApiReady
+
+function spotifyPlay(uri) {
+  const callback = (EmbedController) => {
+    spotifyPlayer = EmbedController;
+    EmbedController.addListener("playback_update", (event) => {
+      if (event.data.position == event.data.duration && event.data.duration > 0 && PLAYLIST.autoplay) {
+        nextItem();
+      }
+    });
+  };
+  spotifyIFrameAPI.createController(document.getElementById("spotifyEmbed"), {}, callback);
+
+  spotifyPlayer.loadUri(uri, true);
+  spotifyPlayer.play();
+}
 
 let twitchPlayer;
 function enableTwitchEmbed() {
