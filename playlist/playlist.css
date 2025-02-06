@@ -220,7 +220,8 @@ video {
 #videoEmbed,
 #twitchEmbed,
 #twitchClipsEmbed,
-#youtubeEmbedContainer {
+#youtubeEmbedContainer,
+#tiktokEmbed {
   width: 100%;
   height: 100%;
   max-height: calc(100vh - 115px);

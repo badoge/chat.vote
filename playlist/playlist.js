@@ -24,6 +24,7 @@ let elements = {
   allowTwitchClips: document.getElementById("allowTwitchClips"),
   allowTwitchStreams: document.getElementById("allowTwitchStreams"),
   allowTwitchVODs: document.getElementById("allowTwitchVODs"),
+  allowTiktokVideos: document.getElementById("allowTiktokVideos"),
   allowYTStreams: document.getElementById("allowYTStreams"),
   allowYTShorts: document.getElementById("allowYTShorts"),
   allowYTVideos: document.getElementById("allowYTVideos"),
@@ -80,6 +81,7 @@ let elements = {
   spotifyEmbed: document.getElementById("spotifyEmbed"),
   twitchEmbed: document.getElementById("twitchEmbed"),
   twitchClipsEmbed: document.getElementById("twitchClipsEmbed"),
+  tiktokEmbed: document.getElementById("tiktokEmbed"),
   videoEmbed: document.getElementById("videoEmbed"),
 
   commandHint: document.getElementById("commandHint"),
@@ -146,6 +148,7 @@ let PLAYLIST = {
   allowTwitchClips: true,
   allowTwitchStreams: true,
   allowTwitchVODs: true,
+  allowTiktokVideos: true,
   allowYTStreams: true,
   allowYTShorts: true,
   allowYTVideos: true,
@@ -208,6 +211,7 @@ async function refreshData() {
   PLAYLIST.allowTwitchClips = elements.allowTwitchClips.checked;
   PLAYLIST.allowTwitchStreams = elements.allowTwitchStreams.checked;
   PLAYLIST.allowTwitchVODs = elements.allowTwitchVODs.checked;
+  PLAYLIST.allowTiktokVideos = elements.allowTiktokVideos.checked;
   PLAYLIST.allowYTStreams = elements.allowYTStreams.checked;
   PLAYLIST.allowYTShorts = elements.allowYTShorts.checked;
   PLAYLIST.allowYTVideos = elements.allowYTVideos.checked;
@@ -311,6 +315,7 @@ async function load_localStorage() {
     elements.allowTwitchClips.checked = PLAYLIST.allowTwitchClips ?? true;
     elements.allowTwitchStreams.checked = PLAYLIST.allowTwitchStreams ?? true;
     elements.allowTwitchVODs.checked = PLAYLIST.allowTwitchVODs ?? true;
+    elements.allowTiktokVideos.checked = PLAYLIST.allowTiktokVideos ?? true;
     elements.allowYTStreams.checked = PLAYLIST.allowYTStreams ?? true;
     elements.allowYTShorts.checked = PLAYLIST.allowYTShorts ?? true;
     elements.allowYTVideos.checked = PLAYLIST.allowYTVideos ?? true;
@@ -455,6 +460,7 @@ function resetSettings(logout = false) {
       allowTwitchClips: true,
       allowTwitchStreams: true,
       allowTwitchVODs: true,
+      allowTiktokVideos: true,
       allowYTStreams: true,
       allowYTShorts: true,
       allowYTVideos: true,
@@ -622,7 +628,7 @@ function connect() {
       case PLAYLIST.songCommandAlias:
         if (currentItem) {
           botReply(
-            `Now playing: ${getItemLink(currentItem.type, currentItem.id)} | Requested by @${currentItem.by[0].username} ${
+            `Now playing: ${getItemLink(currentItem)} | Requested by @${currentItem.by[0].username} ${
               currentItem.by.length > 1 ? `and ${currentItem.by.length - 1} other ${currentItem.by.length - 1 == 1 ? "user" : "users"}` : ""
             }`,
             context.id,
@@ -826,6 +832,7 @@ function addRequest(context, link, msgid, search) {
       title: "",
       channel: "",
       uri: "",
+      url: link?.url || "",
       duration: 0,
       views: -1,
       thumbnail: "",
@@ -960,7 +967,7 @@ function addToHistory(request, localStorageLoad = false) {
               <div class="request-title mb-auto" title="${request.title}">
                 <a 
                 class="link-body-emphasis link-underline-opacity-0" 
-                href="${getItemLink(request.type, request.id)}" 
+                href="${getItemLink(request)}" 
                 target="_blank" 
                 rel="noopener noreferrer"> 
                 ${escapeString(request.title)}
@@ -995,7 +1002,7 @@ function updatePlaylist(request, localStorageLoad = false) {
     document.getElementById(`id${request.id}_title`).innerHTML = `
     <a 
     class="link-body-emphasis link-underline-opacity-0"
-    href="${getItemLink(request.type, request.id)}"
+    href="${getItemLink(request)}"
     target="_blank"
     rel="noopener noreferrer">
     ${escapeString(request.title)}
@@ -1116,6 +1123,23 @@ async function getRequestInfo(request, msgid) {
       return;
     }
   } //spotify
+
+  if (request.type == "tiktok video") {
+    try {
+      let response = await fetch(`https://www.tiktok.com/oembed?url=${encodeURIComponent(request.url)}`);
+      let result = await response.json();
+      console.log(result);
+      request.title = result.title || "(untitled)";
+      request.channel = result.author_unique_id || "(unknown)";
+      request.thumbnail = result.thumbnail_url;
+      request.duration = 0;
+    } catch (error) {
+      deleteRequest(request.id);
+      botReply("⛔ Could not find this video's info", msgid, false);
+      console.log("getRequestInfo tiktok error", error);
+      return;
+    }
+  } //tiktok video
 
   if (request.type == "youtube" || request.type == "youtube short") {
     try {
@@ -1259,7 +1283,7 @@ async function getRequestInfo(request, msgid) {
   if (currentItem && request) {
     let reply = "";
     if (request.search) {
-      reply += `✅ Added ${getItemLink(request.type, request.id)} to the playlist`;
+      reply += `✅ Added ${getItemLink(request)} to the playlist`;
     } else {
       reply += `✅ Your request has been added to the playlist`;
     }
@@ -1279,7 +1303,7 @@ async function getRequestInfo(request, msgid) {
     botReply(reply, msgid, false);
   } else {
     if (request.search) {
-      botReply(`✅ Added ${getItemLink(request.type, request.id)} to the playlist`, msgid, false);
+      botReply(`✅ Added ${getItemLink(request)} to the playlist`, msgid, false);
     } else {
       botReply(`✅ Your request has been added to the playlist`, msgid, false);
     }
@@ -1356,6 +1380,15 @@ async function parseLink(link) {
     return { type: "spotify", id: id[2] };
   } //spotify
 
+  if (link.includes("tiktok.com")) {
+    const tiktokURLRegex = /^.*https:\/\/(?:m|www|vm)?\.?tiktok\.com\/((?:.*\b(?:(?:usr|v|embed|user|video)\/|\?shareId=|\&item_id=)(\d+))|\w+)/;
+    let id = link.match(tiktokURLRegex);
+    if (!id[2] || !id[1].includes("/video/")) {
+      return null;
+    }
+    return { type: "tiktok video", id: id[2], url: link.split("?")[0] };
+  } //tiktok
+
   if (link.toLowerCase().startsWith("spotify")) {
     if (!link.toLowerCase().replace("spotify", "").trim()) {
       return null;
@@ -1414,6 +1447,9 @@ function linkTypeAllowed(type) {
     //supa links dont have a specific type yet so check if both are disabled
     return false;
   }
+  if (type == "tiktok video" && !PLAYLIST.allowTiktokVideos) {
+    return false;
+  }
   if (type == "youtube" && !PLAYLIST.allowYTStreams && !PLAYLIST.allowYTVideos) {
     return false;
   }
@@ -1424,26 +1460,28 @@ function linkTypeAllowed(type) {
   return true;
 } //linkTypeAllowed
 
-function getItemLink(type, id) {
-  switch (type) {
+function getItemLink(request) {
+  switch (request.type) {
     case "youtube":
-      return `https://youtu.be/${id}`;
+      return `https://youtu.be/${request.id}`;
     case "youtube short":
-      return `https://youtube.com/shorts/${id}`;
+      return `https://youtube.com/shorts/${request.id}`;
     case "spotify":
-      return `https://open.spotify.com/track/${id}`;
+      return `https://open.spotify.com/track/${request.id}`;
+    case "tiktok video":
+      return request.url;
     case "twitch stream":
-      return `https://www.twitch.tv/${id}`;
+      return `https://www.twitch.tv/${request.id}`;
     case "twitch vod":
-      return `https://www.twitch.tv/videos/${id}`;
+      return `https://www.twitch.tv/videos/${request.id}`;
     case "twitch clip":
-      return `https://clips.twitch.tv/${id}`;
+      return `https://clips.twitch.tv/${request.id}`;
     case "streamable":
-      return `https://streamable.com/${id}`;
+      return `https://streamable.com/${request.id}`;
     case "supa video":
     case "supa audio":
     case "supa video/audio":
-      return `https://i.supa.codes/${id}`;
+      return `https://i.supa.codes/${request.id}`;
     default:
       return "";
   }
@@ -1607,6 +1645,10 @@ function playItem(item) {
         elements.twitchClipsEmbed.innerHTML = `<iframe src="https://clips.twitch.tv/embed?clip=${item.id}&parent=${window.location.hostname}&autoplay=true&muted=false" preload="auto" height="100%" width="100%"></iframe>`;
       }
       break;
+    case "tiktok video":
+      elements.tiktokEmbed.style.display = "";
+      elements.tiktokEmbed.innerHTML = `<iframe id="tiktokIframe" src="https://www.tiktok.com/player/v1/${item.id}?autoplay=1&rel=0" preload="auto" height="100%" width="100%"></iframe>`;
+      break;
     case "streamable":
       elements.videoEmbed.style.display = "";
       elements.videoEmbed.src = item.video;
@@ -1627,7 +1669,7 @@ function playItem(item) {
   elements.nowPlaying.innerHTML = `
   <a 
   class="link-body-emphasis link-underline-opacity-0"
-  href="${getItemLink(currentItem.type, currentItem.id)}"
+  href="${getItemLink(currentItem)}"
   target="_blank"
   rel="noopener noreferrer">
   ${escapeString(currentItem.title)}
@@ -1669,12 +1711,14 @@ function resetPlayers() {
   elements.spotifyEmbedContainer.style.display = "none";
   elements.twitchEmbed.style.display = "none";
   elements.twitchClipsEmbed.style.display = "none";
+  elements.tiktokEmbed.style.display = "none";
   elements.videoEmbed.style.display = "none";
 
   youtubePlayer.loadVideoById("");
   spotifyPlayer.pause();
   twitchPlayer.setChannel("");
   elements.twitchClipsEmbed.innerHTML = "";
+  elements.tiktokEmbed.innerHTML = "";
   elements.videoEmbed.src = "";
 } //resetPlayers
 
@@ -2157,6 +2201,9 @@ function playPlaylist(reply) {
         twitchClipMP4 = true;
       }
       break;
+    case "tiktok video":
+      document.getElementById("tiktokIframe").contentWindow.postMessage({ type: "play", "x-tiktok-player": true }, "*");
+      break;
     case "streamable":
     case "supa video":
     case "supa audio":
@@ -2198,6 +2245,9 @@ function pausePlaylist(reply) {
         elements.videoEmbed.pause();
         twitchClipMP4 = true;
       }
+      break;
+    case "tiktok video":
+      document.getElementById("tiktokIframe").contentWindow.postMessage({ type: "pause", "x-tiktok-player": true }, "*");
       break;
     case "streamable":
     case "supa video":
@@ -2291,6 +2341,7 @@ window.onload = function () {
   enableTooltips();
   enableTwitchEmbed();
   videoEmbedEventListeners();
+  tiktokEmbedEventListeners();
 }; //onload
 
 let youtubePlayer;
@@ -2403,3 +2454,14 @@ function videoEmbedEventListeners() {
     }
   });
 } //videoEmbedEventListeners
+
+function tiktokEmbedEventListeners() {
+  window.addEventListener("message", (event) => {
+    if (!event?.data?.["x-tiktok-player"]) {
+      return;
+    }
+    if (event.data.type == "onStateChange" && event.data.value == 0) {
+      nextItem();
+    }
+  });
+} //tiktokEmbedEventListeners

@@ -3216,7 +3216,7 @@ async function loadPlaylist() {
 
       for (let [key, req] of requests) {
         let type = req.type;
-        if (type == "twitch stream" || type == "twitch vod") {
+        if (type == "twitch stream" || type == "twitch vod" || type == "tiktok video") {
           //skip streams and vods bcz they are not supported in the brackets site
           continue;
         }
@@ -3259,7 +3259,7 @@ async function loadPlaylist() {
       }
 
       html += `</ul>`;
-      let diff = playlist.length - count;
+      let diff = requests.size - count;
       elements.playlist.innerHTML = `
         Playlist has ${count} videos ${diff ? ` (${diff} unsupported/broken ${diff == 1 ? "video" : "videos"} skipped)` : ""}
         ${html}`;

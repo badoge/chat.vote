@@ -164,12 +164,12 @@
                     >help_outline
                   </i>
                   <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" role="switch" id="allowSupaVideo" onchange="saveSettings()" checked />
-                    <label class="form-check-label" for="allowSupaVideo">Video files</label>
-                  </div>
-                  <div class="form-check form-switch mb-3">
                     <input class="form-check-input" type="checkbox" role="switch" id="allowSupaAudio" onchange="saveSettings()" checked />
                     <label class="form-check-label" for="allowSupaAudio">Audio files</label>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="allowSupaVideo" onchange="saveSettings()" checked />
+                    <label class="form-check-label" for="allowSupaVideo">Video files</label>
                   </div>
                 </div>
                 <div class="col-xl-4">
@@ -193,9 +193,22 @@
                     <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchVODs" onchange="saveSettings()" checked />
                     <label class="form-check-label" for="allowTwitchVODs">VODs</label>
                   </div>
+
+                  <h6>TikTok</h6>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" role="switch" id="allowTiktokVideos" onchange="saveSettings()" checked />
+                    <label class="form-check-label" for="allowTiktokVideos">Videos</label>
+                    <i
+                      class="material-icons notranslate text-warning cursor-pointer"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      data-bs-title="TikTok requests don't support the view count and duration filters"
+                      >warning
+                    </i>
+                  </div>
                 </div>
                 <div class="col-xl-4">
-                  <h6>Youtube</h6>
+                  <h6>YouTube</h6>
                   <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" role="switch" id="allowYTStreams" onchange="saveSettings()" checked />
                     <label class="form-check-label" for="allowYTStreams">Live Streams</label>
@@ -796,6 +809,7 @@
               <div id="spotifyEmbedContainer" style="display: none"><div id="spotifyEmbed"></div></div>
               <div id="twitchEmbed" style="display: none"></div>
               <div id="twitchClipsEmbed" style="display: none" height="100%" width="100%"></div>
+              <div id="tiktokEmbed" style="display: none" height="100%" width="100%"></div>
               <video id="videoEmbed" style="display: none" controls autoplay></video>
             </div>
           </div>
