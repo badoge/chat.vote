@@ -1660,6 +1660,10 @@ function playItem(item) {
     case "tiktok video":
       elements.tiktokEmbed.style.display = "";
       elements.tiktokEmbed.innerHTML = `<iframe id="tiktokIframe" src="https://www.tiktok.com/player/v1/${item.id}?autoplay=1&rel=0" preload="auto" height="100%" width="100%"></iframe>`;
+      setTimeout(() => {
+        //donk embed is muted by default so unmute after a couple secs when it loads
+        document.getElementById("tiktokIframe").contentWindow.postMessage({ type: "unMute", "x-tiktok-player": true }, "*");
+      }, 2000);
       break;
     case "streamable":
       elements.videoEmbed.style.display = "";
