@@ -2,7 +2,6 @@ let elements = {
   //modals
   loginExpiredModal: document.getElementById("loginExpiredModal"),
   resetSettingsModal: document.getElementById("resetSettingsModal"),
-  clearPlaylistModal: document.getElementById("clearPlaylistModal"),
 
   voteSkipDiv: document.getElementById("voteSkipDiv"),
   voteSkipHint: document.getElementById("voteSkipHint"),
@@ -116,13 +115,14 @@ let client;
 let currentTime = 0;
 let loginButton;
 let settingsOffcanvas;
-let loginExpiredModal, resetSettingsModal, clearPlaylistModal;
+let loginExpiredModal, resetSettingsModal;
 let copyLinkButton;
 let playlistTab, approvalTab, historyTab;
 let playlist_open = false;
 let playlist_playing = false;
 let total_duration = 0;
 let togglePlaylistPopover;
+let clearPlaylistPopover;
 let streamerColor = "";
 
 let users = [];
@@ -2300,10 +2300,15 @@ window.onload = function () {
 
   loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
   resetSettingsModal = new bootstrap.Modal(elements.resetSettingsModal);
-  clearPlaylistModal = new bootstrap.Modal(elements.clearPlaylistModal);
   settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
   copyLinkButton = new bootstrap.Popover(elements.copyLinkButton);
   togglePlaylistPopover = new bootstrap.Popover(elements.togglePlaylist);
+
+  clearPlaylistPopover = new bootstrap.Popover("#clearPlaylistPopover", {
+    trigger: "focus",
+    html: true,
+    sanitize: false,
+  });
 
   playlistTab = new bootstrap.Tab(elements.playlistTab);
   approvalTab = new bootstrap.Tab(elements.approvalTab);
