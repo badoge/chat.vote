@@ -1366,7 +1366,7 @@ async function parseLink(link) {
       let response = await fetch(`https://helper.donk.workers.dev/youtube/search?query=${encodeURIComponent(link.toLowerCase().replace("youtube", "").trim())}`);
       let result = await response.json();
       console.log(result);
-      if (result.items.length == 0) {
+      if (result?.items?.length == 0 || result?.items?.[0].id?.kind !== "youtube#video") {
         return null;
       }
 
