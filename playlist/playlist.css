@@ -131,6 +131,7 @@ video {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
   word-break: break-all;
 }
@@ -139,6 +140,7 @@ video {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
+  line-clamp: 1;
   overflow: hidden;
   word-break: break-all;
 }
@@ -147,6 +149,7 @@ video {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
+  line-clamp: 1;
   overflow: hidden;
   word-break: break-all;
 }
@@ -156,6 +159,7 @@ video {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
+  line-clamp: 1;
   overflow: hidden;
   word-break: break-all;
 }
@@ -165,20 +169,38 @@ video {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
+  line-clamp: 1;
   overflow: hidden;
   word-break: break-all;
 }
 
-.delete-request {
+.deletebtn {
+  color: #e74c3c;
+}
+
+.deletebtn:hover {
+  color: #c44133;
+  cursor: pointer;
+}
+
+#bannedUsersListDiv,
+#bannedItemsListDiv,
+#bannedChannelsListDiv {
+  margin: 2rem;
+  overflow-y: auto;
+  max-height: 40vh;
+}
+
+.icon-button {
   cursor: pointer;
   float: inline-end;
 }
 
-.delete-request:hover {
+.icon-button:hover {
   opacity: 80%;
 }
 
-.delete-request:active {
+.icon-button:active {
   opacity: 50%;
 }
 

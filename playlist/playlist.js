@@ -2,6 +2,13 @@ let elements = {
   //modals
   loginExpiredModal: document.getElementById("loginExpiredModal"),
   resetSettingsModal: document.getElementById("resetSettingsModal"),
+  banlistModal: document.getElementById("banlistModal"),
+  bannedUsersList: document.getElementById("bannedUsersList"),
+  bannedItemsList: document.getElementById("bannedItemsList"),
+  bannedChannelsList: document.getElementById("bannedChannelsList"),
+  bannedUserCount: document.getElementById("bannedUserCount"),
+  bannedItemCount: document.getElementById("bannedItemCount"),
+  bannedChannelCount: document.getElementById("bannedChannelCount"),
 
   voteSkipDiv: document.getElementById("voteSkipDiv"),
   voteSkipHint: document.getElementById("voteSkipHint"),
@@ -115,7 +122,7 @@ let client;
 let currentTime = 0;
 let loginButton;
 let settingsOffcanvas;
-let loginExpiredModal, resetSettingsModal;
+let loginExpiredModal, resetSettingsModal, banlistModal;
 let copyLinkButton;
 let playlistTab, approvalTab, historyTab;
 let playlist_open = false;
@@ -128,6 +135,9 @@ let streamerColor = "";
 let users = [];
 let requests = new Map();
 let history = [];
+let bannedUsers = new Map();
+let bannedItems = new Map();
+let bannedChannels = new Map();
 let firstTimeChatters = [];
 let skippers = [];
 
@@ -290,6 +300,9 @@ function saveSettings() {
   localStorage.setItem("PLAYLIST", JSON.stringify(PLAYLIST));
   localforage.setItem("PLAYLIST_REQUESTS", JSON.stringify(requests, replacer));
   localforage.setItem("PLAYLIST_HISTORY", JSON.stringify(history));
+  localforage.setItem("PLAYLIST_BANNED_USERS", JSON.stringify(bannedUsers, replacer));
+  localforage.setItem("PLAYLIST_BANNED_ITEMS", JSON.stringify(bannedItems, replacer));
+  localforage.setItem("PLAYLIST_BANNED_CHANNELS", JSON.stringify(bannedChannels, replacer));
   localStorage.setItem("darkTheme", darkTheme);
   updateSite();
 } //saveSettings
@@ -398,7 +411,6 @@ async function load_localStorage() {
 
   try {
     const storedRequests = await localforage.getItem("PLAYLIST_REQUESTS");
-
     if (!storedRequests) {
       console.log("localStorage playlist requests not found");
     } else {
@@ -419,7 +431,6 @@ async function load_localStorage() {
 
   try {
     const storedHistory = await localforage.getItem("PLAYLIST_HISTORY");
-
     if (!storedHistory) {
       console.log("localStorage playlist history not found");
     } else {
@@ -428,6 +439,39 @@ async function load_localStorage() {
         addToHistory(history[index], true);
       }
       elements.historyCount.innerHTML = `${history.length.toLocaleString()} ${history.length == 1 ? "item" : "items"}`;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  try {
+    const storedUserBanlist = await localforage.getItem("PLAYLIST_BANNED_USERS");
+    if (!storedUserBanlist) {
+      console.log("localStorage playlist banned users not found");
+    } else {
+      bannedUsers = JSON.parse(storedUserBanlist, reviver);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  try {
+    const storedItemBanlist = await localforage.getItem("PLAYLIST_BANNED_ITEMS");
+    if (!storedItemBanlist) {
+      console.log("localStorage playlist banned items not found");
+    } else {
+      bannedItems = JSON.parse(storedItemBanlist, reviver);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  try {
+    const storedChannelBanlist = await localforage.getItem("PLAYLIST_BANNED_CHANNELS");
+    if (!storedChannelBanlist) {
+      console.log("localStorage playlist banned channels not found");
+    } else {
+      bannedChannels = JSON.parse(storedChannelBanlist, reviver);
     }
   } catch (error) {
     console.log(error);
@@ -448,6 +492,9 @@ function resetSettings(logout = false) {
     );
     localforage.setItem("PLAYLIST_REQUESTS", JSON.stringify(new Map(), replacer));
     localforage.setItem("PLAYLIST_HISTORY", JSON.stringify([]));
+    localforage.setItem("PLAYLIST_BANNED_USERS", JSON.stringify(new Map(), replacer));
+    localforage.setItem("PLAYLIST_BANNED_ITEMS", JSON.stringify(new Map(), replacer));
+    localforage.setItem("PLAYLIST_BANNED_CHANNELS", JSON.stringify(new Map(), replacer));
   }
   localStorage.setItem(
     "PLAYLIST",
@@ -565,6 +612,11 @@ function connect() {
     let input = msg.split(" ").filter(Boolean);
 
     if (PLAYLIST.noCommand && playlist_open) {
+      if (bannedUsers.get(context["user-id"])) {
+        botReply(`🚫 You are banned`, context.id, false);
+        return;
+      }
+
       let request = input[0];
       let search = false;
       if (input[0].toLowerCase() == "youtube" || input[0].toLowerCase() == "spotify") {
@@ -602,6 +654,11 @@ function connect() {
           return;
         }
 
+        if (bannedUsers.get(context["user-id"])) {
+          botReply(`🚫 You are banned`, context.id, false);
+          return;
+        }
+
         let request = input[1];
         let search = false;
         if (input[1].toLowerCase() == "youtube" || input[1].toLowerCase() == "spotify") {
@@ -622,11 +679,19 @@ function connect() {
 
       case PLAYLIST.voteskipCommand:
       case PLAYLIST.voteskipCommandAlias:
+        if (bannedUsers.get(context["user-id"])) {
+          return;
+        }
         voteSkip(context["user-id"]);
         break;
       case PLAYLIST.songCommand:
       case PLAYLIST.songCommandAlias:
         if (currentItem) {
+          if (bannedUsers.get(context["user-id"])) {
+            botReply(`🚫 You are banned`, context.id, false);
+            return;
+          }
+
           botReply(
             `Now playing: ${getItemLink(currentItem)} | Requested by @${currentItem.by[0].username} ${
               currentItem.by.length > 1 ? `and ${currentItem.by.length - 1} other ${currentItem.by.length - 1 == 1 ? "user" : "users"}` : ""
@@ -639,6 +704,11 @@ function connect() {
       case PLAYLIST.playlistCommand:
       case PLAYLIST.playlistCommandAlias:
         if (USER.access_token) {
+          if (bannedUsers.get(context["user-id"])) {
+            botReply(`🚫 You are banned`, context.id, false);
+            return;
+          }
+
           botReply(`You can view the playlist here: https://playlist.chat.vote/${USER.channel}`, context.id, true);
         }
         break;
@@ -792,6 +862,35 @@ function findRequestKey(requestProperty, lookupValue) {
 } //findRequestKey
 
 function addRequest(context, link, msgid, search) {
+  if (bannedItems.get(link.id)) {
+    let message = "";
+    switch (link.type) {
+      case "twitch clip":
+        message = "🚫 This clip is banned";
+        break;
+      case "twitch vod":
+        message = "🚫 This VOD is banned";
+        break;
+      case "twitch stream":
+        message = "🚫 This stream is banned";
+        break;
+      case "youtube short":
+        message = "🚫 This short is banned";
+        break;
+      case "spotify":
+        message = "🚫 This song is banned";
+        break;
+      case "supa video/audio":
+        message = "🚫 This link is banned";
+        break;
+      default:
+        message = `🚫 This video is banned`;
+        break;
+    }
+    botReply(message, context.id, false);
+    return;
+  }
+
   const userIndex = getUser(context);
   const limit = checkRequestLimit(userIndex);
 
@@ -871,6 +970,172 @@ function deleteRequest(id, refund = true) {
   saveSettings();
 } //deleteRequest
 
+function banUser(requestID) {
+  let request = requests.get(requestID);
+  if (!request) {
+    showToast("Could not ban user", "danger", 2000);
+    return;
+  }
+
+  //ban everyone that requested
+  for (let index = 0; index < request.by.length; index++) {
+    //check if user is already banned before adding them to the list
+    if (!bannedUsers.get(request.by[index].id)) {
+      bannedUsers.set(request.by[index].id, request.by[index].username);
+    }
+  }
+
+  //ban the item also
+  if (!bannedItems.get(requestID)) {
+    bannedItems.set(requestID, request);
+  }
+
+  //remove all other requests sent by this user except for the one that was clicked
+  for (const [key, value] of requests.entries()) {
+    if (key == requestID) {
+      continue;
+    }
+
+    if (value.by[0].id == request.by[0].id) {
+      deleteRequest(key, false);
+    }
+  }
+
+  deleteRequest(requestID, false);
+} //banUser
+
+function banItem(requestID) {
+  let request = requests.get(requestID);
+  if (!request) {
+    showToast("Could not ban video/song", "danger", 2000);
+    return;
+  }
+
+  //check if item is already banned before adding it to the list
+  if (!bannedItems.get(requestID)) {
+    bannedItems.set(requestID, request);
+  }
+
+  deleteRequest(requestID, false);
+} //banItem
+
+function banChannel(requestID) {
+  let request = requests.get(requestID);
+  if (!request) {
+    showToast("Could not ban channel/artist", "danger", 2000);
+    return;
+  }
+  //check if request has a channel listed
+  if (!request.channel) {
+    showToast("Item has no channel/artist", "danger", 2000);
+    return;
+  }
+
+  //check if channel is already banned before adding it to the list
+  if (!bannedChannels.get(request.channel)) {
+    bannedChannels.set(request.channel, request);
+  }
+
+  deleteRequest(requestID, false);
+} //banChannel
+
+function unbanUser(userid) {
+  //check if user is actually banned
+  if (!bannedUsers.get(userid)) {
+    showToast("That user is not banned", "warning", 2000);
+    return;
+  }
+  bannedUsers.delete(userid);
+  saveSettings();
+  loadBanLists();
+} //unbanUser
+
+function unbanItem(item) {
+  //check if item is actually banned
+  if (!bannedItems.get(item)) {
+    showToast("That video/song is not banned", "warning", 2000);
+    return;
+  }
+  bannedItems.delete(item);
+  saveSettings();
+  loadBanLists();
+} //unbanItem
+
+function unbanChannel(channel) {
+  //check if channel is actually banned
+  if (!bannedChannels.get(channel)) {
+    showToast("That channel/artist is not banned", "warning", 2000);
+    return;
+  }
+  bannedChannels.delete(channel);
+  saveSettings();
+  loadBanLists();
+} //unbanChannel
+
+function unbanAllUsers() {
+  bannedUsers = new Map();
+  saveSettings();
+  loadBanLists();
+} //unbanUser
+
+function unbanAllItems() {
+  bannedItems = new Map();
+  saveSettings();
+  loadBanLists();
+} //unbanItem
+
+function unbanAllChannels() {
+  bannedChannels = new Map();
+  saveSettings();
+  loadBanLists();
+} //unbanChannel
+
+function loadBanLists() {
+  elements.bannedUsersList.innerHTML = "";
+  elements.bannedItemsList.innerHTML = "";
+  elements.bannedChannelsList.innerHTML = "";
+
+  for (const [key, value] of bannedUsers.entries()) {
+    elements.bannedUsersList.insertAdjacentHTML(
+      "afterbegin",
+      `
+      <li class="list-group-item">
+      ${value} <i class="material-icons notranslate deletebtn float-end" onclick="unbanUser('${key}')" title="Unban">highlight_off</i>
+      </li>`
+    );
+  }
+
+  for (const [key, value] of bannedItems.entries()) {
+    elements.bannedItemsList.insertAdjacentHTML(
+      "afterbegin",
+      `
+      <li class="list-group-item">
+        <a 
+        class="link-body-emphasis link-underline-opacity-0"
+        href="${getItemLink(value)}"
+        target="_blank"
+        rel="noopener noreferrer">
+        ${escapeString(value.title)}
+        </a>
+        <i class="material-icons notranslate deletebtn float-end" onclick="unbanItem('${key}')" title="Unban">highlight_off</i>
+      </li>`
+    );
+  }
+
+  for (const [key, value] of bannedChannels.entries()) {
+    elements.bannedChannelsList.insertAdjacentHTML(
+      "afterbegin",
+      `
+      <li class="list-group-item">
+      ${value.channel} <i class="material-icons notranslate deletebtn float-end" onclick="unbanChannel('${value.channel}')" title="Unban">highlight_off</i>
+      </li>`
+    );
+  }
+  elements.bannedUserCount.innerHTML = `${bannedUsers.size} ${bannedUsers.size == 1 ? "User" : "Users"}`;
+  elements.bannedItemCount.innerHTML = `${bannedItems.size} ${bannedItems.size == 1 ? "Video/Song" : "Videos/Songs"}`;
+  elements.bannedChannelCount.innerHTML = `${bannedChannels.size} ${bannedChannels.size == 1 ? "Channel/Artist" : "Channels/Artists"}`;
+} //loadBanLists
+
 function clearPlaylist() {
   playlist_playing = false;
   total_duration = 0;
@@ -908,9 +1173,66 @@ function updateLength() {
 } //updateLength
 
 function addToPlaylist(request, position = "beforeend") {
+  let banChannelButton = "";
+  let banItemText = "";
+
+  switch (request.type) {
+    case "streamable":
+      banChannelButton = `
+      <li>
+        <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Streamable videos are uploaded anonymously so there is no channel to ban">
+          <a class="dropdown-item disabled" aria-disabled="true"><i class="material-icons notranslate">tv_off</i> Ban Channel</a>
+        </span>
+      </li>`;
+      break;
+    case "supa video":
+    case "supa audio":
+    case "supa video/audio":
+      banChannelButton = `
+      <li>
+        <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="supa links are uploaded anonymously so there is no channel to ban">
+          <a class="dropdown-item disabled" aria-disabled="true"><i class="material-icons notranslate">tv_off</i> Ban Channel</a>
+        </span>
+      </li>`;
+      break;
+    case "spotify":
+      banChannelButton = `<li><a class="dropdown-item" onclick="banChannel('${request.id}')"><i class="material-icons notranslate">person_off</i> Ban Artist</a></li>`;
+      break;
+    default:
+      banChannelButton = `<li><a class="dropdown-item" onclick="banChannel('${request.id}')"><i class="material-icons notranslate">tv_off</i> Ban Channel</a></li>`;
+      break;
+  }
+
+  switch (request.type) {
+    case "youtube short":
+      banItemText = `<i class="material-icons notranslate">play_disabled</i> Ban Short`;
+      break;
+    case "twitch clip":
+      banItemText = `<i class="material-icons notranslate">play_disabled</i> Ban Clip`;
+      break;
+    case "twitch stream":
+      banItemText = `<i class="material-icons notranslate">tv_off</i> Ban Stream`;
+      banChannelButton = "";
+      break;
+    case "twitch vod":
+      banItemText = `<i class="material-icons notranslate">play_disabled</i> Ban VOD`;
+      break;
+    case "spotify":
+      banItemText = `<i class="material-icons notranslate">music_off</i> Ban Song`;
+      break;
+    default:
+      banItemText = `<i class="material-icons notranslate">play_disabled</i> Ban Video`;
+      break;
+  }
+
+  let banButtons = `
+  <li><a id="id${request.id}_ban_user" class="dropdown-item" onclick="banUser('${request.id}')" title="Video/song will be banned also"><i class="material-icons notranslate">person_off</i> Ban User</a></li>
+  <li><a class="dropdown-item" onclick="banItem('${request.id}')">${banItemText}</a></li>
+  ${banChannelButton}`;
+
   elements.mainList.insertAdjacentHTML(
     position,
-    `<div class="container-fluid p-0 mb-1" id="id${request.id}">
+    `<div class="container-fluid p-0 mb-2" id="id${request.id}">
         <div class="row g-1">
           <div class="col-auto thumbnail-div">
             <div id="id${request.id}_thumbnail" class="request-thumbnail">
@@ -942,10 +1264,19 @@ function addToPlaylist(request, position = "beforeend") {
               </small>
             </div>
           </div>
-          <div class="col-auto" style="align-self: center"><i class="material-icons notranslate delete-request" onclick="deleteRequest('${request.id}',false)">delete</i></div>
+          <div class="col-auto d-flex flex-column justify-content-between">     
+            <div class="btn-group">
+              <i class="material-icons notranslate icon-button" data-bs-toggle="dropdown" aria-expanded="false">more_vert</i>
+                <ul class="dropdown-menu dropdown-menu-end cursor-pointer" style="user-select: none;">
+                  ${banButtons}
+                </ul>
+              </div>
+            <i class="material-icons notranslate icon-button" onclick="deleteRequest('${request.id}',false)" title="Delete request">delete</i>
+          </div>
         </div>
       </div>`
   );
+  enableTooltips(); //enable the streamable/supa channel ban tooltip
 } //addToPlaylist
 
 function addToHistory(request, localStorageLoad = false) {
@@ -1018,6 +1349,7 @@ function updatePlaylist(request, localStorageLoad = false) {
     document.getElementById(`id${request.id}_info`).title = `
     ${escapeString(request.channel)} ${request.views > -1 ? ` · ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}`;
     document.getElementById(`id${request.id}_duration`).innerText = request.duration == -1 ? "🔴live" : secondsToTimeString(Math.round(request.duration));
+    document.getElementById(`id${request.id}_ban_user`).innerHTML = `<i class="material-icons notranslate">person_off</i> Ban ${request.by.length > 1 ? "Users" : "User"}</a>`;
     document.getElementById(`id${request.id}_by`).innerHTML = `
     Requested by 
     ${request.by[0].badges}
@@ -1040,6 +1372,7 @@ function updatePlaylist(request, localStorageLoad = false) {
     }
   } else {
     //if request info is not ready yet then update requesters only
+    document.getElementById(`id${request.id}_ban_user`).innerHTML = `<i class="material-icons notranslate">person_off</i> Ban ${request.by.length > 1 ? "Users" : "User"}</a>`;
     document.getElementById(`id${request.id}_by`).innerText = `Requested by @${request.by[0].username} ${
       request.by.length > 1 ? `and ${request.by.length - 1} other ${request.by.length - 1 == 1 ? "user" : "users"}` : ""
     }`;
@@ -1244,6 +1577,12 @@ async function getRequestInfo(request, msgid) {
     }
   } //supa
 
+  if (bannedChannels.get(request?.channel)) {
+    deleteRequest(request.id);
+    botReply(`🚫 This ${request.type == "spotify" ? "artist" : "channel"} is banned`, msgid, false);
+    return;
+  }
+
   if (PLAYLIST.maxDuration !== "" && request.duration !== -1 && total_duration + request.duration > PLAYLIST.maxDuration * (PLAYLIST.maxDurationUnit == "m" ? 60 : 3600)) {
     if (playlist_open) {
       togglePlaylist();
@@ -1419,7 +1758,7 @@ async function parseLink(link) {
       return null;
     }
     return { type: "streamable", id: match[1] };
-  } //spotify
+  } //streamable
 
   if (link.includes("i.supa.codes") || link.includes("gachi.gay") || link.includes("kappa.lol") || link.includes("femboy.beauty")) {
     const match = link.match(/\/([0-9a-zA-Z_-]{5,})(?:[?/.].*)?$/);
@@ -2296,9 +2635,14 @@ window.onload = function () {
 
   loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
   resetSettingsModal = new bootstrap.Modal(elements.resetSettingsModal);
+  banlistModal = new bootstrap.Modal(elements.banlistModal);
   settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
   copyLinkButton = new bootstrap.Popover(elements.copyLinkButton);
   togglePlaylistPopover = new bootstrap.Popover(elements.togglePlaylist);
+
+  elements.banlistModal.addEventListener("show.bs.modal", (event) => {
+    loadBanLists();
+  });
 
   clearPlaylistPopover = new bootstrap.Popover("#clearPlaylistPopover", {
     trigger: "focus",

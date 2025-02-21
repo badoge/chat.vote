@@ -165,7 +165,7 @@
                   <td>✔</td>
                   <td>❌</td>
                   <td>❌</td>
-                  <td>✔</td>
+                  <td>❌</td>
                   <td>✔</td>
                 </tr>
               </tbody>
@@ -178,6 +178,86 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="banlistModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title"><i class="material-icons notranslate">gavel</i>Ban list</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-0">
+            <ul class="nav nav-tabs bg-body-tertiary" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link active"
+                  id="usersTab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#users-tab-pane"
+                  type="button"
+                  role="tab"
+                  aria-controls="users-tab-pane"
+                  aria-selected="true"
+                >
+                  <i class="material-icons notranslate">people</i>Users
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="itemsTab" data-bs-toggle="tab" data-bs-target="#items-tab-pane" type="button" role="tab" aria-controls="items-tab-pane" aria-selected="false">
+                  <i class="material-icons notranslate">play_arrow</i>Videos/Songs
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  id="channelsTab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#channels-tab-pane"
+                  type="button"
+                  role="tab"
+                  aria-controls="channels-tab-pane"
+                  aria-selected="false"
+                >
+                  <i class="material-icons notranslate">live_tv</i>Channels/Artists
+                </button>
+              </li>
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane fade show active" id="users-tab-pane" role="tabpanel" aria-labelledby="usersTab" tabindex="0">
+                <button class="btn btn-outline-warning m-2" type="button" onclick="unbanAllUsers()">
+                  <i class="material-icons notranslate">delete_forever</i>Unban all (<span id="bannedUserCount">0 Users</span>)
+                </button>
+
+                <div id="bannedUsersListDiv">
+                  <ul class="list-group" id="bannedUsersList"></ul>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="items-tab-pane" role="tabpanel" aria-labelledby="itemsTab" tabindex="0">
+                <button class="btn btn-outline-warning m-2" type="button" onclick="unbanAllItems()">
+                  <i class="material-icons notranslate">delete_forever</i>Unban all (<span id="bannedItemCount">0 Videos/Songs</span>)
+                </button>
+
+                <div id="bannedItemsListDiv">
+                  <ul class="list-group" id="bannedItemsList"></ul>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="channels-tab-pane" role="tabpanel" aria-labelledby="channelsTab" tabindex="0">
+                <button class="btn btn-outline-warning m-2" type="button" onclick="unbanAllChannels()">
+                  <i class="material-icons notranslate">delete_forever</i>Unban all (<span id="bannedChannelCount">0 Channels/Artists</span>)
+                </button>
+
+                <div id="bannedChannelsListDiv">
+                  <ul class="list-group" id="bannedChannelsList"></ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </div>
         </div>
       </div>
@@ -525,6 +605,8 @@
         <div class="card mb-3">
           <div class="card-header"><i class="material-icons notranslate">shield</i>Moderation Settings</div>
           <div class="card-body">
+            <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#banlistModal"><i class="material-icons notranslate">gavel</i>Ban list</button>
+
             <div class="form-check form-switch mb-3" style="display: none">
               <input disabled class="form-check-input" type="checkbox" role="switch" id="approvalQueue" />
               <label class="form-check-label" for="approvalQueue"><i class="material-icons notranslate">rule</i>Approval queue</label>
