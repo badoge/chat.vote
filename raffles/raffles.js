@@ -649,10 +649,8 @@ function addUserToRaffle(user) {
 } //addUserToRaffle
 
 async function drawRaffleWinner() {
-  if (raffle_users.length < 2) {
-    let p = document.createElement("p");
-    showToast("You need at least 2 users to join before drawing a winner", "warning", 2500);
-    elements.raffleOutput.append(p);
+  if (raffle_users.length < 1) {
+    showToast("No one has joined the raffle", "warning", 2500);
     return;
   }
   if (RAFFLES.animateDrawing) {
