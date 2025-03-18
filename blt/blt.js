@@ -1700,7 +1700,7 @@ function nextQuestion() {
 
   triviaAnswer = answersArrays[questionNumber - 1];
   elements.questionNumber.innerText = `Question ${questionNumber}/${questionsArray.length}`;
-  elements.question.innerText = `Question: ${questionsArray[questionNumber - 1]}`;
+  elements.question.innerText = questionsArray[questionNumber - 1];
   elements.triviaAnswer.innerHTML = getHint();
 
   resetPlayers();
@@ -1708,7 +1708,7 @@ function nextQuestion() {
   triviaStarted = true;
 } //nextQuestion
 
-let triviaChoices = ["a", "b", "c", "d"];
+let triviaChoices = ["1", "2", "3", "4"];
 let correctChoice;
 let correctAnswer;
 function getHint() {
@@ -1722,11 +1722,23 @@ function getHint() {
     let index = shuffled.findIndex((element) => element === correctAnswer);
     correctChoice = triviaChoices[index];
 
-    return `Choices: 
-    <button type="button" class="btn btn-lg btn-primary mb-2"><span class="float-start">A • </span> ${escapeString(shuffled[0])}</button>
-    <button type="button" class="btn btn-lg btn-danger mb-2"><span class="float-start">B • </span> ${escapeString(shuffled[1])}</button>
-    <button type="button" class="btn btn-lg btn-warning mb-2"><span class="float-start">C • </span> ${escapeString(shuffled[2])}</button>
-    <button type="button" class="btn btn-lg btn-info mb-2"><span class="float-start">D • </span> ${escapeString(shuffled[3])}</button>`;
+    return `
+    <div class="btn-group btn-group-lg" role="group">
+      <button type="button" class="btn btn-primary">1</button>
+      <button type="button" class="btn btn-outline-primary text-light-emphasis">${escapeString(shuffled[0])}</button>
+    </div>
+    <div class="btn-group btn-group-lg" role="group">
+      <button type="button" class="btn btn-danger">2</button>
+      <button type="button" class="btn btn-outline-danger text-light-emphasis">${escapeString(shuffled[1])}</button>
+    </div>
+    <div class="btn-group btn-group-lg" role="group">
+      <button type="button" class="btn btn-warning">3</button>
+      <button type="button" class="btn btn-outline-warning text-light-emphasis">${escapeString(shuffled[2])}</button>
+    </div>
+    <div class="btn-group btn-group-lg" role="group">
+      <button type="button" class="btn btn-info">4</button>
+      <button type="button" class="btn btn-outline-info text-light-emphasis">${escapeString(shuffled[3])}</button>
+    </div>`;
   }
 
   if (!elements.showHint.checked) {
