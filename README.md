@@ -46,7 +46,7 @@ Work in progress/test pages/proof of concepts that are not being worked on and a
 
 If you find any issues or if you have suggestions or questions please open an issue.
 
-You can also contact me [in this chat](https://www.twitch.tv/popout/badoge/chat?popout=) or on [discord](https://discord.gg/eF54kvd) or by [email](mailto:contact@chat.vote)
+You can also contact me [in this chat](https://www.twitch.tv/popout/badoge/chat?popout=) or on [discord](https://discord.gg/FR8bgQdPUT) or by [email](mailto:contact@chat.vote)
 
 # Contributing
 
