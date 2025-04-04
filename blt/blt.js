@@ -192,20 +192,32 @@ let elements = {
   //trivia
 
   triviaPoints: document.getElementById("triviaPoints"),
-  triviaPointsCopy: document.getElementById("triviaPointsCopy"),
+  questionTimerDiv: document.getElementById("questionTimerDiv"),
+  questionTimerValue: document.getElementById("questionTimerValue"),
+  questionTimer: document.getElementById("questionTimer"),
   triviaScoring: document.getElementById("triviaScoring"),
-  triviaScoringCopy: document.getElementById("triviaScoringCopy"),
   oneChance: document.getElementById("oneChance"),
-  oneChanceCopy: document.getElementById("oneChanceCopy"),
   showHint: document.getElementById("showHint"),
-  showHintCopy: document.getElementById("showHintCopy"),
+  triviaSettingsWarning: document.getElementById("triviaSettingsWarning"),
+  dismissTriviaSettingsButton: document.getElementById("dismissTriviaSettingsButton"),
+  startTriviaButton: document.getElementById("startTriviaButton"),
   trivia: document.getElementById("trivia"),
   triviaTitleCard: document.getElementById("triviaTitleCard"),
   triviaDescriptionCard: document.getElementById("triviaDescriptionCard"),
   questionNumber: document.getElementById("questionNumber"),
+  triviaTimerDiv: document.getElementById("triviaTimerDiv"),
+  triviaTimer: document.getElementById("triviaTimer"),
   question: document.getElementById("question"),
   triviaAnswer: document.getElementById("triviaAnswer"),
-
+  triviaChoices: document.getElementById("triviaChoices"),
+  choice1A: document.getElementById("choice1A"),
+  choice1B: document.getElementById("choice1B"),
+  choice2A: document.getElementById("choice2A"),
+  choice2B: document.getElementById("choice2B"),
+  choice3A: document.getElementById("choice3A"),
+  choice3B: document.getElementById("choice3B"),
+  choice4A: document.getElementById("choice4A"),
+  choice4B: document.getElementById("choice4B"),
   triviaUsersDiv: document.getElementById("triviaUsersDiv"),
   triviaUsers: document.getElementById("triviaUsers"),
 
@@ -544,34 +556,60 @@ function connect() {
     let command = input[0].toLowerCase();
 
     if (triviaStarted) {
+      //skip users that already answered
       if (triviaUsersAnswered.includes(context.username)) {
         return;
       }
+
+      //skip user if there arent any points left to give
       if (triviaPoints < 1) {
         return;
       }
 
+      //mark user as answered if one chance option is checked
       if (elements.oneChance.checked) {
         triviaUsersAnswered.push(context.username);
       }
 
+      //if value is 1 then user will gain points, but if its -1 then they will lose points - timer scoring mode only
+      let modifier = 1;
+
+      //check if user has the correct answer
+      //if the scoring mode is timer then dont return so that we can punish the user
       if (answerTypes[questionNumber - 1] == "multipleChoice") {
-        if (msg.trim().toLowerCase() !== correctChoice) {
-          return;
+        if (msg.trim() !== correctChoice) {
+          if (triviaScoring == "timer") {
+            modifier = -1;
+          } else {
+            return;
+          }
         }
       } else {
         if (!triviaAnswer.includes(msg.trim().toLowerCase())) {
-          return;
+          if (triviaScoring == "timer") {
+            modifier = -1;
+          } else {
+            return;
+          }
         }
+      }
+
+      let points = triviaPoints;
+
+      //calculate points for timer mode
+      if (triviaScoring == "timer") {
+        let timeDiff = Date.now() - triviaRoundTimestamp;
+        let percentage = timeDiff / (triviaQuestionTimer * 1000);
+        points = Math.floor(triviaPoints - triviaPoints * percentage) * modifier;
       }
 
       let pos = triviaUsers.findIndex((element) => element.username === context.username);
       if (pos != -1) {
-        triviaUsers[pos].points += triviaPoints;
+        triviaUsers[pos].points += points;
         updateTriviaLeaderboard();
       } else {
         let user = {
-          points: triviaPoints,
+          points: points,
           id: context["user-id"],
           username: context.username,
           displayname: context["display-name"],
@@ -583,11 +621,13 @@ function connect() {
 
       triviaUsersAnswered.push(context.username);
 
-      if (elements.triviaScoring.value == "decay") {
+      //reduce points for next user if scoring mode is set to decay
+      if (triviaScoring == "decay") {
         triviaPoints--;
       }
 
-      if (elements.triviaScoring.value == "first") {
+      //setting to 0 will skip all other users bcz of if statement above - bcz scoring mode is set to first answer only
+      if (triviaScoring == "first") {
         triviaPoints = 0;
       }
 
@@ -634,7 +674,7 @@ function connect() {
         updateScores();
         return;
       } //chatter voted for right option
-    }
+    } //bracket
 
     if (currentFormat == "tierlist" && currentTierlistCommands.includes(command)) {
       let pos = currentTierlistData.findIndex((e) => e.command === command);
@@ -645,7 +685,7 @@ function connect() {
       voters.push(context["user-id"]);
       updateScores();
       return;
-    }
+    } //tierlist
   }); //message
 
   //client.on("timeout", (channel, username, reason, duration, userstate) => {}); //timeout
@@ -1628,6 +1668,9 @@ function startTierlist(bracket) {
 } //startTierlist
 
 let triviaPoints;
+let triviaScoring = "first";
+let triviaRoundTimestamp;
+let triviaQuestionTimer = 10;
 let questionNumber = 1;
 let triviaAnswer = [];
 let triviaStarted = false;
@@ -1686,9 +1729,16 @@ function startTrivia() {
   changeSiteLinkTarget("_blank");
 
   nextQuestion();
+
+  //hide the start button in the settings modal
+  elements.triviaSettingsWarning.style.display = "";
+  elements.startTriviaButton.style.display = "none";
+  elements.dismissTriviaSettingsButton.style.display = "";
 } //startTrivia
 
 function nextQuestion() {
+  stopTimer();
+
   //check if trivia is done
   if (questionNumber == questionsArray.length) {
     showToast("No more questions", "warning", 2000);
@@ -1701,46 +1751,32 @@ function nextQuestion() {
   triviaAnswer = answersArrays[questionNumber - 1];
   elements.questionNumber.innerText = `Question ${questionNumber}/${questionsArray.length}`;
   elements.question.innerText = questionsArray[questionNumber - 1];
-  elements.triviaAnswer.innerHTML = getHint();
+
+  if (answerTypes[questionNumber - 1] == "multipleChoice") {
+    elements.triviaAnswer.style.display = "none";
+    elements.triviaChoices.style.display = "";
+    getChoices();
+  } else {
+    elements.triviaAnswer.style.display = "";
+    elements.triviaChoices.style.display = "none";
+    elements.triviaAnswer.innerHTML = getHint();
+  }
 
   resetPlayers();
   showTriviaMedia(mediaArray[questionNumber - 1]);
-  triviaStarted = true;
+
+  if (triviaScoring == "timer") {
+    elements.triviaTimerDiv.style.display = "";
+    startTimer();
+  } else {
+    elements.triviaTimerDiv.style.display = "none";
+
+    //dont start accepting answers yet for timer mode bcz there is a 1 sec animation
+    triviaStarted = true;
+  }
 } //nextQuestion
 
-let triviaChoices = ["1", "2", "3", "4"];
-let correctChoice;
-let correctAnswer;
 function getHint() {
-  if (answerTypes[questionNumber - 1] == "multipleChoice") {
-    if (triviaAnswer.length < 4) {
-      showToast("Question has less than 4 choices", "danger", 3000);
-    }
-
-    correctAnswer = triviaAnswer[0];
-    let shuffled = shuffle(structuredClone(triviaAnswer));
-    let index = shuffled.findIndex((element) => element === correctAnswer);
-    correctChoice = triviaChoices[index];
-
-    return `
-    <div class="btn-group btn-group-lg" role="group">
-      <button type="button" class="btn btn-primary">1</button>
-      <button type="button" class="btn btn-outline-primary text-light-emphasis">${escapeString(shuffled[0])}</button>
-    </div>
-    <div class="btn-group btn-group-lg" role="group">
-      <button type="button" class="btn btn-danger">2</button>
-      <button type="button" class="btn btn-outline-danger text-light-emphasis">${escapeString(shuffled[1])}</button>
-    </div>
-    <div class="btn-group btn-group-lg" role="group">
-      <button type="button" class="btn btn-warning">3</button>
-      <button type="button" class="btn btn-outline-warning text-light-emphasis">${escapeString(shuffled[2])}</button>
-    </div>
-    <div class="btn-group btn-group-lg" role="group">
-      <button type="button" class="btn btn-info">4</button>
-      <button type="button" class="btn btn-outline-info text-light-emphasis">${escapeString(shuffled[3])}</button>
-    </div>`;
-  }
-
   if (!elements.showHint.checked) {
     return "Answer: ❔";
   }
@@ -1757,10 +1793,80 @@ function getHint() {
   return `Answer: ${hint}`;
 } //getHint
 
+let triviaChoices = ["1", "2", "3", "4"];
+let correctChoice;
+let correctChoiceIndex;
+function getChoices() {
+  if (triviaAnswer.length < 4) {
+    showToast("Question has less than 4 choices", "danger", 3000);
+  }
+
+  //reset the button colors
+  elements.choice1A.classList = "btn btn-primary";
+  elements.choice2A.classList = "btn btn-danger";
+  elements.choice3A.classList = "btn btn-warning";
+  elements.choice4A.classList = "btn btn-info";
+  elements.choice1B.classList = "btn btn-outline-primary text-light-emphasis";
+  elements.choice2B.classList = "btn btn-outline-danger text-light-emphasis";
+  elements.choice3B.classList = "btn btn-outline-warning text-light-emphasis";
+  elements.choice4B.classList = "btn btn-outline-info text-light-emphasis";
+
+  let shuffled = shuffle(structuredClone(triviaAnswer));
+  correctChoiceIndex = shuffled.findIndex((element) => element === triviaAnswer[0]);
+  correctChoice = triviaChoices[correctChoiceIndex];
+
+  elements.choice1B.innerText = shuffled[0];
+  elements.choice2B.innerText = shuffled[1];
+  elements.choice3B.innerText = shuffled[2];
+  elements.choice4B.innerText = shuffled[3];
+} //getChoices
+
+let timerAnimation1;
+let timerAnimation2;
+function startTimer() {
+  timerAnimation1 = anime({
+    targets: "#triviaTimer",
+    width: "100%",
+    duration: 1000,
+    easing: "easeInOutExpo",
+
+    complete: function () {
+      triviaRoundTimestamp = Date.now();
+      triviaStarted = true;
+      timerAnimation2 = anime({
+        targets: "#triviaTimer",
+        width: "0%",
+        duration: triviaQuestionTimer * 1000,
+        easing: "linear",
+        complete: function () {
+          showAnswer();
+        },
+      });
+    },
+  });
+} //startTimer
+
+function stopTimer() {
+  timerAnimation1?.pause();
+  timerAnimation2?.pause();
+  anime({
+    targets: "#triviaTimer",
+    width: "0%",
+    duration: 500,
+    easing: "easeOutBounce",
+  });
+} //stopTimer
+
 function showAnswer() {
+  //change to false to stop taking in answers
   triviaStarted = false;
+  stopTimer();
   if (answerTypes[questionNumber - 1] == "multipleChoice") {
-    elements.triviaAnswer.innerText = `Answer: ${correctAnswer}`;
+    //set all buttons to grey except for the correct answer
+    for (let index = 0; index < 4; index++) {
+      elements[`choice${index + 1}A`].classList = `btn btn-${index == correctChoiceIndex ? "success" : "secondary"}`;
+      elements[`choice${index + 1}B`].classList = `btn btn-outline-${index == correctChoiceIndex ? "success" : "secondary"} text-light-emphasis`;
+    }
   } else {
     elements.triviaAnswer.innerText = `Answer: ${triviaAnswer[0]}`;
   }
@@ -2496,6 +2602,9 @@ function quit() {
   resetPlayers();
   disableVoteButton();
   changeSiteLinkTarget("_self");
+  elements.triviaSettingsWarning.style.display = "none";
+  elements.startTriviaButton.style.display = "";
+  elements.dismissTriviaSettingsButton.style.display = "none";
 } //quit
 
 function editBracket(id) {
@@ -3677,33 +3786,25 @@ window.onload = async function () {
   };
 
   elements.triviaPoints.onchange = function () {
-    triviaPoints = parseInt(elements.triviaPoints.value, 10);
-    elements.triviaPointsCopy.value = triviaPoints;
+    triviaPoints = parseInt(this.value, 10);
   };
-  elements.triviaPointsCopy.onchange = function () {
-    triviaPoints = parseInt(elements.triviaPointsCopy.value, 10);
-    elements.triviaPoints.value = triviaPoints;
+  elements.questionTimer.oninput = function () {
+    triviaQuestionTimer = parseInt(this.value, 10);
+    elements.questionTimerValue.innerText = `${triviaQuestionTimer}s`;
   };
-
+  let oldOneChanceValue;
   elements.triviaScoring.onchange = function () {
-    elements.triviaScoringCopy.value = this.value;
-  };
-  elements.triviaScoringCopy.onchange = function () {
-    elements.triviaScoring.value = this.value;
-  };
-
-  elements.oneChance.onchange = function () {
-    elements.oneChanceCopy.checked = this.checked;
-  };
-  elements.oneChanceCopy.onchange = function () {
-    elements.oneChance.checked = this.checked;
-  };
-
-  elements.showHint.onchange = function () {
-    elements.showHintCopy.checked = this.checked;
-  };
-  elements.showHintCopy.onchange = function () {
-    elements.showHint.checked = this.checked;
+    triviaScoring = this.value;
+    if (triviaScoring == "timer") {
+      elements.questionTimerDiv.style.display = "";
+      oldOneChanceValue = elements.oneChance.checked;
+      elements.oneChance.checked = true;
+      elements.oneChance.disabled = true;
+    } else {
+      elements.questionTimerDiv.style.display = "none";
+      elements.oneChance.checked = oldOneChanceValue;
+      elements.oneChance.disabled = false;
+    }
   };
 
   elements.hideScore.addEventListener("click", function () {

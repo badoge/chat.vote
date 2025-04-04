@@ -43,6 +43,11 @@ body {
   overflow-y: auto;
 }
 
+#triviaTimer {
+  transition-timing-function: linear;
+  transition-duration: 0s;
+}
+
 #questionNumber {
   font-size: 1.3rem;
   font-weight: 700;
