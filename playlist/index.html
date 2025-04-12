@@ -117,6 +117,7 @@
                   <th scope="col">View count filters</th>
                   <th scope="col">Volume controls</th>
                   <th scope="col">Moderated platform<sup>[1]</sup></th>
+                  <th scope="col">Search Command<sup>[2]</sup></th>
                 </tr>
               </thead>
               <tbody class="table-group-divider">
@@ -127,21 +128,33 @@
                   <td>✔</td>
                   <td>✔</td>
                   <td>✔</td>
+                  <td>✔</td>
+                </tr>
+                <tr>
+                  <th scope="row">Vimeo</th>
+                  <td>✔</td>
+                  <td>✔</td>
+                  <td>✔</td>
+                  <td>✔</td>
+                  <td>✔</td>
+                  <td>✔</td>
                 </tr>
                 <tr>
                   <th scope="row">Twitch</th>
-                  <td>✔<sup>[2]</sup></td>
+                  <td>✔<sup>[3]</sup></td>
                   <td>✔</td>
                   <td>✔</td>
                   <td>✔</td>
                   <td>✔</td>
+                  <td>❌</td>
                 </tr>
                 <tr>
-                  <th scope="row">Spotify</th>
+                  <th scope="row">Spotify<sup>[4]</sup></th>
                   <td>✔</td>
                   <td>✔</td>
                   <td>❌</td>
                   <td>❌</td>
+                  <td>✔</td>
                   <td>✔</td>
                 </tr>
                 <tr>
@@ -151,6 +164,7 @@
                   <td>❌</td>
                   <td>✔</td>
                   <td>❌</td>
+                  <td>❌</td>
                 </tr>
                 <tr>
                   <th scope="row">i.supa.codes</th>
@@ -158,6 +172,7 @@
                   <td>✔</td>
                   <td>❌</td>
                   <td>✔</td>
+                  <td>❌</td>
                   <td>❌</td>
                 </tr>
                 <tr>
@@ -167,13 +182,16 @@
                   <td>❌</td>
                   <td>❌</td>
                   <td>✔</td>
+                  <td>❌</td>
                 </tr>
               </tbody>
             </table>
             <div class="text-body-secondary">
               [1]: Platforms that are marked as moderated might have some automated filters to remove unsafe content. Platforms like Streamable and i.supa.codes don't require an account, so
               anyone can upload unsafe videos quickly then request them. This however does not mean that the other platforms will always have safe content.<br />
-              [2]: Twitch clips autoplay might break sometimes, especially if you keep the clips in the playlist for more than a day.
+              [2]: You can search some platforms directly using the request command. Example: <kbd>!request spotify camellia ghost</kbd> <br />
+              [3]: Twitch clips autoplay might break sometimes, especially if you keep the clips in the playlist for more than a day.<br />
+              [4]: You need to login to Spotify on this browser to listen to full songs instead of previews. You might also need to enable 3rd party cookies.
             </div>
           </div>
           <div class="modal-footer">
@@ -345,9 +363,15 @@
                     <input class="form-check-input" type="checkbox" role="switch" id="allowYTShorts" onchange="saveSettings()" checked />
                     <label class="form-check-label" for="allowYTShorts">Shorts</label>
                   </div>
-                  <div class="form-check form-switch">
+                  <div class="form-check form-switch mb-3">
                     <input class="form-check-input" type="checkbox" role="switch" id="allowYTVideos" onchange="saveSettings()" checked />
                     <label class="form-check-label" for="allowYTVideos">Videos</label>
+                  </div>
+
+                  <h6>Vimeo</h6>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="allowVimeoVideos" onchange="saveSettings()" checked />
+                    <label class="form-check-label" for="allowVimeoVideos">Videos</label>
                   </div>
                 </div>
               </div>
@@ -433,7 +457,6 @@
               <input class="form-check-input" type="checkbox" role="switch" id="noCommand" onchange="saveSettings()" />
               <label class="form-check-label" for="noCommand"><i class="material-icons notranslate">link</i>Allow requests without a command</label>
             </div>
-            <small class="text-body-secondary">Viewers can search YouTube or Spotify by requesting <kbd>youtube/spotify [query]</kbd></small>
 
             <div class="form-check form-switch mt-5">
               <input class="form-check-input" type="checkbox" role="switch" id="allowVoteSkip" onchange="saveSettings()" />
@@ -938,6 +961,7 @@
                 </span>
               </h1>
               <div id="youtubeEmbedContainer" style="display: none"><div id="youtubeEmbed"></div></div>
+              <div id="vimeoEmbedContainer" style="display: none"><div id="vimeoEmbed"></div></div>
               <div id="spotifyEmbedContainer" style="display: none"><div id="spotifyEmbed"></div></div>
               <div id="twitchEmbed" style="display: none"></div>
               <div id="twitchClipsEmbed" style="display: none" height="100%" width="100%"></div>
@@ -1182,5 +1206,6 @@
     <script src="/js/twitch-embed.min.js" async></script>
     <script src="https://www.youtube.com/iframe_api" async></script>
     <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
+    <script src="https://player.vimeo.com/api/player.js" async></script>
   </body>
 </html>

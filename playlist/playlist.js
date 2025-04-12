@@ -34,6 +34,7 @@ let elements = {
   allowYTStreams: document.getElementById("allowYTStreams"),
   allowYTShorts: document.getElementById("allowYTShorts"),
   allowYTVideos: document.getElementById("allowYTVideos"),
+  allowVimeoVideos: document.getElementById("allowVimeoVideos"),
   maxDuration: document.getElementById("maxDuration"),
   maxDurationUnit: document.getElementById("maxDurationUnit"),
   maxLength: document.getElementById("maxLength"),
@@ -83,6 +84,8 @@ let elements = {
   placeholder: document.getElementById("placeholder"),
   youtubeEmbedContainer: document.getElementById("youtubeEmbedContainer"),
   youtubeEmbed: document.getElementById("youtubeEmbed"),
+  vimeoEmbedContainer: document.getElementById("vimeoEmbedContainer"),
+  vimeoEmbed: document.getElementById("vimeoEmbed"),
   spotifyEmbedContainer: document.getElementById("spotifyEmbedContainer"),
   spotifyEmbed: document.getElementById("spotifyEmbed"),
   twitchEmbed: document.getElementById("twitchEmbed"),
@@ -162,6 +165,7 @@ let PLAYLIST = {
   allowYTStreams: true,
   allowYTShorts: true,
   allowYTVideos: true,
+  allowVimeoVideos: true,
   maxDuration: "",
   maxDurationUnit: "m",
   maxLength: "",
@@ -225,6 +229,7 @@ async function refreshData() {
   PLAYLIST.allowYTStreams = elements.allowYTStreams.checked;
   PLAYLIST.allowYTShorts = elements.allowYTShorts.checked;
   PLAYLIST.allowYTVideos = elements.allowYTVideos.checked;
+  PLAYLIST.allowVimeoVideos = elements.allowVimeoVideos.checked;
   PLAYLIST.maxDuration = parseInt(elements.maxDuration.value, 10) || "";
   PLAYLIST.maxDurationUnit = elements.maxDurationUnit.value || "m";
   PLAYLIST.maxLength = parseInt(elements.maxLength.value, 10) || "";
@@ -332,6 +337,7 @@ async function load_localStorage() {
     elements.allowYTStreams.checked = PLAYLIST.allowYTStreams ?? true;
     elements.allowYTShorts.checked = PLAYLIST.allowYTShorts ?? true;
     elements.allowYTVideos.checked = PLAYLIST.allowYTVideos ?? true;
+    elements.allowVimeoVideos.checked = PLAYLIST.allowVimeoVideos ?? true;
     elements.maxDuration.value = PLAYLIST.maxDuration || "";
     elements.maxDurationUnit.value = PLAYLIST.maxDurationUnit || "m";
     elements.maxLength.value = PLAYLIST.maxLength || "";
@@ -511,6 +517,7 @@ function resetSettings(logout = false) {
       allowYTStreams: true,
       allowYTShorts: true,
       allowYTVideos: true,
+      allowVimeoVideos: true,
       maxDuration: "",
       maxDurationUnit: "m",
       maxLength: "",
@@ -619,7 +626,7 @@ function connect() {
 
       let request = input[0];
       let search = false;
-      if (input[0].toLowerCase() == "youtube" || input[0].toLowerCase() == "spotify") {
+      if (input[0].toLowerCase() == "youtube" || input[0].toLowerCase() == "spotify" || input[0].toLowerCase() == "vimeo") {
         request = input.join(" ");
         search = true;
       }
@@ -661,7 +668,7 @@ function connect() {
 
         let request = input[1];
         let search = false;
-        if (input[1].toLowerCase() == "youtube" || input[1].toLowerCase() == "spotify") {
+        if (input[1].toLowerCase() == "youtube" || input[1].toLowerCase() == "spotify" || input[1].toLowerCase() == "vimeo") {
           request = input.slice(1).join(" ");
           search = true;
         }
@@ -1379,12 +1386,14 @@ function updatePlaylist(request, localStorageLoad = false) {
   }
 } //updatePlaylist
 
+let vimeoCooldown = 0;
 async function getRequestInfo(request, msgid) {
   //skip if request already has info
   if (request.title) {
     updatePlaylist(request);
     return;
   }
+
   if (request.type == "twitch clip") {
     try {
       let response = await fetch(`https://helper.donk.workers.dev/twitch/clipsxd?id=${request.id}`);
@@ -1444,16 +1453,17 @@ async function getRequestInfo(request, msgid) {
       let response = await fetch(`https://helper.donk.workers.dev/spotify/tracks?ids=${request.id}`);
       let result = await response.json();
       console.log(result);
-      request.title = result.tracks[0].name || "(untitled)";
-      request.channel = result.tracks[0].artists[0].name || "(unknown)";
-      request.thumbnail = result.tracks[0].album.images[0].url;
-      request.duration = result.tracks[0].duration_ms / 1000;
-      request.uri = result.tracks[0].uri;
       if (!result.tracks[0].is_playable) {
         deleteRequest(request.id);
         botReply("⛔ Your song is not playable", msgid, false);
         return;
       }
+
+      request.title = result.tracks[0].name || "(untitled)";
+      request.channel = result.tracks[0].artists[0].name || "(unknown)";
+      request.thumbnail = result.tracks[0].album.images[0].url;
+      request.duration = result.tracks[0].duration_ms / 1000;
+      request.uri = result.tracks[0].uri;
     } catch (error) {
       deleteRequest(request.id);
       botReply("⛔ Could not find this song's info", msgid, false);
@@ -1484,11 +1494,12 @@ async function getRequestInfo(request, msgid) {
       let response = await fetch(`https://helper.donk.workers.dev/youtube/videos?id=${request.id}`);
       let result = await response.json();
       console.log(result);
-      request.title = result.items[0].snippet.title || "(untitled)";
-      request.channel = result.items[0].snippet.channelTitle || "(unknown)";
-      request.thumbnail = result.items[0].snippet.thumbnails.medium.url;
-      request.duration = ISO8601ToSeconds(result.items[0].contentDetails.duration);
-      request.views = result.items[0].statistics.viewCount;
+
+      if (result.items[0].contentDetails?.contentRating?.ytRating == "ytAgeRestricted" || !result.items[0].status?.embeddable) {
+        deleteRequest(request.id);
+        botReply("⛔ Your video is age restricted or not embeddable", msgid, false);
+        return;
+      }
 
       if (result.items[0].snippet.liveBroadcastContent !== "none") {
         if (request.duration == 0) {
@@ -1501,11 +1512,11 @@ async function getRequestInfo(request, msgid) {
         }
       }
 
-      if (result.items[0].contentDetails?.contentRating?.ytRating == "ytAgeRestricted" || !result.items[0].status?.embeddable) {
-        deleteRequest(request.id);
-        botReply("⛔ Your video is age restricted or not embeddable", msgid, false);
-        return;
-      }
+      request.title = result.items[0].snippet.title || "(untitled)";
+      request.channel = result.items[0].snippet.channelTitle || "(unknown)";
+      request.thumbnail = result.items[0].snippet.thumbnails.medium.url;
+      request.duration = ISO8601ToSeconds(result.items[0].contentDetails.duration);
+      request.views = result.items[0].statistics.viewCount;
     } catch (error) {
       deleteRequest(request.id);
       botReply("⛔ Could not find this video's info", msgid, false);
@@ -1513,6 +1524,64 @@ async function getRequestInfo(request, msgid) {
       return;
     }
   } //youtube
+
+  if (request.type == "vimeo") {
+    try {
+      if (Date.now() < vimeoCooldown) {
+        deleteRequest(request.id);
+        botReply(`⚠ We reached the Vimeo API limit, ${Math.round((vimeoCooldown - Date.now()) / 1000)}s cooldown...`, msgid, false);
+        return;
+      }
+
+      let response = await fetch(`https://helper.donk.workers.dev/vimeo/videos?id=${request.id}`);
+      let result = await response.json();
+      console.log(result);
+
+      if (result?.error_code == 9000) {
+        deleteRequest(request.id);
+        vimeoCooldown = new Date(result["X-RateLimit-Reset"]).getTime();
+        botReply(`⚠ We reached the Vimeo API limit, ${Math.round((vimeoCooldown - Date.now()) / 1000)}s cooldown...`, msgid, false);
+        return;
+      }
+
+      vimeoCooldown = 0;
+
+      if (result.type !== "video") {
+        deleteRequest(request.id);
+        botReply("⛔ Only Vimeo videos are supported", msgid, false);
+        return;
+      }
+
+      if (result.content_rating_class !== "safe") {
+        deleteRequest(request.id);
+        botReply("⛔ Your video is not rated as safe", msgid, false);
+        return;
+      }
+
+      if (!result.is_playable || result.play.status !== "playable" || result.status !== "available") {
+        deleteRequest(request.id);
+        botReply("⛔ Your video is not playable", msgid, false);
+        return;
+      }
+
+      if (result.privacy.embed !== "public") {
+        deleteRequest(request.id);
+        botReply("⛔ Your video is not embeddable", msgid, false);
+        return;
+      }
+
+      request.title = result.name || "(untitled)";
+      request.channel = result.user.name || "(unknown)";
+      request.thumbnail = result.pictures?.sizes?.[1]?.link;
+      request.duration = result.duration;
+      request.views = result?.stats?.plays || null;
+    } catch (error) {
+      deleteRequest(request.id);
+      botReply("⛔ Could not find this video's info", msgid, false);
+      console.log("getRequestInfo vimeo error", error);
+      return;
+    }
+  } //vimeo
 
   if (request.type == "streamable") {
     try {
@@ -1715,6 +1784,42 @@ async function parseLink(link) {
     }
   } //youtube search
 
+  if (link.includes("vimeo.com")) {
+    const vimeoURLRegex = /(?:http|https)?:?\/?\/?(?:www\.)?(?:player\.)?vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|video\/|)(\d+)(?:|\/\?)/g;
+    const videoID = vimeoURLRegex.exec(link) || null;
+    if (!videoID[1]) {
+      return null;
+    }
+    return { type: "vimeo", id: videoID[1] };
+  } //vimeo
+
+  if (link.toLowerCase().startsWith("vimeo")) {
+    if (!link.toLowerCase().replace("vimeo", "").trim()) {
+      return null;
+    }
+    try {
+      let response = await fetch(`https://helper.donk.workers.dev/vimeo/search?query=${encodeURIComponent(link.toLowerCase().replace("vimeo", "").trim())}`);
+      let result = await response.json();
+      console.log(result);
+
+      if (
+        !result.data[0] ||
+        result.data[0].type !== "video" ||
+        result.data[0].content_rating_class !== "safe" ||
+        result.data[0].privacy.embed !== "public" ||
+        result.data[0].play.status !== "playable" ||
+        result.data[0].status !== "available" ||
+        result.data[0].is_playable !== true
+      ) {
+        return null;
+      }
+
+      return { type: "vimeo", id: result.data[0].uri.replace("/videos/", "") };
+    } catch (error) {
+      return null;
+    }
+  } //vimeo search
+
   if (link.includes("spotify.com")) {
     const spotifyURLRegex = /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:(album|track|playlist|episode)\/|\?uri=spotify:track:)((\w|-){22})/;
     let id = link.match(spotifyURLRegex);
@@ -1724,15 +1829,6 @@ async function parseLink(link) {
     }
     return { type: "spotify", id: id[2] };
   } //spotify
-
-  if (link.includes("tiktok.com")) {
-    const tiktokURLRegex = /^.*https:\/\/(?:m|www|vm)?\.?tiktok\.com\/((?:.*\b(?:(?:usr|v|embed|user|video)\/|\?shareId=|\&item_id=)(\d+))|\w+)/;
-    let id = link.match(tiktokURLRegex);
-    if (!id[2] || !id[1].includes("/video/")) {
-      return null;
-    }
-    return { type: "tiktok video", id: id[2], url: link.split("?")[0] };
-  } //tiktok
 
   if (link.toLowerCase().startsWith("spotify")) {
     if (!link.toLowerCase().replace("spotify", "").trim()) {
@@ -1752,6 +1848,14 @@ async function parseLink(link) {
     }
   } //spotify search
 
+  if (link.includes("tiktok.com")) {
+    const tiktokURLRegex = /^.*https:\/\/(?:m|www|vm)?\.?tiktok\.com\/((?:.*\b(?:(?:usr|v|embed|user|video)\/|\?shareId=|\&item_id=)(\d+))|\w+)/;
+    let id = link.match(tiktokURLRegex);
+    if (!id[2] || !id[1].includes("/video/")) {
+      return null;
+    }
+    return { type: "tiktok video", id: id[2], url: link.split("?")[0] };
+  } //tiktok
   if (link.includes("streamable.com")) {
     const match = link.match(/streamable\.com\/([a-zA-Z0-9]+)/);
     if (!match[1]) {
@@ -1801,7 +1905,9 @@ function linkTypeAllowed(type) {
   if (type == "youtube short" && !PLAYLIST.allowYTShorts) {
     return false;
   }
-
+  if (type == "vimeo" && !PLAYLIST.allowVimeoVideos) {
+    return false;
+  }
   return true;
 } //linkTypeAllowed
 
@@ -1811,6 +1917,8 @@ function getItemLink(request) {
       return `https://youtu.be/${request.id}`;
     case "youtube short":
       return `https://youtube.com/shorts/${request.id}`;
+    case "vimeo":
+      return `https://vimeo.com/${request.id}`;
     case "spotify":
       return `https://open.spotify.com/track/${request.id}`;
     case "tiktok video":
@@ -1844,7 +1952,7 @@ async function addLink() {
   }
   let request = elements.link.value?.replace(/\s+/g, "");
   let search = false;
-  if (elements.link.value.toLowerCase().startsWith("youtube") || elements.link.value.toLowerCase().startsWith("spotify")) {
+  if (elements.link.value.toLowerCase().startsWith("youtube") || elements.link.value.toLowerCase().startsWith("spotify") || elements.link.value.toLowerCase().startsWith("vimeo")) {
     request = elements.link.value.trim();
     search = true;
   }
@@ -1975,6 +2083,10 @@ function playItem(item) {
       elements.youtubeEmbedContainer.style.display = "";
       youtubePlayer.loadVideoById(item.id);
       break;
+    case "vimeo":
+      elements.vimeoEmbedContainer.style.display = "";
+      playVimeoVideo(item.id);
+      break;
     case "spotify":
       elements.spotifyEmbedContainer.style.display = "";
       spotifyPlay(item.uri);
@@ -2059,16 +2171,18 @@ function updateMetadata() {
 function resetPlayers() {
   elements.placeholder.style.display = "none";
   elements.youtubeEmbedContainer.style.display = "none";
+  elements.vimeoEmbedContainer.style.display = "none";
   elements.spotifyEmbedContainer.style.display = "none";
   elements.twitchEmbed.style.display = "none";
   elements.twitchClipsEmbed.style.display = "none";
   elements.tiktokEmbed.style.display = "none";
   elements.videoEmbed.style.display = "none";
 
-  youtubePlayer.loadVideoById("");
-  spotifyPlayer.destroy();
+  youtubePlayer?.loadVideoById("");
+  vimeoPlayer?.unload();
+  spotifyPlayer?.destroy();
   elements.spotifyEmbedContainer.innerHTML = `<div id="spotifyEmbed"></div>`;
-  twitchPlayer.setChannel("");
+  twitchPlayer?.setChannel("");
   elements.twitchClipsEmbed.innerHTML = "";
   elements.tiktokEmbed.innerHTML = "";
   elements.videoEmbed.src = "";
@@ -2540,6 +2654,9 @@ function playPlaylist(reply) {
     case "youtube short":
       youtubePlayer.playVideo();
       break;
+    case "vimeo":
+      vimeoPlayer.play();
+      break;
     case "spotify":
       spotifyPlayer.resume();
       break;
@@ -2566,7 +2683,7 @@ function playPlaylist(reply) {
   }
 
   if (reply) {
-    if (!twitchClipMP4) {
+    if (!twitchClipMP4 && currentItem.type == "twitch clip") {
       botReply(`⚠ Twitch clip playback can't be controlled`, reply, false);
     } else {
       botReply(`▶ Playlist is now playing`, reply, false);
@@ -2584,6 +2701,9 @@ function pausePlaylist(reply) {
     case "youtube":
     case "youtube short":
       youtubePlayer.pauseVideo();
+      break;
+    case "vimeo":
+      vimeoPlayer.pause();
       break;
     case "spotify":
       spotifyPlayer.pause();
@@ -2611,7 +2731,7 @@ function pausePlaylist(reply) {
   }
 
   if (reply) {
-    if (!twitchClipMP4) {
+    if (!twitchClipMP4 && currentItem.type == "twitch clip") {
       botReply(`⚠ Twitch clip playback can't be controlled`, reply, false);
     } else {
       botReply(`⏸ Playlist is now paused`, reply, false);
@@ -2784,7 +2904,7 @@ function spotifyPlay(uri) {
 
   spotifyPlayer.loadUri(uri, true);
   spotifyPlayer.play();
-}
+} //spotifyPlay
 
 let twitchPlayer;
 function enableTwitchEmbed() {
@@ -2838,3 +2958,18 @@ function tiktokEmbedEventListeners() {
     }
   });
 } //tiktokEmbedEventListeners
+
+let vimeoPlayer;
+function playVimeoVideo(id) {
+  //check if embed was created
+  if (!vimeoPlayer) {
+    vimeoPlayer = new Vimeo.Player(elements.vimeoEmbed, { id: id, responsive: true, speed: true, autoplay: true });
+    vimeoPlayer.on("ended", (event) => {
+      if (PLAYLIST.autoplay) {
+        nextItem();
+      }
+    });
+  } else {
+    vimeoPlayer.loadVideo(id);
+  }
+} //playVimeoVideo
