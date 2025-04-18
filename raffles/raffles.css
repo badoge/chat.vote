@@ -8,10 +8,6 @@
   max-width: 80vw;
 }
 
-.arrows {
-  font-size: 2rem;
-}
-
 [data-placeholder]:empty:before {
   content: attr(data-placeholder);
 }

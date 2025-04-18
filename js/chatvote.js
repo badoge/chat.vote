@@ -82,7 +82,6 @@ let elements = {
   toastContainer: document.getElementById("toastContainer"),
   hideQuestion: document.getElementById("hideQuestion"),
   countdown: document.getElementById("countdown"),
-  chartContainer: document.getElementById("chartContainer"),
   voteHint: document.getElementById("voteHint"),
   chartCanvas: document.getElementById("chartCanvas"),
   barChart: document.getElementById("barChart"),
@@ -1200,7 +1199,7 @@ function pushTable(id, suggestion, by, score, context) {
       suggestion,
       `<p class="cursorPointer" data-username="${by}" style="color:${color};" onclick='window.open("https://www.twitch.tv/popout/${USER.channel}/viewercard/${by}?popout=","_blank","width=340,height=800")'>${badgesHTML}${username}</p>`,
       score,
-      `<button type="button" class="removebtn btn btn-danger"><i class="material-icons notranslate">delete_forever</i></button>`,
+      `<button type="button" class="remove-option-button btn btn-danger" onclick="removeData(this,${id})"><i class="material-icons notranslate">delete_forever</i></button>`,
     ])
     .draw(false);
   linkifyElementID("options", CHATVOTE.linkPreviewThumbnailsEnabled);
@@ -1453,28 +1452,33 @@ function updateChart() {
   let colors = [];
   let total = 0;
 
+  //sort the data if the button checkbox is checked in the chart tab and score is not hidden
   if (CHATVOTE.sortChart && !scoreHidden) {
     vote_results_copy.sort(function (a, b) {
       return a.score > b.score ? -1 : a.score == b.score ? 0 : 1;
     });
   }
 
+  //calculate total for % below
   for (let i = 0, j = vote_results_copy.length; i < j; i++) {
     total += vote_results_copy[i].score;
   }
 
   for (let i = 0, j = vote_results_copy.length; i < j; i++) {
-    labels[i] = `${vote_results_copy[i].label} | ${vote_results_copy[i].score} ${vote_results_copy[i].score == 1 ? "Vote" : "Votes"} (${
-      Math.round((vote_results_copy[i].score / total) * 100) || 0
-    }%)`;
-    data[i] = vote_results_copy[i].score;
+    //chart label
     if (scoreHidden) {
-      data[i] = 0;
       labels[i] = `${vote_results_copy[i].label} - score hidden`;
+      data[i] = 0;
+    } else {
+      labels[i] = `${vote_results_copy[i].label} | ${vote_results_copy[i].score} ${vote_results_copy[i].score == 1 ? "Vote" : "Votes"} (${
+        Math.round((vote_results_copy[i].score / total) * 100) || 0
+      }%)`;
+      data[i] = vote_results_copy[i].score;
     }
     colors[i] = vote_results_copy[i].color;
     table.cell({ row: i, column: 4 }).data(vote_results_copy[i].score);
   }
+
   mainChart.data.labels = labels;
   mainChart.data.datasets[0].data = data;
   mainChart.data.datasets[0].backgroundColor = colors;
@@ -1517,7 +1521,10 @@ function updateChart() {
   }
 } //updateChart
 
-function removeData(rowid) {
+function removeData(button, rowid) {
+  let score = parseInt(button.closest("tr").childNodes[3].innerHTML, 10);
+  table.row(button.closest("tr")).remove().draw();
+
   for (let i = vote_results.length - 1; i >= 0; i--) {
     if (vote_results[i].id === rowid) {
       if (vote_results[i].by != USER.channel) {
@@ -1532,6 +1539,12 @@ function removeData(rowid) {
   }
   updateChart();
   checkNumbers();
+  updateHint();
+
+  if (score !== 0) {
+    restartPoll();
+    showToast(`Poll restarted`, "warning", 3000);
+  }
 } //removeData
 
 function hideScore() {
@@ -1951,45 +1964,40 @@ window.onload = function () {
   elements.darkTheme.checked = darkTheme ?? true;
   switchTheme(elements.darkTheme.checked);
 
-  table = $("#options").DataTable({
+  table = new DataTable("#options", {
+    autoWidth: false,
     responsive: true,
     retrieve: true,
     paging: false,
-    scrollCollapse: true,
     ordering: false,
     searching: false,
     info: false,
     columns: [
       {
-        width: "0%",
         visible: false,
       },
       {
-        width: "15%",
+        width: "5%",
       },
       {
-        width: "52%",
+        width: "60%",
       },
       {
-        width: "17%",
+        width: "20%",
       },
       {
         width: "10%",
       },
       {
-        width: "6%",
-      },
-    ],
-    columnDefs: [
-      {
-        orderable: false,
-        targets: 5,
+        width: "5%",
+        className: "remove-option-cell",
       },
     ],
     language: {
       emptyTable: 'Nothing here <img src="/pics/donk.png" alt="donk" style="height:28px; width:28px;">',
     },
   });
+
   elements.pollOption.focus();
   elements.pollOption.select();
   loadAndConnect();
@@ -2194,20 +2202,6 @@ window.onload = function () {
     }
     saveSettings();
   };
-
-  $("#options").on("click", ".removebtn", function () {
-    let cellid = table.row($(this).parents("tr")).data();
-    if (cellid[4] > 0) {
-      showToast(
-        `Someone already voted for the option you just deleted, you should <i class="material-icons notranslate">refresh</i>Restart the poll so they can vote again.`,
-        "warning",
-        7000
-      );
-    }
-    removeData(cellid[0]);
-    table.row($(this).parents("tr")).remove().draw();
-    updateHint();
-  });
 
   loadChart();
 

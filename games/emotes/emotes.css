@@ -26,6 +26,11 @@ body {
   font-size: 1.5em;
 }
 
+#emoteTimeBar {
+  transition-timing-function: linear;
+  transition-duration: 0s;
+}
+
 .resizable {
   display: inline-block;
   resize: both;

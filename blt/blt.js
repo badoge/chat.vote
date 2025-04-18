@@ -231,6 +231,8 @@ let elements = {
   videoEmbed_trivia: document.getElementById("videoEmbed_trivia"),
 };
 
+const { animate, createTimeline, utils } = anime;
+
 const icons = {
   text: `<i class="material-icons notranslate">description</i>`,
   image: `<i class="material-icons notranslate">image</i>`,
@@ -1624,7 +1626,18 @@ function startSingleElimination(bracket) {
   elements.pickWinner.disabled = false;
   elements.left_card_header.style.display = "";
   elements.right_card_header.style.display = "";
+  elements.left_title.style.display = "";
+  elements.right_title.style.display = "";
+  elements.centerTitle.style.display = "";
   elements.winnerTitle.style.display = "none";
+  elements.right_card.style = "";
+  elements.left_card.style = "";
+
+  promoteOptionAnimation?.revert();
+  nextMatchAnimation?.revert();
+  showWinnerAnimation1?.revert();
+  showWinnerAnimation2?.revert();
+  showWinnerAnimation3?.revert();
 
   nextMatch();
 } //startSingleElimination
@@ -1824,21 +1837,18 @@ function getChoices() {
 let timerAnimation1;
 let timerAnimation2;
 function startTimer() {
-  timerAnimation1 = anime({
-    targets: "#triviaTimer",
+  timerAnimation1 = animate("#triviaTimer", {
     width: "100%",
     duration: 1000,
-    easing: "easeInOutExpo",
-
-    complete: function () {
+    ease: "inOutExpo",
+    onComplete: function () {
       triviaRoundTimestamp = Date.now();
       triviaStarted = true;
-      timerAnimation2 = anime({
-        targets: "#triviaTimer",
+      timerAnimation2 = animate("#triviaTimer", {
         width: "0%",
         duration: triviaQuestionTimer * 1000,
-        easing: "linear",
-        complete: function () {
+        ease: "linear",
+        onComplete: function () {
           showAnswer();
         },
       });
@@ -1849,11 +1859,10 @@ function startTimer() {
 function stopTimer() {
   timerAnimation1?.pause();
   timerAnimation2?.pause();
-  anime({
-    targets: "#triviaTimer",
+  animate("#triviaTimer", {
     width: "0%",
     duration: 500,
-    easing: "easeOutBounce",
+    ease: "outBounce",
   });
 } //stopTimer
 
@@ -1887,6 +1896,7 @@ let currentRound = 1;
 let currentOption = 0;
 let currentScores = { left: 0, right: 0 };
 let currentCommand = { left: "a", right: "b" };
+let nextMatchAnimation;
 function nextMatch() {
   //check if current round is done
   if (currentOption == currentBracket[`round${currentRound}`].length) {
@@ -1948,12 +1958,6 @@ function nextMatch() {
     disableVoteButton();
   }
 
-  elements.centerTitle.style = "";
-  elements.left_card.style = "";
-  elements.right_card.style = "";
-  elements.left_title.style = "";
-  elements.right_title.style = "";
-
   if (elements.changeCommand.checked) {
     if (currentCommand.left == "a") {
       currentCommand.left = "1";
@@ -1970,30 +1974,24 @@ function nextMatch() {
   elements.right_command.innerHTML = currentCommand.right;
 
   if (!elements.disableAnimations.checked) {
-    anime({
-      targets: `#centerTitle`,
-      translateY: ["-200px", 0],
-    });
-    anime({
-      targets: `#left_title`,
-      translateX: ["-100%", 0],
-    });
-    anime({
-      targets: `#left_card`,
-      translateX: ["-100%", 0],
-    });
-    anime({
-      targets: `#right_title`,
-      translateX: ["200%", 0],
-    });
-    anime({
-      targets: `#right_card`,
-      translateX: ["200%", 0],
-    });
+    promoteOptionAnimation?.revert();
+    nextMatchAnimation = createTimeline({
+      defaults: {
+        ease: "outElastic(1, .5)",
+        duration: 1000,
+      },
+    })
+      .add(`#centerTitle`, { translateY: ["-100%", 0] }, 0)
+      .add(`#left_title`, { translateX: ["-100%", 0] }, 0)
+      .add(`#left_card`, { translateX: ["-100%", 0] }, 0)
+      .add(`#right_title`, { translateX: ["100%", 0] }, 0)
+      .add(`#right_card`, { translateX: ["100%", 0] }, 0);
+
     if (elements.changeCommand.checked) {
-      anime({
-        targets: ["#left_command", "#right_command"],
-        keyframes: [{ fontSize: "+=20px" }, { fontSize: "-=20px" }],
+      //animate the command so viewers notice that it changed at the start of each round
+      animate(["#left_command", "#right_command"], {
+        ease: "outElastic(1, .5)",
+        fontSize: ["+=20px", "-=20px"],
         delay: 2000,
         duration: 500,
       });
@@ -2179,52 +2177,49 @@ function resetScores() {
   updateScores();
 } //resetScores
 
+let promoteOptionAnimation;
 function promoteOption(option, position = null) {
   let index = currentBracket[`round${currentRound + 1}`].findIndex((e) => e === undefined);
   currentBracket[`round${currentRound + 1}`][index] = option;
 
   if (position && !elements.disableAnimations.checked) {
-    //title
-    anime({
-      targets: `#centerTitle`,
-      translateY: `-200px`,
-      duration: 1000,
-    });
-
-    //loser
-    anime({
-      targets: `#${position == "right" ? "left" : "right"}_title`,
-      translateY: `2000px`,
-      scale: "0.8",
-      duration: 1000,
-    });
-    anime({
-      targets: `#${position == "right" ? "left" : "right"}_card`,
-      translateY: `2000px`,
-      scale: "0.8",
-      duration: 1000,
-    });
-
-    //winner
-    anime({
-      targets: `#${position}_title`,
-      translateX: [{ value: `${position == "right" ? "-" : "+"}110%`, duration: 500 }],
-      translateY: [
-        { value: `-50%`, duration: 500 },
-        { value: "-200%", duration: 500 },
-      ],
-      scale: [{ value: "1.2", duration: 500 }],
-    });
-    anime({
-      targets: `#${position}_card`,
-      translateX: [{ value: `${position == "right" ? "-" : "+"}50%`, duration: 500 }],
-      translateY: [{ value: `50%`, duration: 500 }],
-      scale: [{ value: "1.2", duration: 500 }],
-      translateY: [{ value: "-2000px", duration: 500, delay: 500 }],
-      complete: function (anim) {
+    nextMatchAnimation?.revert();
+    promoteOptionAnimation = createTimeline({
+      defaults: {
+        ease: "outElastic(1, .5)",
+        duration: 1000,
+      },
+      onComplete: () => {
         nextMatch();
       },
-    });
+    })
+      .add(`#centerTitle`, { translateY: [0, `-200%`] }, 0)
+      .add(`#${position == "right" ? "left" : "right"}_title`, { translateX: `${position == "right" ? "-" : "+"}200%`, scale: "0.8" }, 0)
+      .add(`#${position == "right" ? "left" : "right"}_card`, { translateX: `${position == "right" ? "-" : "+"}200%`, scale: "0.8" }, 0)
+      .add(
+        `#${position}_title`,
+        {
+          translateX: `${position == "right" ? "-" : "+"}110%`,
+          translateY: [
+            { to: `-20%`, duration: 500 },
+            { to: "-200%", duration: 500 },
+          ],
+          scale: "1.2",
+        },
+        0
+      )
+      .add(
+        `#${position}_card`,
+        {
+          translateX: `${position == "right" ? "-" : "+"}50%`,
+          translateY: [
+            { to: `-5%`, duration: 500 },
+            { to: "-200%", duration: 500 },
+          ],
+          scale: "1.2",
+        },
+        0
+      );
   } else {
     nextMatch();
   }
@@ -2234,22 +2229,28 @@ function placeTierlistItem(tier) {
   let id = `item${Date.now()}`;
   let link = currentTierlistItem.thumbnail ? `https://proxy.donk.workers.dev/?url=${encodeURI(currentTierlistItem.thumbnail)}` : "/pics/nothumbnail.png";
   let card = document.querySelector(`[data-tier="${tier.command}"]`);
-  card.innerHTML += `
-  <a
-  id="${id}"
-  href="${getItemLink(currentTierlistItem.type, currentTierlistItem.id)}"
-  target="_blank"
-  rel="noopener noreferrer"><img class="border rounded tierlist-item me-1" alt="${elements.currentTierlistItemName.innerHTML}" title="${
-    elements.currentTierlistItemName.innerHTML
-  }" loading="lazy" src="${link}" /></a>`;
+
+  card.insertAdjacentHTML(
+    "beforeend",
+    `<a
+      id="${id}"
+      href="${getItemLink(currentTierlistItem.type, currentTierlistItem.id)}"
+      target="_blank"
+      rel="noopener noreferrer"><img class="border rounded tierlist-item me-1" alt="${elements.currentTierlistItemName.innerHTML}" title="${
+      elements.currentTierlistItemName.innerHTML
+    }" src="${link}" /></a>`
+  );
+
   let start = elements.currentTierlistItem.getBoundingClientRect();
   let destination = document.getElementById(id).getBoundingClientRect();
+
   if (!elements.disableAnimations.checked) {
-    anime({
-      targets: `#${id}`,
-      translateY: [start.top - destination.top, 0],
-      translateX: [start.left - destination.left, 0],
-      height: ["20vh", "10vh"],
+    animate(`#${id} > img`, {
+      ease: "outElastic(1, .5)",
+      translateY: { from: start.top - destination.top },
+      translateX: { from: start.left - destination.left },
+      height: ["30vh", "10vh"],
+      duration: 1000,
     });
   }
 
@@ -2451,6 +2452,7 @@ function updateScores() {
   }
 } //updateScores
 
+let showWinnerAnimation1, showWinnerAnimation2, showWinnerAnimation3;
 function showWinner(first, firstAndSecond) {
   elements.winner.innerHTML += `<strong>${escapeString(first[0].name)}</strong>`;
 
@@ -2461,41 +2463,23 @@ function showWinner(first, firstAndSecond) {
 
   if (!elements.disableAnimations.checked) {
     //move title away
-    anime({
-      targets: `#centerTitle`,
-      translateY: [0, "-200px"],
-      duration: 500,
-      complete: function (anim) {
-        //bring winner title in
-        elements.centerTitle.style.display = "none";
-        elements.left_card_header.style.display = "none";
-        elements.right_card_header.style.display = "none";
-        elements.winnerTitle.style.display = "";
-        anime({
-          targets: `#winnerTitle`,
-          translateY: ["-200px", 0],
-          duration: 1000,
-        });
-      },
-    });
 
-    //move option titles away
-    anime({
-      targets: `#left_title`,
-      translateX: [0, "-200%"],
-      duration: 1000,
-      complete: function (anim) {
-        elements.left_title.style.display = "none";
-      },
-    });
-    anime({
-      targets: `#right_title`,
-      translateX: [0, "200%"],
-      duration: 2000,
-      complete: function (anim) {
-        elements.right_title.style.display = "none";
-      },
-    });
+    nextMatchAnimation?.revert();
+    promoteOptionAnimation?.revert();
+    elements.left_card_header.style.display = "none";
+    elements.right_card_header.style.display = "none";
+    elements.left_title.style.display = "none";
+    elements.right_title.style.display = "none";
+    elements.centerTitle.style.display = "none";
+    elements.winnerTitle.style.display = "";
+
+    showWinnerAnimation1 = createTimeline({
+      defaults: { ease: "outElastic(1, .5)" },
+    })
+      .add(`#centerTitle`, { translateY: "-200px", duration: 500 }, 0)
+      .add(`#left_title`, { translateX: "-200%", duration: 1000 }, 0)
+      .add(`#right_title`, { translateX: "200%", duration: 1000 }, 0)
+      .add(`#winnerTitle`, { translateY: ["-200%", 0], duration: 1000 }, 0);
   } else {
     elements.left_card_header.style.display = "none";
     elements.right_card_header.style.display = "none";
@@ -2511,25 +2495,9 @@ function showWinner(first, firstAndSecond) {
     resetPlayers(false, true);
 
     if (!elements.disableAnimations.checked) {
-      //move loser away
-      anime({
-        targets: `#right_card`,
-        translateX: `2000px`,
-        scale: "0.8",
-        duration: 1000,
-        complete: function (anim) {
-          elements.right_card.style.display = "none";
-        },
-      });
-
-      //bring winner to center
-      anime({
-        targets: `#left_card`,
-        translateX: `50%`,
-        translateY: `5%`,
-        scale: "1.3",
-        duration: 2000,
-      });
+      showWinnerAnimation2 = createTimeline({ defaults: { ease: "outElastic(1, .5)" } }, 0)
+        .add(`#right_card`, { translateX: `200%`, scale: "0.8", duration: 1000 }, 0)
+        .add(`#left_card`, { translateX: `50%`, translateY: `5%`, scale: "1.3", duration: 2000 }, 0);
     } else {
       elements.right_card.style.display = "none";
       elements.left_card.style = "transform: translateX(50%) translateY(5%) scale(1.3);";
@@ -2540,25 +2508,9 @@ function showWinner(first, firstAndSecond) {
     resetPlayers(true, false);
 
     if (!elements.disableAnimations.checked) {
-      //move loser away
-      anime({
-        targets: `#left_card`,
-        translateX: `2000px`,
-        scale: "0.8",
-        duration: 1000,
-        complete: function (anim) {
-          elements.left_card.style.display = "none";
-        },
-      });
-
-      //bring winner to center
-      anime({
-        targets: `#right_card`,
-        translateX: `-50%`,
-        translateY: `5%`,
-        scale: "1.3",
-        duration: 2000,
-      });
+      showWinnerAnimation3 = createTimeline({ defaults: { ease: "outElastic(1, .5)" } })
+        .add(`#left_card`, { translateX: `-200%`, scale: "0.8", duration: 1000 }, 0)
+        .add(`#right_card`, { translateX: `-50%`, translateY: `5%`, scale: "1.3", duration: 2000 }, 0);
     } else {
       elements.left_card.style.display = "none";
       elements.right_card.style = "transform: translateX(-50%) translateY(5%) scale(1.3);";
@@ -3413,19 +3365,40 @@ function zoomCard(id) {
   elements[id].classList.toggle(`zoomed`);
   elements[`${id}_zoom_icon`].innerHTML = elements[id].classList.contains(`zoomed`) ? "zoom_out" : "zoom_in";
   if (elements[id].classList.contains(`zoomed`)) {
-    anime({
-      targets: `#${id}`,
+    animate(`#${id}`, {
+      ease: "outElastic(1, .5)",
       translateX: `${id == "left_card" ? "+=50%" : "-=50%"}`,
-      scale: "+=0.4",
+      scale: 1.4,
     });
   } else {
-    anime({
-      targets: `#${id}`,
-      translateX: `${id == "left_card" ? "-=50%" : "+=50%"}`,
-      scale: "-=0.4",
+    animate(`#${id}`, {
+      ease: "outElastic(1, .5)",
+      translateX: 0,
+      scale: 1,
     });
   }
 } //zoomCard
+
+function zoomOut(event) {
+  if (!elements.left_card.contains(event.target) && elements.left_card.classList.contains(`zoomed`)) {
+    elements.left_card.classList.remove("zoomed");
+    elements.left_card_zoom_icon.innerHTML = "zoom_in";
+    animate(`#left_card`, {
+      ease: "outElastic(1, .5)",
+      translateX: 0,
+      scale: 1,
+    });
+  }
+  if (!elements.right_card.contains(event.target) && elements.right_card.classList.contains(`zoomed`)) {
+    elements.right_card.classList.remove("zoomed");
+    elements.right_card_zoom_icon.innerHTML = "zoom_in";
+    animate(`#right_card`, {
+      ease: "outElastic(1, .5)",
+      translateX: 0,
+      scale: 1,
+    });
+  }
+} //zoomOut
 
 let scoreHidden = false;
 function hideScore() {
@@ -3441,13 +3414,13 @@ function hideScore() {
         left: 0,
         right: 0,
       };
-      anime({
-        targets: scores,
+      animate(scores, {
+        ease: "outElastic(1, .5)",
         left: vote_results.left,
         right: vote_results.right,
-        round: 1,
-        easing: "easeInOutExpo",
-        update: function () {
+        modifier: utils.round(0),
+        ease: "inOutExpo",
+        onUpdate: function () {
           elements.left_score.innerHTML = `${scores.left.toLocaleString()} ${scores.left == 1 ? "vote" : "votes"}`;
           elements.right_score.innerHTML = `${scores.right.toLocaleString()} ${scores.right == 1 ? "vote" : "votes"}`;
         },
@@ -3677,24 +3650,7 @@ window.onload = async function () {
   enablePopovers();
 
   document.addEventListener("click", (event) => {
-    if (!elements.left_card.contains(event.target) && elements.left_card.classList.contains(`zoomed`)) {
-      elements.left_card.classList.remove("zoomed");
-      elements.left_card_zoom_icon.innerHTML = "zoom_in";
-      anime({
-        targets: `#left_card`,
-        translateX: "-=50%",
-        scale: "-=0.4",
-      });
-    }
-    if (!elements.right_card.contains(event.target) && elements.right_card.classList.contains(`zoomed`)) {
-      elements.right_card.classList.remove("zoomed");
-      elements.right_card_zoom_icon.innerHTML = "zoom_in";
-      anime({
-        targets: `#right_card`,
-        translateX: "+=50%",
-        scale: "-=0.4",
-      });
-    }
+    zoomOut(event);
   });
 
   votePopover = new bootstrap.Popover(elements.enableVoting);

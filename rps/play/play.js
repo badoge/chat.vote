@@ -21,6 +21,8 @@ let elements = {
   toastContainer: document.getElementById("toastContainer"),
 };
 
+const { animate } = anime;
+
 let darkTheme = true;
 let loginExpiredModal;
 let streamer = "";
@@ -278,14 +280,13 @@ function animateHand(hand, move) {
   elements[`${hand}_paper`].style.display = "none";
   elements[`${hand}_scissors`].style.display = "none";
 
-  anime({
-    targets: `#${hand}_rock`,
+  animate(`#${hand}_rock`, {
     rotate: hand == "left" ? -30 : 30,
     duration: 300,
-    direction: "alternate",
-    easing: "easeOutElastic(1, .8)",
-    loop: 8,
-    complete: function (anim) {
+    alternate: true,
+    ease: "outElastic(1, .8)",
+    loop: 7,
+    onComplete: function (anim) {
       elements[`${hand}_rock`].style.display = "none";
       elements[`${hand}_${move}`].style.display = "";
     },

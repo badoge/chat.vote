@@ -2,25 +2,70 @@ body {
   margin-bottom: 300px;
 }
 
-.table {
+table {
   word-break: break-all;
 }
 
-.removebtn {
-  width: 90%;
-  margin: 0px;
+table.table.dataTable > :not(caption) > * > * {
+  background-color: var(--bs-dark-bg-subtle);
 }
 
-#options > tbody > tr > td:nth-child(5) {
+#options > thead > tr > *,
+#options > tbody > * > td:nth-child(1),
+#options > tbody > * > td:nth-child(4) {
   text-align: center;
-  padding-left: 4px;
-  padding-right: 4px;
+  vertical-align: middle;
 }
 
-#options > thead > tr > th.sorting_disabled {
+#options > tbody > * > td:nth-child(1),
+#options > tbody > * > td:nth-child(4) {
+  font-size: 2rem;
+  line-height: 1rem;
+}
+
+#options > tbody > * > td:nth-child(2),
+#options > tbody > * > td:nth-child(3) {
+  text-align: start;
+  vertical-align: middle;
+}
+
+/* .remove-option-button {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+} */
+.remove-option-button > i {
+  font-size: 36px;
+}
+
+/* td.remove-option-cell {
+  padding: 0;
+  position: relative;
+} */
+
+.dt-column-title {
   text-align: center;
 }
 
+th {
+  white-space: nowrap;
+}
+
+.main-tabs.active {
+  background-color: var(--bs-dark-bg-subtle) !important;
+  border-bottom-width: 1.5px;
+  border-bottom-color: var(--bs-dark-bg-subtle) !important;
+}
+
+#tableAndChart {
+  border-top-right-radius: 6px;
+  border-top-left-radius: 6px;
+}
+
+.row.mt-2.justify-content-between {
+  margin-top: 0 !important;
+}
 .chartStatDiv {
   height: 40px;
   box-sizing: border-box;
@@ -52,14 +97,6 @@ body {
 
 #questionLabel:hover {
   cursor: text;
-}
-
-#bulkadd {
-  margin-top: 5px;
-}
-
-.arrows {
-  font-size: 2rem;
 }
 
 #optionList {
@@ -152,10 +189,6 @@ body {
   word-wrap: break-word;
 }
 
-th {
-  white-space: nowrap;
-}
-
 #pollOptionLabel {
   font-size: 200%;
   margin: 0;
@@ -165,17 +198,9 @@ th {
   padding: 0px;
 }
 
-#options {
-  margin-bottom: 0px !important;
-}
-
 #enableVotingText {
   font-size: 1.5rem;
   line-height: 1.5rem;
-}
-
-#tableAndChartDiv > .card-body {
-  padding: 10px;
 }
 
 #mainButtonsCard {
@@ -268,15 +293,6 @@ th {
   opacity: 1;
 }
 
-.deletebtn {
-  color: #e74c3c;
-}
-
-.deletebtn:hover {
-  color: #c44133;
-  cursor: pointer;
-}
-
 #hideQuestion {
   position: absolute;
   top: 0;
@@ -319,11 +335,6 @@ th {
 #hideScore,
 #pickRandom {
   height: 41.5px;
-}
-
-#options_length,
-#options_filter {
-  display: none;
 }
 
 /* yea nay coinflip start */

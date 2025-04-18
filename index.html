@@ -713,131 +713,145 @@
             </div>
           </div>
 
-          <div class="card bg-dark-subtle border-dark-subtle" id="tableAndChartDiv">
-            <div class="card-body">
-              <ul class="nav nav-tabs" id="tableAndChart" role="tablist">
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link active" id="tableTabButton" data-bs-toggle="tab" data-bs-target="#tableTab" type="button" role="tab" aria-controls="tableTab" aria-selected="true">
-                    <i class="material-icons notranslate">toc</i>Table view
-                  </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link" id="chartTabButton" data-bs-toggle="tab" data-bs-target="#chartTab" type="button" role="tab" aria-controls="chartTab" aria-selected="false">
-                    <i style="transform: rotateZ(90deg)" class="material-icons notranslate">stacked_bar_chart</i>Chart view
-                  </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link" id="yesnoTabButton" data-bs-toggle="tab" data-bs-target="#yesnoTab" type="button" role="tab" aria-controls="yesnoTab" aria-selected="false">
-                    <img src="/pics/yeanay.webp" alt="yeanay" style="height: 20px" />Mode
-                  </button>
-                </li>
-                <li class="nav-item" role="presentation" style="display: none">
-                  <button class="nav-link" id="overlayTabButton" data-bs-toggle="tab" data-bs-target="#overlayTab" type="button" role="tab" aria-controls="overlayTab" aria-selected="false">
-                    <i class="material-icons notranslate">picture_in_picture</i> Overlay
-                  </button>
-                </li>
-              </ul>
-              <div class="tab-content">
-                <div class="tab-pane fade show active" id="tableTab" role="tabpanel" aria-labelledby="tableTabButton" tabindex="0">
-                  <table id="options" class="table table-bordered" style="width: 100%">
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Command</th>
-                        <th>Option</th>
-                        <th>by</th>
-                        <th>Score</th>
-                        <th>Delete</th>
-                      </tr>
-                    </thead>
-                    <tbody></tbody>
-                  </table>
+          <ul class="nav nav-tabs bg-body-tertiary" id="tableAndChart" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link main-tabs active"
+                id="tableTabButton"
+                data-bs-toggle="tab"
+                data-bs-target="#tableTab"
+                type="button"
+                role="tab"
+                aria-controls="tableTab"
+                aria-selected="true"
+              >
+                <i class="material-icons notranslate">toc</i>Table view
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link main-tabs" id="chartTabButton" data-bs-toggle="tab" data-bs-target="#chartTab" type="button" role="tab" aria-controls="chartTab" aria-selected="false">
+                <i style="transform: rotateZ(90deg)" class="material-icons notranslate">stacked_bar_chart</i>Chart view
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link main-tabs" id="yesnoTabButton" data-bs-toggle="tab" data-bs-target="#yesnoTab" type="button" role="tab" aria-controls="yesnoTab" aria-selected="false">
+                <img src="/pics/yeanay.webp" alt="yeanay" style="height: 20px" />Mode
+              </button>
+            </li>
+            <li class="nav-item" role="presentation" style="display: none">
+              <button
+                class="nav-link main-tabs"
+                id="overlayTabButton"
+                data-bs-toggle="tab"
+                data-bs-target="#overlayTab"
+                type="button"
+                role="tab"
+                aria-controls="overlayTab"
+                aria-selected="false"
+              >
+                <i class="material-icons notranslate">picture_in_picture</i> Overlay
+              </button>
+            </li>
+          </ul>
+          <div class="tab-content bg-dark-subtle">
+            <div class="tab-pane fade show active" id="tableTab" role="tabpanel" aria-labelledby="tableTabButton" tabindex="0">
+              <table id="options" class="table table-bordered" style="width: 100%">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Command</th>
+                    <th>Option</th>
+                    <th>by</th>
+                    <th>Score</th>
+                    <th>Delete</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <div class="tab-pane fade" id="chartTab" role="tabpanel" aria-labelledby="chartTabButton" tabindex="0">
+              <div class="container-fluid p-0">
+                <div id="chartDiv" class="row">
+                  <small id="voteHint" style="height: 0px" class="text-center"></small>
+                  <canvas id="chartCanvas"></canvas>
                 </div>
-                <div class="tab-pane fade" id="chartTab" role="tabpanel" aria-labelledby="chartTabButton" tabindex="0">
-                  <div class="container-fluid" id="chartContainer">
-                    <div id="chartDiv" class="row">
-                      <small id="voteHint" style="height: 0px" class="text-center"></small>
-                      <canvas id="chartCanvas"></canvas>
+                <div class="row p-2">
+                  <div class="col">
+                    <div class="btn-group" role="group" aria-label="chart type toggles">
+                      <input class="btn-check" type="radio" name="charttype" id="barChart" autocomplete="off" checked />
+                      <label class="btn btn-outline-info" for="barChart" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Bar chart">
+                        <i style="transform: rotateZ(90deg)" class="material-icons notranslate">stacked_bar_chart</i>
+                      </label>
+                      <input class="btn-check" type="radio" name="charttype" id="pieChart" autocomplete="off" />
+                      <label class="btn btn-outline-info" for="pieChart" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Pie chart">
+                        <i class="material-icons notranslate">pie_chart</i>
+                      </label>
                     </div>
-                    <div class="row">
-                      <div class="col">
-                        <div class="btn-group" role="group" aria-label="chart type toggles">
-                          <input class="btn-check" type="radio" name="charttype" id="barChart" autocomplete="off" checked />
-                          <label class="btn btn-outline-info" for="barChart" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Bar chart">
-                            <i style="transform: rotateZ(90deg)" class="material-icons notranslate">stacked_bar_chart</i>
-                          </label>
-                          <input class="btn-check" type="radio" name="charttype" id="pieChart" autocomplete="off" />
-                          <label class="btn btn-outline-info" for="pieChart" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Pie chart">
-                            <i class="material-icons notranslate">pie_chart</i>
-                          </label>
-                        </div>
-                        <input type="checkbox" class="btn-check" id="sortChart" autocomplete="off" />
-                        <label class="btn btn-outline-success" for="sortChart" id="sortChartLabel" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Sort chart">
-                          <i class="material-icons notranslate">sort</i>
-                        </label>
-                        <div class="chartStatDiv">Total votes: <span id="totalVotes">0</span></div>
+                    <input type="checkbox" class="btn-check" id="sortChart" autocomplete="off" />
+                    <label class="btn btn-outline-success" for="sortChart" id="sortChartLabel" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Sort chart">
+                      <i class="material-icons notranslate">sort</i>
+                    </label>
+                    <div class="chartStatDiv">Total votes: <span id="totalVotes">0</span></div>
 
-                        <div style="display: none" class="chartStatDiv ms-1" id="numberStats">
-                          <div class="me-1">Average: <span id="averageNumber">0</span> • Median: <span id="medianNumber">0</span></div>
-                        </div>
-                      </div>
+                    <div style="display: none" class="chartStatDiv ms-1" id="numberStats">
+                      <div class="me-1">Average: <span id="averageNumber">0</span> • Median: <span id="medianNumber">0</span></div>
                     </div>
                   </div>
                 </div>
-                <div class="tab-pane fade" id="yesnoTab" role="tabpanel" aria-labelledby="yesnoTabButton" tabindex="0">
-                  <div class="container-fluid text-center">
-                    <div class="row">
-                      <div class="col">
-                        Type <img src="/pics/yea.webp" alt="yea" style="height: 24px; width: 24px" />|yes or <img src="/pics/nay.webp" alt="nay" style="height: 24px; width: 24px" />|no in
-                        chat to vote
-                      </div>
-                    </div>
-                    <div id="yesnoDiv" class="row align-items-center">
-                      <div class="col">
-                        <img id="yeaPic" src="/pics/yea.webp" alt="yea" style="height: 150px" />
-                        <br /><span id="yeaCount">0 Votes (0%)</span>
-                      </div>
-                      <div class="col">
-                        <img id="nayPic" src="/pics/nay.webp" alt="nay" style="height: 150px" />
-                        <br /><span id="nayCount">0 Votes (0%)</span>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col">
-                        <div class="chartStatDiv">Total votes: <span id="yesnoTotalVotes">0</span></div>
-                      </div>
-                    </div>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="yesnoTab" role="tabpanel" aria-labelledby="yesnoTabButton" tabindex="0">
+              <div class="container-fluid text-center">
+                <div class="row">
+                  <div class="col">
+                    Type <img src="/pics/yea.webp" alt="yea" style="height: 24px; width: 24px" />|yes or <img src="/pics/nay.webp" alt="nay" style="height: 24px; width: 24px" />|no in chat
+                    to vote
                   </div>
                 </div>
-                <div class="tab-pane fade" id="overlayTab" role="tabpanel" aria-labelledby="overlayTabButton" tabindex="0">
-                  <div class="container-fluid text-center">
-                    <div class="row">
-                      <div class="col">
-                        <div class="input-group mt-3">
-                          <span class="input-group-text">Overlay URL</span>
-                          <button class="btn btn-outline-info" type="button" data-bs-toggle="modal" data-bs-target="#overlayModal"><i class="material-icons notranslate">help</i></button>
-                          <input
-                            id="overlayLink"
-                            type="password"
-                            readonly
-                            class="form-control"
-                            placeholder='Click "Generate new overlay link" to get your overlay URL'
-                            aria-label="Recipient's username with two button addons"
-                          />
-                          <button class="btn btn-outline-secondary" type="button"><i class="material-icons notranslate">content_copy</i></button>
-                          <button class="btn btn-outline-danger" id="generateOverlayButton" onclick="generateOverlay()" type="button">
-                            <i class="material-icons notranslate">restart_alt</i>Generate new overlay link
-                          </button>
-                        </div>
+                <div id="yesnoDiv" class="row align-items-center">
+                  <div class="col">
+                    <img id="yeaPic" src="/pics/yea.webp" alt="yea" style="height: 150px" />
+                    <br /><span id="yeaCount">0 Votes (0%)</span>
+                  </div>
+                  <div class="col">
+                    <img id="nayPic" src="/pics/nay.webp" alt="nay" style="height: 150px" />
+                    <br /><span id="nayCount">0 Votes (0%)</span>
+                  </div>
+                </div>
+                <div class="row p-2">
+                  <div class="col">
+                    <div class="chartStatDiv">Total votes: <span id="yesnoTotalVotes">0</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="overlayTab" role="tabpanel" aria-labelledby="overlayTabButton" tabindex="0">
+              <div class="container-fluid text-center">
+                <div class="row">
+                  <div class="col">
+                    <div class="input-group mt-3">
+                      <span class="input-group-text">Overlay URL</span>
+                      <button class="btn btn-outline-info" type="button" data-bs-toggle="modal" data-bs-target="#overlayModal"><i class="material-icons notranslate">help</i></button>
+                      <input
+                        id="overlayLink"
+                        type="password"
+                        readonly
+                        class="form-control"
+                        placeholder='Click "Generate new overlay link" to get your overlay URL'
+                        aria-label="Recipient's username with two button addons"
+                      />
+                      <button class="btn btn-outline-secondary" type="button"><i class="material-icons notranslate">content_copy</i></button>
+                      <button class="btn btn-outline-danger" id="generateOverlayButton" onclick="generateOverlay()" type="button">
+                        <i class="material-icons notranslate">restart_alt</i>Generate new overlay link
+                      </button>
+                    </div>
 
-                        <div id="overlayControls" style="display: none">
-                          <label for="donkx" class="form-label">x</label>
-                          <input type="range" class="form-range" oninput="moveX(event)" id="donkx" value="50" min="0" max="100" />
+                    <div id="overlayControls" style="display: none">
+                      <label for="donkx" class="form-label">x</label>
+                      <input type="range" class="form-range" oninput="moveX(event)" id="donkx" value="50" min="0" max="100" />
 
-                          <label for="donky" class="form-label">y</label>
-                          <input type="range" class="form-range" oninput="moveY(event)" id="donky" value="50" min="0" max="100" />
-                        </div>
-                      </div>
+                      <label for="donky" class="form-label">y</label>
+                      <input type="range" class="form-range" oninput="moveY(event)" id="donky" value="50" min="0" max="100" />
                     </div>
                   </div>
                 </div>

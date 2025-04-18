@@ -121,6 +121,8 @@ let elements = {
   volumeSliderValue: document.getElementById("volumeSliderValue"),
 };
 
+const { animate } = anime;
+
 let client;
 let currentTime = 0;
 let loginButton;
@@ -2196,9 +2198,8 @@ function voteSkip(userid) {
 
   if (elements.voteSkipDiv.style.display == "none") {
     elements.voteSkipDiv.style.display = "";
-    anime({
-      targets: `#voteSkipDiv`,
-      easing: "easeOutElastic",
+    animate(`#voteSkipDiv`, {
+      ease: "outElastic(1, .5)",
       translateY: ["-100%", 0],
     });
   }
@@ -2206,12 +2207,11 @@ function voteSkip(userid) {
   clearTimeout(voteskipTimeout);
   voteskipTimeout = setTimeout(() => {
     //hide voteskip counter if no more votes come in
-    anime({
-      targets: `#voteSkipDiv`,
-      easing: "easeOutBounce",
+    animate(`#voteSkipDiv`, {
+      ease: "outBounce",
       duration: 2000,
       translateY: [0, "-100%"],
-      complete: function (anim) {
+      onComplete: function (anim) {
         elements.voteSkipDiv.style.display = "none";
       },
     });
@@ -2233,11 +2233,10 @@ function voteSkip(userid) {
 
 function resetVoteSkip() {
   skippers = [];
-  anime({
-    targets: `#voteSkipDiv`,
-    easing: "easeOutBounce",
+  animate(`#voteSkipDiv`, {
+    ease: "outBounce",
     translateY: [0, "-100%"],
-    complete: function (anim) {
+    onComplete: function (anim) {
       elements.voteSkipDiv.style.display = "none";
     },
   });

@@ -47,14 +47,15 @@ let elements = {
   seventvChannelCount: document.getElementById("seventvChannelCount"),
   qualified: document.getElementById("qualified"),
   output: document.getElementById("output"),
-  timeBar: document.getElementById("timeBar"),
-  progressBar: document.getElementById("progressBar"),
-  progress: document.getElementById("progress"),
+  emoteTimeBarDiv: document.getElementById("emoteTimeBarDiv"),
+  emoteTimeBar: document.getElementById("emoteTimeBar"),
   emotes: document.getElementById("emotes"),
   timer: document.getElementById("timer"),
   timerValue: document.getElementById("timerValue"),
   start: document.getElementById("start"),
 };
+
+const { animate } = anime;
 
 let USER = {
   channel: "",
@@ -202,7 +203,7 @@ function start() {
 
   if (selectedemotes.length < EMOTEBENCHMARK.emotesPerRound) {
     stopTimer();
-    elements.timeBar.style.visibility = "hidden";
+    elements.emoteTimeBarDiv.style.visibility = "hidden";
     clearInterval(EMOTEBENCHMARK.interval);
     EMOTEBENCHMARK.interval = null;
     EMOTEBENCHMARK.turn = 0;
@@ -222,9 +223,7 @@ function start() {
     randomemotes.push(randomEmote);
   }
 
-  elements.progressBar.style.width = "100%";
-  elements.progress.ariaValueNow = 100;
-  elements.timeBar.style.visibility = "visible";
+  elements.emoteTimeBarDiv.style.visibility = "visible";
   setTimeout(() => {
     elements.emotes.innerHTML = "";
 
@@ -259,7 +258,7 @@ function reset() {
   elements.emotes.innerHTML = placeholder;
   elements.qualified.innerHTML = "";
   elements.output.innerHTML = "";
-  elements.timeBar.style.visibility = "hidden";
+  elements.emoteTimeBarDiv.style.visibility = "hidden";
   EMOTEBENCHMARK.qualified = [];
   EMOTEBENCHMARK.qualifiedCurrentRound = [];
   EMOTEBENCHMARK.twitchGlobal = false;
@@ -290,23 +289,14 @@ function reset() {
 } //reset
 
 function animateTimer(time) {
-  let value = {
-    percent: 100,
-  };
-
-  anime({
-    targets: value,
-    percent: 0,
-    round: 1,
+  elements.emoteTimeBar.style.width = "100%";
+  animate("#emoteTimeBar", {
+    width: "0%",
     duration: time,
-    easing: "easeOutQuart",
-    update: function () {
-      elements.progressBar.style.width = `${value.percent}%`;
-      elements.progress.ariaValueNow = value.percent;
-    },
-    complete: function (anim) {
+    ease: "linear",
+    onComplete: function () {
       elements.emotes.innerHTML = placeholder.repeat(EMOTEBENCHMARK.emotesPerRound);
-      elements.timeBar.style.visibility = "hidden";
+      elements.emoteTimeBarDiv.style.visibility = "hidden";
     },
   });
 } //animateTimer

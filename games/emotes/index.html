@@ -582,9 +582,10 @@
                 </div>
               </div>
             </div>
-            <div id="timeBar" class="mb-3" style="visibility: hidden">
-              <div class="progress" id="progress" role="progressbar" aria-label="emote timer" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-                <div class="progress-bar" id="progressBar"></div>
+
+            <div id="emoteTimeBarDiv" class="mb-3" style="visibility: hidden">
+              <div class="progress" role="progressbar" aria-label="emote timer" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                <div id="emoteTimeBar" class="progress-bar" style="width: 100%"></div>
               </div>
             </div>
           </div>
@@ -617,7 +618,7 @@
 
     <script src="/js/tmi.min.js"></script>
     <script src="/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/anime.min.js"></script>
+    <script src="/js/anime.iife.min.js"></script>
     <script src="/js/easytimer.min.js"></script>
     <script src="/js/functions.min.js"></script>
     <script src="/games/games.min.js"></script>
