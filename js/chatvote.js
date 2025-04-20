@@ -94,7 +94,6 @@ let elements = {
   medianNumber: document.getElementById("medianNumber"),
   questionLabel: document.getElementById("questionLabel"),
   pollOption: document.getElementById("pollOption"),
-  pollOptionSpan: document.getElementById("pollOptionSpan"),
   addOption: document.getElementById("addOption"),
   tableTabButton: document.getElementById("tableTabButton"),
   chartTabButton: document.getElementById("chartTabButton"),
@@ -141,7 +140,6 @@ let timer;
 let currentTime = 0;
 let votePopover, suggestPopover;
 let loginButton;
-let optionField;
 let deleteAllModal, randomOptionModal, resetSettingsModal, timeOverModal, yesnoTimeOverModal, loginExpiredModal, tieModal, randomYesnoModal;
 let enableVotingDropdown, enableSuggestionsDropdown;
 let tableTab, chartTab, yesnoTab, overlayTab;
@@ -1085,15 +1083,12 @@ function checkEmpty() {
   if (yesNoMode) {
     return true;
   }
-  if (!vote_results[0] || !vote_results[1]) {
-    optionField.show();
-    setTimeout(function () {
-      optionField.hide();
-    }, 4000);
+  if (!vote_results[0]) {
+    showToast("Poll is empty", "warning", 2000);
     return false;
-  } else {
-    return true;
   }
+
+  return true;
 } //checkEmpty
 
 async function addOption() {
@@ -1199,7 +1194,7 @@ function pushTable(id, suggestion, by, score, context) {
       suggestion,
       `<p class="cursorPointer" data-username="${by}" style="color:${color};" onclick='window.open("https://www.twitch.tv/popout/${USER.channel}/viewercard/${by}?popout=","_blank","width=340,height=800")'>${badgesHTML}${username}</p>`,
       score,
-      `<button type="button" class="remove-option-button btn btn-danger" onclick="removeData(this,${id})"><i class="material-icons notranslate">delete_forever</i></button>`,
+      `<button type="button" class="remove-option-button btn btn-danger"><i class="material-icons notranslate">delete_forever</i></button>`,
     ])
     .draw(false);
   linkifyElementID("options", CHATVOTE.linkPreviewThumbnailsEnabled);
@@ -1521,12 +1516,12 @@ function updateChart() {
   }
 } //updateChart
 
-function removeData(button, rowid) {
-  let score = parseInt(button.closest("tr").childNodes[3].innerHTML, 10);
-  table.row(button.closest("tr")).remove().draw();
+$("#options").on("click", ".remove-option-button", function () {
+  let cellid = table.row($(this).parents("tr")).data();
+  table.row($(this).parents("tr")).remove().draw();
 
   for (let i = vote_results.length - 1; i >= 0; i--) {
-    if (vote_results[i].id === rowid) {
+    if (vote_results[i].id === cellid[0]) {
       if (vote_results[i].by != USER.channel) {
         numberOfSuggestions--;
       }
@@ -1537,15 +1532,16 @@ function removeData(button, rowid) {
     oid = 0;
     changeSiteLinkTarget("_self");
   }
-  updateChart();
-  checkNumbers();
-  updateHint();
 
-  if (score !== 0) {
+  if (cellid[4] > 0) {
     restartPoll();
     showToast(`Poll restarted`, "warning", 3000);
   }
-} //removeData
+
+  updateChart();
+  checkNumbers();
+  updateHint();
+});
 
 function hideScore() {
   scoreHidden = !scoreHidden;
@@ -2002,7 +1998,6 @@ window.onload = function () {
   elements.pollOption.select();
   loadAndConnect();
   settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
-  optionField = new bootstrap.Popover(elements.pollOptionSpan);
   votePopover = new bootstrap.Popover(elements.enableVoting);
   suggestPopover = new bootstrap.Popover(elements.enableSuggestions);
 
