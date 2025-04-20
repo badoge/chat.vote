@@ -263,3 +263,17 @@ video {
   display: inline-block;
   min-width: 120px;
 }
+
+.request-container {
+  -webkit-transition: background-color 300ms linear;
+  -ms-transition: background-color 300ms linear;
+  transition: background-color 300ms linear;
+}
+
+.request-container:hover {
+  background-color: var(--bs-secondary-bg);
+  border-radius: 6px;
+  -webkit-transition: background-color 100ms linear;
+  -ms-transition: background-color 100ms linear;
+  transition: background-color 100ms linear;
+}

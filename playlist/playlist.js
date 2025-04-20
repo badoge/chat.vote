@@ -1241,7 +1241,7 @@ function addToPlaylist(request, position = "beforeend") {
 
   elements.mainList.insertAdjacentHTML(
     position,
-    `<div class="container-fluid p-0 mb-2" id="id${request.id}">
+    `<div class="container-fluid request-container p-0 mb-2" id="id${request.id}">
         <div class="row g-1">
           <div class="col-auto thumbnail-div">
             <div id="id${request.id}_thumbnail" class="request-thumbnail">
@@ -1294,7 +1294,7 @@ function addToHistory(request, localStorageLoad = false) {
   }
   elements.historyList.insertAdjacentHTML(
     localStorageLoad ? "beforeend" : "afterbegin",
-    `<div class="container-fluid p-0 mb-1">
+    `<div class="container-fluid request-container p-0 mb-1">
         <div class="row g-1">
           <div class="col-auto thumbnail-div">
             <div class="request-thumbnail">
