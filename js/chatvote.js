@@ -1488,24 +1488,20 @@ function updateChart() {
       return;
     }
 
-    if (!CHATVOTE.sortChart) {
-      vote_results_copy.sort(function (a, b) {
-        return a.score > b.score ? -1 : a.score == b.score ? 0 : 1;
-      });
-    }
-
     let allNumbers = [];
     for (let index = 0; index < vote_results_copy.length; index++) {
       for (let index2 = 0; index2 < vote_results_copy[index].score; index2++) {
         allNumbers.push(parseInt(vote_results_copy[index].option, 10));
       }
     }
-    if (allNumbers.length) {
-      let middle = Math.floor(allNumbers.length / 2);
-      if (allNumbers.length % 2 === 0) {
-        elements.medianNumber.innerHTML = (allNumbers[middle - 1] + allNumbers[middle]) / 2 || 0;
+
+    let allNumbersSorted = Float32Array.from(allNumbers).sort();
+    if (allNumbersSorted.length) {
+      let middle = Math.floor(allNumbersSorted.length / 2);
+      if (allNumbersSorted.length % 2 === 0) {
+        elements.medianNumber.innerHTML = (allNumbersSorted[middle - 1] + allNumbersSorted[middle]) / 2 || 0;
       } else {
-        elements.medianNumber.innerHTML = allNumbers[middle] || 0;
+        elements.medianNumber.innerHTML = allNumbersSorted[middle] || 0;
       }
     } else {
       elements.medianNumber.innerHTML = "0";
