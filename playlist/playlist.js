@@ -1,5 +1,6 @@
 let elements = {
   //modals
+  dankUpdateModal: document.getElementById("dankUpdateModal"),
   loginExpiredModal: document.getElementById("loginExpiredModal"),
   resetSettingsModal: document.getElementById("resetSettingsModal"),
   banlistModal: document.getElementById("banlistModal"),
@@ -126,7 +127,7 @@ let client;
 let currentTime = 0;
 let loginButton;
 let settingsOffcanvas;
-let loginExpiredModal, resetSettingsModal, banlistModal;
+let dankUpdateModal, loginExpiredModal, resetSettingsModal, banlistModal;
 let copyLinkButton;
 let playlistTab, approvalTab, historyTab;
 let playlist_open = false;
@@ -426,9 +427,16 @@ async function load_localStorage() {
         //reset localstorage for users that have the old array localstorage
         requests = new Map();
       }
+      let showWarning = false;
       for (let request of requests.values()) {
+        if (!request?.name) {
+          showWarning = true;
+        }
         addToPlaylist(request);
         updatePlaylist(request, true);
+      }
+      if (showWarning) {
+        dankUpdateModal.show();
       }
       updateLength();
     }
@@ -2748,6 +2756,7 @@ window.onload = function () {
 
   loadAndConnect();
 
+  dankUpdateModal = new bootstrap.Modal(elements.dankUpdateModal);
   loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
   resetSettingsModal = new bootstrap.Modal(elements.resetSettingsModal);
   banlistModal = new bootstrap.Modal(elements.banlistModal);
