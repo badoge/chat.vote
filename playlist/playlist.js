@@ -96,7 +96,6 @@ let elements = {
   commandHint: document.getElementById("commandHint"),
   commandHint2: document.getElementById("commandHint2"),
   link: document.getElementById("link"),
-  addLink: document.getElementById("addLink"),
 
   //playlist
   playlistTab: document.getElementById("playlistTab"),
@@ -871,7 +870,7 @@ function findRequestKey(requestProperty, lookupValue) {
 } //findRequestKey
 
 function addRequest(context, link, msgid, search) {
-  if (bannedItems.get(link.id)) {
+  if (bannedItems.get(link.name)) {
     let message = "";
     switch (link.type) {
       case "twitch clip":
@@ -889,7 +888,7 @@ function addRequest(context, link, msgid, search) {
       case "spotify":
         message = "🚫 This song is banned";
         break;
-      case "supa video/audio":
+      case "supa":
         message = "🚫 This link is banned";
         break;
       default:
@@ -916,24 +915,25 @@ function addRequest(context, link, msgid, search) {
   }
 
   //check if user already requested this link id
-  if (users[userIndex].requests.some((id) => id === link.id)) {
+  if (users[userIndex].requests.some((id) => id === link.name)) {
     botReply("⚠ You already requested this", context.id, false);
     return;
   }
 
   users[userIndex].requestsCount++;
-  users[userIndex].requests.push(link.id);
+  users[userIndex].requests.push(link.name);
 
   //check if other users already requested this link id
-  let request = requests.get(link.id);
+  let request = requests.get(link.name);
   if (request) {
     request.by.push(users[userIndex]);
-    requests.set(link.id, request);
+    requests.set(link.name, request);
     updatePlaylist(request);
     botReply("⚠ Someone else already requested this", context.id, false);
   } else {
     let newRequest = {
       id: link.id,
+      name: link.name,
       msgid: msgid,
       type: link.type,
       approved: PLAYLIST.approvalQueue ? false : true,
@@ -948,7 +948,7 @@ function addRequest(context, link, msgid, search) {
       time: Date.now(),
       by: [users[userIndex]],
     };
-    requests.set(link.id, newRequest);
+    requests.set(link.name, newRequest);
     addToPlaylist(newRequest);
     getRequestInfo(newRequest, context.id);
     updatePlaylist(newRequest);
@@ -979,8 +979,8 @@ function deleteRequest(id, refund = true) {
   saveSettings();
 } //deleteRequest
 
-function banUser(requestID) {
-  let request = requests.get(requestID);
+function banUser(requestName) {
+  let request = requests.get(requestName);
   if (!request) {
     showToast("Could not ban user", "danger", 2000);
     return;
@@ -995,13 +995,13 @@ function banUser(requestID) {
   }
 
   //ban the item also
-  if (!bannedItems.get(requestID)) {
-    bannedItems.set(requestID, request);
+  if (!bannedItems.get(requestName)) {
+    bannedItems.set(requestName, request);
   }
 
   //remove all other requests sent by this user except for the one that was clicked
   for (const [key, value] of requests.entries()) {
-    if (key == requestID) {
+    if (key == requestName) {
       continue;
     }
 
@@ -1010,26 +1010,26 @@ function banUser(requestID) {
     }
   }
 
-  deleteRequest(requestID, false);
+  deleteRequest(requestName, false);
 } //banUser
 
-function banItem(requestID) {
-  let request = requests.get(requestID);
+function banItem(requestName) {
+  let request = requests.get(requestName);
   if (!request) {
     showToast("Could not ban video/song", "danger", 2000);
     return;
   }
 
   //check if item is already banned before adding it to the list
-  if (!bannedItems.get(requestID)) {
-    bannedItems.set(requestID, request);
+  if (!bannedItems.get(requestName)) {
+    bannedItems.set(requestName, request);
   }
 
-  deleteRequest(requestID, false);
+  deleteRequest(requestName, false);
 } //banItem
 
-function banChannel(requestID) {
-  let request = requests.get(requestID);
+function banChannel(requestName) {
+  let request = requests.get(requestName);
   if (!request) {
     showToast("Could not ban channel/artist", "danger", 2000);
     return;
@@ -1041,11 +1041,11 @@ function banChannel(requestID) {
   }
 
   //check if channel is already banned before adding it to the list
-  if (!bannedChannels.get(request.channel)) {
-    bannedChannels.set(request.channel, request);
+  if (!bannedChannels.get(`${request.platform}:${request.channel}`)) {
+    bannedChannels.set(`${request.platform}:${request.channel}`, request);
   }
 
-  deleteRequest(requestID, false);
+  deleteRequest(requestName, false);
 } //banChannel
 
 function unbanUser(userid) {
@@ -1136,7 +1136,7 @@ function loadBanLists() {
       "afterbegin",
       `
       <li class="list-group-item">
-      ${value.channel} <i class="material-icons notranslate deletebtn float-end" onclick="unbanChannel('${value.channel}')" title="Unban">highlight_off</i>
+      ${value.channel} <i class="material-icons notranslate deletebtn float-end" onclick="unbanChannel('${value.platform}:${value.channel}')" title="Unban">highlight_off</i>
       </li>`
     );
   }
@@ -1194,9 +1194,7 @@ function addToPlaylist(request, position = "beforeend") {
         </span>
       </li>`;
       break;
-    case "supa video":
-    case "supa audio":
-    case "supa video/audio":
+    case "supa":
       banChannelButton = `
       <li>
         <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="supa links are uploaded anonymously so there is no channel to ban">
@@ -1205,10 +1203,10 @@ function addToPlaylist(request, position = "beforeend") {
       </li>`;
       break;
     case "spotify":
-      banChannelButton = `<li><a class="dropdown-item" onclick="banChannel('${request.id}')"><i class="material-icons notranslate">person_off</i> Ban Artist</a></li>`;
+      banChannelButton = `<li><a class="dropdown-item" onclick="banChannel('${request.name}')"><i class="material-icons notranslate">person_off</i> Ban Artist</a></li>`;
       break;
     default:
-      banChannelButton = `<li><a class="dropdown-item" onclick="banChannel('${request.id}')"><i class="material-icons notranslate">tv_off</i> Ban Channel</a></li>`;
+      banChannelButton = `<li><a class="dropdown-item" onclick="banChannel('${request.name}')"><i class="material-icons notranslate">tv_off</i> Ban Channel</a></li>`;
       break;
   }
 
@@ -1235,25 +1233,25 @@ function addToPlaylist(request, position = "beforeend") {
   }
 
   let banButtons = `
-  <li><a id="id${request.id}_ban_user" class="dropdown-item" onclick="banUser('${request.id}')" title="Video/song will be banned also"><i class="material-icons notranslate">person_off</i> Ban User</a></li>
-  <li><a class="dropdown-item" onclick="banItem('${request.id}')">${banItemText}</a></li>
+  <li><a id="id${request.name}_ban_user" class="dropdown-item" onclick="banUser('${request.name}')" title="Video/song will be banned also"><i class="material-icons notranslate">person_off</i> Ban User</a></li>
+  <li><a class="dropdown-item" onclick="banItem('${request.name}')">${banItemText}</a></li>
   ${banChannelButton}`;
 
   elements.mainList.insertAdjacentHTML(
     position,
-    `<div class="container-fluid request-container p-0 mb-2" id="id${request.id}">
+    `<div class="container-fluid request-container p-0 mb-2" id="id${request.name}">
         <div class="row g-1">
           <div class="col-auto thumbnail-div">
-            <div id="id${request.id}_thumbnail" class="request-thumbnail">
+            <div id="id${request.name}_thumbnail" class="request-thumbnail">
               <div class="placeholder-glow" style="width: 160px; height: 90px">
                 <span class="placeholder col-12 rounded h-100"></span>
               </div>
             </div>
-            <span class="badge text-bg-dark duration-label" id="id${request.id}_duration">00:00</span>
+            <span class="badge text-bg-dark duration-label" id="id${request.name}_duration">00:00</span>
           </div>
           <div class="col">
             <div class="vstack h-100">
-              <div class="request-title mb-auto" id="id${request.id}_title" >
+              <div class="request-title mb-auto" id="id${request.name}_title" >
                 <span class="placeholder-glow">
                   <span class="placeholder col-12"></span>
                 </span>
@@ -1261,12 +1259,12 @@ function addToPlaylist(request, position = "beforeend") {
                   <span class="placeholder col-12"></span>
                 </span>
               </div>
-              <small class="request-info text-body-secondary" id="id${request.id}_info" >
+              <small class="request-info text-body-secondary" id="id${request.name}_info" >
                 <span class="placeholder-glow">
                   <span class="placeholder col-12"></span>
                 </span>
               </small>
-              <small class="requested-by text-body-secondary" id="id${request.id}_by" >
+              <small class="requested-by text-body-secondary" id="id${request.name}_by" >
               Requested by: 
               ${request.by[0].badges}
               <span style="color: ${request.by[0].color}">${request.by.map((u) => u.username).join(" & ")}</span>
@@ -1280,7 +1278,7 @@ function addToPlaylist(request, position = "beforeend") {
                   ${banButtons}
                 </ul>
               </div>
-            <i class="material-icons notranslate icon-button" onclick="deleteRequest('${request.id}',false)" title="Delete request">delete</i>
+            <i class="material-icons notranslate icon-button" onclick="deleteRequest('${request.name}',false)" title="Delete request">delete</i>
           </div>
         </div>
       </div>`
@@ -1338,13 +1336,13 @@ function addToHistory(request, localStorageLoad = false) {
 function updatePlaylist(request, localStorageLoad = false) {
   //check if request info has been fetched
   if (request.thumbnail && request.title) {
-    document.getElementById(`id${request.id}_thumbnail`).innerHTML = `
+    document.getElementById(`id${request.name}_thumbnail`).innerHTML = `
     <img 
     onmouseup="openLink(event, '${getItemLink(request)}')" 
     src="${request.thumbnail}" 
     alt="thumbnail" 
     class="rounded cursor-pointer" />`;
-    document.getElementById(`id${request.id}_title`).innerHTML = `
+    document.getElementById(`id${request.name}_title`).innerHTML = `
     <a 
     class="link-body-emphasis link-underline-opacity-0"
     href="${getItemLink(request)}"
@@ -1352,14 +1350,14 @@ function updatePlaylist(request, localStorageLoad = false) {
     rel="noopener noreferrer">
     ${escapeString(request.title)}
     </a>`;
-    document.getElementById(`id${request.id}_title`).title = request.title;
-    document.getElementById(`id${request.id}_info`).innerHTML = `
+    document.getElementById(`id${request.name}_title`).title = request.title;
+    document.getElementById(`id${request.name}_info`).innerHTML = `
     ${escapeString(request.channel)} ${request.views > -1 ? ` · ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}`;
-    document.getElementById(`id${request.id}_info`).title = `
+    document.getElementById(`id${request.name}_info`).title = `
     ${escapeString(request.channel)} ${request.views > -1 ? ` · ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}`;
-    document.getElementById(`id${request.id}_duration`).innerText = request.duration == -1 ? "🔴live" : secondsToTimeString(Math.round(request.duration));
-    document.getElementById(`id${request.id}_ban_user`).innerHTML = `<i class="material-icons notranslate">person_off</i> Ban ${request.by.length > 1 ? "Users" : "User"}</a>`;
-    document.getElementById(`id${request.id}_by`).innerHTML = `
+    document.getElementById(`id${request.name}_duration`).innerText = request.duration == -1 ? "🔴live" : secondsToTimeString(Math.round(request.duration));
+    document.getElementById(`id${request.name}_ban_user`).innerHTML = `<i class="material-icons notranslate">person_off</i> Ban ${request.by.length > 1 ? "Users" : "User"}</a>`;
+    document.getElementById(`id${request.name}_by`).innerHTML = `
     Requested by 
     ${request.by[0].badges}
     <a 
@@ -1370,7 +1368,7 @@ function updatePlaylist(request, localStorageLoad = false) {
     <span style="color: ${request.by[0].color}">${request.by[0].username}</span>
     </a>
      ${request.by.length > 1 ? `and ${request.by.length - 1} other ${request.by.length - 1 == 1 ? "user" : "users"}` : ""}`;
-    document.getElementById(`id${request.id}_by`).title = `Requested by @${request.by.map((u) => u.username).join(" & ")}`;
+    document.getElementById(`id${request.name}_by`).title = `Requested by @${request.by.map((u) => u.username).join(" & ")}`;
 
     if (!playlist_playing && PLAYLIST.autoplay && !localStorageLoad) {
       nextItem();
@@ -1381,8 +1379,8 @@ function updatePlaylist(request, localStorageLoad = false) {
     }
   } else {
     //if request info is not ready yet then update requesters only
-    document.getElementById(`id${request.id}_ban_user`).innerHTML = `<i class="material-icons notranslate">person_off</i> Ban ${request.by.length > 1 ? "Users" : "User"}</a>`;
-    document.getElementById(`id${request.id}_by`).innerText = `Requested by @${request.by[0].username} ${
+    document.getElementById(`id${request.name}_ban_user`).innerHTML = `<i class="material-icons notranslate">person_off</i> Ban ${request.by.length > 1 ? "Users" : "User"}</a>`;
+    document.getElementById(`id${request.name}_by`).innerText = `Requested by @${request.by[0].username} ${
       request.by.length > 1 ? `and ${request.by.length - 1} other ${request.by.length - 1 == 1 ? "user" : "users"}` : ""
     }`;
   }
@@ -1403,12 +1401,13 @@ async function getRequestInfo(request, msgid) {
       console.log(result);
       request.title = result.data.data[0].title || "(untitled)";
       request.channel = result.data.data[0].broadcaster_name || "(unknown)";
+      request.userid = result.data.data[0].broadcaster_id;
       request.thumbnail = result.data.data[0].thumbnail_url;
       request.duration = result.data.data[0].duration;
       request.views = result.data.data[0].view_count;
       request.mp4 = `${result?.extra?.clip?.videoQualities[0]?.sourceURL}${result?.extra?.clipKey}`;
     } catch (error) {
-      deleteRequest(request.id);
+      deleteRequest(request.name);
       botReply("⛔ Could not find this clip's info", msgid, false);
       console.log("getRequestInfo twitch clip error", error);
       return;
@@ -1422,11 +1421,12 @@ async function getRequestInfo(request, msgid) {
       console.log(result);
       request.title = result.data[0].title || "(untitled)";
       request.channel = result.data[0].user_login || "(unknown)";
+      request.userid = result.data[0].user_id;
       request.thumbnail = result.data[0].thumbnail_url.replace("%{width}", "320").replace("%{height}", "180");
       request.duration = convertTwitchVODDuration(result.data[0].duration);
       request.views = result.data[0].view_count;
     } catch (error) {
-      deleteRequest(request.id);
+      deleteRequest(request.name);
       botReply("⛔ Could not find this video's info", msgid, false);
       console.log("getRequestInfo twitch vod error", error);
       return;
@@ -1440,10 +1440,11 @@ async function getRequestInfo(request, msgid) {
       console.log(result);
       request.title = result.data[0].title || "(untitled)";
       request.channel = result.data[0].user_name || "(unknown)";
+      request.userid = result.data[0].user_id;
       request.thumbnail = result.data[0].thumbnail_url.replace("{width}", "320").replace("{height}", "180");
       request.duration = -1;
     } catch (error) {
-      deleteRequest(request.id);
+      deleteRequest(request.name);
       botReply("⛔ Could not find this stream's info", msgid, false);
       console.log("getRequestInfo twitch stream error", error);
       return;
@@ -1456,7 +1457,7 @@ async function getRequestInfo(request, msgid) {
       let result = await response.json();
       console.log(result);
       if (!result.tracks[0].is_playable) {
-        deleteRequest(request.id);
+        deleteRequest(request.name);
         botReply("⛔ Your song is not playable", msgid, false);
         return;
       }
@@ -1467,7 +1468,7 @@ async function getRequestInfo(request, msgid) {
       request.duration = result.tracks[0].duration_ms / 1000;
       request.uri = result.tracks[0].uri;
     } catch (error) {
-      deleteRequest(request.id);
+      deleteRequest(request.name);
       botReply("⛔ Could not find this song's info", msgid, false);
       console.log("getRequestInfo spotify error", error);
       return;
@@ -1484,7 +1485,7 @@ async function getRequestInfo(request, msgid) {
       request.thumbnail = result.thumbnail_url;
       request.duration = 0;
     } catch (error) {
-      deleteRequest(request.id);
+      deleteRequest(request.name);
       botReply("⛔ Could not find this video's info", msgid, false);
       console.log("getRequestInfo tiktok error", error);
       return;
@@ -1498,7 +1499,7 @@ async function getRequestInfo(request, msgid) {
       console.log(result);
 
       if (result.items[0].contentDetails?.contentRating?.ytRating == "ytAgeRestricted" || !result.items[0].status?.embeddable) {
-        deleteRequest(request.id);
+        deleteRequest(request.name);
         botReply("⛔ Your video is age restricted or not embeddable", msgid, false);
         return;
       }
@@ -1508,7 +1509,7 @@ async function getRequestInfo(request, msgid) {
           request.duration = -1;
         }
         if (!PLAYLIST.allowYTStreams) {
-          deleteRequest(request.id);
+          deleteRequest(request.name);
           botReply("🚫 YouTube streams are not allowed", msgid, false);
           return;
         }
@@ -1520,7 +1521,7 @@ async function getRequestInfo(request, msgid) {
       request.duration = ISO8601ToSeconds(result.items[0].contentDetails.duration);
       request.views = result.items[0].statistics.viewCount;
     } catch (error) {
-      deleteRequest(request.id);
+      deleteRequest(request.name);
       botReply("⛔ Could not find this video's info", msgid, false);
       console.log("getRequestInfo youtube error", error);
       return;
@@ -1530,7 +1531,7 @@ async function getRequestInfo(request, msgid) {
   if (request.type == "vimeo") {
     try {
       if (Date.now() < vimeoCooldown) {
-        deleteRequest(request.id);
+        deleteRequest(request.name);
         botReply(`⚠ We reached the Vimeo API limit, ${Math.round((vimeoCooldown - Date.now()) / 1000)}s cooldown...`, msgid, false);
         return;
       }
@@ -1540,7 +1541,7 @@ async function getRequestInfo(request, msgid) {
       console.log(result);
 
       if (result?.error_code == 9000) {
-        deleteRequest(request.id);
+        deleteRequest(request.name);
         vimeoCooldown = new Date(result["X-RateLimit-Reset"]).getTime();
         botReply(`⚠ We reached the Vimeo API limit, ${Math.round((vimeoCooldown - Date.now()) / 1000)}s cooldown...`, msgid, false);
         return;
@@ -1549,25 +1550,25 @@ async function getRequestInfo(request, msgid) {
       vimeoCooldown = 0;
 
       if (result.type !== "video") {
-        deleteRequest(request.id);
+        deleteRequest(request.name);
         botReply("⛔ Only Vimeo videos are supported", msgid, false);
         return;
       }
 
       if (result.content_rating_class !== "safe") {
-        deleteRequest(request.id);
+        deleteRequest(request.name);
         botReply("⛔ Your video is not rated as safe", msgid, false);
         return;
       }
 
       if (!result.is_playable || result.play.status !== "playable" || result.status !== "available") {
-        deleteRequest(request.id);
+        deleteRequest(request.name);
         botReply("⛔ Your video is not playable", msgid, false);
         return;
       }
 
       if (result.privacy.embed !== "public") {
-        deleteRequest(request.id);
+        deleteRequest(request.name);
         botReply("⛔ Your video is not embeddable", msgid, false);
         return;
       }
@@ -1578,7 +1579,7 @@ async function getRequestInfo(request, msgid) {
       request.duration = result.duration;
       request.views = result?.stats?.plays || null;
     } catch (error) {
-      deleteRequest(request.id);
+      deleteRequest(request.name);
       botReply("⛔ Could not find this video's info", msgid, false);
       console.log("getRequestInfo vimeo error", error);
       return;
@@ -1596,14 +1597,14 @@ async function getRequestInfo(request, msgid) {
       request.duration = result.files.mp4.duration;
       request.video = result.files.mp4.url;
     } catch (error) {
-      deleteRequest(request.id);
+      deleteRequest(request.name);
       botReply("⛔ Could not find this video's info", msgid, false);
       console.log("getRequestInfo streamable error", error);
       return;
     }
   } //streamable
 
-  if (request.type == "supa video/audio" || request.type == "supa video" || request.type == "supa audio") {
+  if (request.type == "supa") {
     try {
       let response = await fetch(`https://helper.donk.workers.dev/supa/info?id=${request.id}`);
       let result = await response.json();
@@ -1621,27 +1622,25 @@ async function getRequestInfo(request, msgid) {
       if (result.type.startsWith("video")) {
         if (!PLAYLIST.allowSupaVideo) {
           botReply(`🚫 supa video links are not enabled`, msgid, false);
-          deleteRequest(request.id);
+          deleteRequest(request.name);
           return;
         }
-        request.type = "supa video";
       }
       if (result.type.startsWith("audio")) {
         if (!PLAYLIST.allowSupaVideo) {
           botReply(`🚫 supa audio links are not enabled`, msgid, false);
-          deleteRequest(request.id);
+          deleteRequest(request.name);
           return;
         }
-        request.type = "supa audio";
       }
 
       if (!result.type.startsWith("audio") && !result.type.startsWith("video")) {
-        deleteRequest(request.id);
+        deleteRequest(request.name);
         botReply("🚫 Only video and audio files are allowed", msgid, false);
         return;
       }
     } catch (error) {
-      deleteRequest(request.id);
+      deleteRequest(request.name);
       botReply("⛔ Could not find this link's info", msgid, false);
       console.log("getRequestInfo supa error", error);
       return;
@@ -1649,7 +1648,7 @@ async function getRequestInfo(request, msgid) {
   } //supa
 
   if (bannedChannels.get(request?.channel)) {
-    deleteRequest(request.id);
+    deleteRequest(request.name);
     botReply(`🚫 This ${request.type == "spotify" ? "artist" : "channel"} is banned`, msgid, false);
     return;
   }
@@ -1658,13 +1657,13 @@ async function getRequestInfo(request, msgid) {
     if (playlist_open) {
       togglePlaylist();
     }
-    deleteRequest(request.id);
+    deleteRequest(request.name);
     botReply(`⛔ The playlist's duration limit was reached (${PLAYLIST.maxDuration}${PLAYLIST.maxDurationUnit})`, msgid, false);
     return;
   }
 
   if (PLAYLIST.maxLength !== "" && request.duration !== -1 && request.duration > PLAYLIST.maxLength * 60) {
-    deleteRequest(request.id);
+    deleteRequest(request.name);
     botReply(`⛔ Your request is too long (${PLAYLIST.maxLength}m max)`, msgid, false);
     return;
   }
@@ -1673,19 +1672,19 @@ async function getRequestInfo(request, msgid) {
     if (playlist_open) {
       togglePlaylist();
     }
-    deleteRequest(request.id);
+    deleteRequest(request.name);
     botReply(`⛔ The playlist's size limit was reached (${PLAYLIST.maxSize})`, msgid, false);
     return;
   }
 
   if (PLAYLIST.minViewCount !== "" && request.views !== -1 && request.views < PLAYLIST.minViewCount) {
-    deleteRequest(request.id);
+    deleteRequest(request.name);
     botReply(`⛔ Your request does not meet the minimum view count (${PLAYLIST.minViewCount.toLocaleString()})`, msgid, false);
     return;
   }
 
-  if (PLAYLIST.uniqueOnly && history.some((e) => e.id === request.id)) {
-    deleteRequest(request.id);
+  if (PLAYLIST.uniqueOnly && history.some((e) => e.name === request.name)) {
+    deleteRequest(request.name);
     botReply(`⛔ Your request is not unique`, msgid, false);
     return;
   }
@@ -1741,7 +1740,7 @@ async function parseLink(link) {
       if (!clipID || !clipID[1]) {
         return null;
       }
-      return { type: "twitch clip", id: clipID[1] };
+      return { type: "twitch clip", id: clipID[1], name: `twitch:clip:${clipID[1]}`, platform: "twitch" };
     } //clips
 
     if (link.includes("/videos/")) {
@@ -1749,14 +1748,14 @@ async function parseLink(link) {
       if (!vodID || !parseInt(vodID[1])) {
         return null;
       }
-      return { type: "twitch vod", id: vodID[1] };
+      return { type: "twitch vod", id: vodID[1], name: `twitch:vod:${vodID[1]}`, platform: "twitch" };
     } //vods
 
     const username = link.match(/\/([a-zA-Z0-9_]{1,25})$/);
     if (!username) {
       return null;
     }
-    return { type: "twitch stream", id: username[1] };
+    return { type: "twitch stream", id: username[1], name: `twitch:stream:${username[1]}`, platform: "twitch" };
   } //twitch
 
   if (link.includes("youtube.com") || link.includes("youtu.be")) {
@@ -1765,7 +1764,7 @@ async function parseLink(link) {
     if (videoID[3]?.length != 11) {
       return null;
     }
-    return { type: link.includes("/shorts/") ? "youtube short" : "youtube", id: videoID[3] };
+    return { type: link.includes("/shorts/") ? "youtube short" : "youtube", id: videoID[3], name: `youtube:${videoID[3]}`, platform: "youtube" };
   } //youtube
 
   if (link.toLowerCase().startsWith("youtube")) {
@@ -1780,7 +1779,7 @@ async function parseLink(link) {
         return null;
       }
 
-      return { type: "youtube", id: result.items[0].id.videoId };
+      return { type: "youtube", id: result.items[0].id.videoId, name: `youtube:${result.items[0].id.videoId}`, platform: "youtube" };
     } catch (error) {
       return null;
     }
@@ -1792,7 +1791,7 @@ async function parseLink(link) {
     if (!videoID[1]) {
       return null;
     }
-    return { type: "vimeo", id: videoID[1] };
+    return { type: "vimeo", id: videoID[1], name: `vimeo:${videoID[1]}`, platform: "vimeo" };
   } //vimeo
 
   if (link.toLowerCase().startsWith("vimeo")) {
@@ -1816,7 +1815,7 @@ async function parseLink(link) {
         return null;
       }
 
-      return { type: "vimeo", id: result.data[0].uri.replace("/videos/", "") };
+      return { type: "vimeo", id: result.data[0].uri.replace("/videos/", ""), name: `vimeo:${result.data[0].uri.replace("/videos/", "")}`, platform: "vimeo" };
     } catch (error) {
       return null;
     }
@@ -1829,7 +1828,7 @@ async function parseLink(link) {
     if (!id[2] || (id[1] !== "track" && id[1] !== "episode")) {
       return null;
     }
-    return { type: "spotify", id: id[2] };
+    return { type: "spotify", id: id[2], name: `spotify:${id[2]}`, platform: "spotify" };
   } //spotify
 
   if (link.toLowerCase().startsWith("spotify")) {
@@ -1844,7 +1843,7 @@ async function parseLink(link) {
         return null;
       }
 
-      return { type: "spotify", id: result.tracks.items[0].id };
+      return { type: "spotify", id: result.tracks.items[0].id, name: `spotify:${result.tracks.items[0].id}`, platform: "spotify" };
     } catch (error) {
       return null;
     }
@@ -1856,14 +1855,15 @@ async function parseLink(link) {
     if (!id[2] || !id[1].includes("/video/")) {
       return null;
     }
-    return { type: "tiktok video", id: id[2], url: link.split("?")[0] };
+    return { type: "tiktok video", id: id[2], url: link.split("?")[0], name: `tiktok:${id[2]}`, platform: "tiktok" };
   } //tiktok
+
   if (link.includes("streamable.com")) {
     const match = link.match(/streamable\.com\/([a-zA-Z0-9]+)/);
     if (!match[1]) {
       return null;
     }
-    return { type: "streamable", id: match[1] };
+    return { type: "streamable", id: match[1], name: `streamable:${match[1]}`, platform: "streamable" };
   } //streamable
 
   if (link.includes("i.supa.codes") || link.includes("gachi.gay") || link.includes("kappa.lol") || link.includes("femboy.beauty")) {
@@ -1872,7 +1872,7 @@ async function parseLink(link) {
     if (!match[1]) {
       return null;
     }
-    return { type: "supa video/audio", id: match[1] };
+    return { type: "supa", id: match[1], name: `supa:${match[1]}`, platform: "supa" };
   } //supa
 
   return null;
@@ -1894,8 +1894,9 @@ function linkTypeAllowed(type) {
   if (type == "streamable" && !PLAYLIST.allowStreamable) {
     return false;
   }
-  if (type == "supa video/audio" && !PLAYLIST.allowSupaVideo && !PLAYLIST.allowSupaAudio) {
-    //supa links dont have a specific type yet so check if both are disabled
+  if (type == "supa" && !PLAYLIST.allowSupaVideo && !PLAYLIST.allowSupaAudio) {
+    //supa links dont have a specific type so check if both are disabled to skip early
+    //video/audio will be checked in getRequestInfo()
     return false;
   }
   if (type == "tiktok video" && !PLAYLIST.allowTiktokVideos) {
@@ -1933,9 +1934,7 @@ function getItemLink(request) {
       return `https://clips.twitch.tv/${request.id}`;
     case "streamable":
       return `https://streamable.com/${request.id}`;
-    case "supa video":
-    case "supa audio":
-    case "supa video/audio":
+    case "supa":
       return `https://i.supa.codes/${request.id}`;
     default:
       return "";
@@ -2000,7 +1999,7 @@ function previousItem(reply) {
   resetPlayers();
   resetVoteSkip();
 
-  if (currentItem?.id == history[historyIndex + 1]?.id) {
+  if (currentItem?.name == history[historyIndex + 1]?.name) {
     historyIndex++;
   }
 
@@ -2061,7 +2060,7 @@ function nextItem(reply) {
     historyIndex = -1;
     if (currentItem) {
       addToHistory(currentItem);
-      deleteRequest(currentItem.id, false);
+      deleteRequest(currentItem.name, false);
       elements.historyCount.innerHTML = `${history.length.toLocaleString()} ${history.length == 1 ? "item" : "items"}`;
     }
   }
@@ -2118,8 +2117,7 @@ function playItem(item) {
       elements.videoEmbed.style.display = "";
       elements.videoEmbed.src = item.video;
       break;
-    case "supa video":
-    case "supa audio":
+    case "supa":
       elements.videoEmbed.style.display = "";
       elements.videoEmbed.src = `https://i.supa.codes/${item.id}`;
       break;
@@ -2673,8 +2671,7 @@ function playPlaylist(reply) {
       document.getElementById("tiktokIframe").contentWindow.postMessage({ type: "play", "x-tiktok-player": true }, "*");
       break;
     case "streamable":
-    case "supa video":
-    case "supa audio":
+    case "supa":
       elements.videoEmbed.play();
       break;
     default:
@@ -2721,8 +2718,7 @@ function pausePlaylist(reply) {
       document.getElementById("tiktokIframe").contentWindow.postMessage({ type: "pause", "x-tiktok-player": true }, "*");
       break;
     case "streamable":
-    case "supa video":
-    case "supa audio":
+    case "supa":
       elements.videoEmbed.pause();
       break;
     default:
