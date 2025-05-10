@@ -1919,8 +1919,7 @@ async function parseLink(link) {
   } //streamable
 
   if (link.includes("i.supa.codes") || link.includes("gachi.gay") || link.includes("kappa.lol") || link.includes("femboy.beauty")) {
-    const match = link.match(/\w\/(\w{5,})(?:[?/.].*)?$/);
-    console.log(match);
+    const match = link.match(/\w\/([\w-]{5,})(?:[?/.#].*)?$/);
     if (!match[1]) {
       return null;
     }
