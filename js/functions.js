@@ -891,6 +891,60 @@ function formatViewCount(count) {
   }).format(count);
 } //formatViewCount
 
+/**
+ * Converts a time string to seconds
+ * @param {string} timeString - Time in format "mm:ss", "hh:mm:ss", or just "ss"
+ * @returns {number} - Total seconds
+ */
+function timeToSeconds(timeString) {
+  // Handle empty or invalid input
+  if (!timeString || typeof timeString !== "string") {
+    return 0;
+  }
+
+  // Split the time string by colon
+  const parts = timeString.trim().split(":");
+
+  // Convert based on the format
+  if (parts.length === 1) {
+    // Format: "ss"
+    return parseInt(parts[0], 10);
+  } else if (parts.length === 2) {
+    // Format: "mm:ss"
+    const minutes = parseInt(parts[0], 10);
+    const seconds = parseInt(parts[1], 10);
+    return minutes * 60 + seconds;
+  } else if (parts.length === 3) {
+    // Format: "hh:mm:ss"
+    const hours = parseInt(parts[0], 10);
+    const minutes = parseInt(parts[1], 10);
+    const seconds = parseInt(parts[2], 10);
+    return hours * 3600 + minutes * 60 + seconds;
+  } else {
+    return 0;
+  }
+} //timeToSeconds
+
+function timeStringToSeconds(duration) {
+  const durationRegex = /(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?/;
+  const match = durationRegex.exec(duration);
+  if (!match) {
+    return 0;
+  }
+  const [, hours, minutes, seconds] = match;
+  let totalSeconds = 0;
+  if (hours) {
+    totalSeconds += parseInt(hours) * 60 * 60;
+  }
+  if (minutes) {
+    totalSeconds += parseInt(minutes) * 60;
+  }
+  if (seconds) {
+    totalSeconds += parseInt(seconds);
+  }
+  return totalSeconds;
+} //timeStringToSeconds
+
 function replacer(key, value) {
   if (value instanceof Map) {
     return {

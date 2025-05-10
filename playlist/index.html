@@ -133,16 +133,18 @@
                 <tr>
                   <th scope="col">Platform</th>
                   <th scope="col">Autoplay</th>
+                  <th scope="col">Timestamps<sup>[1]</sup></th>
                   <th scope="col">Duration filters</th>
-                  <th scope="col">View count filters</th>
                   <th scope="col">Volume controls</th>
-                  <th scope="col">Moderated platform<sup>[1]</sup></th>
-                  <th scope="col">Search Command<sup>[2]</sup></th>
+                  <th scope="col">Moderated platform<sup>[2]</sup></th>
+                  <th scope="col">Search Command<sup>[3]</sup></th>
+                  <th scope="col">View count filters</th>
                 </tr>
               </thead>
               <tbody class="table-group-divider">
                 <tr>
                   <th scope="row">YouTube</th>
+                  <td>✔</td>
                   <td>✔</td>
                   <td>✔</td>
                   <td>✔</td>
@@ -158,31 +160,35 @@
                   <td>✔</td>
                   <td>✔</td>
                   <td>✔</td>
+                  <td>✔</td>
                 </tr>
                 <tr>
                   <th scope="row">Twitch</th>
-                  <td>✔<sup>[3]</sup></td>
-                  <td>✔</td>
+                  <td>✔<sup>[4]</sup></td>
+                  <td>✔<sup>[4]</sup></td>
                   <td>✔</td>
                   <td>✔</td>
                   <td>✔</td>
                   <td>❌</td>
+                  <td>✔</td>
                 </tr>
                 <tr>
-                  <th scope="row">Spotify<sup>[4]</sup></th>
+                  <th scope="row">Spotify<sup>[5]</sup></th>
+                  <td>✔</td>
                   <td>✔</td>
                   <td>✔</td>
                   <td>❌</td>
+                  <td>✔</td>
+                  <td>✔</td>
                   <td>❌</td>
-                  <td>✔</td>
-                  <td>✔</td>
                 </tr>
                 <tr>
                   <th scope="row">Streamable</th>
                   <td>✔</td>
                   <td>✔</td>
-                  <td>❌</td>
                   <td>✔</td>
+                  <td>✔</td>
+                  <td>❌</td>
                   <td>❌</td>
                   <td>❌</td>
                 </tr>
@@ -190,28 +196,32 @@
                   <th scope="row">i.supa.codes</th>
                   <td>✔</td>
                   <td>✔</td>
-                  <td>❌</td>
                   <td>✔</td>
+                  <td>✔</td>
+                  <td>❌</td>
                   <td>❌</td>
                   <td>❌</td>
                 </tr>
                 <tr>
                   <th scope="row">TikTok</th>
                   <td>✔</td>
-                  <td>❌</td>
+                  <td>✔</td>
                   <td>❌</td>
                   <td>❌</td>
                   <td>✔</td>
+                  <td>❌</td>
                   <td>❌</td>
                 </tr>
               </tbody>
             </table>
             <div class="text-body-secondary">
-              [1]: Platforms that are marked as moderated might have some automated filters to remove unsafe content. Platforms like Streamable and i.supa.codes don't require an account, so
+              [1]: Viewers can request something at a specific time by requesting a link with a timestamp parameter or adding "start=" at the end of the request. Example:
+              <kbd>!request [link] start=1:30</kbd> will make the video start from 1 minute 30 seconds<br />
+              [2]: Platforms that are marked as moderated might have some automated filters to remove unsafe content. Platforms like Streamable and i.supa.codes don't require an account, so
               anyone can upload unsafe videos quickly then request them. This however does not mean that the other platforms will always have safe content.<br />
-              [2]: You can search some platforms directly using the request command. Example: <kbd>!request spotify camellia ghost</kbd> <br />
-              [3]: Twitch clips autoplay might break sometimes, especially if you keep the clips in the playlist for more than a day.<br />
-              [4]: You need to login to Spotify on this browser to listen to full songs instead of previews. You might also need to enable 3rd party cookies.
+              [3]: You can search some platforms directly using the request command. Example: <kbd>!request spotify camellia ghost</kbd> <br />
+              [4]: Twitch clips autoplay and timestamps might break sometimes, especially if you keep the clips in the playlist for more than a day.<br />
+              [5]: You need to login to Spotify on this browser to listen to full songs instead of previews. You might also need to enable 3rd party cookies.
             </div>
           </div>
           <div class="modal-footer">
@@ -1221,7 +1231,7 @@
     <script src="/js/bootstrap.bundle.min.js"></script>
     <script src="/js/functions.min.js"></script>
     <script src="/playlist/playlist.js"></script>
-    <script src="https://embed.twitch.tv/embed/v1.js"></script>
+    <script src="https://player.twitch.tv/js/embed/v1.js"></script>
     <script src="https://www.youtube.com/iframe_api"></script>
     <script src="https://open.spotify.com/embed/iframe-api/v1"></script>
     <script src="https://player.vimeo.com/api/player.js"></script>

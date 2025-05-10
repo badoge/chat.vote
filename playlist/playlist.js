@@ -639,7 +639,12 @@ function connect() {
         request = input.join(" ");
         search = true;
       }
+
       let link = await parseLink(request);
+      if (link && input[input.length - 1]?.toLowerCase().startsWith("start=")) {
+        link.timestamp = timeToSeconds(input[input.length - 1].split("=")[1]);
+      }
+
       if (link && linkTypeAllowed(link.type)) {
         addRequest(context, link, context.id, search);
         return;
@@ -648,7 +653,7 @@ function connect() {
         botReply(`🚫 ${link.type} links are not enabled`, context.id, false);
         return;
       }
-    }
+    } //no command request
 
     let command = input[0].toLowerCase();
     switch (command) {
@@ -689,6 +694,9 @@ function connect() {
         if (!linkTypeAllowed(link.type)) {
           botReply(`🚫 ${link.type} links are not enabled`, context.id, false);
           return;
+        }
+        if (input[input.length - 1]?.toLowerCase().startsWith("start=")) {
+          link.timestamp = timeToSeconds(input[input.length - 1].split("=")[1]);
         }
         addRequest(context, link, context.id, search);
         break;
@@ -950,6 +958,7 @@ function addRequest(context, link, msgid, search) {
       uri: "",
       url: link?.url || "",
       duration: 0,
+      timestamp: link.timestamp,
       views: -1,
       thumbnail: "",
       search: search,
@@ -1183,7 +1192,7 @@ function updateLength() {
     if (request.duration == -1) {
       continue;
     }
-    duration += request.duration;
+    duration += request.duration - request.timestamp;
   }
 
   elements.playlistLength.innerHTML = `${secondsToTimeString(Math.round(duration)) || "00:00"} (${count} ${count == 1 ? "item" : "items"})`;
@@ -1298,6 +1307,10 @@ function addToHistory(request, localStorageLoad = false) {
   if (!localStorageLoad) {
     history.unshift(request);
   }
+  let timestamp = "";
+  if (request.timestamp > 0) {
+    timestamp = ` (@${secondsToTimeString(Math.round(request.timestamp))})`;
+  }
   elements.historyList.insertAdjacentHTML(
     localStorageLoad ? "beforeend" : "afterbegin",
     `<div class="container-fluid request-container p-0 mb-1">
@@ -1306,7 +1319,7 @@ function addToHistory(request, localStorageLoad = false) {
             <div class="request-thumbnail">
             <img src="${request.thumbnail}" alt="thumbnail" class="rounded" />
             </div>
-            <span class="badge text-bg-dark duration-label">${request.duration == -1 ? "🔴live" : secondsToTimeString(Math.round(request.duration))}</span>
+            <span class="badge text-bg-dark duration-label">${request.duration == -1 ? "🔴live" : secondsToTimeString(Math.round(request.duration)) + timestamp}</span>
           </div>
           <div class="col">
             <div class="vstack h-100">
@@ -1358,12 +1371,16 @@ function updatePlaylist(request, localStorageLoad = false) {
     rel="noopener noreferrer">
     ${escapeString(request.title)}
     </a>`;
+    let timestamp = "";
+    if (request.timestamp > 0) {
+      timestamp = ` (@${secondsToTimeString(Math.round(request.timestamp))})`;
+    }
     document.getElementById(`id${request.name}_title`).title = request.title;
     document.getElementById(`id${request.name}_info`).innerHTML = `
     ${escapeString(request.channel)} ${request.views > -1 ? ` · ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}`;
     document.getElementById(`id${request.name}_info`).title = `
     ${escapeString(request.channel)} ${request.views > -1 ? ` · ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}`;
-    document.getElementById(`id${request.name}_duration`).innerText = request.duration == -1 ? "🔴live" : secondsToTimeString(Math.round(request.duration));
+    document.getElementById(`id${request.name}_duration`).innerText = request.duration == -1 ? "🔴live" : secondsToTimeString(Math.round(request.duration)) + timestamp;
     document.getElementById(`id${request.name}_ban_user`).innerHTML = `<i class="material-icons notranslate">person_off</i> Ban ${request.by.length > 1 ? "Users" : "User"}</a>`;
     document.getElementById(`id${request.name}_by`).innerHTML = `
     Requested by 
@@ -1659,22 +1676,26 @@ async function getRequestInfo(request, msgid) {
     deleteRequest(request.name);
     botReply(`🚫 This ${request.type == "spotify" ? "artist" : "channel"} is banned`, msgid, false);
     return;
-  }
+  } //banned channels check
 
-  if (PLAYLIST.maxDuration !== "" && request.duration !== -1 && total_duration + request.duration > PLAYLIST.maxDuration * (PLAYLIST.maxDurationUnit == "m" ? 60 : 3600)) {
+  if (
+    PLAYLIST.maxDuration !== "" &&
+    request.duration !== -1 &&
+    total_duration + request.duration - request.timestamp > PLAYLIST.maxDuration * (PLAYLIST.maxDurationUnit == "m" ? 60 : 3600)
+  ) {
     if (playlist_open) {
       togglePlaylist();
     }
     deleteRequest(request.name);
     botReply(`⛔ The playlist's duration limit was reached (${PLAYLIST.maxDuration}${PLAYLIST.maxDurationUnit})`, msgid, false);
     return;
-  }
+  } //total duration limit check
 
-  if (PLAYLIST.maxLength !== "" && request.duration !== -1 && request.duration > PLAYLIST.maxLength * 60) {
+  if (PLAYLIST.maxLength !== "" && request.duration !== -1 && request.duration - request.timestamp > PLAYLIST.maxLength * 60) {
     deleteRequest(request.name);
     botReply(`⛔ Your request is too long (${PLAYLIST.maxLength}m max)`, msgid, false);
     return;
-  }
+  } //request length check
 
   if (PLAYLIST.maxSize !== "" && requests.size > PLAYLIST.maxSize) {
     if (playlist_open) {
@@ -1683,22 +1704,28 @@ async function getRequestInfo(request, msgid) {
     deleteRequest(request.name);
     botReply(`⛔ The playlist's size limit was reached (${PLAYLIST.maxSize})`, msgid, false);
     return;
-  }
+  } //playlist size check
 
   if (PLAYLIST.minViewCount !== "" && request.views !== -1 && request.views < PLAYLIST.minViewCount) {
     deleteRequest(request.name);
     botReply(`⛔ Your request does not meet the minimum view count (${PLAYLIST.minViewCount.toLocaleString()})`, msgid, false);
     return;
-  }
+  } //view count check
 
   if (PLAYLIST.uniqueOnly && history.some((e) => e.name === request.name)) {
     deleteRequest(request.name);
     botReply(`⛔ Your request is not unique`, msgid, false);
     return;
-  }
+  } //unique check
 
-  if (request.duration !== -1) {
-    total_duration += request.duration;
+  if (request.timestamp > 0 && request.duration > 0 && request.timestamp > request.duration) {
+    deleteRequest(request.name);
+    botReply(`⛔ Your time stamp is longer than the actual video`, msgid, false);
+    return;
+  } //timestamp check
+
+  if (request.duration > 0) {
+    total_duration += request.duration - request.timestamp;
   }
   updatePlaylist(request);
   updateLength();
@@ -1748,7 +1775,7 @@ async function parseLink(link) {
       if (!clipID || !clipID[1]) {
         return null;
       }
-      return { type: "twitch clip", id: clipID[1], name: `twitch:clip:${clipID[1]}`, platform: "twitch" };
+      return { type: "twitch clip", id: clipID[1], name: `twitch:clip:${clipID[1]}`, platform: "twitch", timestamp: 0 };
     } //clips
 
     if (link.includes("/videos/")) {
@@ -1756,14 +1783,15 @@ async function parseLink(link) {
       if (!vodID || !parseInt(vodID[1])) {
         return null;
       }
-      return { type: "twitch vod", id: vodID[1], name: `twitch:vod:${vodID[1]}`, platform: "twitch" };
+      let timestamp = timeStringToSeconds(new URLSearchParams(new URL(link).search)?.get("t"));
+      return { type: "twitch vod", id: vodID[1], name: `twitch:vod:${vodID[1]}`, platform: "twitch", timestamp: timestamp };
     } //vods
 
     const username = link.match(/\/([a-zA-Z0-9_]{1,25})$/);
     if (!username) {
       return null;
     }
-    return { type: "twitch stream", id: username[1], name: `twitch:stream:${username[1]}`, platform: "twitch" };
+    return { type: "twitch stream", id: username[1], name: `twitch:stream:${username[1]}`, platform: "twitch", timestamp: 0 };
   } //twitch
 
   if (link.includes("youtube.com") || link.includes("youtu.be")) {
@@ -1772,22 +1800,28 @@ async function parseLink(link) {
     if (videoID[3]?.length != 11) {
       return null;
     }
-    return { type: link.includes("/shorts/") ? "youtube short" : "youtube", id: videoID[3], name: `youtube:${videoID[3]}`, platform: "youtube" };
+
+    let timestamp = parseInt(new URLSearchParams(new URL(link).search)?.get("t"), 10) || 0;
+    return { type: link.includes("/shorts/") ? "youtube short" : "youtube", id: videoID[3], name: `youtube:${videoID[3]}`, platform: "youtube", timestamp: timestamp };
   } //youtube
 
   if (link.toLowerCase().startsWith("youtube")) {
-    if (!link.toLowerCase().replace("youtube", "").trim()) {
+    link = link?.toLowerCase().replace("youtube", "").trim();
+    if (link?.includes("start=")) {
+      link = link.split("start=")[0];
+    }
+    if (!link) {
       return null;
     }
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/youtube/search?query=${encodeURIComponent(link.toLowerCase().replace("youtube", "").trim())}`);
+      let response = await fetch(`https://helper.donk.workers.dev/youtube/search?query=${encodeURIComponent(link.trim())}`);
       let result = await response.json();
       console.log(result);
       if (result?.items?.length == 0 || result?.items?.[0].id?.kind !== "youtube#video") {
         return null;
       }
 
-      return { type: "youtube", id: result.items[0].id.videoId, name: `youtube:${result.items[0].id.videoId}`, platform: "youtube" };
+      return { type: "youtube", id: result.items[0].id.videoId, name: `youtube:${result.items[0].id.videoId}`, platform: "youtube", timestamp: 0 };
     } catch (error) {
       return null;
     }
@@ -1799,15 +1833,20 @@ async function parseLink(link) {
     if (!videoID[1]) {
       return null;
     }
-    return { type: "vimeo", id: videoID[1], name: `vimeo:${videoID[1]}`, platform: "vimeo" };
+    let timestamp = parseInt(new URL(link)?.hash?.substring(1)?.match(/t=([0-9.]+)/)[1], 10) || 0;
+    return { type: "vimeo", id: videoID[1], name: `vimeo:${videoID[1]}`, platform: "vimeo", timestamp: timestamp };
   } //vimeo
 
   if (link.toLowerCase().startsWith("vimeo")) {
-    if (!link.toLowerCase().replace("vimeo", "").trim()) {
+    link = link?.toLowerCase().replace("vimeo", "").trim();
+    if (link?.includes("start=")) {
+      link = link.split("start=")[0];
+    }
+    if (!link) {
       return null;
     }
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/vimeo/search?query=${encodeURIComponent(link.toLowerCase().replace("vimeo", "").trim())}`);
+      let response = await fetch(`https://helper.donk.workers.dev/vimeo/search?query=${encodeURIComponent(link.trim())}`);
       let result = await response.json();
       console.log(result);
 
@@ -1823,7 +1862,7 @@ async function parseLink(link) {
         return null;
       }
 
-      return { type: "vimeo", id: result.data[0].uri.replace("/videos/", ""), name: `vimeo:${result.data[0].uri.replace("/videos/", "")}`, platform: "vimeo" };
+      return { type: "vimeo", id: result.data[0].uri.replace("/videos/", ""), name: `vimeo:${result.data[0].uri.replace("/videos/", "")}`, platform: "vimeo", timestamp: 0 };
     } catch (error) {
       return null;
     }
@@ -1836,22 +1875,27 @@ async function parseLink(link) {
     if (!id[2] || (id[1] !== "track" && id[1] !== "episode")) {
       return null;
     }
-    return { type: "spotify", id: id[2], name: `spotify:${id[2]}`, platform: "spotify" };
+    return { type: "spotify", id: id[2], name: `spotify:${id[2]}`, platform: "spotify", timestamp: 0 };
   } //spotify
 
   if (link.toLowerCase().startsWith("spotify")) {
-    if (!link.toLowerCase().replace("spotify", "").trim()) {
+    link = link?.toLowerCase().replace("spotify", "").trim();
+    if (link?.includes("start=")) {
+      link = link.split("start=")[0];
+    }
+    if (!link) {
       return null;
     }
+
     try {
-      let response = await fetch(`https://helper.donk.workers.dev/spotify/search?q=${encodeURIComponent(link.toLowerCase().replace("spotify", "").trim())}`);
+      let response = await fetch(`https://helper.donk.workers.dev/spotify/search?q=${encodeURIComponent(link.trim())}`);
       let result = await response.json();
       console.log(result);
       if (result.tracks.items.length == 0) {
         return null;
       }
 
-      return { type: "spotify", id: result.tracks.items[0].id, name: `spotify:${result.tracks.items[0].id}`, platform: "spotify" };
+      return { type: "spotify", id: result.tracks.items[0].id, name: `spotify:${result.tracks.items[0].id}`, platform: "spotify", timestamp: 0 };
     } catch (error) {
       return null;
     }
@@ -1863,7 +1907,7 @@ async function parseLink(link) {
     if (!id[2] || !id[1].includes("/video/")) {
       return null;
     }
-    return { type: "tiktok video", id: id[2], url: link.split("?")[0], name: `tiktok:${id[2]}`, platform: "tiktok" };
+    return { type: "tiktok video", id: id[2], url: link.split("?")[0], name: `tiktok:${id[2]}`, platform: "tiktok", timestamp: 0 };
   } //tiktok
 
   if (link.includes("streamable.com")) {
@@ -1871,20 +1915,31 @@ async function parseLink(link) {
     if (!match[1]) {
       return null;
     }
-    return { type: "streamable", id: match[1], name: `streamable:${match[1]}`, platform: "streamable" };
+    return { type: "streamable", id: match[1], name: `streamable:${match[1]}`, platform: "streamable", timestamp: 0 };
   } //streamable
 
   if (link.includes("i.supa.codes") || link.includes("gachi.gay") || link.includes("kappa.lol") || link.includes("femboy.beauty")) {
-    const match = link.match(/\/([0-9a-zA-Z_-]{5,})(?:[?/.].*)?$/);
+    const match = link.match(/\w\/(\w{5,})(?:[?/.].*)?$/);
     console.log(match);
     if (!match[1]) {
       return null;
     }
-    return { type: "supa", id: match[1], name: `supa:${match[1]}`, platform: "supa" };
+    return { type: "supa", id: match[1], name: `supa:${match[1]}`, platform: "supa", timestamp: 0 };
   } //supa
 
   return null;
 } //parseLink
+
+async function updateClipMP4(id) {
+  try {
+    let response = await fetch(`https://helper.donk.workers.dev/twitch/clipsxd?id=${id}`);
+    let result = await response.json();
+    return `${result?.extra?.clip?.videoQualities[0]?.sourceURL}${result?.extra?.clipKey}` || null;
+  } catch (error) {
+    console.log("updateClipMP4 error", error);
+    return null;
+  }
+} //updateClipMP4
 
 function linkTypeAllowed(type) {
   if (type == "twitch clip" && !PLAYLIST.allowTwitchClips) {
@@ -1959,15 +2014,15 @@ async function addLink() {
   if (!checkLogin()) {
     return;
   }
-  let request = elements.link.value?.replace(/\s+/g, "");
+  let input = elements.link.value?.split(" ").filter(Boolean);
+  let request = input[0];
   let search = false;
-  if (elements.link.value.toLowerCase().startsWith("youtube") || elements.link.value.toLowerCase().startsWith("spotify") || elements.link.value.toLowerCase().startsWith("vimeo")) {
-    request = elements.link.value.trim();
+  if (input[0].toLowerCase() == "youtube" || input[0].toLowerCase() == "spotify" || input[0].toLowerCase() == "vimeo") {
+    request = input.join(" ");
     search = true;
   }
-  let link = await parseLink(request);
 
-  console.log(link);
+  let link = await parseLink(request);
   if (!link) {
     showToast("Could not parse your request", "warning", 3000);
     elements.link.value = "";
@@ -1977,6 +2032,9 @@ async function addLink() {
     showToast(`${link.type} links are not enabled`, "warning", 3000);
     elements.link.value = "";
     return;
+  }
+  if (input[input.length - 1]?.toLowerCase().startsWith("start=")) {
+    link.timestamp = timeToSeconds(input[input.length - 1].split("=")[1]);
   }
   addRequest(
     {
@@ -2085,20 +2143,20 @@ function nextItem(reply) {
   saveSettings();
 } //nextItem
 
-function playItem(item) {
+async function playItem(item) {
   switch (item.type) {
     case "youtube":
     case "youtube short":
       elements.youtubeEmbedContainer.style.display = "";
-      youtubePlayer.loadVideoById(item.id);
+      youtubePlayer.loadVideoById(item.id, item.timestamp);
       break;
     case "vimeo":
       elements.vimeoEmbedContainer.style.display = "";
-      playVimeoVideo(item.id);
+      playVimeoVideo(item.id, item.timestamp);
       break;
     case "spotify":
       elements.spotifyEmbedContainer.style.display = "";
-      spotifyPlay(item.uri);
+      spotifyPlay(item.uri, item.timestamp);
       break;
     case "twitch stream":
       elements.twitchEmbed.style.display = "";
@@ -2106,6 +2164,7 @@ function playItem(item) {
       break;
     case "twitch vod":
       elements.twitchEmbed.style.display = "";
+      seekTwitchPlayer = true;
       twitchPlayer.setVideo(item.id);
       break;
     case "twitch clip":
@@ -2113,8 +2172,14 @@ function playItem(item) {
         elements.videoEmbed.style.display = "";
         elements.videoEmbed.src = item.mp4;
       } else {
-        elements.twitchClipsEmbed.style.display = "";
-        elements.twitchClipsEmbed.innerHTML = `<iframe src="https://clips.twitch.tv/embed?clip=${item.id}&parent=${window.location.hostname}&autoplay=true&muted=false" preload="auto" height="100%" width="100%"></iframe>`;
+        let newMP4 = await updateClipMP4(item.id);
+        if (newMP4) {
+          elements.videoEmbed.style.display = "";
+          elements.videoEmbed.src = newMP4;
+        } else {
+          elements.twitchClipsEmbed.style.display = "";
+          elements.twitchClipsEmbed.innerHTML = `<iframe src="https://clips.twitch.tv/embed?clip=${item.id}&parent=${window.location.hostname}&autoplay=true&muted=false" preload="auto" height="100%" width="100%"></iframe>`;
+        }
       }
       break;
     case "tiktok video":
@@ -2134,7 +2199,7 @@ function playItem(item) {
   }
 
   if (currentItem.duration !== -1) {
-    total_duration -= currentItem.duration;
+    total_duration -= currentItem.duration - currentItem.timestamp;
   }
 
   elements.nowPlaying.innerHTML = `
@@ -2895,7 +2960,7 @@ window.onSpotifyIframeApiReady = (IFrameAPI) => {
   spotifyIFrameAPI.createController(elements.spotifyEmbed, {}, callback);
 }; //onSpotifyIframeApiReady
 
-function spotifyPlay(uri) {
+function spotifyPlay(uri, timestamp) {
   const callback = (EmbedController) => {
     spotifyPlayer = EmbedController;
     EmbedController.addListener("playback_update", (event) => {
@@ -2906,11 +2971,12 @@ function spotifyPlay(uri) {
   };
   spotifyIFrameAPI.createController(document.getElementById("spotifyEmbed"), {}, callback);
 
-  spotifyPlayer.loadUri(uri, true);
+  spotifyPlayer.loadUri(uri, true, timestamp);
   spotifyPlayer.play();
 } //spotifyPlay
 
 let twitchPlayer;
+let seekTwitchPlayer = true;
 function enableTwitchEmbed() {
   //twitchPlayer.setChannel("")
   //twitchPlayer.setVideo("")
@@ -2928,16 +2994,20 @@ function enableTwitchEmbed() {
   twitchPlayer = new Twitch.Player("twitchEmbed", options);
 
   twitchPlayer.addEventListener(Twitch.Player.ENDED, twitchPlayerEnded);
-  twitchPlayer.addEventListener(Twitch.Player.PAUSE, twitchPlayerPaused);
+  twitchPlayer.addEventListener(Twitch.Player.PLAYING, twitchPlayerPlaying);
 
   function twitchPlayerEnded(event) {
     if (PLAYLIST.autoplay) {
       nextItem();
     }
   }
-  function twitchPlayerPaused(event) {
-    console.log(event);
-  }
+
+  function twitchPlayerPlaying(event) {
+    if (seekTwitchPlayer) {
+      twitchPlayer.seek(currentItem.timestamp);
+      seekTwitchPlayer = false;
+    }
+  } //twitchPlayerReady
 } //enableTwitchEmbed
 
 function videoEmbedEventListeners() {
@@ -2945,6 +3015,9 @@ function videoEmbedEventListeners() {
     if (PLAYLIST.autoplay) {
       nextItem();
     }
+  });
+  elements.videoEmbed.addEventListener("loadstart", (event) => {
+    elements.videoEmbed.currentTime = currentItem.timestamp;
   });
 } //videoEmbedEventListeners
 
@@ -2959,15 +3032,16 @@ function tiktokEmbedEventListeners() {
     if (event.data.type == "onPlayerReady") {
       //donk embed is muted by default so unmute when it loads
       document.getElementById("tiktokIframe").contentWindow.postMessage({ type: "unMute", "x-tiktok-player": true }, "*");
+      document.getElementById("tiktokIframe").contentWindow.postMessage({ type: "seekTo", value: currentItem.timestamp, "x-tiktok-player": true }, "*");
     }
   });
 } //tiktokEmbedEventListeners
 
 let vimeoPlayer;
-function playVimeoVideo(id) {
+function playVimeoVideo(id, timestamp) {
   //check if embed was created
   if (!vimeoPlayer) {
-    vimeoPlayer = new Vimeo.Player(elements.vimeoEmbed, { id: id, responsive: true, speed: true, autoplay: true });
+    vimeoPlayer = new Vimeo.Player(elements.vimeoEmbed, { id: id, responsive: true, speed: true, autoplay: true, start_time: timestamp });
     vimeoPlayer.on("ended", (event) => {
       if (PLAYLIST.autoplay) {
         nextItem();
@@ -2975,5 +3049,9 @@ function playVimeoVideo(id) {
     });
   } else {
     vimeoPlayer.loadVideo(id);
+    setTimeout(() => {
+      //scuffed embed doesnt seek for some reason :) forsen build
+      vimeoPlayer.setCurrentTime(timestamp);
+    }, 1000);
   }
 } //playVimeoVideo
