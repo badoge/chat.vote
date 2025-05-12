@@ -439,6 +439,7 @@ async function load_localStorage() {
         dankUpdateModal.show();
       }
       updateLength();
+      rebuildUsersArray();
     }
   } catch (error) {
     console.log(error);
@@ -492,6 +493,33 @@ async function load_localStorage() {
     console.log(error);
   }
 } //load_localStorage
+
+/**
+ * @description recreates the users array from the requests saved in idb so that limits can be tracked across sessions
+ */
+function rebuildUsersArray() {
+  for (const [key, value] of requests.entries()) {
+    for (let index = 0; index < value.by.length; index++) {
+      const i = users.findIndex((e) => e.id === value.by[index].id);
+      if (i > -1) {
+        users[i].requests.push(key);
+      } else {
+        users.push({
+          id: value.by[index].id,
+          username: value.by[index].username,
+          displayName: value.by[index].displayName,
+          mod: value.by[index].mod,
+          sub: value.by[index].subscriber,
+          vip: value.by[index].vip,
+          firstTimeChatter: value.by[index].firstTimeChatter,
+          badges: value.by[index].badges,
+          color: value.by[index].color,
+          requests: [key],
+        });
+      }
+    }
+  }
+} //rebuildUsersArray
 
 function resetSettings(logout = false) {
   if (logout) {
@@ -818,8 +846,6 @@ function getUser(context) {
       sub: context?.subscriber || false,
       vip: context?.vip || false,
       firstTimeChatter: firstTimeChatters.includes(context.username),
-      requestsCount: 0,
-      requestsDuration: 0,
       badges: addBadges(context.badges, context["user-id"], firstTimeChatters.includes(context.username)),
       color: context.color || "#FFFFFF",
       requests: [],
@@ -925,7 +951,7 @@ function addRequest(context, link, msgid, search) {
   }
 
   //if limit is -1 then the user is allowed to make unlimited requests
-  if (limit !== -1 && users[userIndex].requestsCount >= limit) {
+  if (limit !== -1 && users[userIndex].requests.length >= limit) {
     botReply("⚠ You used up all your requests", context.id, false);
     return;
   }
@@ -936,7 +962,6 @@ function addRequest(context, link, msgid, search) {
     return;
   }
 
-  users[userIndex].requestsCount++;
   users[userIndex].requests.push(link.name);
 
   //check if other users already requested this link id
@@ -980,7 +1005,6 @@ function deleteRequest(id, refund = true) {
     for (let index = 0; index < request.by.length; index++) {
       const userIndex = users.findIndex((u) => u.username === request.by[index].username);
       if (userIndex != -1) {
-        users[userIndex].requestsCount--;
         users[userIndex].requests.splice(
           users[userIndex].requests.findIndex(function (r) {
             return r.value === id;
