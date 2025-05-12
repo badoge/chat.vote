@@ -75,7 +75,7 @@ video {
 #profileLink {
   border-color: #d3c22e;
   cursor: text;
-  width: 15vw;
+  max-width: 13vw;
 }
 
 #copyLinkButton:hover {
@@ -89,12 +89,12 @@ video {
 }
 
 #playlist {
-  height: calc(100vh - 290px);
+  height: calc(100vh - 250px);
 }
 
 #mainList,
 #approvalList {
-  height: calc(100vh - 350px);
+  height: calc(100vh - 310px);
   overflow-x: hidden;
   overflow-y: auto;
   text-align: start;
@@ -103,7 +103,7 @@ video {
 }
 
 #historyList {
-  height: calc(100vh - 400px);
+  height: calc(100vh - 355px);
   overflow-x: hidden;
   overflow-y: auto;
   text-align: start;
@@ -172,6 +172,23 @@ video {
   line-clamp: 1;
   overflow: hidden;
   word-break: break-all;
+}
+
+.now-playing-info {
+  max-width: 120px;
+  display: inline-block;
+  word-break: break-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.now-playing-info > i {
+  vertical-align: middle;
+}
+
+#nowPlayingInfo {
+  line-height: 12px;
 }
 
 .deletebtn {

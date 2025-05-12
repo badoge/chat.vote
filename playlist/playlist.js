@@ -113,6 +113,8 @@ let elements = {
   copyLinkButton: document.getElementById("copyLinkButton"),
   nowPlaying: document.getElementById("nowPlaying"),
   nowPlayingRequester: document.getElementById("nowPlayingRequester"),
+  nowPlayingInfo: document.getElementById("nowPlayingInfo"),
+  nowPlayingBanButtons: document.getElementById("nowPlayingBanButtons"),
   playlistLength: document.getElementById("playlistLength"),
   togglePlaylist: document.getElementById("togglePlaylist"),
   autoplay: document.getElementById("autoplay"),
@@ -977,6 +979,7 @@ function addRequest(context, link, msgid, search) {
       name: link.name,
       msgid: msgid,
       type: link.type,
+      platform: link.platform,
       approved: PLAYLIST.approvalQueue ? false : true,
       title: "",
       channel: "",
@@ -1020,8 +1023,17 @@ function deleteRequest(id, refund = true) {
   saveSettings();
 } //deleteRequest
 
-function banUser(requestName) {
-  let request = requests.get(requestName);
+function banUser(requestName, bannedFromHistory) {
+  let request;
+  if (bannedFromHistory) {
+    const i = history.findIndex((e) => e.name === requestName);
+    if (i > -1) {
+      request = history[i];
+    }
+  } else {
+    request = requests.get(requestName);
+  }
+
   if (!request) {
     showToast("Could not ban user", "danger", 2000);
     return;
@@ -1032,6 +1044,9 @@ function banUser(requestName) {
     //check if user is already banned before adding them to the list
     if (!bannedUsers.get(request.by[index].id)) {
       bannedUsers.set(request.by[index].id, request.by[index].username);
+      showToast(`${request.by[index].username} is now banned`, "success", 2000);
+    } else {
+      showToast(`${request.by[index].username} is already banned`, "warning", 2000);
     }
   }
 
@@ -1040,22 +1055,32 @@ function banUser(requestName) {
     bannedItems.set(requestName, request);
   }
 
-  //remove all other requests sent by this user except for the one that was clicked
-  for (const [key, value] of requests.entries()) {
-    if (key == requestName) {
-      continue;
-    }
+  if (bannedFromHistory) {
+    //save the ban list if the history buttons were used bcz it gets saved in deleteRequest()
+    saveSettings();
+    loadBanLists();
+  } else {
+    deleteRequest(requestName, false);
+  }
 
+  //remove all other requests sent by this user
+  for (const [key, value] of requests.entries()) {
     if (value.by[0].id == request.by[0].id) {
       deleteRequest(key, false);
     }
   }
-
-  deleteRequest(requestName, false);
 } //banUser
 
-function banItem(requestName) {
-  let request = requests.get(requestName);
+function banItem(requestName, bannedFromHistory) {
+  let request;
+  if (bannedFromHistory) {
+    const i = history.findIndex((e) => e.name === requestName);
+    if (i > -1) {
+      request = history[i];
+    }
+  } else {
+    request = requests.get(requestName);
+  }
   if (!request) {
     showToast("Could not ban video/song", "danger", 2000);
     return;
@@ -1064,29 +1089,74 @@ function banItem(requestName) {
   //check if item is already banned before adding it to the list
   if (!bannedItems.get(requestName)) {
     bannedItems.set(requestName, request);
+    showToast(`${request.platform == "spotify" ? "Song" : "Video"} is now banned`, "success", 2000);
+  } else {
+    showToast(`${request.platform == "spotify" ? "Song" : "Video"} is already banned`, "warning", 2000);
   }
 
-  deleteRequest(requestName, false);
+  if (bannedFromHistory) {
+    //save the ban list if the history buttons were used bcz it gets saved in deleteRequest()
+    saveSettings();
+    loadBanLists();
+  } else {
+    deleteRequest(requestName, false);
+  }
 } //banItem
 
-function banChannel(requestName) {
-  let request = requests.get(requestName);
-  if (!request) {
-    showToast("Could not ban channel/artist", "danger", 2000);
-    return;
-  }
-  //check if request has a channel listed
-  if (!request.channel) {
-    showToast("Item has no channel/artist", "danger", 2000);
-    return;
+function banChannel(requestName, bannedFromHistory) {
+  let channelid;
+  if (bannedFromHistory) {
+    const i = history.findIndex((e) => e.name === requestName);
+    if (i > -1) {
+      //check if request has a channel listed
+      if (!history[i].channelid) {
+        showToast("Item has no channel/artist", "danger", 2000);
+        return;
+      }
+      channelid = history[i].channelid;
+      //check if channel is already banned before adding it to the list
+      if (!bannedChannels.get(`${history[i].platform}:${history[i].channelid}`)) {
+        bannedChannels.set(`${history[i].platform}:${history[i].channelid}`, history[i]);
+      } else {
+        showToast(`${history[i].channel} is already banned`, "warning", 2000);
+        return;
+      }
+    } else {
+      showToast("Could not ban channel/artist", "danger", 2000);
+      return;
+    }
+    showToast(`${history[i].channel} is now banned`, "success", 2000);
+    saveSettings();
+    loadBanLists();
+  } else {
+    let request = requests.get(requestName);
+    if (!request) {
+      showToast("Could not ban channel/artist", "danger", 2000);
+      return;
+    }
+    //check if request has a channel listed
+    if (!request.channelid) {
+      showToast("Item has no channel/artist", "danger", 2000);
+      return;
+    }
+    channelid = request.channelid;
+    //check if channel is already banned before adding it to the list
+    if (!bannedChannels.get(`${request.platform}:${request.channelid}`)) {
+      bannedChannels.set(`${request.platform}:${request.channelid}`, request);
+    } else {
+      showToast(`${request.channel} is already banned`, "warning", 2000);
+      return;
+    }
+    showToast(`${request.channel} is now banned`, "success", 2000);
+    deleteRequest(requestName, false);
   }
 
-  //check if channel is already banned before adding it to the list
-  if (!bannedChannels.get(`${request.platform}:${request.channel}`)) {
-    bannedChannels.set(`${request.platform}:${request.channel}`, request);
+  //remove all other requests from the banned channel
+  for (const [key, value] of requests.entries()) {
+    if (value.channelid == channelid) {
+      deleteRequest(key, false);
+    }
   }
-
-  deleteRequest(requestName, false);
 } //banChannel
 
 function unbanUser(userid) {
@@ -1126,19 +1196,19 @@ function unbanAllUsers() {
   bannedUsers = new Map();
   saveSettings();
   loadBanLists();
-} //unbanUser
+} //unbanAllUsers
 
 function unbanAllItems() {
   bannedItems = new Map();
   saveSettings();
   loadBanLists();
-} //unbanItem
+} //unbanAllItems
 
 function unbanAllChannels() {
   bannedChannels = new Map();
   saveSettings();
   loadBanLists();
-} //unbanChannel
+} //unbanAllChannels
 
 function loadBanLists() {
   elements.bannedUsersList.innerHTML = "";
@@ -1177,7 +1247,7 @@ function loadBanLists() {
       "afterbegin",
       `
       <li class="list-group-item">
-      ${value.channel} <i class="material-icons notranslate deletebtn float-end" onclick="unbanChannel('${value.platform}:${value.channel}')" title="Unban">highlight_off</i>
+      ${value.channel} <i class="material-icons notranslate deletebtn float-end" onclick="unbanChannel('${value.platform}:${value.channelid}')" title="Unban">highlight_off</i>
       </li>`
     );
   }
@@ -1197,6 +1267,8 @@ function clearPlaylist() {
   elements.placeholder.style.display = "";
   elements.nowPlaying.innerHTML = `<span class="text-body-secondary">Nothing :)</span>`;
   elements.nowPlayingRequester.innerHTML = `<span class="text-body-secondary">No one :)</span>`;
+  elements.nowPlayingInfo.innerHTML = ``;
+  elements.nowPlayingBanButtons.innerHTML = ``;
   updateLength();
   saveSettings();
 } //clearPlaylist
@@ -1222,7 +1294,7 @@ function updateLength() {
   elements.playlistLength.innerHTML = `${secondsToTimeString(Math.round(duration)) || "00:00"} (${count} ${count == 1 ? "item" : "items"})`;
 } //updateLength
 
-function addToPlaylist(request, position = "beforeend") {
+function makeBanButtons(request, historyButton) {
   let banChannelButton = "";
   let banItemText = "";
 
@@ -1244,10 +1316,20 @@ function addToPlaylist(request, position = "beforeend") {
       </li>`;
       break;
     case "spotify":
-      banChannelButton = `<li><a class="dropdown-item" onclick="banChannel('${request.name}')"><i class="material-icons notranslate">person_off</i> Ban Artist</a></li>`;
+      banChannelButton = `
+      <li>
+        <a class="dropdown-item" onclick="banChannel('${request.name}', ${historyButton})" title="All requests from this artist will be removed also">
+          <i class="material-icons notranslate">person_off</i> Ban Artist
+        </a>
+      </li>`;
       break;
     default:
-      banChannelButton = `<li><a class="dropdown-item" onclick="banChannel('${request.name}')"><i class="material-icons notranslate">tv_off</i> Ban Channel</a></li>`;
+      banChannelButton = `
+      <li>
+        <a class="dropdown-item" onclick="banChannel('${request.name}', ${historyButton})" title="All requests from this channel will be removed also">
+          <i class="material-icons notranslate">tv_off</i> Ban Channel
+        </a>
+      </li>`;
       break;
   }
 
@@ -1273,11 +1355,14 @@ function addToPlaylist(request, position = "beforeend") {
       break;
   }
 
-  let banButtons = `
-  <li><a id="id${request.name}_ban_user" class="dropdown-item" onclick="banUser('${request.name}')" title="Video/song will be banned also"><i class="material-icons notranslate">person_off</i> Ban User</a></li>
-  <li><a class="dropdown-item" onclick="banItem('${request.name}')">${banItemText}</a></li>
+  return `
+  <li><a id="id${request.name}_ban_user" class="dropdown-item" onclick="banUser('${request.name}', ${historyButton})" title="Video/song will be banned also"><i class="material-icons notranslate">person_off</i> Ban User</a></li>
+  <li><a class="dropdown-item" onclick="banItem('${request.name}', ${historyButton})">${banItemText}</a></li>
   ${banChannelButton}`;
+} //makeBanButtons
 
+function addToPlaylist(request, position = "beforeend") {
+  let banButtons = makeBanButtons(request, false);
   elements.mainList.insertAdjacentHTML(
     position,
     `<div class="container-fluid request-container p-0 mb-2" id="id${request.name}">
@@ -1335,9 +1420,11 @@ function addToHistory(request, localStorageLoad = false) {
   if (request.timestamp > 0) {
     timestamp = ` (@${secondsToTimeString(Math.round(request.timestamp))})`;
   }
+  let banButtons = makeBanButtons(request, true);
+
   elements.historyList.insertAdjacentHTML(
     localStorageLoad ? "beforeend" : "afterbegin",
-    `<div class="container-fluid request-container p-0 mb-1">
+    `<div class="container-fluid request-container p-0 mb-2">
         <div class="row g-1">
           <div class="col-auto thumbnail-div">
             <div class="request-thumbnail">
@@ -1372,6 +1459,14 @@ function addToHistory(request, localStorageLoad = false) {
               ${request.by.length > 1 ? `and ${request.by.length - 1} other ${request.by.length - 1 == 1 ? "user" : "users"}` : ""}
               </small>
             </div>
+          </div>
+          <div class="col-auto d-flex flex-column justify-content-between">     
+            <div class="btn-group">
+              <i class="material-icons notranslate icon-button" data-bs-toggle="dropdown" aria-expanded="false">more_vert</i>
+                <ul class="dropdown-menu dropdown-menu-end cursor-pointer" style="user-select: none;">
+                  ${banButtons}
+                </ul>
+              </div>
           </div>
         </div>
       </div>`
@@ -1450,7 +1545,7 @@ async function getRequestInfo(request, msgid) {
       console.log(result);
       request.title = result.data.data[0].title || "(untitled)";
       request.channel = result.data.data[0].broadcaster_name || "(unknown)";
-      request.userid = result.data.data[0].broadcaster_id;
+      request.channelid = result.data.data[0].broadcaster_id;
       request.thumbnail = result.data.data[0].thumbnail_url;
       request.duration = result.data.data[0].duration;
       request.views = result.data.data[0].view_count;
@@ -1470,7 +1565,7 @@ async function getRequestInfo(request, msgid) {
       console.log(result);
       request.title = result.data[0].title || "(untitled)";
       request.channel = result.data[0].user_login || "(unknown)";
-      request.userid = result.data[0].user_id;
+      request.channelid = result.data[0].user_id;
       request.thumbnail = result.data[0].thumbnail_url.replace("%{width}", "320").replace("%{height}", "180");
       request.duration = convertTwitchVODDuration(result.data[0].duration);
       request.views = result.data[0].view_count;
@@ -1489,7 +1584,7 @@ async function getRequestInfo(request, msgid) {
       console.log(result);
       request.title = result.data[0].title || "(untitled)";
       request.channel = result.data[0].user_name || "(unknown)";
-      request.userid = result.data[0].user_id;
+      request.channelid = result.data[0].user_id;
       request.thumbnail = result.data[0].thumbnail_url.replace("{width}", "320").replace("{height}", "180");
       request.duration = -1;
     } catch (error) {
@@ -1512,7 +1607,8 @@ async function getRequestInfo(request, msgid) {
       }
 
       request.title = result.tracks[0].name || "(untitled)";
-      request.channel = result.tracks[0].artists[0].name || "(unknown)";
+      request.channel = result.tracks[0]?.artists[0]?.name || "(unknown)";
+      request.channelid = result.tracks[0].artists[0].id;
       request.thumbnail = result.tracks[0].album.images[0].url;
       request.duration = result.tracks[0].duration_ms / 1000;
       request.uri = result.tracks[0].uri;
@@ -1529,9 +1625,10 @@ async function getRequestInfo(request, msgid) {
       let response = await fetch(`https://www.tiktok.com/oembed?url=${encodeURIComponent(request.url)}`);
       let result = await response.json();
       console.log(result);
-      request.title = result.title || "(untitled)";
-      request.channel = result.author_unique_id || "(unknown)";
-      request.thumbnail = result.thumbnail_url;
+      request.title = result?.title || "(untitled)";
+      request.channel = result?.author_name || "(unknown)";
+      request.channelid = result?.author_unique_id;
+      request.thumbnail = result?.thumbnail_url;
       request.duration = 0;
     } catch (error) {
       deleteRequest(request.name);
@@ -1546,6 +1643,13 @@ async function getRequestInfo(request, msgid) {
       let response = await fetch(`https://helper.donk.workers.dev/youtube/videos?id=${request.id}`);
       let result = await response.json();
       console.log(result);
+
+      request.title = result.items[0].snippet.title || "(untitled)";
+      request.channel = result.items[0].snippet.channelTitle || "(unknown)";
+      request.channelid = result.items[0].snippet.channelId;
+      request.thumbnail = result.items[0].snippet.thumbnails.medium.url;
+      request.duration = ISO8601ToSeconds(result.items[0].contentDetails.duration);
+      request.views = result.items[0].statistics.viewCount;
 
       if (result.items[0].contentDetails?.contentRating?.ytRating == "ytAgeRestricted" || !result.items[0].status?.embeddable) {
         deleteRequest(request.name);
@@ -1563,12 +1667,6 @@ async function getRequestInfo(request, msgid) {
           return;
         }
       }
-
-      request.title = result.items[0].snippet.title || "(untitled)";
-      request.channel = result.items[0].snippet.channelTitle || "(unknown)";
-      request.thumbnail = result.items[0].snippet.thumbnails.medium.url;
-      request.duration = ISO8601ToSeconds(result.items[0].contentDetails.duration);
-      request.views = result.items[0].statistics.viewCount;
     } catch (error) {
       deleteRequest(request.name);
       botReply("⛔ Could not find this video's info", msgid, false);
@@ -1624,6 +1722,7 @@ async function getRequestInfo(request, msgid) {
 
       request.title = result.name || "(untitled)";
       request.channel = result.user.name || "(unknown)";
+      request.channelid = result.user.uri;
       request.thumbnail = result.pictures?.sizes?.[1]?.link;
       request.duration = result.duration;
       request.views = result?.stats?.plays || null;
@@ -1642,6 +1741,7 @@ async function getRequestInfo(request, msgid) {
       console.log(result);
       request.title = result.title || "(untitled)";
       request.channel = "(unknown)";
+      request.channelid = null;
       request.thumbnail = result.thumbnail_url;
       request.duration = result.files.mp4.duration;
       request.video = result.files.mp4.url;
@@ -1660,6 +1760,7 @@ async function getRequestInfo(request, msgid) {
       console.log(result);
       request.title = result?.name?.split(".")[0] || "(untitled)";
       request.channel = "(unknown)";
+      request.channelid = null;
       if (await checkImage(`https://i.supa.codes/t/${request.id}`)) {
         request.thumbnail = `https://i.supa.codes/t/${request.id}`;
       } else {
@@ -1696,7 +1797,7 @@ async function getRequestInfo(request, msgid) {
     }
   } //supa
 
-  if (bannedChannels.get(request?.channel)) {
+  if (bannedChannels.get(`${request?.platform}:${request?.channelid}`)) {
     deleteRequest(request.name);
     botReply(`🚫 This ${request.type == "spotify" ? "artist" : "channel"} is banned`, msgid, false);
     return;
@@ -2099,6 +2200,8 @@ function previousItem(reply) {
     elements.placeholder.style.display = "";
     elements.nowPlaying.innerHTML = `<span class="text-body-secondary">Nothing :)</span>`;
     elements.nowPlayingRequester.innerHTML = `<span class="text-body-secondary">No one :)</span>`;
+    elements.nowPlayingInfo.innerHTML = ``;
+    elements.nowPlayingBanButtons.innerHTML = ``;
     return;
   }
 
@@ -2158,6 +2261,8 @@ function nextItem(reply) {
     elements.placeholder.style.display = "";
     elements.nowPlaying.innerHTML = `<span class="text-body-secondary">Nothing :)</span>`;
     elements.nowPlayingRequester.innerHTML = `<span class="text-body-secondary">No one :)</span>`;
+    elements.nowPlayingInfo.innerHTML = ``;
+    elements.nowPlayingBanButtons.innerHTML = ``;
     return;
   }
   console.log(currentItem);
@@ -2227,24 +2332,42 @@ async function playItem(item) {
 
   elements.nowPlaying.innerHTML = `
   <a 
-  class="link-body-emphasis link-underline-opacity-0"
-  href="${getItemLink(currentItem)}"
-  target="_blank"
-  rel="noopener noreferrer">
-  ${escapeString(currentItem.title)}
+    class="link-body-emphasis link-underline-opacity-0"
+    href="${getItemLink(currentItem)}"
+    target="_blank"
+    rel="noopener noreferrer">
+      ${escapeString(currentItem.title)}
   </a>`;
   elements.nowPlaying.title = currentItem.title;
+
   elements.nowPlayingRequester.innerHTML = `
   ${currentItem.by[0].badges}
   <a 
-  class="link-body-emphasis link-underline-opacity-0"
-  href="https://www.twitch.tv/popout/${USER.channel}/viewercard/${currentItem.by[0].username}"
-  target="_blank"
-  rel="noopener noreferrer">
-  <span style="color: ${currentItem.by[0].color}">${currentItem.by[0].username}</span>
+    class="link-body-emphasis link-underline-opacity-0"
+    href="https://www.twitch.tv/popout/${USER.channel}/viewercard/${currentItem.by[0].username}"
+    target="_blank"
+    rel="noopener noreferrer">
+      <span style="color: ${currentItem.by[0].color}">${currentItem.by[0].username}</span>
   </a>
   ${currentItem.by.length > 1 ? `and ${currentItem.by.length - 1} other ${currentItem.by.length - 1 == 1 ? "user" : "users"}` : ""}`;
   elements.nowPlayingRequester.title = currentItem.by.map((u) => u.username).join(" & ");
+
+  elements.nowPlayingInfo.innerHTML = `
+  <small class="now-playing-info" title="${currentItem.channel}">
+    <i class="material-icons notranslate">${currentItem.platform == "spotify" ? "music_note" : "live_tv"}</i> ${escapeString(currentItem.channel)}
+  </small>
+  <br />
+  <small class="now-playing-info">
+    ${currentItem.views > -1 ? `<i class="material-icons notranslate">visibility</i> ${formatViewCount(currentItem.views)} ${currentItem.views == 1 ? "view" : "views"}` : ""}
+  </small>`;
+
+  elements.nowPlayingBanButtons.innerHTML = `
+    <div class="btn-group dropup">
+      <i class="material-icons notranslate icon-button" data-bs-toggle="dropdown" aria-expanded="false">more_vert</i>
+      <ul class="dropdown-menu dropdown-menu-end cursor-pointer" style="user-select: none;">
+        ${makeBanButtons(currentItem, true)}
+      </ul>
+    </div>`;
   playlist_playing = true;
   updateMetadata();
 } //playItem
@@ -2470,7 +2593,7 @@ async function loadAndConnect() {
   }
   if (USER.channel) {
     connect();
-    elements.profileLink.value = `https://playlist.chat.vote/${USER.channel || ""}`;
+    elements.profileLink.value = `playlist.chat.vote/${USER.channel || ""}`;
   }
 } //loadAndConnect
 
@@ -3040,7 +3163,7 @@ function videoEmbedEventListeners() {
     }
   });
   elements.videoEmbed.addEventListener("loadstart", (event) => {
-    elements.videoEmbed.currentTime = currentItem.timestamp;
+    elements.videoEmbed.currentTime = currentItem?.timestamp || 0;
   });
 } //videoEmbedEventListeners
 

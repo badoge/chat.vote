@@ -436,7 +436,7 @@
             <small class="form-text text-body-secondary">How many videos/songs are allowed to be in the playlist</small>
 
             <div class="input-group mt-3">
-              <span class="input-group-text"><i class="material-icons notranslate">person</i>Minimum view count</span>
+              <span class="input-group-text"><i class="material-icons notranslate">visibility</i>Minimum view count</span>
               <input type="number" aria-label="Minimum view count" id="minViewCount" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
             </div>
             <small class="form-text text-body-secondary"> Videos/songs that have a view count lower than the limit will be blocked </small>
@@ -1003,15 +1003,14 @@
 
         <div class="col-auto p-0 m-2" id="rightCol">
           <div class="card">
-            <div class="card-body p-2">
+            <div class="card-body p-1">
               <h4 class="m-0" id="commandHint">
                 Add songs or videos to the playlist using <kbd class="notranslate text-success cursor-pointer">!request [link]</kbd> or
                 <kbd class="notranslate text-success cursor-pointer">!r [link]</kbd>
               </h4>
-              <label for="link" class="form-label mt-3">Add songs or videos to the playlist:</label>
-              <div class="input-group">
+              <div class="input-group mt-3">
                 <input type="text" id="link" class="form-control" placeholder="Link" aria-label="Add link input text field" aria-describedby="addLink" />
-                <button class="btn btn-secondary" type="button" id="addLink" onclick="addLink()">Add</button>
+                <button class="btn btn-secondary" type="button" id="addLink" onclick="addLink()" title="Or just press enter :)">Add</button>
               </div>
             </div>
           </div>
@@ -1125,16 +1124,16 @@
 
             <div class="p-1">
               <div class="input-group">
-                <input disabled type="text" class="form-control" id="profileLink" onclick="copyLink()" value="https://playlist.chat.vote/username" />
+                <input disabled type="text" class="form-control" id="profileLink" value="playlist.chat.vote/username" />
                 <button
                   type="button"
                   id="copyLinkButton"
+                  onclick="copyLink()"
                   class="btn btn-outline-secondary"
                   data-bs-toggle="popover"
                   data-bs-trigger="manual"
                   data-bs-placement="top"
                   data-bs-content="Link copied :)"
-                  onclick="copyLink()"
                 >
                   <i class="material-icons notranslate">content_copy</i>
                 </button>
@@ -1143,19 +1142,22 @@
 
             <div class="vr"></div>
 
-            <div class="me-auto">
-              <div class="hstack gap-3">
-                <div class="p-0">
-                  <small class="bottomBarLabel">Now playing</small>
-                  <br />
-                  <span id="nowPlaying"><span class="text-body-secondary">Nothing :)</span></span>
-                </div>
-                <div class="p-0">
-                  <small class="bottomBarLabel">Requested by</small>
-                  <br />
-                  <span id="nowPlayingRequester"><span class="text-body-secondary">No one :)</span></span>
-                </div>
+            <div class="hstack gap-3 me-auto">
+              <div>
+                <small class="bottomBarLabel">Now playing</small>
+                <br />
+                <span id="nowPlaying"><span class="text-body-secondary">Nothing :)</span></span>
               </div>
+
+              <div>
+                <small class="bottomBarLabel">Requested by</small>
+                <br />
+                <span id="nowPlayingRequester"><span class="text-body-secondary">No one :)</span></span>
+              </div>
+
+              <div id="nowPlayingInfo"></div>
+
+              <div id="nowPlayingBanButtons"></div>
             </div>
 
             <div class="vr"></div>
