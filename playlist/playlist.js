@@ -2629,6 +2629,14 @@ async function botReply(msg, id, followCooldown) {
   };
   try {
     let response = await fetch(`https://api.chat.vote/reply`, requestOptions);
+    if (response.status == 418) {
+      elements.enableBot.checked = false;
+      saveSettings();
+      let text = await response.text();
+      showToast(`Bot unable to send messages "${text}"... Disabling bot setting`, "danger", 4000);
+      console.log(`botReply response: 418 ${text}`);
+      return;
+    }
     console.log(`botReply response: ${response.status}`);
   } catch (error) {
     console.log("botReply error", error);

@@ -1094,6 +1094,15 @@ async function botSay(msg, joinMsg = false) {
   };
   try {
     let response = await fetch(`https://api.chat.vote/say`, requestOptions);
+    if (response.status == 418) {
+      elements.announceWinner.checked = false;
+      elements.confirmJoin.checked = false;
+      saveSettings();
+      let text = await response.text();
+      showToast(`Bot unable to send messages "${text}"... Disabling bot settings`, "danger", 4000);
+      console.log(`botSay response: 418 ${text}`);
+      return;
+    }
     console.log(`botSay response: ${response.status}`);
   } catch (error) {
     console.log("botSay error", error);
