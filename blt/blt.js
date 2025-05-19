@@ -2,12 +2,6 @@ let elements = {
   //modals
   loginExpiredModal: document.getElementById("loginExpiredModal"),
 
-  deleteBracketModal: document.getElementById("deleteBracketModal"),
-  deleteBracketModalBody: document.getElementById("deleteBracketModalBody"),
-  deleteBracketButton: document.getElementById("deleteBracketButton"),
-  deleteTriviaModal: document.getElementById("deleteTriviaModal"),
-  deleteTriviaModalBody: document.getElementById("deleteTriviaModalBody"),
-  deleteTriviaButton: document.getElementById("deleteTriviaButton"),
   tierlistEditorModal: document.getElementById("tierlistEditorModal"),
   tierlistEditor: document.getElementById("tierlistEditor"),
 
@@ -248,18 +242,7 @@ let darkTheme = true;
 
 let client;
 let loginButton;
-let loginExpiredModal,
-  deleteBracketModal,
-  deleteTriviaModal,
-  tierlistEditorModal,
-  previewModal,
-  generateChatModal,
-  generateModal,
-  communityModal,
-  startModal,
-  startTriviaModal,
-  publishedModal,
-  importModal;
+let loginExpiredModal, tierlistEditorModal, previewModal, generateChatModal, generateModal, communityModal, startModal, startTriviaModal, publishedModal, importModal;
 let votePopover, votePopoverTierlist;
 let currentBracket = {};
 let currentTierlist = {};
@@ -2606,18 +2589,26 @@ function editTrivia(id) {
 
 function deleteBracket(id) {
   id = parseInt(id, 10);
-  let bracket = BRACKETS.brackets.find((x) => x.id === id);
-  elements.deleteBracketModalBody.innerText = `Delete "${bracket.title}"?`;
-  elements.deleteBracketButton.dataset.bracketId = id;
-  deleteBracketModal.show();
+  BRACKETS.brackets.splice(
+    BRACKETS.brackets.findIndex((e) => e.id === id),
+    1
+  );
+  loadBrackets();
+  saveSettings();
+  elements.bracketEditor.style.display = "none";
+  enableTooltips();
 } //deleteBracket
 
 function deleteTrivia(id) {
   id = parseInt(id, 10);
-  let trivia = TRIVIA.trivia.find((x) => x.id === id);
-  elements.deleteTriviaModalBody.innerText = `Delete "${trivia.title}"?`;
-  elements.deleteTriviaButton.dataset.triviaId = id;
-  deleteTriviaModal.show();
+  TRIVIA.trivia.splice(
+    TRIVIA.trivia.findIndex((e) => e.id === id),
+    1
+  );
+  loadTrivia();
+  saveSettings();
+  elements.triviaEditor.style.display = "none";
+  enableTooltips();
 } //deleteTrivia
 
 function loadBrackets() {
@@ -2651,7 +2642,9 @@ function loadBrackets() {
         <i class="material-icons notranslate">edit</i>
         </button>
         <button type="button" class="btn btn-danger"
-         data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Delete bracket" onclick="deleteBracket(${BRACKETS.brackets[index].id})">
+         data-bs-toggle="popover" data-bs-trigger="focus" data-bs-placement="top" data-bs-title="Delete bracket?"
+         data-bs-content='<button type="button" class="btn btn-danger" onclick="deleteBracket(${BRACKETS.brackets[index].id})">
+         <i class="material-icons notranslate">delete_forever</i>Delete "${escapeString(BRACKETS.brackets[index].title)}"</button>'>
           <i class="material-icons notranslate">delete_forever</i>
         </button>
       </div>
@@ -2664,6 +2657,7 @@ function loadBrackets() {
   }
   elements.myBrackets.innerHTML = html;
   enableTooltips();
+  enablePopovers(true);
 } //loadBrackets
 
 function loadTrivia() {
@@ -2696,7 +2690,9 @@ function loadTrivia() {
         <i class="material-icons notranslate">edit</i>
         </button>
         <button type="button" class="btn btn-danger"
-         data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Delete trivia" onclick="deleteTrivia(${TRIVIA.trivia[index].id})">
+         data-bs-toggle="popover" data-bs-trigger="focus" data-bs-placement="top" data-bs-title="Delete trivia?"
+         data-bs-content='<button type="button" class="btn btn-danger" onclick="deleteTrivia(${TRIVIA.trivia[index].id})">
+         <i class="material-icons notranslate">delete_forever</i>Delete "${escapeString(TRIVIA.trivia[index].title)}"</button>'>
           <i class="material-icons notranslate">delete_forever</i>
         </button>
       </div>
@@ -2709,6 +2705,7 @@ function loadTrivia() {
   }
   elements.myTrivia.innerHTML = html;
   enableTooltips();
+  enablePopovers(true);
 } //loadTrivia
 
 function closeBracketEditor() {
@@ -3657,8 +3654,6 @@ window.onload = async function () {
   votePopoverTierlist = new bootstrap.Popover(elements.enableVotingTierlist);
 
   loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
-  deleteBracketModal = new bootstrap.Modal(elements.deleteBracketModal);
-  deleteTriviaModal = new bootstrap.Modal(elements.deleteTriviaModal);
   tierlistEditorModal = new bootstrap.Modal(elements.tierlistEditorModal);
   previewModal = new bootstrap.Modal(elements.previewModal);
   generateChatModal = new bootstrap.Modal(elements.generateChatModal);
@@ -3668,6 +3663,16 @@ window.onload = async function () {
   startTriviaModal = new bootstrap.Modal(elements.startTriviaModal);
   publishedModal = new bootstrap.Modal(elements.publishedModal);
   importModal = new bootstrap.Modal(elements.importModal);
+
+  let quitPopovers = document.querySelectorAll(".quit-button");
+  for (let index = 0; index < quitPopovers.length; index++) {
+    console.log(quitPopovers[index]);
+    clearPlaylistPopover = new bootstrap.Popover(quitPopovers[index], {
+      trigger: "focus",
+      html: true,
+      sanitize: false,
+    });
+  }
 
   elements.tierlistEditorModal.addEventListener("show.bs.modal", (event) => {
     loadTierlistEditor();
@@ -3798,32 +3803,6 @@ window.onload = async function () {
   elements.addTriviaQuestion.addEventListener("click", function () {
     addTriviaQuestion();
     saveTrivia(true);
-  });
-
-  elements.deleteBracketButton.addEventListener("click", function () {
-    let id = parseInt(this.dataset.bracketId, 10);
-    BRACKETS.brackets.splice(
-      BRACKETS.brackets.findIndex((e) => e.id === id),
-      1
-    );
-    loadBrackets();
-    saveSettings();
-    elements.bracketEditor.style.display = "none";
-    deleteBracketModal.hide();
-    enableTooltips();
-  });
-
-  elements.deleteTriviaButton.addEventListener("click", function () {
-    let id = parseInt(this.dataset.triviaId, 10);
-    TRIVIA.trivia.splice(
-      TRIVIA.trivia.findIndex((e) => e.id === id),
-      1
-    );
-    loadTrivia();
-    saveSettings();
-    elements.triviaEditor.style.display = "none";
-    deleteTriviaModal.hide();
-    enableTooltips();
   });
 
   dragElement();

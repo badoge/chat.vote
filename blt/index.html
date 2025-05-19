@@ -66,54 +66,6 @@
       </div>
     </div>
 
-    <div class="modal fade" id="deleteBracketModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Are you sure?</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body" id="deleteBracketModalBody"></div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-danger" id="deleteBracketButton"><i class="material-icons notranslate">delete_forever</i>Delete bracket</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal fade" id="deleteTriviaModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Are you sure?</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body" id="deleteTriviaModalBody"></div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-danger" id="deleteTriviaButton"><i class="material-icons notranslate">delete_forever</i>Delete trivia</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal fade" id="quitModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Are you sure?</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">Results will be lost if you quit</div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="quit()">Quit</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div class="modal fade" id="tierlistEditorModal" tabindex="-1" data-bs-backdrop="false" aria-hidden="true">
       <div class="modal-dialog modal-lg float-end border border-warning rounded-3" style="margin-top: 100px; margin-right: 300px">
         <div class="modal-content">
@@ -982,7 +934,13 @@
 
       <div class="row fixed-bottom text-center mb-2">
         <div class="col">
-          <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#quitModal">
+          <button
+            type="button"
+            class="btn btn-danger quit-button"
+            data-bs-toggle="popover"
+            data-bs-title="Are you sure?"
+            data-bs-content='Results will be lost if you quit<br> <button type="button" class="btn btn-danger float-end my-3" onclick="quit()"><i class="material-icons notranslate">delete_forever</i>Quit</button>'
+          >
             <i class="material-icons notranslate">close</i>
           </button>
           <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#changeBracketSettingsModal">
@@ -1086,7 +1044,13 @@
               <i class="material-icons notranslate">settings</i>
             </button>
             <br />
-            <button type="button" class="btn btn-danger mb-3" data-bs-toggle="modal" data-bs-target="#quitModal">
+            <button
+              type="button"
+              class="btn btn-danger quit-button mb-3"
+              data-bs-toggle="popover"
+              data-bs-title="Are you sure?"
+              data-bs-content='Results will be lost if you quit<br> <button type="button" class="btn btn-danger float-end my-3" onclick="quit()"><i class="material-icons notranslate">delete_forever</i>Quit</button>'
+            >
               <i class="material-icons notranslate">close</i>
             </button>
             <br />
@@ -1184,7 +1148,13 @@
 
       <div class="row fixed-bottom text-center mb-2">
         <div class="col">
-          <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#quitModal">
+          <button
+            type="button"
+            class="btn btn-danger quit-button"
+            data-bs-toggle="popover"
+            data-bs-title="Are you sure?"
+            data-bs-content='Results will be lost if you quit<br> <button type="button" class="btn btn-danger float-end my-3" onclick="quit()"><i class="material-icons notranslate">delete_forever</i>Quit</button>'
+          >
             <i class="material-icons notranslate">close</i>
           </button>
           <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#startTriviaModal">

@@ -706,9 +706,15 @@ function enableTooltips() {
   );
 } //enableTooltips
 
-function enablePopovers() {
+function enablePopovers(html = false) {
   const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
-  const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl));
+  if (html) {
+    {
+      const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl, { trigger: "focus", html: true, sanitize: false }));
+    }
+  } else {
+    const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl));
+  }
 } //enablePopovers
 
 async function checkToken(access_token) {
