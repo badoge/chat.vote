@@ -626,6 +626,12 @@ window.onload = function () {
   enableTooltips();
   enablePopovers();
 
+  let deleteAllButtonPopover = new bootstrap.Popover("#deleteAllButton", {
+    trigger: "focus",
+    html: true,
+    sanitize: false,
+  });
+
   elements.pollTitle.addEventListener("keydown", function (event) {
     if (event.key === "Tab") {
       event.preventDefault();

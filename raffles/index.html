@@ -33,24 +33,6 @@
   <body>
     <noscript><div class="alert alert-danger" role="alert">WARNING! JavaScript is disabled. This site will not work properly without it.</div></noscript>
 
-    <div class="modal fade" id="resetSettingsModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Are you sure?</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <p>All settings will be reset and the page will reload</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="resetSettings()">Reset</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div class="modal fade" id="loginExpiredModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -783,7 +765,14 @@
 
             <div class="input-group mb-0">
               <span class="input-group-text redborder"><i class="material-icons notranslate">restore</i>Restore default settings</span>
-              <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#resetSettingsModal">
+              <button
+                id="resetSettingsPopover"
+                class="btn btn-outline-danger"
+                type="button"
+                data-bs-toggle="popover"
+                data-bs-title="Are you sure?"
+                data-bs-content='All settings will be reset and the page will reload<br><button type="button" class="btn btn-danger float-end my-3" onclick="resetSettings()"><i class="material-icons notranslate">delete_forever</i>Reset settings</button>'
+              >
                 <i class="material-icons notranslate">delete_forever</i>Reset settings
               </button>
             </div>

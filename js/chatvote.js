@@ -1,9 +1,7 @@
 let elements = {
   //modals
-  deleteAllModal: document.getElementById("deleteAllModal"),
   randomOptionModal: document.getElementById("randomOptionModal"),
   randomOptionWinner: document.getElementById("randomOptionWinner"),
-  resetSettingsModal: document.getElementById("resetSettingsModal"),
   timeOverModal: document.getElementById("timeOverModal"),
   timeOverWinner: document.getElementById("timeOverWinner"),
   yesnoTimeOverModal: document.getElementById("yesnoTimeOverModal"),
@@ -44,7 +42,6 @@ let elements = {
 
   //hotbar - quick actions
   restartPoll: document.getElementById("restartPoll"),
-  deleteAll: document.getElementById("deleteAll"),
   hideScore: document.getElementById("hideScore"),
   hideScoreIcon: document.getElementById("hideScoreIcon"),
   pickRandom: document.getElementById("pickRandom"),
@@ -140,7 +137,7 @@ let timer;
 let currentTime = 0;
 let votePopover, suggestPopover;
 let loginButton;
-let deleteAllModal, randomOptionModal, resetSettingsModal, timeOverModal, yesnoTimeOverModal, loginExpiredModal, tieModal, randomYesnoModal;
+let randomOptionModal, timeOverModal, yesnoTimeOverModal, loginExpiredModal, tieModal, randomYesnoModal;
 let enableVotingDropdown, enableSuggestionsDropdown;
 let tableTab, chartTab, yesnoTab, overlayTab;
 let settingsOffcanvas;
@@ -321,6 +318,12 @@ function resetSettings(logout = false) {
 } //resetSettings
 
 function resetPoll() {
+  if (yesNoMode) {
+    restartPoll();
+    showToast("YEA/NAY mode options can't be removed", "warning", 2000);
+    return;
+  }
+
   vote_results = [];
   voters = [];
   voters_options = [];
@@ -1993,6 +1996,8 @@ window.onload = function () {
   elements.pollOption.focus();
   elements.pollOption.select();
   loadAndConnect();
+  enableTooltips();
+  enablePopovers();
   settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
   votePopover = new bootstrap.Popover(elements.enableVoting);
   suggestPopover = new bootstrap.Popover(elements.enableSuggestions);
@@ -2001,9 +2006,20 @@ window.onload = function () {
     loginButton = new bootstrap.Popover(elements.loginButton);
   }
 
-  deleteAllModal = new bootstrap.Modal(elements.deleteAllModal);
+  let resetSettingsPopover = new bootstrap.Popover("#resetSettingsPopover", {
+    trigger: "focus",
+    html: true,
+    sanitize: false,
+    container: ".offcanvas-body",
+  });
+
+  let deleteAllPopover = new bootstrap.Popover("#deleteAll", {
+    trigger: "focus",
+    html: true,
+    sanitize: false,
+  });
+
   randomOptionModal = new bootstrap.Modal(elements.randomOptionModal);
-  resetSettingsModal = new bootstrap.Modal(elements.resetSettingsModal);
   timeOverModal = new bootstrap.Modal(elements.timeOverModal);
   yesnoTimeOverModal = new bootstrap.Modal(elements.yesnoTimeOverModal);
   loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
@@ -2043,9 +2059,6 @@ window.onload = function () {
       stopYesNo();
     }
   });
-
-  enableTooltips();
-  enablePopovers();
 
   elements.questionLabel.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
@@ -2200,13 +2213,6 @@ window.onload = function () {
     if (!streamerColor && USER.userID) {
       streamerColor = await getStreamerColor(USER.userID);
     }
-  });
-  elements.deleteAll.addEventListener("click", function () {
-    if (yesNoMode) {
-      restartPoll();
-      return;
-    }
-    deleteAllModal.show();
   });
 
   elements.restartYesno.addEventListener("click", function () {

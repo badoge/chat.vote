@@ -1,6 +1,5 @@
 let elements = {
   //modals
-  resetSettingsModal: document.getElementById("resetSettingsModal"),
   loginExpiredModal: document.getElementById("loginExpiredModal"),
   restartRaffleModal: document.getElementById("restartRaffleModal"),
   fancyRaffleModal: document.getElementById("fancyRaffleModal"),
@@ -108,7 +107,7 @@ let timer_raffle;
 let currentTime = 0;
 let rafflePopover;
 let loginButton;
-let resetSettingsModal, loginExpiredModal, restartRaffleModal, fancyRaffleModal;
+let loginExpiredModal, restartRaffleModal, fancyRaffleModal;
 let currentRaffleWinner = "";
 let raffleWinners = [];
 let settingsOffcanvas;
@@ -1412,13 +1411,22 @@ window.onload = function () {
   switchTheme(elements.darkTheme.checked);
 
   loadAndConnect();
+  enableTooltips();
+  enablePopovers();
+
+  let resetSettingsPopover = new bootstrap.Popover("#resetSettingsPopover", {
+    trigger: "focus",
+    html: true,
+    sanitize: false,
+    container: ".offcanvas-body",
+  });
+
   rafflePopover = new bootstrap.Popover(elements.enableRaffle);
 
   if (!USER.channel) {
     loginButton = new bootstrap.Popover(elements.loginButton);
   }
 
-  resetSettingsModal = new bootstrap.Modal(elements.resetSettingsModal);
   loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
   restartRaffleModal = new bootstrap.Modal(elements.restartRaffleModal);
   fancyRaffleModal = new bootstrap.Modal(elements.fancyRaffleModal);
@@ -1428,9 +1436,6 @@ window.onload = function () {
   elements.settingsOffcanvas.addEventListener("hide.bs.offcanvas", function () {
     saveSettings();
   });
-
-  enableTooltips();
-  enablePopovers();
 
   elements.enableRaffle.addEventListener("click", function () {
     if (raffle_open) {

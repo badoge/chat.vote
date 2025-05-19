@@ -35,24 +35,6 @@
       <div class="alert alert-danger" role="alert">WARNING! JavaScript is disabled. This site will not work properly without it.</div>
     </noscript>
 
-    <div class="modal fade" id="deleteAllModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Are you sure?</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <p>All poll options will be deleted</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="reset()">Delete all</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div class="modal fade" data-bs-backdrop="static" id="pollModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -361,7 +343,14 @@
 
             <div class="float-end">
               <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove all options from the poll">
-                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAllModal">
+                <button
+                  id="deleteAllButton"
+                  type="button"
+                  class="btn btn-outline-danger"
+                  data-bs-toggle="popover"
+                  data-bs-title="Are you sure?"
+                  data-bs-content='All poll options will be deleted<br><button type="button" class="btn btn-danger float-end my-3" onclick="reset()"><i class="material-icons notranslate">delete_forever</i>Delete all</button>'
+                >
                   <i class="material-icons notranslate">delete_forever</i>All
                 </button>
               </span>
