@@ -111,6 +111,7 @@ let elements = {
 
   //overlay
   overlayLink: document.getElementById("overlayLink"),
+  connectOverlayButton: document.getElementById("connectOverlayButton"),
   generateOverlayButton: document.getElementById("generateOverlayButton"),
 };
 
@@ -277,6 +278,14 @@ function load_localStorage() {
     if (elements.sortChart.checked) {
       elements.sortChartLabel.setAttribute("data-bs-title", "Unsort chart");
     }
+  }
+
+  if (!localStorage.getItem("OVERLAY")) {
+    console.log("localStorage overlay not found");
+  } else {
+    overlayID = localStorage.getItem("OVERLAY");
+    elements.overlayLink.value = `https://chat.vote/overlay#${overlayID}`;
+    elements.connectOverlayButton.disabled = false;
   }
 } //load_localStorage
 
@@ -1821,7 +1830,9 @@ let overlayID;
 let peerConnection;
 let dataChannel;
 async function generateOverlay() {
-  document.getElementById("overlay").innerHTML = spinner;
+  elements.generateOverlayButton.innerHTML = `<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>`;
+  elements.connectOverlayButton.disabled = true;
+
   let requestOptions = {
     method: "POST",
     headers: {
@@ -1832,19 +1843,35 @@ async function generateOverlay() {
   try {
     let response = await fetch(`https://overlay.chat.vote/generate`, requestOptions);
     let result = await response.json();
+    console.log(result);
     showToast(result.message, "info", 3000);
     overlayID = result.data.id;
-    document.getElementById("overlay").innerHTML = `
-    https://chat.vote/overlay#${result.data.id}<br>
-    <button type="button" onclick="connectOverlay()" class="btn btn-success">Connect overlay</button>`;
-    console.log(result);
+    elements.overlayLink.value = `https://chat.vote/overlay#${result.data.id}`;
+    localStorage.setItem("OVERLAY", result.data.id);
+    elements.connectOverlayButton.disabled = false;
+    elements.generateOverlayButton.innerHTML = `<i class="material-icons notranslate">restart_alt</i>Generate new overlay link`;
   } catch (error) {
     console.log(error);
   }
 } //generateOverlay
 
+async function copyOverlayLink() {
+  let link = elements.overlayLink.value;
+  if (!link) {
+    showToast("Generate an overlay link first", "warning", 2000);
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(link);
+    showToast("Link copied :)", "success", 1000);
+  } catch (error) {
+    showToast("Could not copy link :(", "danger", 1000);
+  }
+} //copyOverlayLink
+
 async function connectOverlay() {
-  document.getElementById("overlay").innerHTML = spinner;
+  elements.connectOverlayButton.innerHTML = `<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>`;
+  elements.connectOverlayButton.disabled = true;
 
   let requestOptions = {
     headers: {
@@ -1887,8 +1914,11 @@ async function connectOverlay() {
 
       dataChannel.onopen = (event) => {
         console.log("datachannel open");
-        document.getElementById("overlay").style.display = "none";
-        document.getElementById("overlayControls").style.display = "";
+        showToast("Overlay connected", "success", 1000);
+        elements.connectOverlayButton.innerHTML = `<i class="material-icons notranslate">done</i>Overlay connected`;
+        elements.connectOverlayButton.disabled = true;
+        document.getElementById("overlayX").disabled = false;
+        document.getElementById("overlayY").disabled = false;
       };
 
       dataChannel.onmessage = (event) => {
@@ -2232,6 +2262,13 @@ window.onload = function () {
     tooltip.setContent({ ".tooltip-inner": scoreHidden ? "Hide score" : "Show score" });
     hideScore();
   });
+
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+
+  if (urlParams.get("overlay") === "true") {
+    document.getElementById("overlaytabli").style.display = "";
+  }
 }; //onload
 
 window.onbeforeunload = function () {

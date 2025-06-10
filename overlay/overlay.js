@@ -20,10 +20,22 @@ async function createOffer() {
     peerConnection.onconnectionstatechange = (event) => {
       console.log("onconnectionstatechange");
       console.log(event);
-      if (event.currentTarget.connectionState == "connecting") {
-        setTimeout(() => {
-          getAnswer();
-        }, 1000);
+
+      switch (event.currentTarget.connectionState) {
+        case "connecting":
+          setTimeout(() => {
+            getAnswer();
+          }, 1000);
+          break;
+
+        case "failed":
+          setTimeout(() => {
+            createOffer();
+          }, 1000);
+          break;
+
+        default:
+          break;
       }
     };
 
