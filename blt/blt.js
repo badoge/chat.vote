@@ -234,7 +234,6 @@ const icons = {
   twitch: `<i class="material-icons notranslate">movie_creation</i>`,
   spotify: `<i class="material-icons notranslate">audiotrack</i>`,
   streamable: `<i class="material-icons notranslate">play_arrow</i>`,
-  "supa video/audio": `<i class="material-icons notranslate">play_arrow</i>`,
 };
 const spotifyURLRegex = /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:(album|track|playlist|episode)\/|\?uri=spotify:track:)((\w|-){22})/;
 
@@ -764,7 +763,6 @@ function addBracketOption(name = "", type = "", value = "", thumbnail = "", vide
             <option value="twitch" ${optionType == "twitch" ? "selected" : ""}>Twitch clip</option>
             <option value="spotify" ${optionType == "spotify" ? "selected" : ""}>Spotify song</option>
             <option value="streamable" ${optionType == "streamable" ? "selected" : ""}>Streamable video</option>
-            <option value="supa video/audio" ${optionType == "supa video/audio" ? "selected" : ""}>supa video/audio file</option>
           </select>
         </div>
 
@@ -829,7 +827,6 @@ function addTriviaQuestion(multipleChoice = null, type = "", question = "", answ
             <option value="twitch" ${questionType == "twitch" ? "selected" : ""}>Twitch clip</option>
             <option value="spotify" ${questionType == "spotify" ? "selected" : ""}>Spotify song</option>
             <option value="streamable" ${questionType == "streamable" ? "selected" : ""}>Streamable video</option>
-            <option value="supa video/audio" ${questionType == "supa video/audio" ? "selected" : ""}>supa video/audio file</option>
           </select>
         </div>
 
@@ -1001,30 +998,6 @@ async function previewOption(id, button) {
     option.dataset.video = "";
   } //streamable
 
-  if (link?.type == "supa video/audio") {
-    link = await getRequestInfo(link);
-    name.value = link.title;
-    thumbnail.value = link.thumbnail;
-    type.value = link.type;
-    if (link.type == "image") {
-      elements.previewModalBody.innerHTML = `
-      <div class="card">
-      <div class="card-body">
-      <img src="https://i.supa.codes/${link.id}" alt="${name.value}" title="${name.value}" class="option-image">
-      </div>
-      </div>`;
-    } else {
-      elements.previewModalBody.innerHTML = `
-      <div class="card">
-      <div class="card-body">
-      <video src="https://i.supa.codes/${link.id}" controls autoplay height="480" width="100%"></video>
-      </div>
-      </div>`;
-    }
-
-    previewModal.show();
-  }
-
   button.innerHTML = `<i class="material-icons notranslate">preview</i>Preview`;
   saveBracket();
 } //previewOption
@@ -1138,28 +1111,6 @@ async function previewQuestion(id, button) {
     question.dataset.video = "";
   } //streamable
 
-  if (link?.type == "supa video/audio") {
-    link = await getRequestInfo(link);
-    questionType.value = link.type;
-    if (link.type == "image") {
-      elements.previewModalBody.innerHTML = `
-      <div class="card">
-      <div class="card-body">
-      <img src="https://i.supa.codes/${link.id}" alt="${question.value}" title="${question.value}" class="option-image">
-      </div>
-      </div>`;
-    } else {
-      elements.previewModalBody.innerHTML = `
-      <div class="card">
-      <div class="card-body">
-      <video src="https://i.supa.codes/${link.id}" controls autoplay height="480" width="100%"></video>
-      </div>
-      </div>`;
-    }
-
-    previewModal.show();
-  }
-
   button.innerHTML = `<i class="material-icons notranslate">preview</i>Preview`;
   saveTrivia();
 } //previewQuestion
@@ -1208,15 +1159,6 @@ function parseLink(link) {
     }
     return { type: "streamable", id: match[1] };
   } //streamable
-
-  if (link.includes("i.supa.codes") || link.includes("gachi.gay") || link.includes("kappa.lol") || link.includes("femboy.beauty")) {
-    const match = link.match(/\/([0-9a-zA-Z_-]{5,})(?:[?/.].*)?$/);
-    console.log(match);
-    if (!match[1]) {
-      return null;
-    }
-    return { type: "supa video/audio", id: match[1] };
-  } //supa
 
   return null;
 } //parseLink
@@ -1297,32 +1239,6 @@ async function getRequestInfo(link) {
     }
   }
 
-  if (link.type == "supa video/audio") {
-    try {
-      let response = await fetch(`https://helper.donk.workers.dev/supa/info?id=${link.id}`);
-      let result = await response.json();
-      console.log(result);
-      if (!result.type.startsWith("audio") && !result.type.startsWith("video") && !result.type.startsWith("image")) {
-        showToast("Link is not of a video or audio file", "warning", 3000);
-        return;
-      }
-      link.title = result?.name?.split(".")[0] || "(untitled)";
-      if (await checkImage(`https://i.supa.codes/t/${link.id}`)) {
-        link.thumbnail = `https://i.supa.codes/t/${link.id}`;
-      } else {
-        link.thumbnail = "https://chat.vote/pics/nothumbnail.png";
-      }
-      if (result.type.startsWith("image")) {
-        link.type = "image";
-      }
-      link.duration = result?.mediainfo?.duration || 0;
-    } catch (error) {
-      showToast("Could not get video info", "warning", 3000);
-      console.log("getRequestInfo supa error", error);
-      return;
-    }
-  } //supa
-
   return link;
 } //getRequestInfo
 
@@ -1391,7 +1307,6 @@ function saveBracket(edited = false) {
       case "youtube":
       case "twitch":
       case "spotify":
-      case "supa video/audio":
         bracket.options.push({
           value: optionValues[index].value,
           type: optionTypes[index].value,
@@ -1452,7 +1367,6 @@ function saveTrivia(edited = false) {
       case "youtube":
       case "twitch":
       case "spotify":
-      case "supa video/audio":
         trivia.questions.push({
           multipleChoice: choiceTypes[index].checked,
           type: questionTypes[index].value,
@@ -2070,11 +1984,6 @@ async function nextTierlistItem() {
     elements.videoEmbed_tierlist.src = video;
   } //streamable
 
-  if (item.type == "supa video/audio") {
-    elements.videoEmbed_tierlist.style.display = "";
-    elements.videoEmbed_tierlist.src = `https://i.supa.codes/${item.id}`;
-  } //supa
-
   resetScores();
   if (!elements.keepVotingEnabled.checked) {
     disableVoteButton();
@@ -2314,11 +2223,6 @@ async function showOption(position, option) {
     elements[`videoEmbed_${position}`].style.display = "";
     elements[`videoEmbed_${position}`].src = video;
   } //streamable
-
-  if (option.type == "supa video/audio") {
-    elements[`videoEmbed_${position}`].style.display = "";
-    elements[`videoEmbed_${position}`].src = `https://i.supa.codes/${option.id}`;
-  } //supa
 } //showOption
 
 async function showTriviaMedia(mediaLink) {
@@ -2376,11 +2280,6 @@ async function showTriviaMedia(mediaLink) {
     elements.videoEmbed_trivia.style.display = "";
     elements.videoEmbed_trivia.src = video;
   } //streamable
-
-  if (option.type == "supa video/audio") {
-    elements.videoEmbed_trivia.style.display = "";
-    elements.videoEmbed_trivia.src = `https://i.supa.codes/${option.id}`;
-  } //supa
 } //showTriviaMedia
 
 function updateScores() {
@@ -3303,10 +3202,6 @@ async function loadPlaylist() {
           type = "twitch";
         }
 
-        if (type == "supa video" || type == "supa audio") {
-          type = "supa video/audio";
-        }
-
         count++;
 
         let link = getItemLink(type, req.id);
@@ -3625,8 +3520,6 @@ function getItemLink(type, id) {
       return `https://clips.twitch.tv/${id}`;
     case "streamable":
       return `https://streamable.com/${id}`;
-    case "supa video/audio":
-      return `https://i.supa.codes/${id}`;
     default:
       return "";
   }

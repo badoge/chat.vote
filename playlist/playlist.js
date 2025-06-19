@@ -26,8 +26,6 @@ let elements = {
   settingsOffcanvas: document.getElementById("settingsOffcanvas"),
   allowSpotifySongs: document.getElementById("allowSpotifySongs"),
   allowStreamable: document.getElementById("allowStreamable"),
-  allowSupaVideo: document.getElementById("allowSupaVideo"),
-  allowSupaAudio: document.getElementById("allowSupaAudio"),
   allowTwitchClips: document.getElementById("allowTwitchClips"),
   allowTwitchStreams: document.getElementById("allowTwitchStreams"),
   allowTwitchVODs: document.getElementById("allowTwitchVODs"),
@@ -160,8 +158,6 @@ let PLAYLIST = {
   autoplay: true,
   allowSpotifySongs: true,
   allowStreamable: true,
-  allowSupaVideo: true,
-  allowSupaAudio: true,
   allowTwitchClips: true,
   allowTwitchStreams: true,
   allowTwitchVODs: true,
@@ -224,8 +220,6 @@ async function refreshData() {
   PLAYLIST.autoplay = elements.autoplay.checked;
   PLAYLIST.allowSpotifySongs = elements.allowSpotifySongs.checked;
   PLAYLIST.allowStreamable = elements.allowStreamable.checked;
-  PLAYLIST.allowSupaVideo = elements.allowSupaVideo.checked;
-  PLAYLIST.allowSupaAudio = elements.allowSupaAudio.checked;
   PLAYLIST.allowTwitchClips = elements.allowTwitchClips.checked;
   PLAYLIST.allowTwitchStreams = elements.allowTwitchStreams.checked;
   PLAYLIST.allowTwitchVODs = elements.allowTwitchVODs.checked;
@@ -332,8 +326,6 @@ async function load_localStorage() {
     elements.autoplay.checked = PLAYLIST.autoplay ?? true;
     elements.allowSpotifySongs.checked = PLAYLIST.allowSpotifySongs ?? true;
     elements.allowStreamable.checked = PLAYLIST.allowStreamable ?? true;
-    elements.allowSupaVideo.checked = PLAYLIST.allowSupaVideo ?? true;
-    elements.allowSupaAudio.checked = PLAYLIST.allowSupaAudio ?? true;
     elements.allowTwitchClips.checked = PLAYLIST.allowTwitchClips ?? true;
     elements.allowTwitchStreams.checked = PLAYLIST.allowTwitchStreams ?? true;
     elements.allowTwitchVODs.checked = PLAYLIST.allowTwitchVODs ?? true;
@@ -547,8 +539,6 @@ function resetSettings(logout = false) {
       autoplay: true,
       allowSpotifySongs: true,
       allowStreamable: true,
-      allowSupaVideo: true,
-      allowSupaAudio: true,
       allowTwitchClips: true,
       allowTwitchStreams: true,
       allowTwitchVODs: true,
@@ -932,9 +922,6 @@ function addRequest(context, link, msgid, search) {
       case "spotify":
         message = "🚫 This song is banned";
         break;
-      case "supa":
-        message = "🚫 This link is banned";
-        break;
       default:
         message = `🚫 This video is banned`;
         break;
@@ -1307,14 +1294,6 @@ function makeBanButtons(request, historyButton) {
         </span>
       </li>`;
       break;
-    case "supa":
-      banChannelButton = `
-      <li>
-        <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="supa links are uploaded anonymously so there is no channel to ban">
-          <a class="dropdown-item disabled" aria-disabled="true"><i class="material-icons notranslate">tv_off</i> Ban Channel</a>
-        </span>
-      </li>`;
-      break;
     case "spotify":
       banChannelButton = `
       <li>
@@ -1409,7 +1388,7 @@ function addToPlaylist(request, position = "beforeend") {
         </div>
       </div>`
   );
-  enableTooltips(); //enable the streamable/supa channel ban tooltip
+  enableTooltips(); //enable the streamable channel ban tooltip
 } //addToPlaylist
 
 function addToHistory(request, localStorageLoad = false) {
@@ -1753,50 +1732,6 @@ async function getRequestInfo(request, msgid) {
     }
   } //streamable
 
-  if (request.type == "supa") {
-    try {
-      let response = await fetch(`https://helper.donk.workers.dev/supa/info?id=${request.id}`);
-      let result = await response.json();
-      console.log(result);
-      request.title = result?.name?.split(".")[0] || "(untitled)";
-      request.channel = "(unknown)";
-      request.channelid = null;
-      if (await checkImage(`https://i.supa.codes/t/${request.id}`)) {
-        request.thumbnail = `https://i.supa.codes/t/${request.id}`;
-      } else {
-        request.thumbnail = "https://chat.vote/pics/nothumbnail.png";
-      }
-      request.duration = result?.mediainfo?.duration || 0;
-
-      //update type here bcz video and audio links are the same and checking file extension is not reliable
-      if (result.type.startsWith("video")) {
-        if (!PLAYLIST.allowSupaVideo) {
-          botReply(`🚫 supa video links are not enabled`, msgid, false);
-          deleteRequest(request.name);
-          return;
-        }
-      }
-      if (result.type.startsWith("audio")) {
-        if (!PLAYLIST.allowSupaVideo) {
-          botReply(`🚫 supa audio links are not enabled`, msgid, false);
-          deleteRequest(request.name);
-          return;
-        }
-      }
-
-      if (!result.type.startsWith("audio") && !result.type.startsWith("video")) {
-        deleteRequest(request.name);
-        botReply("🚫 Only video and audio files are allowed", msgid, false);
-        return;
-      }
-    } catch (error) {
-      deleteRequest(request.name);
-      botReply("⛔ Could not find this link's info", msgid, false);
-      console.log("getRequestInfo supa error", error);
-      return;
-    }
-  } //supa
-
   if (bannedChannels.get(`${request?.platform}:${request?.channelid}`)) {
     deleteRequest(request.name);
     botReply(`🚫 This ${request.type == "spotify" ? "artist" : "channel"} is banned`, msgid, false);
@@ -2043,14 +1978,6 @@ async function parseLink(link) {
     return { type: "streamable", id: match[1], name: `streamable:${match[1]}`, platform: "streamable", timestamp: 0 };
   } //streamable
 
-  if (link.includes("i.supa.codes") || link.includes("gachi.gay") || link.includes("kappa.lol") || link.includes("femboy.beauty")) {
-    const match = link.match(/\w\/([\w-]{5,})(?:[?/.#].*)?$/);
-    if (!match[1]) {
-      return null;
-    }
-    return { type: "supa", id: match[1], name: `supa:${match[1]}`, platform: "supa", timestamp: 0 };
-  } //supa
-
   return null;
 } //parseLink
 
@@ -2079,11 +2006,6 @@ function linkTypeAllowed(type) {
     return false;
   }
   if (type == "streamable" && !PLAYLIST.allowStreamable) {
-    return false;
-  }
-  if (type == "supa" && !PLAYLIST.allowSupaVideo && !PLAYLIST.allowSupaAudio) {
-    //supa links dont have a specific type so check if both are disabled to skip early
-    //video/audio will be checked in getRequestInfo()
     return false;
   }
   if (type == "tiktok video" && !PLAYLIST.allowTiktokVideos) {
@@ -2121,8 +2043,6 @@ function getItemLink(request) {
       return `https://clips.twitch.tv/${request.id}`;
     case "streamable":
       return `https://streamable.com/${request.id}`;
-    case "supa":
-      return `https://i.supa.codes/${request.id}`;
     default:
       return "";
   }
@@ -2317,10 +2237,6 @@ async function playItem(item) {
     case "streamable":
       elements.videoEmbed.style.display = "";
       elements.videoEmbed.src = item.video;
-      break;
-    case "supa":
-      elements.videoEmbed.style.display = "";
-      elements.videoEmbed.src = `https://i.supa.codes/${item.id}`;
       break;
     default:
       break;
@@ -2898,7 +2814,6 @@ function playPlaylist(reply) {
       document.getElementById("tiktokIframe").contentWindow.postMessage({ type: "play", "x-tiktok-player": true }, "*");
       break;
     case "streamable":
-    case "supa":
       elements.videoEmbed.play();
       break;
     default:
@@ -2945,7 +2860,6 @@ function pausePlaylist(reply) {
       document.getElementById("tiktokIframe").contentWindow.postMessage({ type: "pause", "x-tiktok-player": true }, "*");
       break;
     case "streamable":
-    case "supa":
       elements.videoEmbed.pause();
       break;
     default:
