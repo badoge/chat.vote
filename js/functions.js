@@ -342,6 +342,13 @@ async function getStreamerColor(channelId) {
 } //getStreamerColor
 
 async function sendUsername(site, channel, platform, stream = null) {
+  let lastLog = new Date(localStorage.getItem("logTime1"));
+  if (new Date() - lastLog > 24 * 60 * 60 * 1000) {
+    localStorage.setItem("logTime1", new Date().toISOString());
+  } else {
+    return;
+  }
+
   let body = JSON.stringify({ site: site, channel: channel, platform: platform, stream: stream });
   let requestOptions = {
     method: "POST",
@@ -361,6 +368,12 @@ async function sendUsername(site, channel, platform, stream = null) {
 
 async function sendData(site, channel, platform, data, stream = null) {
   if (!channel) {
+    return;
+  }
+  let lastLog = new Date(localStorage.getItem("logTime2"));
+  if (new Date() - lastLog > 24 * 60 * 60 * 1000) {
+    localStorage.setItem("logTime2", new Date().toISOString());
+  } else {
     return;
   }
   let body = JSON.stringify({
