@@ -318,7 +318,8 @@
               data-bs-toggle="popover"
               data-bs-title="Not signed in"
               data-bs-content="You need sign in first before adding options or enabling voting/suggestions"
-              ><span class="twitch-icon"></span>Sign in with Twitch
+            >
+              <span class="twitch-icon"></span>Sign in with Twitch
             </a>
             <div class="btn-group" role="group">
               <button
@@ -498,19 +499,18 @@
               | 7TV: <span id="seventvGlobalEmotes">0</span>/<span id="seventvChannelEmotes">0</span>
             </div>
 
-            <div class="input-group mb-0">
-              <span class="input-group-text redborder"><i class="material-icons notranslate">restore</i>Restore default settings</span>
-              <button
-                id="resetSettingsPopover"
-                class="btn btn-outline-danger"
-                type="button"
-                data-bs-toggle="popover"
-                data-bs-title="Are you sure?"
-                data-bs-content='All settings will be reset and the page will reload<br><button type="button" class="btn btn-danger float-end my-3" onclick="resetSettings()"><i class="material-icons notranslate">delete_forever</i>Reset settings</button>'
-              >
-                <i class="material-icons notranslate">delete_forever</i>Reset settings
-              </button>
-            </div>
+            <a
+              id="resetSettingsPopover"
+              tabindex="0"
+              class="btn btn-danger"
+              role="button"
+              data-bs-toggle="popover"
+              data-bs-trigger="focus"
+              data-bs-title="Are you sure?"
+              data-bs-content='All settings will be reset and the page will reload<br><button type="button" class="btn btn-danger float-end my-3" onclick="resetSettings()"><i class="material-icons notranslate">delete_forever</i>Reset settings</button>'
+              ><i class="material-icons notranslate">delete_forever</i>Reset all settings</a
+            >
+            <br />
             <small class="text-body-secondary">Resets all settings and reloads the page.</small>
           </div>
         </div>
@@ -967,7 +967,7 @@
                   <i class="material-icons notranslate">settings</i>Settings
                 </button>
 
-                <div class="btn-group float-end mt-2" role="group" aria-label="Restart, random option, hide score, and delete all buttons">
+                <div class="float-end mt-2" role="group" aria-label="Restart, random option, hide score, and delete all buttons">
                   <button
                     type="button"
                     class="btn btn-outline-warning quick-actions"
@@ -1002,16 +1002,22 @@
                   >
                     <i class="material-icons notranslate" id="hideScoreIcon">visibility</i>
                   </button>
-                  <button
-                    type="button"
-                    class="btn btn-outline-danger quick-actions"
-                    id="deleteAll"
-                    data-bs-toggle="popover"
-                    data-bs-title="Are you sure?"
-                    data-bs-content='All poll options will be deleted<br><button type="button" class="btn btn-danger float-end my-3" onclick="resetPoll()"><i class="material-icons notranslate">delete_forever</i>Delete all</button>'
-                  >
-                    <i class="material-icons notranslate">delete_forever</i>
-                  </button>
+                  <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove all options from the poll">
+                    <a
+                      id="deleteAll"
+                      tabindex="0"
+                      class="btn btn-outline-danger quick-actions"
+                      role="button"
+                      data-bs-toggle="popover"
+                      data-bs-placement="top"
+                      data-bs-trigger="focus"
+                      data-bs-title="Are you sure?"
+                      data-bs-content='All poll options will be deleted<br><button type="button" class="btn btn-danger float-end my-3" onclick="resetPoll()"><i class="material-icons notranslate">delete_forever</i>Delete all</button>'
+                      style="padding-top: 14px"
+                    >
+                      <i class="material-icons notranslate">delete_forever</i>
+                    </a>
+                  </span>
                 </div>
               </div>
             </div>

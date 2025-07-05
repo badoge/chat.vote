@@ -277,9 +277,11 @@
 
           <div id="underOptions">
             <div class="btn-group dropdown-center">
-              <button type="button" id="createpollbtn" class="btn btn-success btn-lg" onclick="createPoll()"><i class="material-icons notranslate">create</i>Create Poll</button>
+              <button type="button" id="createpollbtn" class="btn btn-success btn-lg" onclick="createPoll()">
+                <i class="material-icons notranslate" style="vertical-align: text-bottom">create</i>Create Poll
+              </button>
               <button type="button" class="btn btn-success btn-lg dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                <i class="material-icons notranslate">settings</i><span class="visually-hidden">Poll settings</span>
+                <i class="material-icons notranslate" style="vertical-align: text-bottom">settings</i><span class="visually-hidden">Poll settings</span>
               </button>
               <form class="container-fluid dropdown-menu p-4 bg-body-tertiary" style="width: 35vw">
                 <div class="row">
@@ -343,16 +345,19 @@
 
             <div class="float-end">
               <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove all options from the poll">
-                <button
+                <a
                   id="deleteAllButton"
-                  type="button"
+                  tabindex="0"
                   class="btn btn-outline-danger"
+                  role="button"
                   data-bs-toggle="popover"
+                  data-bs-placement="top"
+                  data-bs-trigger="focus"
                   data-bs-title="Are you sure?"
                   data-bs-content='All poll options will be deleted<br><button type="button" class="btn btn-danger float-end my-3" onclick="reset()"><i class="material-icons notranslate">delete_forever</i>Delete all</button>'
                 >
                   <i class="material-icons notranslate">delete_forever</i>All
-                </button>
+                </a>
               </span>
             </div>
           </div>

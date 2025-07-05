@@ -3559,8 +3559,7 @@ window.onload = async function () {
 
   let quitPopovers = document.querySelectorAll(".quit-button");
   for (let index = 0; index < quitPopovers.length; index++) {
-    console.log(quitPopovers[index]);
-    clearPlaylistPopover = new bootstrap.Popover(quitPopovers[index], {
+    let popover = new bootstrap.Popover(quitPopovers[index], {
       trigger: "focus",
       html: true,
       sanitize: false,

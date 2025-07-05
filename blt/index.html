@@ -934,15 +934,19 @@
 
       <div class="row fixed-bottom text-center mb-2">
         <div class="col">
-          <button
-            type="button"
+          <a
+            tabindex="0"
             class="btn btn-danger quit-button"
+            role="button"
             data-bs-toggle="popover"
+            data-bs-placement="top"
+            data-bs-trigger="focus"
             data-bs-title="Are you sure?"
             data-bs-content='Results will be lost if you quit<br> <button type="button" class="btn btn-danger float-end my-3" onclick="quit()"><i class="material-icons notranslate">delete_forever</i>Quit</button>'
           >
             <i class="material-icons notranslate">close</i>
-          </button>
+          </a>
+
           <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#changeBracketSettingsModal">
             <i class="material-icons notranslate">settings</i>
           </button>
@@ -1044,15 +1048,21 @@
               <i class="material-icons notranslate">settings</i>
             </button>
             <br />
-            <button
-              type="button"
-              class="btn btn-danger quit-button mb-3"
-              data-bs-toggle="popover"
-              data-bs-title="Are you sure?"
-              data-bs-content='Results will be lost if you quit<br> <button type="button" class="btn btn-danger float-end my-3" onclick="quit()"><i class="material-icons notranslate">delete_forever</i>Quit</button>'
-            >
-              <i class="material-icons notranslate">close</i>
-            </button>
+            <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Quit tier list">
+              <a
+                tabindex="0"
+                class="btn btn-danger quit-button mb-3"
+                role="button"
+                data-bs-toggle="popover"
+                data-bs-placement="top"
+                data-bs-trigger="focus"
+                data-bs-container="#tierlist"
+                data-bs-title="Are you sure?"
+                data-bs-content='Results will be lost if you quit<br> <button type="button" class="btn btn-danger float-end my-3" onclick="quit()"><i class="material-icons notranslate">delete_forever</i>Quit</button>'
+              >
+                <i class="material-icons notranslate">close</i>
+              </a>
+            </span>
             <br />
             <button type="button" id="pickWinnerTierlist" class="btn btn-info mb-3" onclick="pickWinnerTierlist()"><i class="material-icons notranslate">navigate_next</i>Next item</button>
           </div>
