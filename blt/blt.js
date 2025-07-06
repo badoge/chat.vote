@@ -49,12 +49,12 @@ let elements = {
   startModal: document.getElementById("startModal"),
   formatSelect: document.getElementById("formatSelect"),
   optionLimit: document.getElementById("optionLimit"),
-  bracketSettings: document.getElementById("bracketSettings"),
-  tierlistSettings: document.getElementById("tierlistSettings"),
+  bracketSettings: document.querySelectorAll(".bracketSettings"),
+  tierlistSettings: document.querySelectorAll(".tierlistSettings"),
   changeCommand: document.getElementById("changeCommand"),
   changeCommandCopy: document.getElementById("changeCommandCopy"),
-  highestTier: document.getElementById("highestTier"),
-  averageTier: document.getElementById("averageTier"),
+  averageScore: document.getElementById("averageScore"),
+  averageScoreCopy: document.getElementById("averageScoreCopy"),
   keepVotingEnabled: document.getElementById("keepVotingEnabled"),
   keepVotingEnabledCopy: document.getElementById("keepVotingEnabledCopy"),
   disableAnimations: document.getElementById("disableAnimations"),
@@ -1408,12 +1408,20 @@ function showStartModal(id) {
   let bracket = BRACKETS.brackets.find((x) => x.id === bracketid);
   if (bracket?.defaultFormat == "tierlist") {
     elements.formatSelect.value = "tierlist";
-    elements.bracketSettings.style.display = "none";
-    elements.tierlistSettings.style.display = "";
+    for (let e of document.querySelectorAll(".tierlistSettings")) {
+      e.style.display = "";
+    }
+    for (let e of elements.bracketSettings) {
+      e.style.display = "none";
+    }
   } else {
     elements.formatSelect.value = "single";
-    elements.bracketSettings.style.display = "";
-    elements.tierlistSettings.style.display = "none";
+    for (let e of document.querySelectorAll(".tierlistSettings")) {
+      e.style.display = "none";
+    }
+    for (let e of elements.bracketSettings) {
+      e.style.display = "";
+    }
   }
   if (bracket.options.length < 2) {
     showToast("Bracket must have 2 options at least", "warning", 3000);
@@ -2032,7 +2040,7 @@ function pickWinner(winner = null) {
 } //pickWinner
 
 function pickWinnerTierlist() {
-  if (elements.averageTier.checked) {
+  if (elements.averageScore.checked) {
     for (let index = 0; index < 6; index++) {
       if (elements[`tierlistScore${index}`].innerHTML.includes("⭐")) {
         placeTierlistItem(currentTierlistData[index]);
@@ -2303,13 +2311,13 @@ function updateScores() {
           max = i;
         }
       }
-      if (elements.averageTier.checked) {
+      if (elements.averageScore.checked) {
         let weights = 0;
         //first 5 scores only because idk score has no weight
         for (let i = 0; i < 5; i++) {
           weights += currentTierlistData[i].score * currentTierlistData[i].weight;
         }
-        let winner = Math.round(weights / (total - currentTierlistData[6].score));
+        let winner = Math.round(weights / (total - currentTierlistData[5].score));
         for (let i = 0; i < 6; i++) {
           elements[`tierlistScore${i}`].innerHTML = `${currentTierlistData[i].score} (${Math.round((currentTierlistData[i].score / total) * 100) || 0}%) ${
             currentTierlistData[i].weight == winner ? "⭐" : ""
@@ -2317,7 +2325,7 @@ function updateScores() {
         }
         //mark idk as winner if all other scores are 0
         if (isNaN(winner) && total) {
-          elements[`tierlistScore6`].innerHTML = `${currentTierlistData[6].score} (${Math.round((currentTierlistData[6].score / total) * 100) || 0}%) ⭐<br />`;
+          elements[`tierlistScore5`].innerHTML = `${currentTierlistData[5].score} (${Math.round((currentTierlistData[5].score / total) * 100) || 0}%) ⭐<br />`;
         }
       } else {
         for (let i = 0; i < 6; i++) {
@@ -3574,11 +3582,19 @@ window.onload = async function () {
 
   elements.formatSelect.onchange = function () {
     if (this.value == "tierlist") {
-      elements.bracketSettings.style.display = "none";
-      elements.tierlistSettings.style.display = "";
+      for (let e of document.querySelectorAll(".tierlistSettings")) {
+        e.style.display = "";
+      }
+      for (let e of elements.bracketSettings) {
+        e.style.display = "none";
+      }
     } else {
-      elements.bracketSettings.style.display = "";
-      elements.tierlistSettings.style.display = "none";
+      for (let e of elements.bracketSettings) {
+        e.style.display = "";
+      }
+      for (let e of document.querySelectorAll(".tierlistSettings")) {
+        e.style.display = "none";
+      }
     }
   };
 
@@ -3587,6 +3603,14 @@ window.onload = async function () {
   };
   elements.changeCommandCopy.onchange = function () {
     elements.changeCommand.checked = this.checked;
+  };
+
+  elements.averageScore.onchange = function () {
+    elements.averageScoreCopy.checked = this.checked;
+  };
+  elements.averageScoreCopy.onchange = function () {
+    elements.averageScore.checked = this.checked;
+    updateScores();
   };
 
   elements.keepVotingEnabled.onchange = function () {

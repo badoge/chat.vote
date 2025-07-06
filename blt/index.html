@@ -492,7 +492,7 @@
             </div>
             <small class="text-body-secondary mb-3">Will skip random options to reduce the bracket/tier list length</small>
 
-            <div id="bracketSettings">
+            <div class="bracketSettings">
               <div class="form-check form-switch mt-3">
                 <input class="form-check-input" type="checkbox" role="switch" id="changeCommand" />
                 <label class="form-check-label" for="changeCommand">Alternate voting command</label><br />
@@ -500,19 +500,15 @@
               </div>
             </div>
 
-            <div class="mt-3" id="tierlistSettings" style="display: none">
-              <label>Scoring</label><br />
-              <div class="btn-group" role="group" aria-label="Mode">
-                <input type="radio" class="btn-check" name="tierlistScoringSelect" value="highest" id="highestTier" autocomplete="off" checked />
-                <label class="btn btn-outline-primary" for="highestTier">Highest tier</label>
-                <input type="radio" class="btn-check" name="tierlistScoringSelect" value="average" id="averageTier" autocomplete="off" />
-                <label class="btn btn-outline-info" for="averageTier">Average tier</label>
+            <div class="tierlistSettings" style="display: none">
+              <div class="form-check form-switch mt-3">
+                <input class="form-check-input" type="checkbox" role="switch" id="averageScore" />
+                <label class="form-check-label" for="changeCommand">Use average score</label><br />
+                <small class="text-body-secondary">
+                  If this is unchecked then the item will be placed in the tier with the most votes. If this is checked and an item has 50 S votes and 10 F votes then it will be placed in
+                  the average tier which is A
+                </small>
               </div>
-              <br />
-              <small class="text-body-secondary">
-                If Highest tier is selected then the item will be placed in the tier with the most votes. If Average tier is selected and the item has 50 S votes and 10 F votes then it will
-                be placed in A tier
-              </small>
             </div>
 
             <div class="form-check form-switch mt-3">
@@ -612,18 +608,31 @@
       </div>
     </div>
 
-    <div class="modal fade" id="changeBracketSettingsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="changeSettingsModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Bracket settings</h5>
+            <h5 class="modal-title">Settings</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <div class="form-check form-switch mt-3">
-              <input class="form-check-input" type="checkbox" role="switch" id="changeCommandCopy" />
-              <label class="form-check-label" for="changeCommandCopy">Alternate voting command</label><br />
-              <small class="text-body-secondary"> Switches the voting command from 1/2 to a/b every other round to get around the Twitch 30s same message cooldown </small>
+            <div class="bracketSettings">
+              <div class="form-check form-switch mt-3">
+                <input class="form-check-input" type="checkbox" role="switch" id="changeCommandCopy" />
+                <label class="form-check-label" for="changeCommandCopy">Alternate voting command</label><br />
+                <small class="text-body-secondary"> Switches the voting command from 1/2 to a/b every other round to get around the Twitch 30s same message cooldown </small>
+              </div>
+            </div>
+
+            <div class="tierlistSettings" style="display: none">
+              <div class="form-check form-switch mt-3">
+                <input class="form-check-input" type="checkbox" role="switch" id="averageScoreCopy" />
+                <label class="form-check-label" for="averageScoreCopy">Use average score</label><br />
+                <small class="text-body-secondary">
+                  If this is unchecked then the item will be placed in the tier with the most votes. If this is checked and an item has 50 S votes and 10 F votes then it will be placed in
+                  the average tier which is A
+                </small>
+              </div>
             </div>
 
             <div class="form-check form-switch mt-3">
@@ -949,7 +958,7 @@
             </a>
           </span>
           <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Settings">
-            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#changeBracketSettingsModal">
+            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#changeSettingsModal">
               <i class="material-icons notranslate">settings</i>
             </button>
           </span>
@@ -1042,7 +1051,7 @@
               <i class="material-icons notranslate">refresh</i>
             </button>
 
-            <button type="button" style="display: none" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#tierlistEditorModal">
+            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#changeSettingsModal">
               <i class="material-icons notranslate">settings</i>
             </button>
 
