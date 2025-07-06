@@ -84,24 +84,6 @@
       </div>
     </div>
 
-    <div class="modal fade" id="resetSettingsModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Are you sure?</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <p>All settings will be reset and the page will reload</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="resetSettings()">Reset</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div class="modal fade" id="clearHistoryModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -750,11 +732,19 @@
           </div>
         </div>
 
-        <div class="input-group">
-          <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#resetSettingsModal">
-            <i class="material-icons notranslate">restart_alt</i>Reset settings
-          </button>
-        </div>
+        <a
+          id="resetSettingsPopover"
+          tabindex="0"
+          class="btn btn-danger"
+          role="button"
+          data-bs-toggle="popover"
+          data-bs-trigger="focus"
+          data-bs-title="Are you sure?"
+          data-bs-content='All settings will be reset and the page will reload<br><button type="button" class="btn btn-danger float-end my-3" onclick="resetSettings()"><i class="material-icons notranslate">delete_forever</i>Reset settings</button>'
+          ><i class="material-icons notranslate">delete_forever</i>Reset all settings</a
+        >
+        <br />
+        <small class="text-body-secondary">Resets all settings and reloads the page.</small>
       </div>
     </div>
 
@@ -1147,7 +1137,7 @@
               <a
                 id="clearPlaylistPopover"
                 tabindex="0"
-                class="btn btn-outline-warning"
+                class="btn btn-outline-warning html-popover"
                 role="button"
                 data-bs-toggle="popover"
                 data-bs-trigger="focus"

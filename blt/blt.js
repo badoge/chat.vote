@@ -2540,12 +2540,19 @@ function loadBrackets() {
          data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit bracket" onclick="editBracket(${BRACKETS.brackets[index].id})">
         <i class="material-icons notranslate">edit</i>
         </button>
-        <button type="button" class="btn btn-danger"
-         data-bs-toggle="popover" data-bs-trigger="focus" data-bs-placement="top" data-bs-title="Delete bracket?"
-         data-bs-content='<button type="button" class="btn btn-danger" onclick="deleteBracket(${BRACKETS.brackets[index].id})">
-         <i class="material-icons notranslate">delete_forever</i>Delete "${escapeString(BRACKETS.brackets[index].title)}"</button>'>
+        <a
+          tabindex="0"
+          class="btn btn btn-danger html-popover"
+          role="button"
+          data-bs-toggle="popover"
+          data-bs-trigger="focus"
+          data-bs-placement="top"
+          data-bs-title="Delete bracket?"
+          data-bs-content='<button type="button" class="btn btn-danger" onclick="deleteBracket(${BRACKETS.brackets[index].id})">
+                            <i class="material-icons notranslate">delete_forever</i>Delete "${escapeString(BRACKETS.brackets[index].title)}"</button>'
+        >
           <i class="material-icons notranslate">delete_forever</i>
-        </button>
+        </a>
       </div>
     </div>
     <div class="card-body my-bracket-body">
@@ -2556,7 +2563,7 @@ function loadBrackets() {
   }
   elements.myBrackets.innerHTML = html;
   enableTooltips();
-  enablePopovers(true);
+  enablePopovers();
 } //loadBrackets
 
 function loadTrivia() {
@@ -2588,12 +2595,19 @@ function loadTrivia() {
          data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit trivia" onclick="editTrivia(${TRIVIA.trivia[index].id})">
         <i class="material-icons notranslate">edit</i>
         </button>
-        <button type="button" class="btn btn-danger"
-         data-bs-toggle="popover" data-bs-trigger="focus" data-bs-placement="top" data-bs-title="Delete trivia?"
-         data-bs-content='<button type="button" class="btn btn-danger" onclick="deleteTrivia(${TRIVIA.trivia[index].id})">
-         <i class="material-icons notranslate">delete_forever</i>Delete "${escapeString(TRIVIA.trivia[index].title)}"</button>'>
+        <a
+          tabindex="0"
+          class="btn btn btn-danger html-popover"
+          role="button"
+          data-bs-toggle="popover"
+          data-bs-trigger="focus"
+          data-bs-placement="top"
+          data-bs-title="Delete trivia?"
+          data-bs-content='<button type="button" class="btn btn-danger" onclick="deleteTrivia(${TRIVIA.trivia[index].id})">
+                            <i class="material-icons notranslate">delete_forever</i>Delete "${escapeString(TRIVIA.trivia[index].title)}"</button>'
+        >
           <i class="material-icons notranslate">delete_forever</i>
-        </button>
+        </a>
       </div>
     </div>
     <div class="card-body my-trivia-body">
@@ -2604,7 +2618,7 @@ function loadTrivia() {
   }
   elements.myTrivia.innerHTML = html;
   enableTooltips();
-  enablePopovers(true);
+  enablePopovers();
 } //loadTrivia
 
 function closeBracketEditor() {
@@ -3556,15 +3570,6 @@ window.onload = async function () {
   startTriviaModal = new bootstrap.Modal(elements.startTriviaModal);
   publishedModal = new bootstrap.Modal(elements.publishedModal);
   importModal = new bootstrap.Modal(elements.importModal);
-
-  let quitPopovers = document.querySelectorAll(".quit-button");
-  for (let index = 0; index < quitPopovers.length; index++) {
-    let popover = new bootstrap.Popover(quitPopovers[index], {
-      trigger: "focus",
-      html: true,
-      sanitize: false,
-    });
-  }
 
   elements.tierlistEditorModal.addEventListener("show.bs.modal", (event) => {
     loadTierlistEditor();

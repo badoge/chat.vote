@@ -1,7 +1,6 @@
 let elements = {
   //modals
   loginExpiredModal: document.getElementById("loginExpiredModal"),
-  restartRaffleModal: document.getElementById("restartRaffleModal"),
   fancyRaffleModal: document.getElementById("fancyRaffleModal"),
   claw: document.getElementById("claw"),
   slot: document.getElementById("slot"),
@@ -107,7 +106,7 @@ let timer_raffle;
 let currentTime = 0;
 let rafflePopover;
 let loginButton;
-let loginExpiredModal, restartRaffleModal, fancyRaffleModal;
+let loginExpiredModal, fancyRaffleModal;
 let currentRaffleWinner = "";
 let raffleWinners = [];
 let settingsOffcanvas;
@@ -1429,7 +1428,6 @@ window.onload = function () {
   }
 
   loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
-  restartRaffleModal = new bootstrap.Modal(elements.restartRaffleModal);
   fancyRaffleModal = new bootstrap.Modal(elements.fancyRaffleModal);
 
   settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);

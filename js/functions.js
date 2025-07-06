@@ -719,14 +719,14 @@ function enableTooltips() {
   );
 } //enableTooltips
 
-function enablePopovers(html = false) {
+function enablePopovers() {
   const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
-  if (html) {
-    {
-      const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl, { trigger: "focus", html: true, sanitize: false }));
+  for (let index = 0; index < popoverTriggerList.length; index++) {
+    if (popoverTriggerList[index].classList.contains("html-popover")) {
+      const popover = new bootstrap.Popover(popoverTriggerList[index], { trigger: "focus", html: true, sanitize: false });
+    } else {
+      const popover = new bootstrap.Popover(popoverTriggerList[index]);
     }
-  } else {
-    const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl));
   }
 } //enablePopovers
 

@@ -2,7 +2,6 @@ let elements = {
   //modals
   dankUpdateModal: document.getElementById("dankUpdateModal"),
   loginExpiredModal: document.getElementById("loginExpiredModal"),
-  resetSettingsModal: document.getElementById("resetSettingsModal"),
   banlistModal: document.getElementById("banlistModal"),
   bannedUsersList: document.getElementById("bannedUsersList"),
   bannedItemsList: document.getElementById("bannedItemsList"),
@@ -127,14 +126,13 @@ let client;
 let currentTime = 0;
 let loginButton;
 let settingsOffcanvas;
-let dankUpdateModal, loginExpiredModal, resetSettingsModal, banlistModal;
+let dankUpdateModal, loginExpiredModal, banlistModal;
 let copyLinkButton;
 let playlistTab, approvalTab, historyTab;
 let playlist_open = false;
 let playlist_playing = false;
 let total_duration = 0;
 let togglePlaylistPopover;
-let clearPlaylistPopover;
 let streamerColor = "";
 
 let users = [];
@@ -2891,7 +2889,6 @@ window.onload = function () {
 
   dankUpdateModal = new bootstrap.Modal(elements.dankUpdateModal);
   loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
-  resetSettingsModal = new bootstrap.Modal(elements.resetSettingsModal);
   banlistModal = new bootstrap.Modal(elements.banlistModal);
   settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
   copyLinkButton = new bootstrap.Popover(elements.copyLinkButton);
@@ -2901,10 +2898,13 @@ window.onload = function () {
     loadBanLists();
   });
 
-  clearPlaylistPopover = new bootstrap.Popover("#clearPlaylistPopover", {
+  enablePopovers();
+
+  let resetSettingsPopover = new bootstrap.Popover("#resetSettingsPopover", {
     trigger: "focus",
     html: true,
     sanitize: false,
+    container: ".offcanvas-body",
   });
 
   playlistTab = new bootstrap.Tab(elements.playlistTab);

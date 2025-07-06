@@ -671,9 +671,6 @@ function connect() {
           }
         }
         if (voted) {
-          if (context["first-msg"]) {
-            firstMessageWarning(context.username);
-          }
           voters.push(context.username);
           voters_options.push(votes);
           updateChart();
@@ -683,9 +680,6 @@ function connect() {
         let pos = vote_results.findIndex((e) => e.id === parseInt(input[0], 10));
         if (pos == -1) {
           return;
-        }
-        if (context["first-msg"]) {
-          firstMessageWarning(context.username);
         }
         voters.push(context.username);
         voters_options.push([vote_results[pos].option]);
@@ -738,9 +732,6 @@ function connect() {
           }
         }
         if (voted) {
-          if (context["first-msg"]) {
-            firstMessageWarning(context.username);
-          }
           voters.push(context.username);
           voters_options.push(votes);
           updateChart();
@@ -750,9 +741,6 @@ function connect() {
         let pos = vote_results.findIndex((e) => e.option_clean === input[0].toLowerCase());
         if (pos == -1) {
           return;
-        }
-        if (context["first-msg"]) {
-          firstMessageWarning(context.username);
         }
         voters.push(context.username);
         voters_options.push([vote_results[pos].option]);
@@ -768,9 +756,6 @@ function connect() {
       }
       if (voters_yesno.includes(context.username)) {
         return;
-      }
-      if (context["first-msg"]) {
-        firstMessageWarning(context.username);
       }
       if (command == "voteyea" || command == "yes") {
         voters_yesno.push(context.username);
@@ -1563,10 +1548,6 @@ function hideScore() {
   }
 } //hideScore
 
-function firstMessageWarning(username) {
-  showToast(`<i class="material-icons notranslate">warning_amber</i>${username}'s first ever message in chat was a vote.`, "warning", 3000);
-} //firstMessageWarning
-
 function logout() {
   elements.topRight.innerHTML = ` <div class="btn-group" role="group" aria-label="login options">
   <a
@@ -2042,12 +2023,6 @@ window.onload = function () {
     html: true,
     sanitize: false,
     container: ".offcanvas-body",
-  });
-
-  let deleteAllPopover = new bootstrap.Popover("#deleteAll", {
-    trigger: "focus",
-    html: true,
-    sanitize: false,
   });
 
   randomOptionModal = new bootstrap.Modal(elements.randomOptionModal);
