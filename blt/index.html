@@ -979,13 +979,34 @@
     </div>
 
     <div class="container-fluid" id="tierlist" style="display: none">
-      <div id="tierlistItem" class="container-fluid border border-secondary rounded-3 float-end">
-        <i id="tierlistItemDrag" class="material-icons notranslate mt-2" style="cursor: move; position: fixed">drag_indicator</i>
-
-        <div class="row">
-          <div class="col text-center m-1 p-0">
-            <h5 id="currentTierlistItemName"></h5>
-
+      <div class="container-fluid" id="tierlistItem">
+        <div class="row" style="height: 95%">
+          <div class="col-3 p-0">
+            <div class="row">
+              <div class="col">
+                <h4 id="currentTierlistItemName" style="word-break: break-all"></h4>
+              </div>
+            </div>
+            <div class="row" style="font-size: 2rem; white-space: nowrap">
+              <div class="col-3 text-end p-1">
+                <kbd id="tierlistLabel0">S</kbd> <br />
+                <kbd id="tierlistLabel1">A</kbd> <br />
+                <kbd id="tierlistLabel2">B</kbd> <br />
+                <kbd id="tierlistLabel3">C</kbd> <br />
+                <kbd id="tierlistLabel4">F</kbd> <br />
+                <kbd id="tierlistLabel5">IDK</kbd> <br />
+              </div>
+              <div class="col-9 text-start p-1">
+                <span id="tierlistScore0">0 (0%) <br /></span>
+                <span id="tierlistScore1">0 (0%) <br /></span>
+                <span id="tierlistScore2">0 (0%) <br /></span>
+                <span id="tierlistScore3">0 (0%) <br /></span>
+                <span id="tierlistScore4">0 (0%) <br /></span>
+                <span id="tierlistScore5">0 (0%) <br /></span>
+              </div>
+            </div>
+          </div>
+          <div class="col-9 text-center p-0">
             <div id="currentTierlistItem">
               <div id="text_image_tierlist" style="display: none"></div>
               <div id="youtubeEmbedContainer_tierlist" style="display: none"><div id="youtubeEmbed_tierlist"></div></div>
@@ -996,42 +1017,15 @@
           </div>
         </div>
 
-        <hr />
-        <div class="row">
-          <div class="col-6 p-0">
-            <div class="row">
-              <div class="col-6 text-end p-0">
-                <div class="col text-end p-1">
-                  <kbd id="tierlistLabel0">S</kbd> <br />
-                  <kbd id="tierlistLabel1">A</kbd> <br />
-                  <kbd id="tierlistLabel2">B</kbd> <br />
-                  <kbd id="tierlistLabel3">C</kbd> <br />
-                  <kbd id="tierlistLabel4">D</kbd> <br />
-                  <kbd id="tierlistLabel5">F</kbd> <br />
-                  <kbd id="tierlistLabel6">IDK</kbd> <br />
-                </div>
-              </div>
-              <div class="col-6 text-start p-0">
-                <div class="col text-start p-1">
-                  <span id="tierlistScore0">0 (0%) <br /></span>
-                  <span id="tierlistScore1">0 (0%) <br /></span>
-                  <span id="tierlistScore2">0 (0%) <br /></span>
-                  <span id="tierlistScore3">0 (0%) <br /></span>
-                  <span id="tierlistScore4">0 (0%) <br /></span>
-                  <span id="tierlistScore5">0 (0%) <br /></span>
-                  <span id="tierlistScore6">0 (0%) <br /></span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-6 text-center p-0">
+        <div class="row text-center mt-1">
+          <div class="col">
             <button
               type="button"
-              class="btn btn-success mb-3"
+              class="btn btn-success"
               id="enableVotingTierlist"
               data-bs-container="body"
               data-bs-trigger="manual"
-              data-bs-placement="right"
+              data-bs-placement="bottom"
               data-bs-toggle="popover"
               data-bs-title="Voting disabled"
               data-bs-content="A viewer is trying to vote but voting is disabled"
@@ -1039,22 +1033,23 @@
             >
               Start Voting
             </button>
-            <br />
-            <button type="button" id="hideScoreTierlist" class="btn btn-primary mb-3" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Hide score">
+
+            <button type="button" id="hideScoreTierlist" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Hide score">
               <i class="material-icons notranslate" id="hideScoreTierlistIcon">visibility</i>
             </button>
-            <br />
-            <button type="button" class="btn btn-warning mb-3" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Restart round" onclick="restartMatch()">
+
+            <button type="button" class="btn btn-warning" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Restart round" onclick="restartMatch()">
               <i class="material-icons notranslate">refresh</i>
             </button>
-            <button type="button" style="display: none" class="btn btn-secondary mb-3" data-bs-toggle="modal" data-bs-target="#tierlistEditorModal">
+
+            <button type="button" style="display: none" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#tierlistEditorModal">
               <i class="material-icons notranslate">settings</i>
             </button>
-            <br />
-            <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Quit tier list">
+
+            <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Quit tier list">
               <a
                 tabindex="0"
-                class="btn btn-danger html-popover mb-3"
+                class="btn btn-danger html-popover"
                 role="button"
                 data-bs-toggle="popover"
                 data-bs-placement="top"
@@ -1066,8 +1061,26 @@
                 <i class="material-icons notranslate">close</i>
               </a>
             </span>
-            <br />
-            <button type="button" id="pickWinnerTierlist" class="btn btn-info mb-3" onclick="pickWinnerTierlist()"><i class="material-icons notranslate">navigate_next</i>Next item</button>
+
+            <button
+              type="button"
+              class="btn btn-outline-info"
+              data-bs-toggle="tooltip"
+              data-bs-placement="bottom"
+              data-bs-html="true"
+              data-bs-title="
+                    <h5>Card Controls</h5>
+                    <p class='text-start'>
+                      click and drag: <strong>move card</strong><br>
+                      scroll: <strong>resize card</strong><br>
+                      ALT + scroll: <strong>change card opacity</strong><br>
+                      R: <strong>reset card position</strong><br>
+                    </p>"
+            >
+              <i class="material-icons notranslate">lightbulb</i>
+            </button>
+
+            <button type="button" id="pickWinnerTierlist" class="btn btn-info" onclick="pickWinnerTierlist()"><i class="material-icons notranslate">navigate_next</i>Next item</button>
           </div>
         </div>
       </div>

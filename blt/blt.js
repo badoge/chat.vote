@@ -160,14 +160,12 @@ let elements = {
   tierlistLabel3: document.getElementById("tierlistLabel3"),
   tierlistLabel4: document.getElementById("tierlistLabel4"),
   tierlistLabel5: document.getElementById("tierlistLabel5"),
-  tierlistLabel6: document.getElementById("tierlistLabel6"),
   tierlistScore0: document.getElementById("tierlistScore0"),
   tierlistScore1: document.getElementById("tierlistScore1"),
   tierlistScore2: document.getElementById("tierlistScore2"),
   tierlistScore3: document.getElementById("tierlistScore3"),
   tierlistScore4: document.getElementById("tierlistScore4"),
   tierlistScore5: document.getElementById("tierlistScore5"),
-  tierlistScore6: document.getElementById("tierlistScore6"),
 
   currentTierlistItemName: document.getElementById("currentTierlistItemName"),
   currentTierlistItem: document.getElementById("currentTierlistItem"),
@@ -225,7 +223,7 @@ let elements = {
   videoEmbed_trivia: document.getElementById("videoEmbed_trivia"),
 };
 
-const { animate, createTimeline, utils } = anime;
+const { animate, createTimeline, utils, createDraggable } = anime;
 
 const icons = {
   text: `<i class="material-icons notranslate">description</i>`,
@@ -1550,9 +1548,10 @@ function startTierlist(bracket) {
     elements.upcoming_thumbnails.insertAdjacentHTML(
       "beforeend",
       `<a
+      draggable="false"
       href="${getItemLink(bracket.options[index].type, bracket.options[index].id)}"
       target="_blank"
-      rel="noopener noreferrer"><img class="border rounded tierlist-item me-1" alt="${bracket.options[index].name}" title="${
+      rel="noopener noreferrer"><img draggable="false" class="border rounded tierlist-item me-1" alt="${bracket.options[index].name}" title="${
         bracket.options[index].name
       }" loading="lazy" src="${link}" /></a>`
     );
@@ -1561,7 +1560,6 @@ function startTierlist(bracket) {
   addTier("A", "a", "#d9740f");
   addTier("B", "b", "#dea216");
   addTier("C", "c", "#f7e51b");
-  addTier("D", "d", "#64f71b");
   addTier("F", "f", "#08cc12");
   addTier("¯\\_(ツ)_/¯", "idk", "#0fd9cb");
 
@@ -1898,11 +1896,10 @@ function nextMatch() {
 
 let currentItem = 1;
 let currentTierlistData = [
-  { name: "s", command: "s", score: 0, weight: 5 },
-  { name: "a", command: "a", score: 0, weight: 4 },
-  { name: "b", command: "b", score: 0, weight: 3 },
-  { name: "c", command: "c", score: 0, weight: 2 },
-  { name: "d", command: "d", score: 0, weight: 1 },
+  { name: "s", command: "s", score: 0, weight: 4 },
+  { name: "a", command: "a", score: 0, weight: 3 },
+  { name: "b", command: "b", score: 0, weight: 2 },
+  { name: "c", command: "c", score: 0, weight: 1 },
   { name: "f", command: "f", score: 0, weight: 0 },
   { name: "idk", command: "idk", score: 0 },
 ];
@@ -1946,7 +1943,7 @@ async function nextTierlistItem() {
       elements.text_image_tierlist.innerHTML = `Invalid image URL`;
       return;
     }
-    elements.text_image_tierlist.innerHTML = `<img src="https://proxy.donk.workers.dev/?url=${encodeURI(item.value)}" alt="${item.name}" title="${item.name}" class="tierlist-image">`;
+    elements.text_image_tierlist.innerHTML = `<img src="https://proxy.donk.workers.dev/?url=${encodeURI(item.value)}" alt="${item.name}" title="${item.name}">`;
   } //image
 
   if (item.type == "youtube") {
@@ -2036,7 +2033,7 @@ function pickWinner(winner = null) {
 
 function pickWinnerTierlist() {
   if (elements.averageTier.checked) {
-    for (let index = 0; index < 7; index++) {
+    for (let index = 0; index < 6; index++) {
       if (elements[`tierlistScore${index}`].innerHTML.includes("⭐")) {
         placeTierlistItem(currentTierlistData[index]);
         return;
@@ -2126,9 +2123,10 @@ function placeTierlistItem(tier) {
     "beforeend",
     `<a
       id="${id}"
+      draggable="false"
       href="${getItemLink(currentTierlistItem.type, currentTierlistItem.id)}"
       target="_blank"
-      rel="noopener noreferrer"><img class="border rounded tierlist-item me-1" alt="${elements.currentTierlistItemName.innerHTML}" title="${
+      rel="noopener noreferrer"><img draggable="false" class="border rounded tierlist-item me-1" alt="${elements.currentTierlistItemName.innerHTML}" title="${
       elements.currentTierlistItemName.innerHTML
     }" src="${link}" /></a>`
   );
@@ -2299,7 +2297,7 @@ function updateScores() {
     if (!scoreHidden) {
       let total = 0;
       let max = 0;
-      for (let i = 0; i < 7; i++) {
+      for (let i = 0; i < 6; i++) {
         total += currentTierlistData[i].score;
         if (currentTierlistData[i].score > currentTierlistData[max].score) {
           max = i;
@@ -2307,12 +2305,12 @@ function updateScores() {
       }
       if (elements.averageTier.checked) {
         let weights = 0;
-        //first 6 scores only because idk score has no weight
-        for (let i = 0; i < 6; i++) {
+        //first 5 scores only because idk score has no weight
+        for (let i = 0; i < 5; i++) {
           weights += currentTierlistData[i].score * currentTierlistData[i].weight;
         }
         let winner = Math.round(weights / (total - currentTierlistData[6].score));
-        for (let i = 0; i < 7; i++) {
+        for (let i = 0; i < 6; i++) {
           elements[`tierlistScore${i}`].innerHTML = `${currentTierlistData[i].score} (${Math.round((currentTierlistData[i].score / total) * 100) || 0}%) ${
             currentTierlistData[i].weight == winner ? "⭐" : ""
           }<br />`;
@@ -2322,12 +2320,12 @@ function updateScores() {
           elements[`tierlistScore6`].innerHTML = `${currentTierlistData[6].score} (${Math.round((currentTierlistData[6].score / total) * 100) || 0}%) ⭐<br />`;
         }
       } else {
-        for (let i = 0; i < 7; i++) {
+        for (let i = 0; i < 6; i++) {
           elements[`tierlistScore${i}`].innerHTML = `${currentTierlistData[i].score} (${Math.round((currentTierlistData[i].score / total) * 100) || 0}%) ${i == max ? "⭐" : ""}<br />`;
         }
       }
     } else {
-      for (let i = 0; i < 7; i++) {
+      for (let i = 0; i < 6; i++) {
         elements[`tierlistScore${i}`].innerHTML = `🙈<br />`;
       }
     }
@@ -3428,44 +3426,6 @@ async function getYTChannelID(handle) {
   }
 } //getYTChannelID
 
-function dragElement() {
-  let pos1 = 0,
-    pos2 = 0,
-    pos3 = 0,
-    pos4 = 0;
-  elements.tierlistItemDrag.onmousedown = dragMouseDown;
-
-  function dragMouseDown(e) {
-    e = e || window.event;
-    e.preventDefault();
-    // get the mouse cursor position at startup:
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    document.onmouseup = closeDragElement;
-    // call a function whenever the cursor moves:
-    document.onmousemove = elementDrag;
-  }
-
-  function elementDrag(e) {
-    e = e || window.event;
-    e.preventDefault();
-    // calculate the new cursor position:
-    pos1 = pos3 - e.clientX;
-    pos2 = pos4 - e.clientY;
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    // set the element's new position:
-    elements.tierlistItem.style.top = elements.tierlistItem.offsetTop - pos2 + "px";
-    elements.tierlistItem.style.left = elements.tierlistItem.offsetLeft - pos1 + "px";
-  }
-
-  function closeDragElement() {
-    // stop moving when mouse button is released:
-    document.onmouseup = null;
-    document.onmousemove = null;
-  }
-} //dragElement
-
 async function testImage(url, format) {
   try {
     const res = await fetch(`https://helper.donk.workers.dev/cors/?${url}`);
@@ -3702,7 +3662,26 @@ window.onload = async function () {
     saveTrivia(true);
   });
 
-  dragElement();
+  const draggable = createDraggable(elements.tierlistItem);
+
+  elements.tierlistItem.addEventListener("mousewheel", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.altKey) {
+      let opacity = parseFloat(getComputedStyle(elements.tierlistItem).getPropertyValue("opacity"));
+      elements.tierlistItem.style.opacity = event.wheelDelta > 0 ? Math.min(opacity + 0.07, 1) : Math.max(opacity - 0.07, 0.2);
+    } else {
+      let scale = parseFloat(getComputedStyle(elements.tierlistItem).getPropertyValue("scale"));
+      elements.tierlistItem.style.scale = event.wheelDelta > 0 ? Math.min(scale + 0.07, 2) : Math.max(scale - 0.07, 0.1);
+    }
+  });
+
+  window.addEventListener("keydown", (event) => {
+    if (event.code === "KeyR" && document.activeElement.tagName !== "INPUT") {
+      elements.tierlistItem.style = "transform: translateX(0px) translateY(0px)";
+      draggable.reset();
+    }
+  });
 
   let code = location.hash?.replace("#", "")?.trim();
   if (code.length == 4) {
