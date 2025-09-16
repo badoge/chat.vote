@@ -113,7 +113,7 @@
             <table class="table table-hover">
               <thead>
                 <tr>
-                  <th scope="col">Platform</th>
+                  <th scope="col"></th>
                   <th scope="col">Autoplay</th>
                   <th scope="col">Timestamps<sup>[1]</sup></th>
                   <th scope="col">Duration filters</th>
@@ -300,7 +300,9 @@
         <div class="card mb-3">
           <div class="card-header">
             <span class="align-middle"><i class="material-icons notranslate">checklist</i>Enabled Platforms</span>
-            <button type="button" class="btn btn-sm btn-primary float-end" data-bs-toggle="modal" data-bs-target="#platformsInfoModal">Platform support details</button>
+            <button type="button" class="btn btn-sm btn-primary float-end" data-bs-toggle="modal" data-bs-target="#platformsInfoModal">
+              <i class="material-icons notranslate">info</i> Platform support details
+            </button>
           </div>
           <div class="card-body">
             <div class="container-fluid">
@@ -376,26 +378,26 @@
                 <option value="h">Hours</option>
               </select>
             </div>
-            <small class="form-text text-body-secondary">The max duration of all videos/songs added up</small>
+            <small class="form-text text-body-secondary">The max duration of all requests added up</small>
 
             <div class="input-group mt-3">
               <span class="input-group-text"><i class="material-icons notranslate">timelapse</i>Max song/video length</span>
               <input type="number" aria-label="Max song/video length" id="maxLength" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
               <span class="input-group-text">Minutes</span>
             </div>
-            <small class="form-text text-body-secondary">How long a single video/song can be</small>
+            <small class="form-text text-body-secondary">How long a single request can be</small>
 
             <div class="input-group mt-3">
               <span class="input-group-text"><i class="material-icons notranslate">format_list_numbered</i>Max playlist size</span>
               <input type="number" aria-label="Max playlist length" id="maxSize" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
             </div>
-            <small class="form-text text-body-secondary">How many videos/songs are allowed to be in the playlist</small>
+            <small class="form-text text-body-secondary">How many requests are allowed to be in the playlist</small>
 
             <div class="input-group mt-3">
               <span class="input-group-text"><i class="material-icons notranslate">visibility</i>Minimum view count</span>
               <input type="number" aria-label="Minimum view count" id="minViewCount" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
             </div>
-            <small class="form-text text-body-secondary"> Videos/songs that have a view count lower than the limit will be blocked </small>
+            <small class="form-text text-body-secondary"> Requests that have a view count lower than the limit will be blocked </small>
             <br /><span class="text-warning"
               >See <span class="cursor-pointer text-info" data-bs-toggle="modal" data-bs-target="#platformsInfoModal">Platform support details</span> for info about which platforms work with
               these filters</span
@@ -407,7 +409,7 @@
               <label class="form-check-label" for="uniqueOnly"><i class="material-icons notranslate">history_toggle_off</i>Skip non unique videos/songs</label>
               <br />
               <small class="text-body-secondary">
-                Any video/song found in the <span class="text-primary"><i class="material-icons notranslate">history</i>History</span> tab will be skipped
+                Any request found in the <span class="text-primary"><i class="material-icons notranslate">history</i>History</span> tab will be skipped
               </small>
             </div>
           </div>
@@ -417,7 +419,7 @@
           <div class="card-header"><i class="material-icons notranslate">chat</i>Chat Commands</div>
           <div class="card-body">
             <div class="input-group">
-              <span class="input-group-text">Request</span>
+              <span class="input-group-text"><i class="material-icons notranslate">add</i>Request</span>
               <input
                 type="text"
                 id="requestCommand"
@@ -441,7 +443,7 @@
             </div>
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" role="switch" id="noCommand" onchange="saveSettings()" />
-              <label class="form-check-label" for="noCommand"><i class="material-icons notranslate">link</i>Allow requests without a command</label>
+              <label class="form-check-label" for="noCommand"><i class="material-icons notranslate">link</i>Add any supported link in chat to the playlist</label>
             </div>
 
             <div class="form-check form-switch mt-5">
@@ -449,7 +451,7 @@
               <label class="form-check-label" for="allowVoteSkip"><i class="material-icons notranslate">how_to_vote</i>Allow viewers to vote skip</label>
             </div>
             <div class="input-group mb-1">
-              <span class="input-group-text">Vote Skip command</span>
+              <span class="input-group-text"><i class="material-icons notranslate">double_arrow</i> Vote Skip command</span>
               <input
                 type="text"
                 id="voteskipCommand"
@@ -472,7 +474,7 @@
               />
             </div>
             <div class="input-group mb-5">
-              <span class="input-group-text">Skip after</span>
+              <span class="input-group-text"><i class="material-icons notranslate">incomplete_circle</i> Skip after</span>
               <input type="number" aria-label="vote skip votes needed" id="voteskipCount" placeholder="100" value="100" min="1" class="form-control" onchange="saveSettings()" />
               <span class="input-group-text">votes</span>
             </div>
@@ -482,18 +484,18 @@
               <label class="form-check-label" for="enableBot"><i class="material-icons notranslate">smart_toy</i>Enable chat bot</label>
               <br />
               <small class="text-body-secondary">
-                Enables the bot commands below and adds confirmation replies for some commands - Make sure to mod the bot (@chatvote) so that it can post links without getting timed out by
-                other bots
+                Enables the bot commands below and adds confirmation replies for some commands - Make sure to mod the bot <kbd>/mod chatvote</kbd> so that it can post links without getting
+                timed out by other bots
               </small>
             </div>
             <div class="input-group mb-3">
-              <span class="input-group-text">Bot commands cooldown</span>
+              <span class="input-group-text"><i class="material-icons notranslate">hourglass_top</i>Bot commands cooldown</span>
               <input type="number" aria-label="Bot commands cooldown" id="botCooldown" placeholder="1" value="1" min="1" class="form-control" onchange="saveSettings()" />
               <span class="input-group-text">seconds</span>
             </div>
             <h6>Bot Commands</h6>
             <div class="input-group mb-3">
-              <span class="input-group-text">Song/video name & link</span>
+              <span class="input-group-text"><i class="material-icons notranslate">link</i>Request name & link</span>
               <input type="text" id="songCommand" data-default="!song" value="!song" aria-label="Song name command" placeholder="command" class="form-control" onchange="saveSettings()" />
               <input
                 type="text"
@@ -507,7 +509,7 @@
               />
             </div>
             <div class="input-group mb-3">
-              <span class="input-group-text">Playlist link</span>
+              <span class="input-group-text"><i class="material-icons notranslate">language</i>Playlist link</span>
               <input
                 type="text"
                 id="playlistCommand"
@@ -540,8 +542,17 @@
               <thead>
                 <tr>
                   <th scope="col">Role</th>
-                  <th scope="col" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="How many requests each user can make based on the highest role limit they have">
+                  <th scope="col">
                     Request limit
+                    <i
+                      class="material-icons notranslate"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      data-bs-html="true"
+                      data-bs-title="<i>Leave empty for unlimited requests</i><br>The final limit for each user will be based on the highest role limit they have"
+                    >
+                      info
+                    </i>
                   </th>
                 </tr>
               </thead>
@@ -550,7 +561,7 @@
                   <th scope="row">
                     <div class="form-check form-switch">
                       <input class="form-check-input" type="checkbox" role="switch" id="allowPlebs" onchange="saveSettings()" checked />
-                      <label class="form-check-label" for="allowPlebs">Non subscriber</label>
+                      <label class="form-check-label" for="allowPlebs"><img src="/pics/pleb.png" class="role-badge" /> Non subscriber</label>
                     </div>
                   </th>
                   <td>
@@ -561,7 +572,7 @@
                   <th scope="row">
                     <div class="form-check form-switch">
                       <input class="form-check-input" type="checkbox" role="switch" id="allowSubs" onchange="saveSettings()" checked />
-                      <label class="form-check-label" for="allowSubs">Subscriber</label>
+                      <label class="form-check-label" for="allowSubs"><img src="/pics/sub.png" class="role-badge" /> Subscriber</label>
                     </div>
                   </th>
                   <td>
@@ -573,7 +584,7 @@
                   <th scope="row">
                     <div class="form-check form-switch">
                       <input class="form-check-input" type="checkbox" role="switch" id="allowMods" onchange="saveSettings()" checked />
-                      <label class="form-check-label" for="allowMods">Mod</label>
+                      <label class="form-check-label" for="allowMods"><img src="/pics/mod.png" class="role-badge" /> Mod</label>
                     </div>
                   </th>
                   <td>
@@ -584,7 +595,7 @@
                   <th scope="row">
                     <div class="form-check form-switch">
                       <input class="form-check-input" type="checkbox" role="switch" id="allowVips" onchange="saveSettings()" checked />
-                      <label class="form-check-label" for="allowVips">VIP</label>
+                      <label class="form-check-label" for="allowVips"><img src="/pics/vip.png" class="role-badge" /> VIP</label>
                     </div>
                   </th>
                   <td>
@@ -595,7 +606,7 @@
                   <th scope="row">
                     <div class="form-check form-switch">
                       <input class="form-check-input" type="checkbox" role="switch" id="allowFirstTimeChatters" onchange="saveSettings()" checked />
-                      <label class="form-check-label" for="allowFirstTimeChatters">First time chatter</label>
+                      <label class="form-check-label" for="allowFirstTimeChatters"><img src="/pics/firstmsg.png" class="role-badge" /> First time chatter</label>
                     </div>
                   </th>
                   <td>
@@ -624,7 +635,7 @@
 
             <h6>Moderation Commands</h6>
             <div class="input-group mb-1">
-              <span class="input-group-text">Open playlist</span>
+              <span class="input-group-text"><i class="material-icons notranslate">playlist_add_check</i>Open playlist</span>
               <input
                 type="text"
                 id="openCommand"
@@ -637,7 +648,7 @@
               />
             </div>
             <div class="input-group mb-1">
-              <span class="input-group-text">Close playlist</span>
+              <span class="input-group-text"><i class="material-icons notranslate">playlist_remove</i>Close playlist</span>
               <input
                 type="text"
                 id="closeCommand"
@@ -650,11 +661,11 @@
               />
             </div>
             <div class="input-group mb-1">
-              <span class="input-group-text">Play current video/song</span>
+              <span class="input-group-text"><i class="material-icons notranslate">play_arrow</i>Play current request</span>
               <input type="text" id="playCommand" data-default="!play" value="!play" aria-label="Play command" placeholder="Play command" class="form-control" onchange="saveSettings()" />
             </div>
             <div class="input-group mb-1">
-              <span class="input-group-text">Pause current video/song</span>
+              <span class="input-group-text"><i class="material-icons notranslate">pause</i>Pause current request</span>
               <input
                 type="text"
                 id="pauseCommand"
@@ -667,7 +678,7 @@
               />
             </div>
             <div class="input-group mb-1">
-              <span class="input-group-text">Toggle autoplay</span>
+              <span class="input-group-text"><i class="material-icons notranslate">playlist_play</i>Toggle autoplay</span>
               <input
                 type="text"
                 id="autoplayCommand"
@@ -680,11 +691,11 @@
               />
             </div>
             <div class="input-group mb-1">
-              <span class="input-group-text">Skip current video/song</span>
+              <span class="input-group-text"><i class="material-icons notranslate">skip_next</i>Skip current request</span>
               <input type="text" id="skipCommand" data-default="!skip" value="!skip" aria-label="Skip command" placeholder="Skip command" class="form-control" onchange="saveSettings()" />
             </div>
             <div class="input-group mb-1">
-              <span class="input-group-text">Go back to previous video/song</span>
+              <span class="input-group-text"><i class="material-icons notranslate">skip_previous</i>Go back to previous request</span>
               <input
                 type="text"
                 id="rewindCommand"
@@ -698,13 +709,14 @@
             </div>
             <div class="input-group mb-1">
               <span class="input-group-text">
-                Delete request by ID
+                <i class="material-icons notranslate">delete</i>Delete request by ID
                 <i
                   class="material-icons notranslate cursor-pointer"
                   data-bs-toggle="tooltip"
                   data-bs-placement="top"
                   data-bs-title="Mods will be able to delete requests by copying the command from your playlist.chat.vote/username page"
-                  >info
+                >
+                  help
                 </i>
               </span>
               <input
@@ -725,9 +737,7 @@
 
             <small class="text-body-secondary">
               <i class="material-icons notranslate">lightbulb</i> Tip: Mods can delete a request by
-              <a class="link-body-emphasis" href="https://twitter.com/TwitchSupport/status/1070135668980871168" target="_blank" rel="noopener noreferrer">
-                deleteing the request message in chat
-              </a>
+              <a class="link-body-emphasis" href="https://twitter.com/TwitchSupport/status/1070135668980871168" target="_blank" rel="noopener noreferrer"> deleteing the message in chat </a>
             </small>
           </div>
         </div>
@@ -947,7 +957,7 @@
           <div class="card" id="playersCard">
             <div class="card-body p-0">
               <h1 id="placeholder" class="display-1">
-                Nothing here :)<br />
+                Nothing here <img src="/pics/donk.png" alt="donk" style="width: 80px; vertical-align: bottom" /><br /><br /><br />
                 <span id="commandHint2">
                   Request something using<br />
                   <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">!request [link]</kbd> or
@@ -974,7 +984,7 @@
               </h4>
               <div class="input-group mt-3">
                 <input type="text" id="link" class="form-control" placeholder="Link" aria-label="Add link input text field" aria-describedby="addLink" />
-                <button class="btn btn-secondary" type="button" id="addLink" onclick="addLink()" title="Or just press enter :)">Add</button>
+                <button class="btn btn-secondary" type="button" id="addLink" onclick="addLink()" title="Or just press enter :)"><i class="material-icons notranslate">add</i>Add</button>
               </div>
             </div>
           </div>
@@ -1108,15 +1118,19 @@
 
             <div class="hstack gap-3 me-auto">
               <div>
-                <small class="bottomBarLabel">Now playing</small>
+                <small class="bottomBarLabel"><i class="material-icons notranslate" style="font-size: 1rem; vertical-align: middle">play_circle_filled</i>Now playing</small>
                 <br />
-                <span id="nowPlaying"><span class="text-body-secondary">Nothing :)</span></span>
+                <span id="nowPlaying"
+                  ><span class="text-body-secondary">Nothing <img src="/pics/donk.png" alt="donk" style="width: 16px; vertical-align: middle" /></span
+                ></span>
               </div>
 
               <div>
-                <small class="bottomBarLabel">Requested by</small>
+                <small class="bottomBarLabel"><i class="material-icons notranslate" style="font-size: 1rem; vertical-align: middle">account_circle</i>Requested by</small>
                 <br />
-                <span id="nowPlayingRequester"><span class="text-body-secondary">No one :)</span></span>
+                <span id="nowPlayingRequester"
+                  ><span class="text-body-secondary">No one <img src="/pics/donk.png" alt="donk" style="width: 16px; vertical-align: middle" /></span
+                ></span>
               </div>
 
               <div id="nowPlayingInfo"></div>
@@ -1127,7 +1141,7 @@
             <div class="vr"></div>
 
             <div>
-              <small class="bottomBarLabel">Playlist length</small><br />
+              <small class="bottomBarLabel"><i class="material-icons notranslate" style="font-size: 1rem; vertical-align: middle">access_time_filled</i>Playlist length</small><br />
               <span id="playlistLength">00:00 (0 items)</span>
             </div>
 
@@ -1144,9 +1158,9 @@
                 data-bs-placement="top"
                 data-bs-title="Are you sure?"
                 data-bs-content='All videos/songs will be removed from the playlist including the current playing video <br>
-                <button type="button" class="btn btn-danger float-end mb-3" onclick="clearPlaylist()"><i class="material-icons notranslate">delete_forever</i>Clear</button>'
+                <button type="button" class="btn btn-danger float-end mb-3" onclick="clearPlaylist()"><i class="material-icons notranslate">delete_sweep</i>Clear</button>'
               >
-                <i class="material-icons notranslate">delete_forever</i>Clear playlist
+                <i class="material-icons notranslate">delete_sweep</i>Clear playlist
               </a>
 
               <button
@@ -1161,7 +1175,7 @@
                 data-bs-title="Playlist closed"
                 data-bs-content="A viewer is trying to request something but the playlist is closed"
               >
-                Open Playlist
+                <i class="material-icons notranslate">playlist_add_check</i> Open Playlist
               </button>
             </div>
 

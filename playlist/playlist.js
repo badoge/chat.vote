@@ -2753,10 +2753,10 @@ function togglePlaylist() {
   playlist_open = !playlist_open;
   if (playlist_open) {
     elements.togglePlaylist.classList = "btn btn-danger";
-    elements.togglePlaylist.innerHTML = "Close Playlist";
+    elements.togglePlaylist.innerHTML = `<i class="material-icons notranslate">playlist_remove</i> Close Playlist`;
   } else {
     elements.togglePlaylist.classList = "btn btn-success";
-    elements.togglePlaylist.innerHTML = "Open Playlist";
+    elements.togglePlaylist.innerHTML = `<i class="material-icons notranslate">playlist_add_check</i> Open Playlist`;
   }
 } //togglePlaylist
 

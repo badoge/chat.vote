@@ -60,6 +60,12 @@
   opacity: 1;
 }
 
+.role-badge {
+  height: 24px;
+  width: 24px;
+  vertical-align: bottom;
+}
+
 iframe,
 video {
   border-radius: 6px;
