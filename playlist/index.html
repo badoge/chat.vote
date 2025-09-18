@@ -102,7 +102,7 @@
       </div>
     </div>
 
-    <div class="modal modal-lg fade" id="platformsInfoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal modal-xl fade" id="platformsInfoModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
@@ -120,12 +120,14 @@
                   <th scope="col">Volume controls</th>
                   <th scope="col">Moderated platform<sup>[2]</sup></th>
                   <th scope="col">Search Command<sup>[3]</sup></th>
+                  <th scope="col">Content age filters</th>
                   <th scope="col">View count filters</th>
                 </tr>
               </thead>
               <tbody class="table-group-divider">
                 <tr>
                   <th scope="row">YouTube</th>
+                  <td>✔</td>
                   <td>✔</td>
                   <td>✔</td>
                   <td>✔</td>
@@ -143,6 +145,7 @@
                   <td>✔</td>
                   <td>✔</td>
                   <td>✔</td>
+                  <td>✔</td>
                 </tr>
                 <tr>
                   <th scope="row">Twitch</th>
@@ -153,6 +156,7 @@
                   <td>✔</td>
                   <td>❌</td>
                   <td>✔</td>
+                  <td>✔</td>
                 </tr>
                 <tr>
                   <th scope="row">Spotify<sup>[5]</sup></th>
@@ -160,6 +164,7 @@
                   <td>✔</td>
                   <td>✔</td>
                   <td>❌</td>
+                  <td>✔</td>
                   <td>✔</td>
                   <td>✔</td>
                   <td>❌</td>
@@ -173,6 +178,7 @@
                   <td>❌</td>
                   <td>❌</td>
                   <td>❌</td>
+                  <td>❌</td>
                 </tr>
                 <tr>
                   <th scope="row">TikTok</th>
@@ -181,6 +187,7 @@
                   <td>❌</td>
                   <td>❌</td>
                   <td>✔</td>
+                  <td>❌</td>
                   <td>❌</td>
                   <td>❌</td>
                 </tr>
@@ -378,32 +385,61 @@
                 <option value="h">Hours</option>
               </select>
             </div>
-            <small class="form-text text-body-secondary">The max duration of all requests added up</small>
+            <small class="text-body-secondary">The max duration of all requests added up</small>
 
             <div class="input-group mt-3">
               <span class="input-group-text"><i class="material-icons notranslate">timelapse</i>Max song/video length</span>
               <input type="number" aria-label="Max song/video length" id="maxLength" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
               <span class="input-group-text">Minutes</span>
             </div>
-            <small class="form-text text-body-secondary">How long a single request can be</small>
+            <small class="text-body-secondary">How long a single request can be</small>
 
             <div class="input-group mt-3">
               <span class="input-group-text"><i class="material-icons notranslate">format_list_numbered</i>Max playlist size</span>
               <input type="number" aria-label="Max playlist length" id="maxSize" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
             </div>
-            <small class="form-text text-body-secondary">How many requests are allowed to be in the playlist</small>
+            <small class="text-body-secondary">How many requests are allowed to be in the playlist</small>
 
             <div class="input-group mt-3">
-              <span class="input-group-text"><i class="material-icons notranslate">visibility</i>Minimum view count</span>
+              <span class="input-group-text"><i class="material-icons notranslate">visibility</i>Min view count</span>
               <input type="number" aria-label="Minimum view count" id="minViewCount" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
             </div>
-            <small class="form-text text-body-secondary"> Requests that have a view count lower than the limit will be blocked </small>
-            <br /><span class="text-warning"
-              >See <span class="cursor-pointer text-info" data-bs-toggle="modal" data-bs-target="#platformsInfoModal">Platform support details</span> for info about which platforms work with
-              these filters</span
-            >
+            <small class="text-body-secondary">Requests that have a view count lower than the limit will be blocked</small>
 
-            <br />
+            <p class="mt-3 mb-0">
+              <i class="material-icons notranslate">calendar_today</i>Content age limits
+              <i
+                class="material-icons notranslate"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                data-bs-html="true"
+                data-bs-title="Set one or both fields to limit how old or new a request can be<br><i>Leave empty to disable</i>"
+              >
+                help
+              </i>
+            </p>
+            <div class="input-group">
+              <span class="input-group-text"><i class="material-icons notranslate">date_range</i>Older than</span>
+              <input type="number" aria-label="Min upload age" id="minUploadAge" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
+              <select class="form-select" id="minUploadAgeUnit" onchange="saveSettings()">
+                <option selected value="h">Hours</option>
+                <option value="d">Days</option>
+                <option value="mo">Months</option>
+                <option value="y">Years</option>
+              </select>
+            </div>
+            <div class="input-group mt-1">
+              <span class="input-group-text"><i class="material-icons notranslate">calendar_month</i>Newer than</span>
+              <input type="number" aria-label="Max upload age" id="maxUploadAge" placeholder="Unlimited" min="1" class="form-control" onchange="saveSettings()" />
+              <select class="form-select" id="maxUploadAgeUnit" onchange="saveSettings()">
+                <option selected value="h">Hours</option>
+                <option value="d">Days</option>
+                <option value="mo">Months</option>
+                <option value="y">Years</option>
+              </select>
+            </div>
+            <small class="fst-italic" id="uploadAgeDesc">No age limits set</small>
+
             <div class="form-check form-switch mt-3">
               <input class="form-check-input" type="checkbox" role="switch" id="uniqueOnly" onchange="saveSettings()" />
               <label class="form-check-label" for="uniqueOnly"><i class="material-icons notranslate">history_toggle_off</i>Skip non unique videos/songs</label>
@@ -412,6 +448,12 @@
                 Any request found in the <span class="text-primary"><i class="material-icons notranslate">history</i>History</span> tab will be skipped
               </small>
             </div>
+          </div>
+          <div class="card-footer text-body-secondary">
+            <small class="text-warning">
+              See <span class="cursor-pointer text-info" data-bs-toggle="modal" data-bs-target="#platformsInfoModal">Platform support details</span> for info about which platforms work with
+              these filters
+            </small>
           </div>
         </div>
 
@@ -630,7 +672,7 @@
             <div class="form-check form-switch mb-3" style="display: none">
               <input disabled class="form-check-input" type="checkbox" role="switch" id="approvalQueue" />
               <label class="form-check-label" for="approvalQueue"><i class="material-icons notranslate">rule</i>Approval queue</label>
-              <br /><small class="form-text text-body-secondary">Requests will have to be manually approved by you before they get added to the playlist</small>
+              <br /><small class="text-body-secondary">Requests will have to be manually approved by you before they get added to the playlist</small>
             </div>
 
             <h6>Moderation Commands</h6>
@@ -1075,7 +1117,7 @@
                 </div>
                 <div class="tab-pane fade" id="history-tab-pane" role="tabpanel" aria-labelledby="historyTab" tabindex="0">
                   <button class="btn btn-outline-warning mt-2" type="button" data-bs-toggle="modal" data-bs-target="#clearHistoryModal">
-                    <i class="material-icons notranslate">delete_forever</i>Clear history (<span id="historyCount">0 items</span>)
+                    <i class="material-icons notranslate">delete_forever</i>Clear history (<span id="historyCount">0 requests</span>)
                   </button>
                   <div class="mt-2" id="historyList"></div>
                 </div>
@@ -1142,7 +1184,7 @@
 
             <div>
               <small class="bottomBarLabel"><i class="material-icons notranslate" style="font-size: 1rem; vertical-align: middle">access_time_filled</i>Playlist length</small><br />
-              <span id="playlistLength">00:00 (0 items)</span>
+              <span id="playlistLength">00:00 (0 requests)</span>
             </div>
 
             <div class="vr"></div>

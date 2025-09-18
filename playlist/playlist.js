@@ -38,6 +38,11 @@ let elements = {
   maxLength: document.getElementById("maxLength"),
   maxSize: document.getElementById("maxSize"),
   minViewCount: document.getElementById("minViewCount"),
+  minUploadAge: document.getElementById("minUploadAge"),
+  minUploadAgeUnit: document.getElementById("minUploadAgeUnit"),
+  maxUploadAge: document.getElementById("maxUploadAge"),
+  maxUploadAgeUnit: document.getElementById("maxUploadAgeUnit"),
+  uploadAgeDesc: document.getElementById("uploadAgeDesc"),
   uniqueOnly: document.getElementById("uniqueOnly"),
   whoCanRequest: document.getElementById("whoCanRequest"),
   allowPlebs: document.getElementById("allowPlebs"),
@@ -169,6 +174,10 @@ let PLAYLIST = {
   maxLength: "",
   maxSize: "",
   minViewCount: "",
+  minUploadAge: "",
+  minUploadAgeUnit: "h",
+  maxUploadAge: "",
+  maxUploadAgeUnit: "h",
   uniqueOnly: false,
   allowPlebs: true,
   allowSubs: true,
@@ -231,6 +240,10 @@ async function refreshData() {
   PLAYLIST.maxLength = parseInt(elements.maxLength.value, 10) || "";
   PLAYLIST.maxSize = parseInt(elements.maxSize.value, 10) || "";
   PLAYLIST.minViewCount = parseInt(elements.minViewCount.value, 10) || "";
+  PLAYLIST.minUploadAge = parseInt(elements.minUploadAge.value, 10) || "";
+  PLAYLIST.minUploadAgeUnit = elements.minUploadAgeUnit.value || "h";
+  PLAYLIST.maxUploadAge = parseInt(elements.maxUploadAge.value, 10) || "";
+  PLAYLIST.maxUploadAgeUnit = elements.maxUploadAgeUnit.value || "h";
   PLAYLIST.uniqueOnly = elements.uniqueOnly.checked;
   PLAYLIST.allowPlebs = elements.allowPlebs.checked;
   PLAYLIST.allowSubs = elements.allowSubs.checked;
@@ -291,6 +304,42 @@ async function refreshData() {
     <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">${PLAYLIST.requestCommandAlias} [link]</kbd>`;
   }
 
+  let min = numberAndUnitToSeconds(PLAYLIST.minUploadAge, PLAYLIST.minUploadAgeUnit) * 1000;
+  let max = numberAndUnitToSeconds(PLAYLIST.maxUploadAge, PLAYLIST.maxUploadAgeUnit) * 1000;
+  let now = Date.now();
+
+  if (min > 0 && max > 0 && min == max) {
+    PLAYLIST.minUploadAge = "";
+    PLAYLIST.maxUploadAge = "";
+    elements.minUploadAge.value = "";
+    elements.maxUploadAge.value = "";
+    showToast("Limits can't be the same", "warning", 3000);
+  }
+
+  if (min > 0 && max > 0 && min > max) {
+    PLAYLIST.minUploadAge = "";
+    PLAYLIST.maxUploadAge = "";
+    elements.minUploadAge.value = "";
+    elements.maxUploadAge.value = "";
+    showToast("Older than limit must be less than the Newer than limit", "warning", 5000);
+  }
+
+  if (PLAYLIST.minUploadAge && PLAYLIST.maxUploadAge) {
+    elements.uploadAgeDesc.innerHTML = `Content must be uploaded between ${new Date(now - max).toLocaleString("en-GB")} and ${new Date(now - min).toLocaleString("en-GB")}`;
+  }
+
+  if (PLAYLIST.minUploadAge && !PLAYLIST.maxUploadAge) {
+    elements.uploadAgeDesc.innerHTML = `Content must be uploaded before ${new Date(now - min).toLocaleString("en-GB")}`;
+  }
+
+  if (!PLAYLIST.minUploadAge && PLAYLIST.maxUploadAge) {
+    elements.uploadAgeDesc.innerHTML = `Content must be uploaded after ${new Date(now - max).toLocaleString("en-GB")}`;
+  }
+
+  if (!PLAYLIST.minUploadAge && !PLAYLIST.maxUploadAge) {
+    elements.uploadAgeDesc.innerHTML = `No age limits set`;
+  }
+
   updateWhoCanRequest();
   checkCommands();
 } //refreshdata
@@ -337,6 +386,10 @@ async function load_localStorage() {
     elements.maxLength.value = PLAYLIST.maxLength || "";
     elements.maxSize.value = PLAYLIST.maxSize || "";
     elements.minViewCount.value = PLAYLIST.minViewCount || "";
+    elements.minUploadAge.value = PLAYLIST.minUploadAge || "";
+    elements.minUploadAgeUnit.value = PLAYLIST.minUploadAgeUnit || "h";
+    elements.maxUploadAge.value = PLAYLIST.maxUploadAge || "";
+    elements.maxUploadAgeUnit.value = PLAYLIST.maxUploadAgeUnit || "h";
     elements.uniqueOnly.checked = PLAYLIST.uniqueOnly ?? false;
     elements.allowPlebs.checked = PLAYLIST.allowPlebs ?? true;
     elements.allowSubs.checked = PLAYLIST.allowSubs ?? true;
@@ -446,7 +499,7 @@ async function load_localStorage() {
       for (let index = 0; index < history.length; index++) {
         addToHistory(history[index], true);
       }
-      elements.historyCount.innerHTML = `${history.length.toLocaleString()} ${history.length == 1 ? "item" : "items"}`;
+      elements.historyCount.innerHTML = `${history.length.toLocaleString()} ${history.length == 1 ? "request" : "requests"}`;
     }
   } catch (error) {
     console.log(error);
@@ -550,6 +603,10 @@ function resetSettings(logout = false) {
       maxLength: "",
       maxSize: "",
       minViewCount: "",
+      minUploadAge: "",
+      minUploadAgeUnit: "h",
+      maxUploadAge: "",
+      maxUploadAgeUnit: "h",
       uniqueOnly: false,
       allowPlebs: true,
       allowSubs: true,
@@ -792,7 +849,7 @@ function connect() {
     }
   }); //message
 
-  client.on("timeout", (channel, username, reason, duration, userstate) => {}); //timeout
+  //client.on("timeout", (channel, username, reason, duration, userstate) => {}); //timeout
 
   client.on("messagedeleted", (channel, username, deletedMessage, userstate) => {
     const requestKey = findRequestKey("msgid", userstate["target-msg-id"]);
@@ -970,9 +1027,10 @@ function addRequest(context, link, msgid, search) {
       channel: "",
       uri: "",
       url: link?.url || "",
-      duration: 0,
+      duration: null,
       timestamp: link.timestamp,
-      views: -1,
+      views: null,
+      age: null,
       thumbnail: "",
       search: search,
       time: Date.now(),
@@ -1261,7 +1319,7 @@ function clearPlaylist() {
 function clearHistory() {
   history = [];
   elements.historyList.innerHTML = "";
-  elements.historyCount.innerHTML = `${history.length.toLocaleString()} ${history.length == 1 ? "item" : "items"}`;
+  elements.historyCount.innerHTML = `${history.length.toLocaleString()} ${history.length == 1 ? "request" : "requests"}`;
   saveSettings();
 } //clearPlaylist
 
@@ -1270,13 +1328,13 @@ function updateLength() {
   let duration = 0;
 
   for (let request of requests.values()) {
-    if (request.duration == -1) {
+    if (request.duration == -1 || request.duration == null) {
       continue;
     }
     duration += request.duration - request.timestamp;
   }
 
-  elements.playlistLength.innerHTML = `${secondsToTimeString(Math.round(duration)) || "00:00"} (${count} ${count == 1 ? "item" : "items"})`;
+  elements.playlistLength.innerHTML = `${secondsToTimeString(Math.round(duration)) || "00:00"} (${count} ${count == 1 ? "request" : "requests"})`;
 } //updateLength
 
 function makeBanButtons(request, historyButton) {
@@ -1421,7 +1479,7 @@ function addToHistory(request, localStorageLoad = false) {
                 </a>
               </div>
               <small class="request-info text-body-secondary">
-              ${escapeString(request.channel)} ${request.views > -1 ? ` · ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}
+              ${escapeString(request.channel)} ${request.views !== null ? ` • ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}
               </small>
               <small class="requested-by text-body-secondary" title="Requested by @${request.by.map((u) => u.username).join(" & ")}">
               Requested by 
@@ -1473,9 +1531,9 @@ function updatePlaylist(request, localStorageLoad = false) {
     }
     document.getElementById(`id${request.name}_title`).title = request.title;
     document.getElementById(`id${request.name}_info`).innerHTML = `
-    ${escapeString(request.channel)} ${request.views > -1 ? ` · ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}`;
+    ${escapeString(request.channel)} ${request.views !== null ? ` • ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}`;
     document.getElementById(`id${request.name}_info`).title = `
-    ${escapeString(request.channel)} ${request.views > -1 ? ` · ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}`;
+    ${escapeString(request.channel)} ${request.views !== null ? ` • ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}`;
     document.getElementById(`id${request.name}_duration`).innerText = request.duration == -1 ? "🔴live" : secondsToTimeString(Math.round(request.duration)) + timestamp;
     document.getElementById(`id${request.name}_ban_user`).innerHTML = `<i class="material-icons notranslate">person_off</i> Ban ${request.by.length > 1 ? "Users" : "User"}</a>`;
     document.getElementById(`id${request.name}_by`).innerHTML = `
@@ -1526,6 +1584,7 @@ async function getRequestInfo(request, msgid) {
       request.thumbnail = result.data.data[0].thumbnail_url;
       request.duration = result.data.data[0].duration;
       request.views = result.data.data[0].view_count;
+      request.age = new Date(result.data.data[0].created_at).getTime();
       request.mp4 = `${result?.extra?.clip?.videoQualities[0]?.sourceURL}${result?.extra?.clipKey}`;
     } catch (error) {
       deleteRequest(request.name);
@@ -1546,6 +1605,7 @@ async function getRequestInfo(request, msgid) {
       request.thumbnail = result.data[0].thumbnail_url.replace("%{width}", "320").replace("%{height}", "180");
       request.duration = convertTwitchVODDuration(result.data[0].duration);
       request.views = result.data[0].view_count;
+      request.age = new Date(result.data[0].created_at).getTime();
     } catch (error) {
       deleteRequest(request.name);
       botReply("⛔ Could not find this video's info", msgid, false);
@@ -1564,6 +1624,8 @@ async function getRequestInfo(request, msgid) {
       request.channelid = result.data[0].user_id;
       request.thumbnail = result.data[0].thumbnail_url.replace("{width}", "320").replace("{height}", "180");
       request.duration = -1;
+      request.views = result.data[0].viewer_count;
+      request.age = new Date(result.data[0].started_at).getTime();
     } catch (error) {
       deleteRequest(request.name);
       botReply("⛔ Could not find this stream's info", msgid, false);
@@ -1588,6 +1650,8 @@ async function getRequestInfo(request, msgid) {
       request.channelid = result.tracks[0].artists[0].id;
       request.thumbnail = result.tracks[0].album.images[0].url;
       request.duration = result.tracks[0].duration_ms / 1000;
+      request.views = null;
+      request.age = spotifyReleaseDateToTimestamp(result.tracks[0].album.release_date, result.tracks[0].album.release_date_precision);
       request.uri = result.tracks[0].uri;
     } catch (error) {
       deleteRequest(request.name);
@@ -1606,7 +1670,9 @@ async function getRequestInfo(request, msgid) {
       request.channel = result?.author_name || "(unknown)";
       request.channelid = result?.author_unique_id;
       request.thumbnail = result?.thumbnail_url;
-      request.duration = 0;
+      request.duration = null;
+      request.views = null;
+      request.age = null;
     } catch (error) {
       deleteRequest(request.name);
       botReply("⛔ Could not find this video's info", msgid, false);
@@ -1626,6 +1692,7 @@ async function getRequestInfo(request, msgid) {
       request.channelid = result.items[0].snippet.channelId;
       request.thumbnail = result.items[0].snippet.thumbnails.medium.url;
       request.duration = ISO8601ToSeconds(result.items[0].contentDetails.duration);
+      request.age = new Date(result.items[0].snippet.publishedAt).getTime();
       request.views = result.items[0].statistics.viewCount;
 
       if (result.items[0].contentDetails?.contentRating?.ytRating == "ytAgeRestricted" || !result.items[0].status?.embeddable) {
@@ -1703,6 +1770,7 @@ async function getRequestInfo(request, msgid) {
       request.thumbnail = result.pictures?.sizes?.[1]?.link;
       request.duration = result.duration;
       request.views = result?.stats?.plays || null;
+      request.age = new Date(result.created_time).getTime();
     } catch (error) {
       deleteRequest(request.name);
       botReply("⛔ Could not find this video's info", msgid, false);
@@ -1721,6 +1789,8 @@ async function getRequestInfo(request, msgid) {
       request.channelid = null;
       request.thumbnail = result.thumbnail_url;
       request.duration = result.files.mp4.duration;
+      request.views = null;
+      request.age = null;
       request.video = result.files.mp4.url;
     } catch (error) {
       deleteRequest(request.name);
@@ -1739,7 +1809,8 @@ async function getRequestInfo(request, msgid) {
   if (
     PLAYLIST.maxDuration !== "" &&
     request.duration !== -1 &&
-    total_duration + request.duration - request.timestamp > PLAYLIST.maxDuration * (PLAYLIST.maxDurationUnit == "m" ? 60 : 3600)
+    request.duration !== null &&
+    total_duration + request.duration - request.timestamp > numberAndUnitToSeconds(PLAYLIST.maxDuration, PLAYLIST.maxDurationUnit)
   ) {
     if (playlist_open) {
       togglePlaylist();
@@ -1749,7 +1820,7 @@ async function getRequestInfo(request, msgid) {
     return;
   } //total duration limit check
 
-  if (PLAYLIST.maxLength !== "" && request.duration !== -1 && request.duration - request.timestamp > PLAYLIST.maxLength * 60) {
+  if (PLAYLIST.maxLength !== "" && request.duration !== -1 && request.duration !== null && request.duration - request.timestamp > PLAYLIST.maxLength * 60) {
     deleteRequest(request.name);
     botReply(`⛔ Your request is too long (${PLAYLIST.maxLength}m max)`, msgid, false);
     return;
@@ -1764,11 +1835,37 @@ async function getRequestInfo(request, msgid) {
     return;
   } //playlist size check
 
-  if (PLAYLIST.minViewCount !== "" && request.views !== -1 && request.views < PLAYLIST.minViewCount) {
+  if (PLAYLIST.minViewCount !== "" && request.views !== null && request.views < PLAYLIST.minViewCount) {
     deleteRequest(request.name);
     botReply(`⛔ Your request does not meet the minimum view count (${PLAYLIST.minViewCount.toLocaleString()})`, msgid, false);
     return;
   } //view count check
+
+  if (PLAYLIST.minUploadAge !== "" && request.age !== null && request.age > Date.now() - numberAndUnitToSeconds(PLAYLIST.minUploadAge, PLAYLIST.minUploadAgeUnit) * 1000) {
+    deleteRequest(request.name);
+    let min = numberAndUnitToSeconds(PLAYLIST.minUploadAge, PLAYLIST.minUploadAgeUnit) * 1000;
+    let max = numberAndUnitToSeconds(PLAYLIST.maxUploadAge, PLAYLIST.maxUploadAgeUnit) * 1000;
+    let now = Date.now();
+    if (PLAYLIST.maxUploadAge !== "") {
+      botReply(`⛔ Your request is too new (must be uploaded between ${new Date(now - max).toLocaleString("en-GB")} and ${new Date(now - min).toLocaleString("en-GB")})`, msgid, false);
+    } else {
+      botReply(`⛔ Your request is too new (must be uploaded before ${new Date(now - min).toLocaleString("en-GB")})`, msgid, false);
+    }
+    return;
+  } //min upload age check
+
+  if (PLAYLIST.maxUploadAge !== "" && request.age !== null && request.age < Date.now() - numberAndUnitToSeconds(PLAYLIST.maxUploadAge, PLAYLIST.maxUploadAgeUnit) * 1000) {
+    deleteRequest(request.name);
+    let min = numberAndUnitToSeconds(PLAYLIST.minUploadAge, PLAYLIST.minUploadAgeUnit) * 1000;
+    let max = numberAndUnitToSeconds(PLAYLIST.maxUploadAge, PLAYLIST.maxUploadAgeUnit) * 1000;
+    let now = Date.now();
+    if (PLAYLIST.minUploadAge !== "") {
+      botReply(`⛔ Your request is too old (must be uploaded between ${new Date(now - max).toLocaleString("en-GB")} and ${new Date(now - min).toLocaleString("en-GB")})`, msgid, false);
+    } else {
+      botReply(`⛔ Your request is too old (must be uploaded after ${new Date(now - max).toLocaleString("en-GB")})`, msgid, false);
+    }
+    return;
+  } //max upload age check
 
   if (PLAYLIST.uniqueOnly && history.some((e) => e.name === request.name)) {
     deleteRequest(request.name);
@@ -1891,7 +1988,7 @@ async function parseLink(link) {
     if (!videoID[1]) {
       return null;
     }
-    let timestamp = parseInt(new URL(link)?.hash?.substring(1)?.match(/t=([0-9.]+)/)[1], 10) || 0;
+    let timestamp = parseInt(new URL(link)?.hash?.substring(1)?.match(/t=([0-9.]+)/)?.[1], 10) || 0;
     return { type: "vimeo", id: videoID[1], name: `vimeo:${videoID[1]}`, platform: "vimeo", timestamp: timestamp };
   } //vimeo
 
@@ -2171,7 +2268,7 @@ function nextItem(reply) {
     if (currentItem) {
       addToHistory(currentItem);
       deleteRequest(currentItem.name, false);
-      elements.historyCount.innerHTML = `${history.length.toLocaleString()} ${history.length == 1 ? "item" : "items"}`;
+      elements.historyCount.innerHTML = `${history.length.toLocaleString()} ${history.length == 1 ? "request" : "requests"}`;
     }
   }
   if (!currentItem) {
@@ -2240,7 +2337,7 @@ async function playItem(item) {
       break;
   }
 
-  if (currentItem.duration !== -1) {
+  if (currentItem.duration !== -1 && currentItem.duration !== null) {
     total_duration -= currentItem.duration - currentItem.timestamp;
   }
 
@@ -2272,7 +2369,7 @@ async function playItem(item) {
   </small>
   <br />
   <small class="now-playing-info">
-    ${currentItem.views > -1 ? `<i class="material-icons notranslate">visibility</i> ${formatViewCount(currentItem.views)} ${currentItem.views == 1 ? "view" : "views"}` : ""}
+    ${currentItem.views !== null ? `<i class="material-icons notranslate">visibility</i> ${formatViewCount(currentItem.views)} ${currentItem.views == 1 ? "view" : "views"}` : ""}
   </small>`;
 
   elements.nowPlayingBanButtons.innerHTML = `

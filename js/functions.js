@@ -730,6 +730,57 @@ function enablePopovers() {
   }
 } //enablePopovers
 
+/**
+ * @description converts the values from the number input and unit select to seconds
+ * @param {number} number number input
+ * @param {string} unit date unit - m, h, d, mo, y
+ * @returns {number} seconds
+ */
+function numberAndUnitToSeconds(number, unit) {
+  number = parseInt(number, 10);
+  if (!number || !unit) {
+    return 0;
+  }
+  switch (unit) {
+    case "m":
+      return number * 60;
+    case "h":
+      return number * 3600;
+    case "d":
+      return number * 86400;
+    case "mo":
+      return number * 2592000;
+    case "y":
+      return number * 31536000;
+    default:
+      return 0;
+  }
+} //numberAndUnitToSeconds
+
+/**
+ * @description convert the release date and release date precision from the spotify api to a timestamp
+ * @param {string} releaseDate
+ * @param {string} releaseDatePrecision
+ * @returns {number}
+ */
+function spotifyReleaseDateToTimestamp(releaseDate, releaseDatePrecision) {
+  let date;
+  switch (releaseDatePrecision) {
+    case "year":
+      date = `${releaseDate}-01-01`;
+      break;
+    case "month":
+      date = `${releaseDate}-01`;
+      break;
+    case "day":
+      date = releaseDate;
+      break;
+    default:
+      return 0;
+  }
+  return new Date(date).getTime();
+} //spotifyReleaseDateToTimestamp
+
 async function checkToken(access_token) {
   let requestOptions = {
     headers: { Authorization: `OAuth ${access_token}` },
