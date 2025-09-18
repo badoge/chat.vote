@@ -51,19 +51,6 @@
   height: min-content;
 }
 
-.copy-command {
-  cursor: pointer;
-  float: inline-end;
-}
-
-.copy-command:hover {
-  opacity: 80%;
-}
-
-.copy-command:active {
-  opacity: 50%;
-}
-
 #toastContainer {
   position: fixed;
   bottom: 10px;

@@ -93,10 +93,29 @@
           </div>
           <div class="modal-body">
             <p>All videos/songs will be removed from the history</p>
+            <p>Favorites will become hidden</p>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
             <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="clearHistory()"><i class="material-icons notranslate">delete_forever</i>Clear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="clearFavoritesModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Are you sure?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>All favorites will be removed</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="clearFavorites()"><i class="material-icons notranslate">heart_broken</i>Clear</button>
           </div>
         </div>
       </div>
@@ -442,7 +461,7 @@
 
             <div class="form-check form-switch mt-3">
               <input class="form-check-input" type="checkbox" role="switch" id="uniqueOnly" onchange="saveSettings()" />
-              <label class="form-check-label" for="uniqueOnly"><i class="material-icons notranslate">history_toggle_off</i>Skip non unique videos/songs</label>
+              <label class="form-check-label" for="uniqueOnly"><i class="material-icons notranslate">history_toggle_off</i>Skip non unique requests</label>
               <br />
               <small class="text-body-secondary">
                 Any request found in the <span class="text-primary"><i class="material-icons notranslate">history</i>History</span> tab will be skipped
@@ -777,6 +796,16 @@
               <label class="form-check-label" for="modCommands"><i class="material-icons notranslate">verified_user</i>Allow mods to use moderation commands</label>
             </div>
 
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" role="switch" id="enableFavorites" onchange="saveSettings()" />
+              <label class="form-check-label" for="enableFavorites"><i class="material-icons notranslate">favorite</i>Enable request favoriting</label>
+              <br />
+              <small class="text-body-secondary">
+                Adds a button to the bottom bar that allows you to favorite a request<br />
+                Favorited requests can be seen in the <span class="text-primary"><i class="material-icons notranslate">history</i>History</span> tab
+              </small>
+            </div>
+
             <small class="text-body-secondary">
               <i class="material-icons notranslate">lightbulb</i> Tip: Mods can delete a request by
               <a class="link-body-emphasis" href="https://twitter.com/TwitchSupport/status/1070135668980871168" target="_blank" rel="noopener noreferrer"> deleteing the message in chat </a>
@@ -1084,41 +1113,28 @@
                 <div class="tab-pane fade" id="approval-tab-pane" role="tabpanel" aria-labelledby="approvalTab" tabindex="0">
                   <ul class="list-group mt-1" id="approvalList">
                     <li class="list-group-item">An item</li>
-                    <li class="list-group-item">A second item</li>
-                    <li class="list-group-item">A third item</li>
-                    <li class="list-group-item">A fourth item</li>
-                    <li class="list-group-item">And a fifth one</li>
-                    <li class="list-group-item">An item</li>
-                    <li class="list-group-item">A second item</li>
-                    <li class="list-group-item">A third item</li>
-                    <li class="list-group-item">A fourth item</li>
-                    <li class="list-group-item">And a fifth one</li>
-                    <li class="list-group-item">An item</li>
-                    <li class="list-group-item">A second item</li>
-                    <li class="list-group-item">A third item</li>
-                    <li class="list-group-item">A fourth item</li>
-                    <li class="list-group-item">And a fifth one</li>
-                    <li class="list-group-item">An item</li>
-                    <li class="list-group-item">A second item</li>
-                    <li class="list-group-item">A third item</li>
-                    <li class="list-group-item">A fourth item</li>
-                    <li class="list-group-item">And a fifth one</li>
-                    <li class="list-group-item">An item</li>
-                    <li class="list-group-item">A second item</li>
-                    <li class="list-group-item">A third item</li>
-                    <li class="list-group-item">A fourth item</li>
-                    <li class="list-group-item">And a fifth one</li>
-                    <li class="list-group-item">An item</li>
-                    <li class="list-group-item">A second item</li>
-                    <li class="list-group-item">A third item</li>
-                    <li class="list-group-item">A fourth item</li>
-                    <li class="list-group-item">And a fifth one</li>
                   </ul>
                 </div>
                 <div class="tab-pane fade" id="history-tab-pane" role="tabpanel" aria-labelledby="historyTab" tabindex="0">
-                  <button class="btn btn-outline-warning mt-2" type="button" data-bs-toggle="modal" data-bs-target="#clearHistoryModal">
-                    <i class="material-icons notranslate">delete_forever</i>Clear history (<span id="historyCount">0 requests</span>)
-                  </button>
+                  <div class="text-center">
+                    <button class="btn btn-outline-warning mt-2" type="button" data-bs-toggle="modal" data-bs-target="#clearHistoryModal">
+                      <i class="material-icons notranslate">delete_forever</i>Clear history (<span id="historyCount">0 requests</span>)
+                    </button>
+                    <div class="input-group mt-3">
+                      <div class="input-group-text">
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" id="showFavorites" onchange="loadHistory()" />
+                          <label class="form-check-label" for="showFavorites">Show favorites only</label>
+                        </div>
+                      </div>
+                      <button class="btn btn-outline-warning" type="button" data-bs-toggle="modal" data-bs-target="#clearFavoritesModal">
+                        <i class="material-icons notranslate">heart_broken</i>Clear favorites (<span id="favoriteCount">0</span>)
+                      </button>
+                    </div>
+                    <button class="btn btn-outline-success mt-2" type="button" onclick="downloadFavorites()"><i class="material-icons notranslate">download</i>Download favorites</button>
+                  </div>
+
+                  <hr />
                   <div class="mt-2" id="historyList"></div>
                 </div>
               </div>
@@ -1178,6 +1194,12 @@
               <div id="nowPlayingInfo"></div>
 
               <div id="nowPlayingBanButtons"></div>
+
+              <div id="favoriteButtonDiv" style="display: none">
+                <i id="favoriteButton" onclick="favorite()" class="material-icons notranslate" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Add to favorites">
+                  favorite_border
+                </i>
+              </div>
             </div>
 
             <div class="vr"></div>

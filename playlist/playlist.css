@@ -109,7 +109,7 @@ video {
 }
 
 #historyList {
-  height: calc(100vh - 355px);
+  height: calc(100vh - 490px);
   overflow-x: hidden;
   overflow-y: auto;
   text-align: start;
@@ -161,7 +161,7 @@ video {
 }
 
 #nowPlaying {
-  max-width: 500px;
+  max-width: 450px;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
@@ -195,6 +195,12 @@ video {
 
 #nowPlayingInfo {
   line-height: 12px;
+}
+
+#favoriteButton {
+  font-size: 2rem;
+  cursor: pointer;
+  user-select: none;
 }
 
 .deletebtn {

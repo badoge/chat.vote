@@ -80,6 +80,7 @@ let elements = {
   rewindCommand: document.getElementById("rewindCommand"),
   deleteCommand: document.getElementById("deleteCommand"),
   modCommands: document.getElementById("modCommands"),
+  enableFavorites: document.getElementById("enableFavorites"),
 
   //main
   toastContainer: document.getElementById("toastContainer"),
@@ -108,6 +109,8 @@ let elements = {
   approvalList: document.getElementById("approvalList"),
   historyTab: document.getElementById("historyTab"),
   historyCount: document.getElementById("historyCount"),
+  favoriteCount: document.getElementById("favoriteCount"),
+  showFavorites: document.getElementById("showFavorites"),
   historyList: document.getElementById("historyList"),
 
   //bottom row
@@ -117,6 +120,8 @@ let elements = {
   nowPlayingRequester: document.getElementById("nowPlayingRequester"),
   nowPlayingInfo: document.getElementById("nowPlayingInfo"),
   nowPlayingBanButtons: document.getElementById("nowPlayingBanButtons"),
+  favoriteButtonDiv: document.getElementById("favoriteButtonDiv"),
+  favoriteButton: document.getElementById("favoriteButton"),
   playlistLength: document.getElementById("playlistLength"),
   togglePlaylist: document.getElementById("togglePlaylist"),
   autoplay: document.getElementById("autoplay"),
@@ -143,6 +148,7 @@ let streamerColor = "";
 let users = [];
 let requests = new Map();
 let history = [];
+let favorites = [];
 let bannedUsers = new Map();
 let bannedItems = new Map();
 let bannedChannels = new Map();
@@ -212,6 +218,7 @@ let PLAYLIST = {
   rewindCommand: "!rewind",
   deleteCommand: "!delete",
   modCommands: true,
+  enableFavorites: false,
 };
 
 async function refreshData() {
@@ -278,6 +285,7 @@ async function refreshData() {
   PLAYLIST.rewindCommand = elements.rewindCommand.value.replace(/\s+/g, "").toLowerCase() || "!rewind";
   PLAYLIST.deleteCommand = elements.deleteCommand.value.replace(/\s+/g, "").toLowerCase() || "!delete";
   PLAYLIST.modCommands = elements.modCommands.checked;
+  PLAYLIST.enableFavorites = elements.enableFavorites.checked;
 
   elements.voteskipCommand.disabled = !PLAYLIST.allowVoteSkip;
   elements.voteskipCommandAlias.disabled = !PLAYLIST.allowVoteSkip;
@@ -340,6 +348,12 @@ async function refreshData() {
     elements.uploadAgeDesc.innerHTML = `No age limits set`;
   }
 
+  if (PLAYLIST.enableFavorites) {
+    elements.favoriteButtonDiv.style.display = "";
+  } else {
+    elements.favoriteButtonDiv.style.display = "none";
+  }
+
   updateWhoCanRequest();
   checkCommands();
 } //refreshdata
@@ -350,6 +364,7 @@ function saveSettings() {
   localStorage.setItem("PLAYLIST", JSON.stringify(PLAYLIST));
   localforage.setItem("PLAYLIST_REQUESTS", JSON.stringify(requests, replacer));
   localforage.setItem("PLAYLIST_HISTORY", JSON.stringify(history));
+  localforage.setItem("PLAYLIST_FAVORITES", JSON.stringify(favorites));
   localforage.setItem("PLAYLIST_BANNED_USERS", JSON.stringify(bannedUsers, replacer));
   localforage.setItem("PLAYLIST_BANNED_ITEMS", JSON.stringify(bannedItems, replacer));
   localforage.setItem("PLAYLIST_BANNED_CHANNELS", JSON.stringify(bannedChannels, replacer));
@@ -424,6 +439,7 @@ async function load_localStorage() {
     elements.rewindCommand.value = PLAYLIST.rewindCommand || "!rewind";
     elements.deleteCommand.value = PLAYLIST.deleteCommand || "!delete";
     elements.modCommands.checked = PLAYLIST.modCommands ?? true;
+    elements.enableFavorites.checked = PLAYLIST.enableFavorites ?? false;
 
     elements.voteskipCommand.disabled = !PLAYLIST.allowVoteSkip;
     elements.voteskipCommandAlias.disabled = !PLAYLIST.allowVoteSkip;
@@ -496,10 +512,19 @@ async function load_localStorage() {
       console.log("localStorage playlist history not found");
     } else {
       history = JSON.parse(storedHistory);
-      for (let index = 0; index < history.length; index++) {
-        addToHistory(history[index], true);
-      }
-      elements.historyCount.innerHTML = `${history.length.toLocaleString()} ${history.length == 1 ? "request" : "requests"}`;
+      loadHistory();
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  try {
+    const storedFavorites = await localforage.getItem("PLAYLIST_FAVORITES");
+    if (!storedFavorites) {
+      console.log("localStorage playlist favorites not found");
+    } else {
+      favorites = JSON.parse(storedFavorites);
+      elements.favoriteCount.innerHTML = `${favorites.length.toLocaleString()}`;
     }
   } catch (error) {
     console.log(error);
@@ -580,6 +605,7 @@ function resetSettings(logout = false) {
     );
     localforage.setItem("PLAYLIST_REQUESTS", JSON.stringify(new Map(), replacer));
     localforage.setItem("PLAYLIST_HISTORY", JSON.stringify([]));
+    localforage.setItem("PLAYLIST_FAVORITES", JSON.stringify([]));
     localforage.setItem("PLAYLIST_BANNED_USERS", JSON.stringify(new Map(), replacer));
     localforage.setItem("PLAYLIST_BANNED_ITEMS", JSON.stringify(new Map(), replacer));
     localforage.setItem("PLAYLIST_BANNED_CHANNELS", JSON.stringify(new Map(), replacer));
@@ -641,6 +667,7 @@ function resetSettings(logout = false) {
       rewindCommand: "!rewind",
       deleteCommand: "!delete",
       modCommands: true,
+      enableFavorites: false,
     })
   );
   location.reload();
@@ -1321,7 +1348,28 @@ function clearHistory() {
   elements.historyList.innerHTML = "";
   elements.historyCount.innerHTML = `${history.length.toLocaleString()} ${history.length == 1 ? "request" : "requests"}`;
   saveSettings();
-} //clearPlaylist
+} //clearHistory
+
+function clearFavorites() {
+  favorites = [];
+  elements.historyList.innerHTML = "";
+  elements.showFavorites.checked = false;
+  elements.favoriteCount.innerHTML = `${favorites.length.toLocaleString()}`;
+  toggleFavoriteButton(false);
+  saveSettings();
+  loadHistory();
+} //clearFavorites
+
+function loadHistory() {
+  elements.historyList.innerHTML = "";
+  for (let index = 0; index < history.length; index++) {
+    if (elements.showFavorites.checked && !favorites.includes(history[index].name)) {
+      continue;
+    }
+    addToHistory(history[index], true);
+  }
+  elements.historyCount.innerHTML = `${history.length.toLocaleString()} ${history.length == 1 ? "request" : "requests"}`;
+} //loadHistory
 
 function updateLength() {
   const count = requests.size;
@@ -2381,6 +2429,7 @@ async function playItem(item) {
     </div>`;
   playlist_playing = true;
   updateMetadata();
+  toggleFavoriteButton(favorites.includes(currentItem.name));
 } //playItem
 
 function updateMetadata() {
@@ -2397,6 +2446,43 @@ function updateMetadata() {
     });
   }
 } //updateMetadata
+
+function favorite() {
+  if (!currentItem?.name) {
+    showToast("Nothing is playing right now", "danger", 3000);
+    return;
+  }
+  if (favorites.includes(currentItem.name)) {
+    let index = favorites.indexOf(currentItem.name);
+    if (index !== -1) {
+      favorites.splice(index, 1);
+    }
+    toggleFavoriteButton(false);
+  } else {
+    favorites.push(currentItem.name);
+    toggleFavoriteButton(true);
+    elements.favoriteCount.innerHTML = `${favorites.length.toLocaleString()}`;
+  }
+  saveSettings();
+} //favorite
+
+function toggleFavoriteButton(active) {
+  const tooltip = bootstrap.Tooltip.getInstance("#favoriteButton");
+
+  if (!active) {
+    elements.favoriteButton.innerText = "favorite_border";
+    elements.favoriteButton.classList.remove("text-danger");
+    tooltip.setContent({ ".tooltip-inner": "Add to favorites" });
+  } else {
+    elements.favoriteButton.innerText = "favorite";
+    elements.favoriteButton.classList.add("text-danger");
+    tooltip.setContent({ ".tooltip-inner": "Remove from favorites" });
+  }
+} //toggleFavoriteButton
+
+function downloadFavorites() {
+  showToast("not working yet :)", "info", 1000);
+} //downloadFavorites
 
 function resetPlayers() {
   elements.placeholder.style.display = "none";
