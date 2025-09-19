@@ -93,7 +93,7 @@
           </div>
           <div class="modal-body">
             <p>All videos/songs will be removed from the history</p>
-            <p>Favorites will become hidden</p>
+            <p class="text-warning">Favorites will be gone also</p>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -802,7 +802,8 @@
               <br />
               <small class="text-body-secondary">
                 Adds a button to the bottom bar that allows you to favorite a request<br />
-                Favorited requests can be seen in the <span class="text-primary"><i class="material-icons notranslate">history</i>History</span> tab
+                Favorited requests can be seen in the <span class="text-primary"><i class="material-icons notranslate">history</i>History</span> tab<br />
+                Clearing history will also clear favorites
               </small>
             </div>
 
@@ -1116,22 +1117,39 @@
                   </ul>
                 </div>
                 <div class="tab-pane fade" id="history-tab-pane" role="tabpanel" aria-labelledby="historyTab" tabindex="0">
-                  <div class="text-center">
-                    <button class="btn btn-outline-warning mt-2" type="button" data-bs-toggle="modal" data-bs-target="#clearHistoryModal">
-                      <i class="material-icons notranslate">delete_forever</i>Clear history (<span id="historyCount">0 requests</span>)
-                    </button>
-                    <div class="input-group mt-3">
-                      <div class="input-group-text">
-                        <div class="form-check form-switch">
-                          <input class="form-check-input" type="checkbox" role="switch" id="showFavorites" onchange="loadHistory()" />
-                          <label class="form-check-label" for="showFavorites">Show favorites only</label>
-                        </div>
-                      </div>
-                      <button class="btn btn-outline-warning" type="button" data-bs-toggle="modal" data-bs-target="#clearFavoritesModal">
-                        <i class="material-icons notranslate">heart_broken</i>Clear favorites (<span id="favoriteCount">0</span>)
+                  <div class="hstack gap-1 mt-2">
+                    <div class="p-1 align-self-start">
+                      <h5 class="mb-2"><i class="material-icons notranslate">history</i>History (<span id="historyCount">0 requests</span>)</h5>
+
+                      <button class="btn btn-outline-warning" type="button" data-bs-toggle="modal" data-bs-target="#clearHistoryModal">
+                        <i class="material-icons notranslate">delete_forever</i>Clear history
                       </button>
+                      <br /><small class="text-body-secondary">Will clear favorites also</small>
+                      <h6 class="mt-2"><i class="material-icons notranslate">download</i>Download history</h6>
+                      <div class="btn-group" role="group" aria-label="Download history">
+                        <button class="btn btn-outline-success" type="button" onclick="downloadHistory('json')"><i class="material-icons notranslate">download</i>JSON</button>
+                        <button class="btn btn-outline-success" type="button" onclick="downloadHistory('csv')"><i class="material-icons notranslate">download</i>CSV</button>
+                      </div>
                     </div>
-                    <button class="btn btn-outline-success mt-2" type="button" onclick="downloadFavorites()"><i class="material-icons notranslate">download</i>Download favorites</button>
+                    <div class="vr"></div>
+                    <div class="p-1 align-self-start">
+                      <h5 class="mb-2"><i class="material-icons notranslate">favorite</i>Favorites (<span id="favoriteCount">0 requests</span>)</h5>
+
+                      <button class="btn btn-outline-warning mb-2" type="button" data-bs-toggle="modal" data-bs-target="#clearFavoritesModal">
+                        <i class="material-icons notranslate">heart_broken</i>Clear favorites
+                      </button>
+
+                      <h6><i class="material-icons notranslate">download</i>Download favorites</h6>
+                      <div class="btn-group mb-2" role="group" aria-label="Download favorites">
+                        <button class="btn btn-outline-success" type="button" onclick="downloadFavorites('json')"><i class="material-icons notranslate">download</i>JSON</button>
+                        <button class="btn btn-outline-success" type="button" onclick="downloadFavorites('csv')"><i class="material-icons notranslate">download</i>CSV</button>
+                      </div>
+
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="showFavorites" onchange="loadHistory()" />
+                        <label class="form-check-label" for="showFavorites">Show favorites only</label>
+                      </div>
+                    </div>
                   </div>
 
                   <hr />

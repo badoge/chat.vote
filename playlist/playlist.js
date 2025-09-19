@@ -524,7 +524,7 @@ async function load_localStorage() {
       console.log("localStorage playlist favorites not found");
     } else {
       favorites = JSON.parse(storedFavorites);
-      elements.favoriteCount.innerHTML = `${favorites.length.toLocaleString()}`;
+      elements.favoriteCount.innerHTML = `${favorites.length.toLocaleString()} ${favorites.length == 1 ? "request" : "requests"}`;
     }
   } catch (error) {
     console.log(error);
@@ -1354,7 +1354,7 @@ function clearFavorites() {
   favorites = [];
   elements.historyList.innerHTML = "";
   elements.showFavorites.checked = false;
-  elements.favoriteCount.innerHTML = `${favorites.length.toLocaleString()}`;
+  elements.favoriteCount.innerHTML = `${favorites.length.toLocaleString()} ${favorites.length == 1 ? "request" : "requests"}`;
   toggleFavoriteButton(false);
   saveSettings();
   loadHistory();
@@ -2461,7 +2461,7 @@ function favorite() {
   } else {
     favorites.push(currentItem.name);
     toggleFavoriteButton(true);
-    elements.favoriteCount.innerHTML = `${favorites.length.toLocaleString()}`;
+    elements.favoriteCount.innerHTML = `${favorites.length.toLocaleString()} ${favorites.length == 1 ? "request" : "requests"}`;
   }
   saveSettings();
 } //favorite
@@ -2480,9 +2480,167 @@ function toggleFavoriteButton(active) {
   }
 } //toggleFavoriteButton
 
-function downloadFavorites() {
-  showToast("not working yet :)", "info", 1000);
+function downloadFavorites(format) {
+  if (history.length == 0) {
+    showToast("Favorite downloading disabled because history was cleared", "danger", 3000);
+    return;
+  }
+
+  if (history.length == 0 || favorites.length == 0) {
+    showToast("There is nothing to download", "danger", 3000);
+    return;
+  }
+
+  if (format == "json") {
+    let cleanFavorites = [];
+    for (let index = 0; index < history.length; index++) {
+      if (!favorites.includes(history[index].name)) {
+        continue;
+      }
+      cleanFavorites.push({
+        id: history[index].id,
+        title: history[index].title,
+        channel: history[index].channel,
+        duration: history[index].duration,
+        timestamp: history[index].timestamp,
+        views: history[index].views,
+        upload_date: new Date(history[index].age).toISOString(),
+        request_date: new Date(history[index].time).toISOString(),
+        requesters: history[index].by.map((requester) => requester.username),
+        url: getItemLink(history[index]),
+      });
+    }
+
+    if (cleanFavorites.length !== favorites.length) {
+      showToast("Some favorites are missing from the history", "warning", 3000);
+    }
+
+    const blob = new Blob([JSON.stringify(cleanFavorites)], { type: "text/json" });
+    const link = document.createElement("a");
+    link.download = `chatvote playlist favorites - ${new Date().toISOString()}.json`;
+    link.href = window.URL.createObjectURL(blob);
+    link.dataset.downloadurl = ["text/json", link.download, link.href].join(":");
+    const event = new MouseEvent("click", {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+    });
+    link.dispatchEvent(event);
+    link.remove();
+  } else if (format == "csv") {
+    let cleanFavorites = [];
+    for (let index = 0; index < history.length; index++) {
+      if (!favorites.includes(history[index].name)) {
+        continue;
+      }
+      cleanFavorites.push({
+        id: history[index].id,
+        title: history[index].title,
+        channel: history[index].channel,
+        duration: history[index].duration,
+        timestamp: history[index].timestamp,
+        views: history[index].views,
+        upload_date: new Date(history[index].age).toISOString(),
+        request_date: new Date(history[index].time).toISOString(),
+        requesters: history[index].by.map((requester) => requester.username),
+        url: getItemLink(history[index]),
+      });
+    }
+
+    if (cleanFavorites.length !== favorites.length) {
+      showToast("Some favorites are missing from the history", "warning", 3000);
+    }
+
+    const keys = Object.keys(cleanFavorites[0]);
+    const header = keys.join(",") + "\n";
+    const rows = cleanFavorites.map((obj) => keys.map((k) => JSON.stringify(obj[k] ?? "")).join(",")).join("\n");
+    const blob = new Blob([header + rows], { type: "text/csv" });
+    const link = document.createElement("a");
+    link.download = `chatvote playlist favorites - ${new Date().toISOString()}.csv`;
+    link.href = window.URL.createObjectURL(blob);
+    link.dataset.downloadurl = ["text/csv", link.download, link.href].join(":");
+    const event = new MouseEvent("click", {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+    });
+    link.dispatchEvent(event);
+    link.remove();
+  } else {
+    showToast("Something went wrong :(", "danger", 2000);
+  }
 } //downloadFavorites
+
+function downloadHistory(format) {
+  if (history.length == 0) {
+    showToast("There is nothing to download", "danger", 3000);
+    return;
+  }
+
+  if (format == "json") {
+    let cleanHistory = [];
+    for (let index = 0; index < history.length; index++) {
+      cleanHistory.push({
+        id: history[index].id,
+        title: history[index].title,
+        channel: history[index].channel,
+        duration: history[index].duration,
+        timestamp: history[index].timestamp,
+        views: history[index].views,
+        upload_date: new Date(history[index].age).toISOString(),
+        request_date: new Date(history[index].time).toISOString(),
+        requesters: history[index].by.map((requester) => requester.username),
+        url: getItemLink(history[index]),
+      });
+    }
+    const blob = new Blob([JSON.stringify(cleanHistory)], { type: "text/json" });
+    const link = document.createElement("a");
+    link.download = `chatvote playlist history - ${new Date().toISOString()}.json`;
+    link.href = window.URL.createObjectURL(blob);
+    link.dataset.downloadurl = ["text/json", link.download, link.href].join(":");
+    const event = new MouseEvent("click", {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+    });
+    link.dispatchEvent(event);
+    link.remove();
+  } else if (format == "csv") {
+    let cleanHistory = [];
+    for (let index = 0; index < history.length; index++) {
+      cleanHistory.push({
+        id: history[index].id,
+        title: history[index].title,
+        channel: history[index].channel,
+        duration: history[index].duration,
+        timestamp: history[index].timestamp,
+        views: history[index].views,
+        upload_date: new Date(history[index].age).toISOString(),
+        request_date: new Date(history[index].time).toISOString(),
+        requesters: history[index].by.map((requester) => requester.username),
+        url: getItemLink(history[index]),
+      });
+    }
+
+    const keys = Object.keys(cleanHistory[0]);
+    const header = keys.join(",") + "\n";
+    const rows = cleanHistory.map((obj) => keys.map((k) => JSON.stringify(obj[k] ?? "")).join(",")).join("\n");
+    const blob = new Blob([header + rows], { type: "text/csv" });
+    const link = document.createElement("a");
+    link.download = `chatvote playlist history - ${new Date().toISOString()}.csv`;
+    link.href = window.URL.createObjectURL(blob);
+    link.dataset.downloadurl = ["text/csv", link.download, link.href].join(":");
+    const event = new MouseEvent("click", {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+    });
+    link.dispatchEvent(event);
+    link.remove();
+  } else {
+    showToast("Something went wrong :(", "danger", 2000);
+  }
+} //downloadHistory
 
 function resetPlayers() {
   elements.placeholder.style.display = "none";
