@@ -1,6 +1,10 @@
 <script>
+  import { onMount } from "svelte";
   import "bootstrap/dist/css/bootstrap.min.css";
-  import "bootstrap/dist/js/bootstrap.bundle.min.js";
+
+  onMount(async () => {
+    await import("bootstrap");
+  });
   let { children } = $props();
 </script>
 
