@@ -1,243 +1,242 @@
 <script>
-    let settingsModal, loginExpiredModal;
-let myChart;
-let viewCountArray = [];
-let viewCountLabelsArray = [];
-let targetCount = 1;
-let chartWidth = 20;
-let updateRate = 5;
-let channel;
-let updateOnChange = true;
+  import { onMount, onDestroy } from "svelte";
 
-let elements = {
-  settingsModal: document.getElementById("settingsModal"),
-  loginExpiredModal: document.getElementById("loginExpiredModal"),
-  ctx: document.getElementById("myChart").getContext("2d"),
-  toastContainer: document.getElementById("toastContainer"),
-  overlay: document.getElementById("overlay"),
-  overlayBody: document.getElementById("overlayBody"),
+  onDestroy(() => {
+    return "dank";
+  });
 
-  targetCount: document.getElementById("targetCount"),
-  chartWidth: document.getElementById("chartWidth"),
-  updateRate: document.getElementById("updateRate"),
-  updateOnChange: document.getElementById("updateOnChange"),
-  recoveryDelay: document.getElementById("recoveryDelay"),
-  showViewcount: document.getElementById("showViewcount"),
-  autoColor: document.getElementById("autoColor"),
-  lineColor: document.getElementById("lineColor"),
-  fillColor: document.getElementById("fillColor"),
-  backgroundColor: document.getElementById("backgroundColor"),
-  transparentBG: document.getElementById("transparentBG"),
-  noFill: document.getElementById("noFill"),
-
-  serverIP: document.getElementById("serverIP"),
-  serverPort: document.getElementById("serverPort"),
-  serverPassword: document.getElementById("serverPassword"),
-  connectOBS: document.getElementById("connectOBS"),
-  stopDelay: document.getElementById("stopDelay"),
-};
-
-let USER = {
-  channel: "",
-  twitchLogin: false,
-  access_token: "",
-  userID: "",
-};
-
-function load_localStorage() {
-  if (!localStorage.getItem("USER")) {
-    console.log("localStorage user info not found");
-  } else {
-    USER = JSON.parse(localStorage.getItem("USER"));
-  }
-} //load_localStorage
-
-function refreshData() {
-  if (!USER.twitchLogin) {
-    console.log("no twitch login");
-  }
-} //refreshdata
-
-function saveSettings() {
-  refreshData();
-  localStorage.setItem("USER", JSON.stringify(USER));
-  localStorage.setItem("CHATVOTE", JSON.stringify(CHATVOTE));
-} //saveSettings
-
-let oldCount = 0;
-
-async function getViewCount() {
-  let requestOptions = {
-    headers: { Authorization: `Bearer ${USER.access_token}`, "Client-Id": CLIENT_ID },
-  };
-
-  try {
-    let response = await fetch(`https://api.twitch.tv/helix/streams?user_login=${channel}`, requestOptions);
-    if (!response.ok) {
-      console.log("getViewCount error");
+  onMount(async () => {
+    settingsModal = new bootstrap.Modal(elements.settingsModal);
+    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
+    loadAndConnect();
+    if (!USER.channel) {
+      loginExpiredModal.show();
     }
-    let result = await response.json();
-    if (!result.data[0]) {
-      showToast("Channel not live", "danger", 5000);
-      return;
-    }
-    if (oldCount != result.data[0].viewer_count || !updateOnChange) {
-      oldCount = result.data[0].viewer_count;
-      viewCountArray.push(result.data[0].viewer_count);
+    loadChart();
 
-      elements.overlayBody.innerText = result.data[0].viewer_count.toLocaleString();
+    enableTooltips();
+    enablePopovers();
 
-      if (result.data[0].viewer_count > targetCount) {
-        elements.overlay.classList = "display-1 card text-bg-success";
+    elements.targetCount.oninput = function () {
+      targetCount = parseInt(this.value, 10);
+    };
+    elements.chartWidth.oninput = function () {
+      chartWidth = parseInt(this.value, 10);
+    };
+    elements.updateRate.oninput = function () {
+      updateRate = parseInt(this.value, 10);
+    };
+    elements.updateOnChange.onchange = function () {
+      updateOnChange = this.checked;
+    };
+    elements.lineColor.oninput = function () {
+      myChart.data.datasets[0].borderColor = this.value;
+      myChart.update();
+    };
+    elements.fillColor.oninput = function () {
+      elements.noFill.checked = false;
+      myChart.data.datasets[0].backgroundColor = this.value;
+      myChart.update();
+    };
+    elements.backgroundColor.oninput = function () {
+      elements.transparentBG.checked = false;
+      document.body.style.backgroundColor = this.value;
+    };
+    elements.transparentBG.onchange = function () {
+      if (this.checked) {
+        document.body.style.backgroundColor = "transparent";
       } else {
-        elements.overlay.classList = "display-1 card text-bg-danger";
-        elements.overlayBody.innerText = `${result.data[0].viewer_count.toLocaleString()}/${targetCount.toLocaleString()}`;
+        document.body.style.backgroundColor = elements.backgroundColor.value;
       }
-      let time = new Date();
-      viewCountLabelsArray.push(`${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`);
-      if (viewCountArray.length == 1) {
-        viewCountArray.push(result.data[0].viewer_count);
-        viewCountLabelsArray.push(`${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`);
+    };
+    elements.noFill.onchange = function () {
+      if (this.checked) {
+        myChart.data.datasets[0].backgroundColor = "transparent";
+      } else {
+        myChart.data.datasets[0].backgroundColor = elements.fillColor.value;
       }
       myChart.update();
-      while (viewCountArray.length > chartWidth) {
-        viewCountArray.shift();
-        viewCountLabelsArray.shift();
+    };
+
+    elements.autoColor.onchange = function () {
+      console.log("autoColor");
+    };
+    elements.showViewcount.onchange = function () {
+      if (this.checked) {
+        elements.overlay.style.display = "block";
+      } else {
+        elements.overlay.style.display = "none";
       }
-    }
-  } catch (error) {
-    console.log("getViewCount error", error);
-  }
-  setTimeout(() => {
-    getViewCount();
-  }, updateRate * 1000);
-}
+    };
 
-async function loadAndConnect() {
-  load_localStorage();
-  refreshData();
-  const params = new Proxy(new URLSearchParams(window.location.search), {
-    get: (searchParams, prop) => searchParams.get(prop),
+    elements.connectOBS.addEventListener("click", function () {
+      console.log("connectOBS");
+    });
   });
-  channel = params.channel || USER.channel;
 
-  if (USER.twitchLogin && !(await checkToken(USER.access_token))) {
-    USER.channel = "";
-    loginExpiredModal.show();
-    return;
+  let settingsModal, loginExpiredModal;
+  let myChart;
+  let viewCountArray = [];
+  let viewCountLabelsArray = [];
+  let targetCount = 1;
+  let chartWidth = 20;
+  let updateRate = 5;
+  let channel;
+  let updateOnChange = true;
+
+  let elements = {
+    settingsModal: document.getElementById("settingsModal"),
+    loginExpiredModal: document.getElementById("loginExpiredModal"),
+    ctx: document.getElementById("myChart").getContext("2d"),
+    overlay: document.getElementById("overlay"),
+    overlayBody: document.getElementById("overlayBody"),
+
+    targetCount: document.getElementById("targetCount"),
+    chartWidth: document.getElementById("chartWidth"),
+    updateRate: document.getElementById("updateRate"),
+    updateOnChange: document.getElementById("updateOnChange"),
+    recoveryDelay: document.getElementById("recoveryDelay"),
+    showViewcount: document.getElementById("showViewcount"),
+    autoColor: document.getElementById("autoColor"),
+    lineColor: document.getElementById("lineColor"),
+    fillColor: document.getElementById("fillColor"),
+    backgroundColor: document.getElementById("backgroundColor"),
+    transparentBG: document.getElementById("transparentBG"),
+    noFill: document.getElementById("noFill"),
+
+    serverIP: document.getElementById("serverIP"),
+    serverPort: document.getElementById("serverPort"),
+    serverPassword: document.getElementById("serverPassword"),
+    connectOBS: document.getElementById("connectOBS"),
+    stopDelay: document.getElementById("stopDelay"),
+  };
+
+  let USER = {
+    channel: "",
+    twitchLogin: false,
+    access_token: "",
+    userID: "",
+  };
+
+  function load_localStorage() {
+    if (!localStorage.getItem("USER")) {
+      console.log("localStorage user info not found");
+    } else {
+      USER = JSON.parse(localStorage.getItem("USER"));
+    }
+  } //load_localStorage
+
+  function refreshData() {
+    if (!USER.twitchLogin) {
+      console.log("no twitch login");
+    }
+  } //refreshdata
+
+  function saveSettings() {
+    refreshData();
+    localStorage.setItem("USER", JSON.stringify(USER));
+    localStorage.setItem("CHATVOTE", JSON.stringify(CHATVOTE));
+  } //saveSettings
+
+  let oldCount = 0;
+
+  async function getViewCount() {
+    let requestOptions = {
+      headers: { Authorization: `Bearer ${USER.access_token}`, "Client-Id": CLIENT_ID },
+    };
+
+    try {
+      let response = await fetch(`https://api.twitch.tv/helix/streams?user_login=${channel}`, requestOptions);
+      if (!response.ok) {
+        console.log("getViewCount error");
+      }
+      let result = await response.json();
+      if (!result.data[0]) {
+        showToast("Channel not live", "danger", 5000);
+        return;
+      }
+      if (oldCount != result.data[0].viewer_count || !updateOnChange) {
+        oldCount = result.data[0].viewer_count;
+        viewCountArray.push(result.data[0].viewer_count);
+
+        elements.overlayBody.innerText = result.data[0].viewer_count.toLocaleString();
+
+        if (result.data[0].viewer_count > targetCount) {
+          elements.overlay.classList = "display-1 card text-bg-success";
+        } else {
+          elements.overlay.classList = "display-1 card text-bg-danger";
+          elements.overlayBody.innerText = `${result.data[0].viewer_count.toLocaleString()}/${targetCount.toLocaleString()}`;
+        }
+        let time = new Date();
+        viewCountLabelsArray.push(`${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`);
+        if (viewCountArray.length == 1) {
+          viewCountArray.push(result.data[0].viewer_count);
+          viewCountLabelsArray.push(`${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`);
+        }
+        myChart.update();
+        while (viewCountArray.length > chartWidth) {
+          viewCountArray.shift();
+          viewCountLabelsArray.shift();
+        }
+      }
+    } catch (error) {
+      console.log("getViewCount error", error);
+    }
+    setTimeout(() => {
+      getViewCount();
+    }, updateRate * 1000);
   }
 
-  if (USER.channel) {
-    getViewCount();
-  }
-} //loadAndConnect
+  async function loadAndConnect() {
+    load_localStorage();
+    refreshData();
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+      get: (searchParams, prop) => searchParams.get(prop),
+    });
+    channel = params.channel || USER.channel;
 
-function loadChart() {
-  refreshData();
-  if (myChart) {
-    myChart.destroy();
-  }
-  myChart = new Chart(elements.ctx, {
-    type: "line",
-    data: {
-      labels: viewCountLabelsArray,
-      datasets: [
-        {
-          label: "dank",
-          data: viewCountArray,
-          borderColor: "#def33f",
-          backgroundColor: "#000000",
-          borderWidth: 2,
-          tension: 0.1,
-          fill: true,
-        },
-      ],
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true,
+    if (USER.twitchLogin && !(await checkToken(USER.access_token))) {
+      USER.channel = "";
+      loginExpiredModal.show();
+      return;
+    }
+
+    if (USER.channel) {
+      getViewCount();
+    }
+  } //loadAndConnect
+
+  function loadChart() {
+    refreshData();
+    if (myChart) {
+      myChart.destroy();
+    }
+    myChart = new Chart(elements.ctx, {
+      type: "line",
+      data: {
+        labels: viewCountLabelsArray,
+        datasets: [
+          {
+            label: "dank",
+            data: viewCountArray,
+            borderColor: "#def33f",
+            backgroundColor: "#000000",
+            borderWidth: 2,
+            tension: 0.1,
+            fill: true,
+          },
+        ],
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+          },
         },
       },
-    },
-  });
-} //loadChart
-
-window.onload = function () {
-  settingsModal = new bootstrap.Modal(elements.settingsModal);
-  loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
-  loadAndConnect();
-  if (!USER.channel) {
-    loginExpiredModal.show();
-  }
-  loadChart();
-
-  enableTooltips();
-  enablePopovers();
-
-  elements.targetCount.oninput = function () {
-    targetCount = parseInt(this.value, 10);
-  };
-  elements.chartWidth.oninput = function () {
-    chartWidth = parseInt(this.value, 10);
-  };
-  elements.updateRate.oninput = function () {
-    updateRate = parseInt(this.value, 10);
-  };
-  elements.updateOnChange.onchange = function () {
-    updateOnChange = this.checked;
-  };
-  elements.lineColor.oninput = function () {
-    myChart.data.datasets[0].borderColor = this.value;
-    myChart.update();
-  };
-  elements.fillColor.oninput = function () {
-    elements.noFill.checked = false;
-    myChart.data.datasets[0].backgroundColor = this.value;
-    myChart.update();
-  };
-  elements.backgroundColor.oninput = function () {
-    elements.transparentBG.checked = false;
-    document.body.style.backgroundColor = this.value;
-  };
-  elements.transparentBG.onchange = function () {
-    if (this.checked) {
-      document.body.style.backgroundColor = "transparent";
-    } else {
-      document.body.style.backgroundColor = elements.backgroundColor.value;
-    }
-  };
-  elements.noFill.onchange = function () {
-    if (this.checked) {
-      myChart.data.datasets[0].backgroundColor = "transparent";
-    } else {
-      myChart.data.datasets[0].backgroundColor = elements.fillColor.value;
-    }
-    myChart.update();
-  };
-
-  elements.autoColor.onchange = function () {
-    console.log("autoColor");
-  };
-  elements.showViewcount.onchange = function () {
-    if (this.checked) {
-      elements.overlay.style.display = "block";
-    } else {
-      elements.overlay.style.display = "none";
-    }
-  };
-
-  elements.connectOBS.addEventListener("click", function () {
-    console.log("connectOBS");
-  });
-}; //onload
-
-// window.onbeforeunload = function () {
-//   return "dank";
-// }; //onbeforeunload
-
+    });
+  } //loadChart
 </script>
-
 
 <svelte:head>
   <title>chat.vote/viewers</title>
@@ -287,10 +286,6 @@ window.onload = function () {
 </div>
 
 <canvas id="myChart"></canvas>
-
-<div aria-live="polite" aria-atomic="true" class="position-relative">
-  <div id="toastContainer" class="toast-container"></div>
-</div>
 
 <button id="openOffcanvasbtn" title="Settings" class="btn btn-warning" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" aria-controls="offcanvas">
   <i class="material-icons notranslate">settings</i> Settings<i class="material-icons notranslate">arrow_forward_ios</i>
@@ -386,7 +381,7 @@ window.onload = function () {
               data-bs-custom-class="wide-tooltip"
               data-bs-placement="right"
               data-bs-html="true"
-              data-bs-title="<img src="/waytoodank/obsinfo.png"/>"
+              data-bs-title="<img src='/waytoodank/obsinfo.png'/>"
               >help
             </i>
           </label>
@@ -401,7 +396,7 @@ window.onload = function () {
               data-bs-custom-class="wide-tooltip"
               data-bs-placement="right"
               data-bs-html="true"
-              data-bs-title="<img src="/waytoodank/obsinfo.png"/>"
+              data-bs-title="<img src='/waytoodank/obsinfo.png'/>"
               >help
             </i>
           </label>
@@ -416,7 +411,7 @@ window.onload = function () {
               data-bs-custom-class="wide-tooltip"
               data-bs-placement="right"
               data-bs-html="true"
-              data-bs-title="<img src="/waytoodank/obsinfo.png"/>"
+              data-bs-title="<img src='/waytoodank/obsinfo.png'/>"
               >help
             </i>
           </label>
@@ -435,49 +430,34 @@ window.onload = function () {
   </div>
 </div>
 
-
 <style>
-    #toastContainer {
-  position: fixed;
-  top: 10px;
-  left: 10px;
-  z-index: 1056;
-  font-weight: bold;
-  text-shadow: -1px 1px 2px #000000;
-}
+  #openOffcanvasbtn {
+    font-size: 25px;
+    position: fixed;
+    bottom: 50px;
+    left: 0;
+    transform-origin: bottom left;
+    border-radius: 0 1em 1em 0;
+    z-index: 0;
+  }
 
-#toastContainer > div > div {
-  font-size: 1.5em;
-}
+  #overlay {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+  }
 
-#openOffcanvasbtn {
-  font-size: 25px;
-  position: fixed;
-  bottom: 50px;
-  left: 0;
-  transform-origin: bottom left;
-  border-radius: 0 1em 1em 0;
-  z-index: 0;
-}
+  .form-control-color {
+    width: 8em;
+    height: 3em;
+  }
 
-#overlay {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-}
-
-.form-control-color {
-  width: 8em;
-  height: 3em;
-}
-
-body #openOffcanvasbtn {
-  display: none;
-}
-body:hover #openOffcanvasbtn {
-  display: inline;
-}
-
+  body #openOffcanvasbtn {
+    display: none;
+  }
+  body:hover #openOffcanvasbtn {
+    display: inline;
+  }
 </style>

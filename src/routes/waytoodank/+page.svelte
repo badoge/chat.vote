@@ -1,5 +1,9 @@
 <script>
+    import { onMount } from "svelte";
 
+  onMount(async () => {});
+
+  
     const obs = new OBSWebSocket();
 
 let fft;
@@ -24,7 +28,6 @@ let elements = {
   satslider: document.getElementById("satslider"),
   smoothingvalue: document.getElementById("smoothingvalue"),
   visualizer: document.getElementById("visualizer"),
-  toastContainer: document.getElementById("toastContainer"),
 };
 
 let WAYTOODANK = {
@@ -284,9 +287,6 @@ window.onload = function () {
 <div class="container-fluid">
   <div class="row" id="row1">
     <div class="col-xxl-2">
-      <div aria-live="polite" aria-atomic="true" class="position-relative">
-        <div id="toastContainer" class="toast-container"></div>
-      </div>
     </div>
 
     <div class="col-lg-4">
@@ -429,15 +429,6 @@ window.onload = function () {
   max-width: 1200px;
 }
 
-#toastContainer {
-  z-index: 1051;
-  position: fixed;
-  top: 1%;
-  width: 15vw;
-}
 
-#toastContainer > div > div {
-  font-size: 1.5em;
-}
 
 </style>

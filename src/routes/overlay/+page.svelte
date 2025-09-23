@@ -1,4 +1,14 @@
 <script>
+  import { onMount } from "svelte";
+
+  onMount(async () => {
+    overlayID = location.hash?.replace("#", "")?.trim();
+
+    if (overlayID?.length == 64) {
+      createOffer();
+    }
+  });
+
   let peerConnection;
   let dataChannel;
   let overlayID;
@@ -111,14 +121,6 @@
       console.log(error);
     }
   } //getAnswer
-
-  window.onload = function () {
-    overlayID = location.hash?.replace("#", "")?.trim();
-
-    if (overlayID?.length == 64) {
-      createOffer();
-    }
-  }; //onload
 </script>
 
 <img src="/pics/donk.png" alt="donk" id="donk" style="left: 50%; top: 50%; position: fixed" />

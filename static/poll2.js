@@ -15,7 +15,6 @@ let elements = {
   reportDetails: document.getElementById("reportDetails"),
   reportContact: document.getElementById("reportContact"),
   report: document.getElementById("report"),
-  toastContainer: document.getElementById("toastContainer"),
   vote: document.getElementById("vote"),
   unblur: document.getElementById("unblur"),
   mainrow: document.getElementById("mainrow"),
@@ -514,15 +513,10 @@ function backToPoll() {
   window.location.href = currentUrl;
 } //backToPoll
 
-function switchTheme(checkbox) {
-  document.documentElement.setAttribute("data-bs-theme", checkbox ? "dark" : "light");
-  document.getElementById("twitchLogo").style.filter = `invert(${checkbox ? 0.25 : 0.65})`;
-} //switchTheme
+
 
 window.onload = function () {
-  darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
-  elements.darkTheme.checked = darkTheme ?? true;
-  switchTheme(elements.darkTheme.checked);
+
 
   captchaModal = new bootstrap.Modal(elements.captchaModal);
   reportModal = new bootstrap.Modal(elements.reportModal);

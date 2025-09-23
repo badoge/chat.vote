@@ -135,7 +135,6 @@
         <div class="card-body">
           <h3 class="card-title">Work in progress/Test pages/proof of concepts that are not being worked on :)</h3>
           <p><a target="_blank" rel="noopener noreferrer" href="/tts">chat.vote/tts</a> Some simple tts command that can be used from chat</p>
-          <p><a target="_blank" rel="noopener noreferrer" href="/watch">chat.vote/watch</a> A simple tool that syncs a YouTube video for a streamer and their viewers</p>
           <p><a target="_blank" rel="noopener noreferrer" href="/waytoodank/">chat.vote/waytoodank</a> A WAYTOODANK OBS music visualizer</p>
           <p><a target="_blank" rel="noopener noreferrer" href="/viewers/">chat.vote/viewers</a> A graph that shows the view count of a channel over time</p>
           <p><a target="_blank" rel="noopener noreferrer" href="/forsen/">chat.vote/forsen</a> A raffles site for forsen that works with 1 click only :)</p>

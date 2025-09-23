@@ -1,4 +1,12 @@
 <script>
+  import { onMount } from "svelte";
+
+  onMount(async () => {
+    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
+
+    loadAndConnect();
+  });
+
   let { data } = $props();
   let channel = $state(data.slug.toLowerCase().replace(/\s/g, ""));
 
@@ -7,7 +15,6 @@
     me: document.getElementById("me"),
     opponent: document.getElementById("opponent"),
     topRight: document.getElementById("topRight"),
-    darkTheme: document.getElementById("darkTheme"),
     loginExpiredModal: document.getElementById("loginExpiredModal"),
     left_rock: document.getElementById("left_rock"),
     left_paper: document.getElementById("left_paper"),
@@ -21,8 +28,6 @@
     rock: document.getElementById("rock"),
     paper: document.getElementById("paper"),
     scissors: document.getElementById("scissors"),
-
-    toastContainer: document.getElementById("toastContainer"),
   };
 
   const { animate } = anime;
@@ -102,25 +107,12 @@
     return false;
   } //resetSettings
 
-  async function refreshData() {
-    darkTheme = elements.darkTheme.checked ?? true;
-  } //refreshData
+  async function refreshData() {} //refreshData
 
   function saveSettings() {
     refreshData();
-    localStorage.setItem("darkTheme", darkTheme);
     localStorage.setItem("USER", JSON.stringify(USER));
   } //saveSettings
-
-  function switchTheme(checkbox) {
-    document.documentElement.setAttribute("data-bs-theme", checkbox ? "dark" : "light");
-    if (document.getElementById("btnGroupDrop1") && document.getElementById("btnGroupDrop2")) {
-      document.getElementById("btnGroupDrop1").classList.remove(`${checkbox ? "btn-secondary" : "btn-dark"}`);
-      document.getElementById("btnGroupDrop1").classList.add(`${checkbox ? "btn-dark" : "btn-secondary"}`);
-      document.getElementById("btnGroupDrop2").classList.remove(`${checkbox ? "btn-secondary" : "btn-dark"}`);
-      document.getElementById("btnGroupDrop2").classList.add(`${checkbox ? "btn-dark" : "btn-secondary"}`);
-    }
-  } //switchTheme
 
   function load_localStorage() {
     if (!localStorage.getItem("USER")) {
@@ -264,21 +256,6 @@
     }
   } //loadAndConnect
 
-  window.onload = function () {
-    darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
-    elements.darkTheme.checked = darkTheme ?? true;
-    switchTheme(elements.darkTheme.checked);
-
-    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
-
-    loadAndConnect();
-
-    elements.darkTheme.onchange = function () {
-      switchTheme(this.checked);
-      saveSettings();
-    };
-  }; //onload
-
   function animateHand(hand, move) {
     elements[`${hand}_rock`].style.display = "";
     elements[`${hand}_paper`].style.display = "none";
@@ -390,10 +367,6 @@
   </nav>
 </div>
 
-<div aria-live="polite" aria-atomic="true" class="position-relative">
-  <div id="toastContainer" class="toast-container"></div>
-</div>
-
 <div class="container-fluid text-center" id="game" style="display: none">
   <div class="row">
     <div class="col"></div>
@@ -453,18 +426,6 @@
   ::-webkit-scrollbar-track {
     background: var(--bs-dark-bg-subtle);
     border-radius: 6px;
-  }
-
-  #toastContainer {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    z-index: 1056;
-    font-weight: bold;
-  }
-
-  #toastContainer > div > div {
-    font-size: 1.5em;
   }
 
   .mirror-img {

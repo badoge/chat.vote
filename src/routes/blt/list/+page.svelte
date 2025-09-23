@@ -1,11 +1,36 @@
 <script>
+  import { onMount } from "svelte";
+
+  onMount(async () => {
+    let requestOptions = {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    };
+    try {
+      let response = await fetch(`https://blt.donk.workers.dev/check`, requestOptions);
+      let result = await response.json();
+      if (response.status !== 200 || result.message !== "OK") {
+        elements.main.innerHTML = "You don't have permission to view this page";
+        return;
+      }
+    } catch (error) {
+      elements.main.innerHTML = "You don't have permission to view this page";
+      return;
+    }
+
+    loadList();
+    blacklistModal = new bootstrap.Modal(elements.blacklistModal);
+    optionsModal = new bootstrap.Modal(elements.optionsModal);
+  });
+
   let elements = {
     blacklistModal: document.getElementById("blacklistModal"),
     reason: document.getElementById("reason"),
     optionsModal: document.getElementById("optionsModal"),
     optionsModalBody: document.getElementById("optionsModalBody"),
 
-    toastContainer: document.getElementById("toastContainer"),
     main: document.getElementById("main"),
     list: document.getElementById("list"),
     blacklisted: document.getElementById("blacklisted"),
@@ -159,30 +184,6 @@
       console.log(error);
     }
   } //loadList
-
-  window.onload = async function () {
-    let requestOptions = {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    };
-    try {
-      let response = await fetch(`https://blt.donk.workers.dev/check`, requestOptions);
-      let result = await response.json();
-      if (response.status !== 200 || result.message !== "OK") {
-        elements.main.innerHTML = "You don't have permission to view this page";
-        return;
-      }
-    } catch (error) {
-      elements.main.innerHTML = "You don't have permission to view this page";
-      return;
-    }
-
-    loadList();
-    blacklistModal = new bootstrap.Modal(elements.blacklistModal);
-    optionsModal = new bootstrap.Modal(elements.optionsModal);
-  }; //onload
 </script>
 
 <svelte:head>
@@ -257,5 +258,4 @@
     </div>
     <div class="col-xl-3"></div>
   </div>
-  <div id="toastContainer" class="toast-container"></div>
 </div>

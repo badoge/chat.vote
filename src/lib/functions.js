@@ -8,6 +8,21 @@ let channelBadges = { subscriber: [], bits: [] };
 let globalBadges = {};
 let customBadges = [];
 
+export function login() {
+  elements.topRight.innerHTML = `<div class="btn-group" role="group" aria-label="log in button group">
+    <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></button>
+    <div class="btn-group" role="group">
+        <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      </button>
+        <ul class="dropdown-menu dropdown-menu-lg-end" aria-label="Log out">
+            <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
+        </ul>
+    </div>
+</div>`;
+  window.open("/prompt.html", "loginWindow", "toolbar=0,status=0,scrollbars=0,width=500px,height=800px");
+  return false;
+} //login
+
 export async function get7TVPFP(userID) {
   if (!userID) {
     return "/pics/donk.png";

@@ -1,4 +1,30 @@
 <script>
+  import { onMount } from "svelte";
+
+  onMount(async () => {
+    loadAndConnect();
+
+    if (!USER.channel) {
+      loginButton = new bootstrap.Popover(elements.loginButton);
+    }
+
+    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
+    aboutModal = new bootstrap.Modal(elements.aboutModal);
+
+    enableTooltips();
+    enablePopovers();
+
+    elements.channelName.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        connect();
+      }
+    });
+
+    initGraph();
+    listeners();
+    document.getElementById("tttoverlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
+  });
+
   let streamersTurn = true;
   let voters = [];
 
@@ -16,9 +42,6 @@
     loginButton: document.getElementById("loginButton"),
     channelName: document.getElementById("channelName"),
     darkTheme: document.getElementById("darkTheme"),
-
-    //main
-    toastContainer: document.getElementById("toastContainer"),
   };
 
   let loginButton;
@@ -57,39 +80,6 @@
       }
     }
   } //handleMessage
-
-  window.onload = function () {
-    darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
-    elements.darkTheme.checked = darkTheme ?? true;
-    switchTheme(elements.darkTheme.checked);
-
-    loadAndConnect();
-
-    if (!USER.channel) {
-      loginButton = new bootstrap.Popover(elements.loginButton);
-    }
-
-    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
-    aboutModal = new bootstrap.Modal(elements.aboutModal);
-
-    enableTooltips();
-    enablePopovers();
-
-    elements.channelName.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        connect();
-      }
-    });
-
-    elements.darkTheme.onchange = function () {
-      switchTheme(this.checked);
-      saveSettings();
-    };
-
-    initGraph();
-    listeners();
-    document.getElementById("tttoverlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
-  }; //onload
 
   function initGraph() {
     if (TTT.chart) {
@@ -575,7 +565,7 @@
       </div>
       <div class="col">
         <div class="card h-100 bg-body-tertiary border-light">
-          <img src="/games/pics/ttt.png" onclick="toggleGrid()" class="card-img-top" alt="tic tac toe" />
+          <img src="/games/pics/ttt.png" onclick={toggleGrid} class="card-img-top" alt="tic tac toe" />
           <div class="card-body">
             <h5 class="card-title">tic tac toe</h5>
             <p class="card-text">An ancient game of wits. Will you outsmart the hive mind - which is your chat?</p>
@@ -608,7 +598,7 @@
       <div class="col">
         <div class="card">
           <div class="card-body p-1">
-            <button type="button" onclick="toggleGrid()" class="btn btn-primary"><i class="material-icons notranslate">arrow_back</i>Back</button>
+            <button type="button" onclick={toggleGrid} class="btn btn-primary"><i class="material-icons notranslate">arrow_back</i>Back</button>
             <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#howToPlayModal"><i class="material-icons notranslate">help_outline</i>How To Play</button>
             <b id="gameName">tic tac toe</b>
           </div>
@@ -639,7 +629,7 @@
           </div>
         </div>
         <div class="col-xl-5 centertext">
-          <button type="button" onclick="playTurn()" class="btn btn-lg btn-success">Play chat's turn</button>
+          <button type="button" onclick={playTurn} class="btn btn-lg btn-success">Play chat's turn</button>
           <div id="tttoutput"></div>
           <div id="tttchartdiv" class="chart-container">
             <div id="tttoverlay"></div>
@@ -650,10 +640,6 @@
       </div>
     </div>
   </div>
-</div>
-
-<div aria-live="polite" aria-atomic="true" class="position-relative">
-  <div id="toastContainer" class="toast-container"></div>
 </div>
 
 <style>
@@ -671,18 +657,6 @@
     cursor: pointer;
     width: 100%;
     height: 230px;
-  }
-
-  #toastContainer {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    z-index: 1056;
-    font-weight: bold;
-  }
-
-  #toastContainer > div > div {
-    font-size: 1.5em;
   }
 
   .resizable {

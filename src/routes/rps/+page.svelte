@@ -1,4 +1,15 @@
 <script>
+  import { onMount } from "svelte";
+
+  onMount(async () => {
+    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
+    copyLinkButton = new bootstrap.Popover(elements.copyLinkButton);
+
+    loadAndConnect();
+
+    randomAnimations();
+  });
+
   let elements = {
     loginButton: document.getElementById("loginButton"),
     topRight: document.getElementById("topRight"),
@@ -10,7 +21,6 @@
     right_rock: document.getElementById("right_rock"),
     right_paper: document.getElementById("right_paper"),
     right_scissors: document.getElementById("right_scissors"),
-    toastContainer: document.getElementById("toastContainer"),
     gameLink: document.getElementById("gameLink"),
     copyLinkButton: document.getElementById("copyLinkButton"),
     bracket: document.getElementById("bracket"),
@@ -102,16 +112,6 @@
     localStorage.setItem("darkTheme", darkTheme);
     localStorage.setItem("USER", JSON.stringify(USER));
   } //saveSettings
-
-  function switchTheme(checkbox) {
-    document.documentElement.setAttribute("data-bs-theme", checkbox ? "dark" : "light");
-    if (document.getElementById("btnGroupDrop1") && document.getElementById("btnGroupDrop2")) {
-      document.getElementById("btnGroupDrop1").classList.remove(`${checkbox ? "btn-secondary" : "btn-dark"}`);
-      document.getElementById("btnGroupDrop1").classList.add(`${checkbox ? "btn-dark" : "btn-secondary"}`);
-      document.getElementById("btnGroupDrop2").classList.remove(`${checkbox ? "btn-secondary" : "btn-dark"}`);
-      document.getElementById("btnGroupDrop2").classList.add(`${checkbox ? "btn-dark" : "btn-secondary"}`);
-    }
-  } //switchTheme
 
   function load_localStorage() {
     if (!localStorage.getItem("USER")) {
@@ -282,23 +282,6 @@
     }
   } //loadAndConnect
 
-  window.onload = function () {
-    darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
-    elements.darkTheme.checked = darkTheme ?? true;
-    switchTheme(elements.darkTheme.checked);
-
-    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
-    copyLinkButton = new bootstrap.Popover(elements.copyLinkButton);
-
-    loadAndConnect();
-
-    elements.darkTheme.onchange = function () {
-      switchTheme(this.checked);
-      saveSettings();
-    };
-    randomAnimations();
-  }; //onload
-
   function animateHand(hand, move) {
     elements[`${hand}_rock`].style.display = "";
     elements[`${hand}_paper`].style.display = "none";
@@ -436,10 +419,6 @@
   </nav>
 </div>
 
-<div aria-live="polite" aria-atomic="true" class="position-relative">
-  <div id="toastContainer" class="toast-container"></div>
-</div>
-
 <div class="text-center">
   not working yet <img src="https://cdn.betterttv.net/emote/54fa8f1401e468494b85b537/1x" /> submitting now so that I can finish it before stream/judging starts
   <img src="https://cdn.7tv.app/emote/6154ecd36251d7e000db18a0/1x.webp" />
@@ -533,18 +512,6 @@
   ::-webkit-scrollbar-track {
     background: var(--bs-dark-bg-subtle);
     border-radius: 6px;
-  }
-
-  #toastContainer {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    z-index: 1056;
-    font-weight: bold;
-  }
-
-  #toastContainer > div > div {
-    font-size: 1.5em;
   }
 
   .mirror-img {

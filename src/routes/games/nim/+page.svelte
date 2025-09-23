@@ -1,4 +1,34 @@
 <script>
+  import { onMount } from "svelte";
+
+  onMount(async () => {
+    let popsicles = document.querySelectorAll(".nim-popsicle");
+    for (let i = 0; i < popsicles.length; i++) {
+      popsicles[i].style.filter = `hue-rotate(${Math.random() * 360}deg)`;
+    }
+
+    loadAndConnect();
+
+    if (!USER.channel) {
+      loginButton = new bootstrap.Popover(elements.loginButton);
+    }
+
+    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
+    aboutModal = new bootstrap.Modal(elements.aboutModal);
+
+    enableTooltips();
+    enablePopovers();
+
+    elements.channelName.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        connect();
+      }
+    });
+
+    initGraph();
+    elements.overlay.innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
+  });
+
   let elements = {
     //modals
     grid: document.getElementById("grid"),
@@ -15,7 +45,6 @@
     darkTheme: document.getElementById("darkTheme"),
 
     //main
-    toastContainer: document.getElementById("toastContainer"),
     popCondition: document.getElementById("popCondition"),
     popCountNumber: document.getElementById("popCountNumber"),
     settings: document.getElementById("settings"),
@@ -335,43 +364,6 @@
     // mandatory stuff
     elements.gamestate.style.visibility = "hidden";
   } //reset
-
-  window.onload = function () {
-    darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
-    elements.darkTheme.checked = darkTheme ?? true;
-    switchTheme(elements.darkTheme.checked);
-
-    let popsicles = document.querySelectorAll(".nim-popsicle");
-    for (let i = 0; i < popsicles.length; i++) {
-      popsicles[i].style.filter = `hue-rotate(${Math.random() * 360}deg)`;
-    }
-
-    loadAndConnect();
-
-    if (!USER.channel) {
-      loginButton = new bootstrap.Popover(elements.loginButton);
-    }
-
-    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
-    aboutModal = new bootstrap.Modal(elements.aboutModal);
-
-    enableTooltips();
-    enablePopovers();
-
-    elements.channelName.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        connect();
-      }
-    });
-
-    elements.darkTheme.onchange = function () {
-      switchTheme(this.checked);
-      saveSettings();
-    };
-
-    initGraph();
-    elements.overlay.innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
-  }; //onload
 </script>
 
 <svelte:head>
@@ -709,10 +701,6 @@
   </div>
 </div>
 
-<div aria-live="polite" aria-atomic="true" class="position-relative">
-  <div id="toastContainer" class="toast-container"></div>
-</div>
-
 <style>
   body {
     margin-bottom: 300px;
@@ -728,18 +716,6 @@
     cursor: pointer;
     width: 100%;
     height: 230px;
-  }
-
-  #toastContainer {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    z-index: 1056;
-    font-weight: bold;
-  }
-
-  #toastContainer > div > div {
-    font-size: 1.5em;
   }
 
   .resizable {

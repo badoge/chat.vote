@@ -173,16 +173,7 @@ function logout() {
   resetSettings();
 } //logout
 
-function switchTheme(checkbox) {
-  document.documentElement.setAttribute("data-bs-theme", checkbox ? "dark" : "light");
-  document.getElementById("twitchLogo").style.filter = `invert(${checkbox ? 0.25 : 0.65})`;
-  if (document.getElementById("btnGroupDrop1") && document.getElementById("btnGroupDrop2")) {
-    document.getElementById("btnGroupDrop1").classList.remove(`${checkbox ? "btn-secondary" : "btn-dark"}`);
-    document.getElementById("btnGroupDrop1").classList.add(`${checkbox ? "btn-dark" : "btn-secondary"}`);
-    document.getElementById("btnGroupDrop2").classList.remove(`${checkbox ? "btn-secondary" : "btn-dark"}`);
-    document.getElementById("btnGroupDrop2").classList.add(`${checkbox ? "btn-dark" : "btn-secondary"}`);
-  }
-} //switchTheme
+
 
 async function loadAndConnect() {
   load_localStorage();

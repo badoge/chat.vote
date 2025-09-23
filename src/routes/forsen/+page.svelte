@@ -1,4 +1,29 @@
 <script>
+  import { onMount, onDestroy } from "svelte";
+
+  onDestroy(() => {
+    return "Are you sure?";
+  });
+
+  onMount(async () => {
+    connect();
+    fpsBenchmark();
+
+    restartRaffleModal = new bootstrap.Modal(elements.restartRaffleModal);
+    restartTier3RaffleModal = new bootstrap.Modal(elements.restartTier3RaffleModal);
+    fancyRaffleModal = new bootstrap.Modal(elements.fancyRaffleModal);
+
+    enableTooltips();
+
+    tickSound = new Howl({
+      src: ["/raffles/tick.mp3"],
+    });
+    revealSound = new Howl({
+      src: ["/raffles/reveal.mp3"],
+    });
+    loadTier3Emotes();
+  });
+
   const USERNAME = "forsen";
   const pfp = "https://static-cdn.jtvnw.net/jtv_user_pictures/forsen-profile_image-48b43e1e4f54b5c8-600x600.png";
   const userid = 22484632;
@@ -792,29 +817,6 @@
       elements.emotes.innerHTML = `<span class="text-danger">Could not load emotes</span>`;
     }
   }
-
-  window.onload = async function () {
-    connect();
-    fpsBenchmark();
-
-    restartRaffleModal = new bootstrap.Modal(elements.restartRaffleModal);
-    restartTier3RaffleModal = new bootstrap.Modal(elements.restartTier3RaffleModal);
-    fancyRaffleModal = new bootstrap.Modal(elements.fancyRaffleModal);
-
-    enableTooltips();
-
-    tickSound = new Howl({
-      src: ["/raffles/tick.mp3"],
-    });
-    revealSound = new Howl({
-      src: ["/raffles/reveal.mp3"],
-    });
-    loadTier3Emotes();
-  }; //onload
-
-  window.onbeforeunload = function () {
-    return "Are you sure?";
-  }; //onbeforeunload
 </script>
 
 <svelte:head>

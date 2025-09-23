@@ -1,5 +1,209 @@
 <script>
+  import { onMount } from "svelte";
 
+  onMount(async () => {
+
+
+
+  loadAndConnect();
+
+  if (!USER.channel) {
+    loginButton = new bootstrap.Popover(elements.loginButton);
+  }
+
+  enableTooltips();
+  enablePopovers();
+
+  document.addEventListener("click", (event) => {
+    zoomOut(event);
+  });
+
+  votePopover = new bootstrap.Popover(elements.enableVoting);
+  votePopoverTierlist = new bootstrap.Popover(elements.enableVotingTierlist);
+
+  loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
+  tierlistEditorModal = new bootstrap.Modal(elements.tierlistEditorModal);
+  previewModal = new bootstrap.Modal(elements.previewModal);
+  generateChatModal = new bootstrap.Modal(elements.generateChatModal);
+  generateModal = new bootstrap.Modal(elements.generateModal);
+  communityModal = new bootstrap.Modal(elements.communityModal);
+  startModal = new bootstrap.Modal(elements.startModal);
+  startTriviaModal = new bootstrap.Modal(elements.startTriviaModal);
+  publishedModal = new bootstrap.Modal(elements.publishedModal);
+  importModal = new bootstrap.Modal(elements.importModal);
+
+  elements.tierlistEditorModal.addEventListener("show.bs.modal", (event) => {
+    loadTierlistEditor();
+  });
+
+  elements.previewModal.addEventListener("hidden.bs.modal", (event) => {
+    elements.previewModalBody.innerHTML = "";
+  });
+
+  elements.generateModal.addEventListener("hidden.bs.modal", (event) => {
+    previewedBracket = [];
+    previewedBracketDescription = "";
+    previewedBracketTitle = "";
+    for (let element of document.getElementsByClassName("generate-type")) {
+      element.style.display = "none";
+    }
+    for (let element of document.getElementsByClassName("generate-value")) {
+      element.value = "";
+    }
+    for (let element of document.getElementsByClassName("generate-preview")) {
+      element.innerHTML = "";
+    }
+  });
+
+  elements.channelName.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      connect();
+    }
+  });
+
+
+
+  elements.generateBracketType.onchange = function () {
+    for (let element of document.getElementsByClassName("generate-type")) {
+      element.style.display = "none";
+    }
+    elements[`${this.value}Settings`].style.display = "";
+  };
+
+  elements.formatSelect.onchange = function () {
+    if (this.value == "tierlist") {
+      for (let e of document.querySelectorAll(".tierlistSettings")) {
+        e.style.display = "";
+      }
+      for (let e of elements.bracketSettings) {
+        e.style.display = "none";
+      }
+    } else {
+      for (let e of elements.bracketSettings) {
+        e.style.display = "";
+      }
+      for (let e of document.querySelectorAll(".tierlistSettings")) {
+        e.style.display = "none";
+      }
+    }
+  };
+
+  elements.changeCommand.onchange = function () {
+    elements.changeCommandCopy.checked = this.checked;
+  };
+  elements.changeCommandCopy.onchange = function () {
+    elements.changeCommand.checked = this.checked;
+  };
+
+  elements.averageScore.onchange = function () {
+    elements.averageScoreCopy.checked = this.checked;
+  };
+  elements.averageScoreCopy.onchange = function () {
+    elements.averageScore.checked = this.checked;
+    updateScores();
+  };
+
+  elements.keepVotingEnabled.onchange = function () {
+    elements.keepVotingEnabledCopy.checked = this.checked;
+  };
+  elements.keepVotingEnabledCopy.onchange = function () {
+    elements.keepVotingEnabled.checked = this.checked;
+  };
+
+  elements.disableAnimations.onchange = function () {
+    elements.disableAnimationsCopy.checked = this.checked;
+  };
+  elements.disableAnimationsCopy.onchange = function () {
+    elements.disableAnimations.checked = this.checked;
+  };
+
+  elements.triviaPoints.onchange = function () {
+    triviaPoints = parseInt(this.value, 10);
+  };
+  elements.questionTimer.oninput = function () {
+    triviaQuestionTimer = parseInt(this.value, 10);
+    elements.questionTimerValue.innerText = `${triviaQuestionTimer}s`;
+  };
+  let oldOneChanceValue;
+  elements.triviaScoring.onchange = function () {
+    triviaScoring = this.value;
+    if (triviaScoring == "timer") {
+      elements.questionTimerDiv.style.display = "";
+      oldOneChanceValue = elements.oneChance.checked;
+      elements.oneChance.checked = true;
+      elements.oneChance.disabled = true;
+    } else {
+      elements.questionTimerDiv.style.display = "none";
+      elements.oneChance.checked = oldOneChanceValue;
+      elements.oneChance.disabled = false;
+    }
+  };
+
+  elements.hideScore.addEventListener("click", function () {
+    const tooltip = bootstrap.Tooltip.getInstance("#hideScore");
+    tooltip.setContent({ ".tooltip-inner": scoreHidden ? "Hide score" : "Show score" });
+    hideScore();
+  });
+  elements.hideScoreTierlist.addEventListener("click", function () {
+    const tooltip = bootstrap.Tooltip.getInstance("#hideScoreTierlist");
+    tooltip.setContent({ ".tooltip-inner": scoreHidden ? "Hide score" : "Show score" });
+    hideScore();
+  });
+
+  elements.importBracket.addEventListener("click", function () {
+    previewedBracket = [];
+    previewedBracketDescription = "";
+    previewedBracketTitle = "";
+    for (let element of document.getElementsByClassName("generate-type")) {
+      element.style.display = "none";
+    }
+    for (let element of document.getElementsByClassName("generate-value")) {
+      element.value = "";
+    }
+    for (let element of document.getElementsByClassName("generate-preview")) {
+      element.innerHTML = "";
+    }
+    generateModal.show();
+  });
+
+  elements.addBracketOption.addEventListener("click", function () {
+    addBracketOption();
+    saveBracket(true);
+  });
+
+  elements.addTriviaQuestion.addEventListener("click", function () {
+    addTriviaQuestion();
+    saveTrivia(true);
+  });
+
+  const draggable = createDraggable(elements.tierlistItem);
+
+  elements.tierlistItem.addEventListener("mousewheel", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.altKey) {
+      let opacity = parseFloat(getComputedStyle(elements.tierlistItem).getPropertyValue("opacity"));
+      elements.tierlistItem.style.opacity = event.wheelDelta > 0 ? Math.min(opacity + 0.07, 1) : Math.max(opacity - 0.07, 0.2);
+    } else {
+      let scale = parseFloat(getComputedStyle(elements.tierlistItem).getPropertyValue("scale"));
+      elements.tierlistItem.style.scale = event.wheelDelta > 0 ? Math.min(scale + 0.07, 2) : Math.max(scale - 0.07, 0.1);
+    }
+  });
+
+  window.addEventListener("keydown", (event) => {
+    if (event.code === "KeyR" && document.activeElement.tagName !== "INPUT") {
+      elements.tierlistItem.style = "transform: translateX(0px) translateY(0px)";
+      draggable.reset();
+    }
+  });
+
+  let code = location.hash?.replace("#", "")?.trim();
+  if (code.length == 4) {
+    importCode(code);
+    history.replaceState(undefined, undefined, "#");
+  }
+  });
+  
     let elements = {
   //modals
   loginExpiredModal: document.getElementById("loginExpiredModal"),
@@ -95,7 +299,6 @@
   editor: document.getElementById("editor"),
 
   //bracket
-  toastContainer: document.getElementById("toastContainer"),
   bracket: document.getElementById("bracket"),
 
   centerTitle: document.getElementById("centerTitle"),
@@ -693,16 +896,7 @@ function connect() {
   client.connect().catch(console.error);
 } //connect
 
-function switchTheme(checkbox) {
-  document.documentElement.setAttribute("data-bs-theme", checkbox ? "dark" : "light");
-  document.getElementById("twitchLogo").style.filter = `invert(${checkbox ? 0.25 : 0.65})`;
-  if (document.getElementById("btnGroupDrop1") && document.getElementById("btnGroupDrop2")) {
-    document.getElementById("btnGroupDrop1").classList.remove(`${checkbox ? "btn-secondary" : "btn-dark"}`);
-    document.getElementById("btnGroupDrop1").classList.add(`${checkbox ? "btn-dark" : "btn-secondary"}`);
-    document.getElementById("btnGroupDrop2").classList.remove(`${checkbox ? "btn-secondary" : "btn-dark"}`);
-    document.getElementById("btnGroupDrop2").classList.add(`${checkbox ? "btn-dark" : "btn-secondary"}`);
-  }
-} //switchTheme
+
 
 function addTriviaUser(user) {
   user.name = user.username == user.displayname.toLowerCase() ? `${user.displayname}` : `${user.displayname} (${user.username})`;
@@ -3509,212 +3703,6 @@ function getItemLink(type, id) {
   }
 } //getItemLink
 
-window.onload = async function () {
-  darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
-  elements.darkTheme.checked = darkTheme ?? true;
-  switchTheme(elements.darkTheme.checked);
-
-  loadAndConnect();
-
-  if (!USER.channel) {
-    loginButton = new bootstrap.Popover(elements.loginButton);
-  }
-
-  enableTooltips();
-  enablePopovers();
-
-  document.addEventListener("click", (event) => {
-    zoomOut(event);
-  });
-
-  votePopover = new bootstrap.Popover(elements.enableVoting);
-  votePopoverTierlist = new bootstrap.Popover(elements.enableVotingTierlist);
-
-  loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
-  tierlistEditorModal = new bootstrap.Modal(elements.tierlistEditorModal);
-  previewModal = new bootstrap.Modal(elements.previewModal);
-  generateChatModal = new bootstrap.Modal(elements.generateChatModal);
-  generateModal = new bootstrap.Modal(elements.generateModal);
-  communityModal = new bootstrap.Modal(elements.communityModal);
-  startModal = new bootstrap.Modal(elements.startModal);
-  startTriviaModal = new bootstrap.Modal(elements.startTriviaModal);
-  publishedModal = new bootstrap.Modal(elements.publishedModal);
-  importModal = new bootstrap.Modal(elements.importModal);
-
-  elements.tierlistEditorModal.addEventListener("show.bs.modal", (event) => {
-    loadTierlistEditor();
-  });
-
-  elements.previewModal.addEventListener("hidden.bs.modal", (event) => {
-    elements.previewModalBody.innerHTML = "";
-  });
-
-  elements.generateModal.addEventListener("hidden.bs.modal", (event) => {
-    previewedBracket = [];
-    previewedBracketDescription = "";
-    previewedBracketTitle = "";
-    for (let element of document.getElementsByClassName("generate-type")) {
-      element.style.display = "none";
-    }
-    for (let element of document.getElementsByClassName("generate-value")) {
-      element.value = "";
-    }
-    for (let element of document.getElementsByClassName("generate-preview")) {
-      element.innerHTML = "";
-    }
-  });
-
-  elements.channelName.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      connect();
-    }
-  });
-
-  elements.darkTheme.onchange = function () {
-    switchTheme(this.checked);
-    saveSettings();
-  };
-
-  elements.generateBracketType.onchange = function () {
-    for (let element of document.getElementsByClassName("generate-type")) {
-      element.style.display = "none";
-    }
-    elements[`${this.value}Settings`].style.display = "";
-  };
-
-  elements.formatSelect.onchange = function () {
-    if (this.value == "tierlist") {
-      for (let e of document.querySelectorAll(".tierlistSettings")) {
-        e.style.display = "";
-      }
-      for (let e of elements.bracketSettings) {
-        e.style.display = "none";
-      }
-    } else {
-      for (let e of elements.bracketSettings) {
-        e.style.display = "";
-      }
-      for (let e of document.querySelectorAll(".tierlistSettings")) {
-        e.style.display = "none";
-      }
-    }
-  };
-
-  elements.changeCommand.onchange = function () {
-    elements.changeCommandCopy.checked = this.checked;
-  };
-  elements.changeCommandCopy.onchange = function () {
-    elements.changeCommand.checked = this.checked;
-  };
-
-  elements.averageScore.onchange = function () {
-    elements.averageScoreCopy.checked = this.checked;
-  };
-  elements.averageScoreCopy.onchange = function () {
-    elements.averageScore.checked = this.checked;
-    updateScores();
-  };
-
-  elements.keepVotingEnabled.onchange = function () {
-    elements.keepVotingEnabledCopy.checked = this.checked;
-  };
-  elements.keepVotingEnabledCopy.onchange = function () {
-    elements.keepVotingEnabled.checked = this.checked;
-  };
-
-  elements.disableAnimations.onchange = function () {
-    elements.disableAnimationsCopy.checked = this.checked;
-  };
-  elements.disableAnimationsCopy.onchange = function () {
-    elements.disableAnimations.checked = this.checked;
-  };
-
-  elements.triviaPoints.onchange = function () {
-    triviaPoints = parseInt(this.value, 10);
-  };
-  elements.questionTimer.oninput = function () {
-    triviaQuestionTimer = parseInt(this.value, 10);
-    elements.questionTimerValue.innerText = `${triviaQuestionTimer}s`;
-  };
-  let oldOneChanceValue;
-  elements.triviaScoring.onchange = function () {
-    triviaScoring = this.value;
-    if (triviaScoring == "timer") {
-      elements.questionTimerDiv.style.display = "";
-      oldOneChanceValue = elements.oneChance.checked;
-      elements.oneChance.checked = true;
-      elements.oneChance.disabled = true;
-    } else {
-      elements.questionTimerDiv.style.display = "none";
-      elements.oneChance.checked = oldOneChanceValue;
-      elements.oneChance.disabled = false;
-    }
-  };
-
-  elements.hideScore.addEventListener("click", function () {
-    const tooltip = bootstrap.Tooltip.getInstance("#hideScore");
-    tooltip.setContent({ ".tooltip-inner": scoreHidden ? "Hide score" : "Show score" });
-    hideScore();
-  });
-  elements.hideScoreTierlist.addEventListener("click", function () {
-    const tooltip = bootstrap.Tooltip.getInstance("#hideScoreTierlist");
-    tooltip.setContent({ ".tooltip-inner": scoreHidden ? "Hide score" : "Show score" });
-    hideScore();
-  });
-
-  elements.importBracket.addEventListener("click", function () {
-    previewedBracket = [];
-    previewedBracketDescription = "";
-    previewedBracketTitle = "";
-    for (let element of document.getElementsByClassName("generate-type")) {
-      element.style.display = "none";
-    }
-    for (let element of document.getElementsByClassName("generate-value")) {
-      element.value = "";
-    }
-    for (let element of document.getElementsByClassName("generate-preview")) {
-      element.innerHTML = "";
-    }
-    generateModal.show();
-  });
-
-  elements.addBracketOption.addEventListener("click", function () {
-    addBracketOption();
-    saveBracket(true);
-  });
-
-  elements.addTriviaQuestion.addEventListener("click", function () {
-    addTriviaQuestion();
-    saveTrivia(true);
-  });
-
-  const draggable = createDraggable(elements.tierlistItem);
-
-  elements.tierlistItem.addEventListener("mousewheel", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    if (event.altKey) {
-      let opacity = parseFloat(getComputedStyle(elements.tierlistItem).getPropertyValue("opacity"));
-      elements.tierlistItem.style.opacity = event.wheelDelta > 0 ? Math.min(opacity + 0.07, 1) : Math.max(opacity - 0.07, 0.2);
-    } else {
-      let scale = parseFloat(getComputedStyle(elements.tierlistItem).getPropertyValue("scale"));
-      elements.tierlistItem.style.scale = event.wheelDelta > 0 ? Math.min(scale + 0.07, 2) : Math.max(scale - 0.07, 0.1);
-    }
-  });
-
-  window.addEventListener("keydown", (event) => {
-    if (event.code === "KeyR" && document.activeElement.tagName !== "INPUT") {
-      elements.tierlistItem.style = "transform: translateX(0px) translateY(0px)";
-      draggable.reset();
-    }
-  });
-
-  let code = location.hash?.replace("#", "")?.trim();
-  if (code.length == 4) {
-    importCode(code);
-    history.replaceState(undefined, undefined, "#");
-  }
-}; //onload
 
 let youtubePlayer_left;
 let youtubePlayer_right;
@@ -3861,17 +3849,7 @@ window.onSpotifyIframeApiReady = (IFrameAPI) => {
   overflow: hidden;
 }
 
-#toastContainer {
-  position: fixed;
-  bottom: 10px;
-  left: 10px;
-  z-index: 1056;
-  font-weight: bold;
-}
 
-#toastContainer > div > div {
-  font-size: 1.5em;
-}
 
 #myBrackets,
 #mytrivia {
@@ -4796,10 +4774,6 @@ window.onSpotifyIframeApiReady = (IFrameAPI) => {
       </div>
     </div>
   </div>
-</div>
-
-<div aria-live="polite" aria-atomic="true" class="position-relative">
-  <div id="toastContainer" class="toast-container"></div>
 </div>
 
 <div class="container-fluid" id="bracket" style="display: none">

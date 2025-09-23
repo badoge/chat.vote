@@ -1,4 +1,88 @@
 <script>
+  import { onMount } from "svelte";
+
+  onMount(async () => {
+    loadAndConnect();
+
+    if (!USER.channel) {
+      loginButton = new bootstrap.Popover(elements.loginButton);
+    }
+
+    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
+    aboutModal = new bootstrap.Modal(elements.aboutModal);
+    settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
+
+    enableTooltips();
+    enablePopovers();
+
+    elements.channelName.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        connect();
+      }
+    });
+
+    elements.twitchGlobal.onchange = function () {
+      EMOTEBENCHMARK.twitchGlobal = this.checked;
+    };
+    elements.bttvGlobal.onchange = function () {
+      EMOTEBENCHMARK.bttvGlobal = this.checked;
+    };
+    elements.ffzGlobal.onchange = function () {
+      EMOTEBENCHMARK.ffzGlobal = this.checked;
+    };
+    elements.seventvGlobal.onchange = function () {
+      EMOTEBENCHMARK.seventvGlobal = this.checked;
+    };
+    elements.twitchChannel.onchange = function () {
+      EMOTEBENCHMARK.twitchChannel = this.checked;
+    };
+    elements.bttvChannel.onchange = function () {
+      EMOTEBENCHMARK.bttvChannel = this.checked;
+    };
+    elements.ffzChannel.onchange = function () {
+      EMOTEBENCHMARK.ffzChannel = this.checked;
+    };
+    elements.seventvChannel.onchange = function () {
+      EMOTEBENCHMARK.seventvChannel = this.checked;
+    };
+
+    elements.emotesPerRound.oninput = function () {
+      EMOTEBENCHMARK.emotesPerRound = parseInt(this.value, 10) || 1;
+      elements.emotesPerRoundLabel.innerHTML = this.value;
+      elements.emotes.innerHTML = placeholder.repeat(this.value);
+    };
+    elements.turnLength.oninput = function () {
+      EMOTEBENCHMARK.turnLength = (parseInt(this.value, 10) || 15) * 1000;
+      elements.turnLengthLabel.innerHTML = this.value;
+    };
+    elements.emoteTimer.oninput = function () {
+      EMOTEBENCHMARK.emoteTimer = (parseInt(this.value, 10) || 2) * 1000;
+      elements.emoteTimerLabel.innerHTML = this.value;
+    };
+
+    allEmotes.twitchGlobal = await getGlobalTwitchEmotes(true);
+    allEmotes.bttvGlobal = await getGlobalBTTVEmotes(true);
+    allEmotes.ffzGlobal = await getGlobalFFZEmotes(true);
+    allEmotes.seventvGlobal = await getGlobal7TVEmotes(true);
+
+    elements.twitchGlobalCount.innerHTML = `<br>${allEmotes.twitchGlobal.length} emotes`;
+    elements.bttvGlobalCount.innerHTML = `<br>${allEmotes.bttvGlobal.length} emotes`;
+    elements.ffzGlobalCount.innerHTML = `<br>${allEmotes.ffzGlobal.length} emotes`;
+    elements.seventvGlobalCount.innerHTML = `<br>${allEmotes.seventvGlobal.length} emotes`;
+
+    if (USER.channel) {
+      allEmotes.twitchChannel = await getChannelTwitchEmotes(USER.channel, true);
+      allEmotes.bttvChannel = await getChannelBTTVEmotes(USER.userID, true);
+      allEmotes.ffzChannel = await getChannelFFZEmotes(USER.userID, true);
+      allEmotes.seventvChannel = await getChannel7TVEmotes(USER.userID, true);
+
+      elements.twitchChannelCount.innerHTML = `<br>${allEmotes.twitchChannel.length} emotes`;
+      elements.bttvChannelCount.innerHTML = `<br>${allEmotes.bttvChannel.length} emotes`;
+      elements.ffzChannelCount.innerHTML = `<br>${allEmotes.ffzChannel.length} emotes`;
+      elements.seventvChannelCount.innerHTML = `<br>${allEmotes.seventvChannel.length} emotes`;
+    }
+  });
+
   const placeholder = `<div class="card placeholder-emote">
 <div class="card-body">
 <img src="/pics/donk.png" alt="placeholder donk" title="placeholder donk" />
@@ -20,7 +104,6 @@
     darkTheme: document.getElementById("darkTheme"),
 
     //main
-    toastContainer: document.getElementById("toastContainer"),
     settingsOffcanvas: document.getElementById("settingsOffcanvas"),
     twitchGlobal: document.getElementById("twitchGlobal"),
     bttvGlobal: document.getElementById("bttvGlobal"),
@@ -349,97 +432,6 @@
     }
     elements.timer.style.visibility = "hidden";
   } //stopTimer
-
-  window.onload = async function () {
-    darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
-    elements.darkTheme.checked = darkTheme ?? true;
-    switchTheme(elements.darkTheme.checked);
-
-    loadAndConnect();
-
-    if (!USER.channel) {
-      loginButton = new bootstrap.Popover(elements.loginButton);
-    }
-
-    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
-    aboutModal = new bootstrap.Modal(elements.aboutModal);
-    settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
-
-    enableTooltips();
-    enablePopovers();
-
-    elements.channelName.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        connect();
-      }
-    });
-
-    elements.darkTheme.onchange = function () {
-      switchTheme(this.checked);
-      saveSettings();
-    };
-
-    elements.twitchGlobal.onchange = function () {
-      EMOTEBENCHMARK.twitchGlobal = this.checked;
-    };
-    elements.bttvGlobal.onchange = function () {
-      EMOTEBENCHMARK.bttvGlobal = this.checked;
-    };
-    elements.ffzGlobal.onchange = function () {
-      EMOTEBENCHMARK.ffzGlobal = this.checked;
-    };
-    elements.seventvGlobal.onchange = function () {
-      EMOTEBENCHMARK.seventvGlobal = this.checked;
-    };
-    elements.twitchChannel.onchange = function () {
-      EMOTEBENCHMARK.twitchChannel = this.checked;
-    };
-    elements.bttvChannel.onchange = function () {
-      EMOTEBENCHMARK.bttvChannel = this.checked;
-    };
-    elements.ffzChannel.onchange = function () {
-      EMOTEBENCHMARK.ffzChannel = this.checked;
-    };
-    elements.seventvChannel.onchange = function () {
-      EMOTEBENCHMARK.seventvChannel = this.checked;
-    };
-
-    elements.emotesPerRound.oninput = function () {
-      EMOTEBENCHMARK.emotesPerRound = parseInt(this.value, 10) || 1;
-      elements.emotesPerRoundLabel.innerHTML = this.value;
-      elements.emotes.innerHTML = placeholder.repeat(this.value);
-    };
-    elements.turnLength.oninput = function () {
-      EMOTEBENCHMARK.turnLength = (parseInt(this.value, 10) || 15) * 1000;
-      elements.turnLengthLabel.innerHTML = this.value;
-    };
-    elements.emoteTimer.oninput = function () {
-      EMOTEBENCHMARK.emoteTimer = (parseInt(this.value, 10) || 2) * 1000;
-      elements.emoteTimerLabel.innerHTML = this.value;
-    };
-
-    allEmotes.twitchGlobal = await getGlobalTwitchEmotes(true);
-    allEmotes.bttvGlobal = await getGlobalBTTVEmotes(true);
-    allEmotes.ffzGlobal = await getGlobalFFZEmotes(true);
-    allEmotes.seventvGlobal = await getGlobal7TVEmotes(true);
-
-    elements.twitchGlobalCount.innerHTML = `<br>${allEmotes.twitchGlobal.length} emotes`;
-    elements.bttvGlobalCount.innerHTML = `<br>${allEmotes.bttvGlobal.length} emotes`;
-    elements.ffzGlobalCount.innerHTML = `<br>${allEmotes.ffzGlobal.length} emotes`;
-    elements.seventvGlobalCount.innerHTML = `<br>${allEmotes.seventvGlobal.length} emotes`;
-
-    if (USER.channel) {
-      allEmotes.twitchChannel = await getChannelTwitchEmotes(USER.channel, true);
-      allEmotes.bttvChannel = await getChannelBTTVEmotes(USER.userID, true);
-      allEmotes.ffzChannel = await getChannelFFZEmotes(USER.userID, true);
-      allEmotes.seventvChannel = await getChannel7TVEmotes(USER.userID, true);
-
-      elements.twitchChannelCount.innerHTML = `<br>${allEmotes.twitchChannel.length} emotes`;
-      elements.bttvChannelCount.innerHTML = `<br>${allEmotes.bttvChannel.length} emotes`;
-      elements.ffzChannelCount.innerHTML = `<br>${allEmotes.ffzChannel.length} emotes`;
-      elements.seventvChannelCount.innerHTML = `<br>${allEmotes.seventvChannel.length} emotes`;
-    }
-  }; //onload
 </script>
 
 <svelte:head>
@@ -847,10 +839,6 @@
   </div>
 </div>
 
-<div aria-live="polite" aria-atomic="true" class="position-relative">
-  <div id="toastContainer" class="toast-container"></div>
-</div>
-
 <style>
   body {
     margin-bottom: 300px;
@@ -866,18 +854,6 @@
     cursor: pointer;
     width: 100%;
     height: 230px;
-  }
-
-  #toastContainer {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    z-index: 1056;
-    font-weight: bold;
-  }
-
-  #toastContainer > div > div {
-    font-size: 1.5em;
   }
 
   #emoteTimeBar {

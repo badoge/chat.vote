@@ -1,6 +1,38 @@
 <script>
   import { enablePopovers, enableTooltips, sendData } from "$lib/functions";
   import { onMount, onDestroy } from "svelte";
+  import IcBaselineRefresh from "~icons/ic/baseline-refresh";
+  import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
+  import IcBaselineVisibility from "~icons/ic/baseline-visibility";
+  import IcBaselineCasino from "~icons/ic/baseline-casino";
+  import IcBaselineSettings from "~icons/ic/baseline-settings";
+  import IcOutlineArrowDropUp from "~icons/ic/outline-arrow-drop-up";
+  import IcBaselineArrowDropDown from "~icons/ic/baseline-arrow-drop-down";
+  import IcBaselineStackedBarChart from "~icons/ic/baseline-stacked-bar-chart";
+  import IcBaselineToc from "~icons/ic/baseline-toc";
+  import IcBaselinePlusOne from "~icons/ic/baseline-plus-one";
+  import IcBaselineSwapHoriz from "~icons/ic/baseline-swap-horiz";
+  import IcBaselineAttachMoney from "~icons/ic/baseline-attach-money";
+  import IcBaselineNotificationImportant from "~icons/ic/baseline-notification-important";
+  import IcBaselinePreview from "~icons/ic/baseline-preview";
+  import IcBaselineCelebration from "~icons/ic/baseline-celebration";
+  import IcBaselineFileDownload from "~icons/ic/baseline-file-download";
+  import IcBaselineTimer from "~icons/ic/baseline-timer";
+  import IcBaselineAdd from "~icons/ic/baseline-add";
+  import IcBaselineHelp from "~icons/ic/baseline-help";
+  import IcBaselineRestartAlt from "~icons/ic/baseline-restart-alt";
+  import IcBaselineConnectWithoutContact from "~icons/ic/baseline-connect-without-contact";
+  import IcBaselineContentCopy from "~icons/ic/baseline-content-copy";
+  import IcBaselineSort from "~icons/ic/baseline-sort";
+  import IcBaselinePieChart from "~icons/ic/baseline-pie-chart";
+  import IcBaselineLayers from "~icons/ic/baseline-layers";
+  import IcBaselineStop from "~icons/ic/baseline-stop";
+  import IcBaselinePause from "~icons/ic/baseline-pause";
+  import IcBaselinePlayArrow from "~icons/ic/baseline-play-arrow";
+
+  /**
+   * @type {{ darkTheme: any; pollOption: any; settingsOffcanvas: any; enableVoting: any; enableSuggestions: any; loginButton: any; randomOptionModal: any; timeOverModal: any; yesnoTimeOverModal: any; loginExpiredModal: any; tieModal: any; randomYesnoModal: any; enableVotingDropdown: any; enableSuggestionsDropdown: any; tableTabButton: any; chartTabButton: any; yesnoTabButton: any; overlayTabButton: any; questionLabel: any; hideQuestion: any; channelName: any; voteWithNumbers: any; multiChoiceExample: any; voteWithText: any; barChart: any; pieChart: any; sortChart: any; suggestionLimit: any; suggestionPrefix: any; suggestionsCommand: any; confettiLevel: any; linkPreviewThumbnailsEnabled: any; showChat: any; multiChoice: any; subMode: any; subOnlyAlert: any; restartYesno: any; pickRandom: any; hideScore: any; allowChange: any; suggestionLimitUser: any; timerValueMinutes: any; chartCanvas: any; refreshWarningEnabled: any; sortChartLabel: any; overlayLink: any; connectOverlayButton: any; voteHint: any; totalVotes: any; remove: any; randomOptionWinner: any; removeRandomWinner: any; tieModalText: any; coin: any; status: any; topRight: any; bttvGlobalEmotes: any; ffzGlobalEmotes: any; seventvGlobalEmotes: any; bttvChannelEmotes: any; ffzChannelEmotes: any; seventvChannelEmotes: any; yeaPic: any; nayPic: any; yeaCount: any; nayCount: any; yesnoTotalVotes: any; optionList: any; numberStats: any; json_selected: any; voters_selected: any; txt_selected: any; averageNumber: any; medianNumber: any; hideScoreIcon: any; chat: any; countdown: any; unpauseTimer: any; pauseTimer: any; stopTimer: any; yesnoTimeOverWinner: any; timeOverWinner: any; enableVotingText: any; enableSuggestionsText: any; generateOverlayButton: any; restartPoll?: HTMLElement | null; addOption?: HTMLElement | null; options?: HTMLElement | null; chatiframe?: HTMLElement | null; yesnoDiv?: HTMLElement | null; }}
+   */
   let elements;
   onMount(async () => {
     await import("bootstrap");
@@ -26,7 +58,6 @@
       topRight: document.getElementById("topRight"),
       loginButton: document.getElementById("loginButton"),
       channelName: document.getElementById("channelName"),
-      darkTheme: document.getElementById("darkTheme"),
 
       //settings
       settingsOffcanvas: document.getElementById("settingsOffcanvas"),
@@ -83,7 +114,6 @@
       optionList: document.getElementById("optionList"),
 
       //main
-      toastContainer: document.getElementById("toastContainer"),
       hideQuestion: document.getElementById("hideQuestion"),
       countdown: document.getElementById("countdown"),
       voteHint: document.getElementById("voteHint"),
@@ -124,7 +154,6 @@
 
     darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
     elements.darkTheme.checked = darkTheme ?? true;
-    switchTheme(elements.darkTheme.checked);
 
     table = new DataTable("#options", {
       autoWidth: false,
@@ -266,11 +295,6 @@
         connect();
       }
     });
-
-    elements.darkTheme.onchange = function () {
-      switchTheme(this.checked);
-      saveSettings();
-    };
 
     elements.voteWithNumbers.onchange = async function () {
       if (this.checked) {
@@ -866,21 +890,6 @@
       elements.coin.classList.add(Math.random() < 0.5 ? "heads" : "tails");
     }, 100);
   } //pickRandomYesNo
-
-  function login() {
-    elements.topRight.innerHTML = `<div class="btn-group" role="group" aria-label="log in button group">
-    <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></button>
-    <div class="btn-group" role="group">
-        <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-      </button>
-        <ul class="dropdown-menu dropdown-menu-lg-end" aria-label="Log out">
-            <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
-        </ul>
-    </div>
-</div>`;
-    window.open("/prompt.html", "loginWindow", "toolbar=0,status=0,scrollbars=0,width=500px,height=800px");
-    return false;
-  } //login
 
   function connect() {
     elements.status.innerHTML = `
@@ -2094,18 +2103,6 @@
     elements.suggestionPrefix.scrollIntoView();
   } //changeSuggestionCommand
 
-  function switchTheme(checkbox) {
-    document.documentElement.setAttribute("data-bs-theme", checkbox ? "dark" : "light");
-    document.getElementById("twitchLogo").style.filter = `invert(${checkbox ? 0.25 : 0.65})`;
-    document.getElementById("twitchLogo2").style.filter = `invert(${checkbox ? 0.25 : 0.65})`;
-    if (document.getElementById("btnGroupDrop1") && document.getElementById("btnGroupDrop2")) {
-      document.getElementById("btnGroupDrop1").classList.remove(`${checkbox ? "btn-secondary" : "btn-dark"}`);
-      document.getElementById("btnGroupDrop1").classList.add(`${checkbox ? "btn-dark" : "btn-secondary"}`);
-      document.getElementById("btnGroupDrop2").classList.remove(`${checkbox ? "btn-secondary" : "btn-dark"}`);
-      document.getElementById("btnGroupDrop2").classList.add(`${checkbox ? "btn-dark" : "btn-secondary"}`);
-    }
-  } //switchTheme
-
   let overlayID;
   let peerConnection;
   let dataChannel;
@@ -2276,7 +2273,7 @@
         <p id="randomOptionWinner"></p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick={pickRandomOption()}><i class="material-icons notranslate">refresh</i>reroll</button>
+        <button type="button" class="btn btn-secondary" onclick={pickRandomOption()}><IcBaselineRefresh />reroll</button>
         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
       </div>
     </div>
@@ -2295,7 +2292,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-info" data-bs-dismiss="modal" onclick={removeWinner()}>Remove winner and restart</button>
-        <button type="button" class="btn btn-warning" data-bs-dismiss="modal" onclick={restartPoll()}><i class="material-icons notranslate">refresh</i>Restart</button>
+        <button type="button" class="btn btn-warning" data-bs-dismiss="modal" onclick={restartPoll()}><IcBaselineRefresh />Restart</button>
         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
       </div>
     </div>
@@ -2363,8 +2360,8 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-info" id="removeRandomWinner" style="display: none" data-bs-dismiss="modal" onclick={removeRandomWinner()}>Remove winner and restart</button>
-        <button type="button" class="btn btn-primary" onclick={pickRandomTiedOption()}><i class="material-icons notranslate">casino</i>Pick a random option</button>
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick={enableVoteButton()}><i class="material-icons notranslate">timer</i>Keep voting</button>
+        <button type="button" class="btn btn-primary" onclick={pickRandomTiedOption()}><IcBaselineCasino />Pick a random option</button>
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick={enableVoteButton()}><IcBaselineTimer />Keep voting</button>
       </div>
     </div>
   </div>
@@ -2385,7 +2382,7 @@
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick={pickRandomYesNo()}><i class="material-icons notranslate">refresh</i>reroll</button>
+        <button type="button" class="btn btn-secondary" onclick={pickRandomYesNo()}><IcBaselineRefresh />reroll</button>
       </div>
     </div>
   </div>
@@ -2403,7 +2400,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick={addOptionBulk()}><i class="material-icons notranslate">add</i>Add</button>
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick={addOptionBulk()}><IcBaselineAdd /> Add</button>
       </div>
     </div>
   </div>
@@ -2426,7 +2423,7 @@
 
 <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="settingsOffcanvas" aria-labelledby="settingsOffcanvasLabel">
   <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="settingsOffcanvasLabel"><i class="material-icons notranslate">settings</i>Settings</h5>
+    <h5 class="offcanvas-title" id="settingsOffcanvasLabel"><IcBaselineSettings />Settings</h5>
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
@@ -2457,7 +2454,7 @@
               <option value="10">10</option>
             </select>
             <label class="input-group-text text-light" for="remove">options and</label>
-            <button class="btn btn-secondary" type="button" onclick={removeAndRestart()}>restart<i class="material-icons notranslate">refresh</i></button>
+            <button class="btn btn-secondary" type="button" onclick={removeAndRestart()}>restart<IcBaselineRefresh /></button>
           </div>
         </div>
       </div>
@@ -2467,7 +2464,7 @@
       <div class="card-body">
         <div class="form-check form-switch mb-3">
           <input type="checkbox" class="form-check-input" id="multiChoice" aria-describedby="multiChoiceDesc" />
-          <label class="form-check-label" for="multiChoice"><i class="material-icons notranslate">plus_one</i>Allow multiple choices</label><br />
+          <label class="form-check-label" for="multiChoice"> <IcBaselinePlusOne /> Allow multiple choices</label><br />
           <small id="multiChoiceDesc" class="text-body-secondary">
             Viewers will be able to vote for multiple options at once.<br />
             <span id="multiChoiceExample">Example: <span class="notranslate">1 2 3</span></span>
@@ -2477,14 +2474,14 @@
         </div>
         <div class="form-check form-switch mb-3">
           <input type="checkbox" class="form-check-input" id="allowChange" onchange={saveSettings()} aria-describedby="allowChangeDesc" />
-          <label class="form-check-label" for="allowChange"><i class="material-icons notranslate">swap_horiz</i>Allow vote changing</label><br />
+          <label class="form-check-label" for="allowChange"> <IcBaselineSwapHoriz /> Allow vote changing</label><br />
           <small id="allowChangeDesc" class="text-body-secondary"> Viewers will be able to change the option they selected by voting again. They can change their vote only once.</small><br
           />
           <small class="yesno-warning text-warning" style="display: none"> Does not support <img src="/pics/yeanay.webp" alt="yeanay" style="height: 1.2em" />Mode </small>
         </div>
         <div class="form-check form-switch">
           <input type="checkbox" class="form-check-input" id="subMode" aria-describedby="submodedesc" />
-          <label class="form-check-label" for="subMode"><i class="material-icons notranslate">attach_money</i>Subscribers only poll</label>
+          <label class="form-check-label" for="subMode"> <IcBaselineAttachMoney /> Subscribers only poll</label>
           <small id="submodedesc" class="text-body-secondary"><br />Viewers that are not subscribed to your channel will not be able to vote or make suggestions. </small>
         </div>
       </div>
@@ -2502,18 +2499,18 @@
 
         <div class="form-check form-switch mb-3">
           <input class="form-check-input" type="checkbox" id="refreshWarningEnabled" onchange={saveSettings()} />
-          <label class="form-check-label" for="refreshWarningEnabled"><i class="material-icons notranslate">notification_important</i>Enable close/refresh warning</label>
+          <label class="form-check-label" for="refreshWarningEnabled"> <IcBaselineNotificationImportant /> Enable close/refresh warning</label>
           <br /><small class="text-body-secondary">Shows a warning before leaving/refreshing the site so that you don't accidentally lose your poll results.</small>
         </div>
 
         <div class="form-check form-switch mb-3">
           <input class="form-check-input" type="checkbox" id="linkPreviewThumbnailsEnabled" />
-          <label class="form-check-label" for="linkPreviewThumbnailsEnabled"> <i class="material-icons notranslate">preview</i>Show thumbnails in link preview </label>
+          <label class="form-check-label" for="linkPreviewThumbnailsEnabled"> <IcBaselinePreview /> Show thumbnails in link preview </label>
           <br /><small class="text-body-secondary"><b class="text-danger">Use with caution; viewers might link images that break Twitch's TOS.</b></small>
         </div>
 
         <div class="input-group">
-          <span class="input-group-text"><i class="material-icons notranslate">celebration</i>Confetti</span>
+          <span class="input-group-text"><IcBaselineCelebration />Confetti</span>
           <select class="form-select" id="confettiLevel" style="max-width: 7em">
             <option value="0" selected>Off</option>
             <option value="1">Low</option>
@@ -2530,7 +2527,7 @@
       <div class="card-body">
         <div class="input-group mb-0">
           <span class="input-group-text blueborder">Refresh 3rd party emotes</span>
-          <button class="btn btn-outline-info" type="button" onclick={getEmotes()}><i class="material-icons notranslate">refresh</i></button>
+          <button class="btn btn-outline-info" type="button" onclick={getEmotes()}><IcBaselineRefresh /></button>
         </div>
         <div class="text-body-secondary mb-3">
           Loaded emotes (global/channel): BTTV: <span id="bttvGlobalEmotes">0</span>/<span id="bttvChannelEmotes">0</span> | FFZ: <span id="ffzGlobalEmotes">0</span>/<span
@@ -2549,7 +2546,7 @@
           data-bs-title="Are you sure?"
           data-bs-content="All settings will be reset and the page will reload<br><button type='button' class='btn btn-danger float-end my-3' onclick='resetSettings()'><i class='material-icons notranslate'>delete_forever</i>Reset settings</button>"
         >
-          <i class="material-icons notranslate">delete_forever</i>Reset all settings
+          <IcBaselineDeleteForever />Reset all settings
         </a>
         <br />
         <small class="text-body-secondary">Resets all settings and reloads the page.</small>
@@ -2582,23 +2579,7 @@
           </div>
         </div>
 
-        <button type="button" onclick={download()} class="btn btn-primary"><i class="material-icons notranslate">file_download</i>Download</button>
-      </div>
-    </div>
-
-    <div class="card mb-2">
-      <div class="card-body">
-        <h5>Other stuff by me :)</h5>
-        <p>
-          <a target="_blank" rel="noopener noreferrer" href="https://chat.vote/poll/">chat.vote/poll</a><br />
-          <small>Like normal chat.vote but you vote by visiting the site instead of typing in chat.</small><br />
-          <a target="_blank" rel="noopener noreferrer" href="https://chat.vote/games/">chat.vote/games</a><br />
-          <small>Mini games with chat interaction.</small><br />
-          <a target="_blank" rel="noopener noreferrer" href="https://okayeg.com">OkayegBOT</a><br />
-          <small>Fun/utility Twitch chat bot.</small><br />
-          <a target="_blank" rel="noopener noreferrer" href="https://zero.chat.vote">0weebs</a><br />
-          <small>Twitch moderation bot that bans weebs.</small><br />
-        </p>
+        <button type="button" onclick={download()} class="btn btn-primary"><IcBaselineFileDownload /> Download</button>
       </div>
     </div>
 
@@ -2613,46 +2594,18 @@
         </p>
       </div>
     </div>
-
-    <div class="card mb-2">
-      <div class="card-body">
-        <h5>About:</h5>
-        <h6>This site uses:</h6>
-        <ul>
-          <li><a target="_blank" rel="noopener noreferrer" href="https://getbootstrap.com/">Bootstrap</a></li>
-          <li><a target="_blank" rel="noopener noreferrer" href="https://tmijs.com/">tmi.js</a> to read twitch chat</li>
-          <li><a target="_blank" rel="noopener noreferrer" href="https://datatables.net/">DataTables</a> the main table that shows the poll options</li>
-          <li><a target="_blank" rel="noopener noreferrer" href="https://www.chartjs.org/">Chart.js</a> to display the results graph</li>
-          <li><a target="_blank" rel="noopener noreferrer" href="https://github.com/albert-gonzalez/easytimer.js">EasyTimer.js</a> for the countdown timer</li>
-          <li><a target="_blank" rel="noopener noreferrer" href="https://linkify.js.org/">Linkify</a> to make suggested links clickable</li>
-          <li><a target="_blank" rel="noopener noreferrer" href="https://wiki.chatterino.com/Link%20Previews/">Chatterino API</a> to get link previews</li>
-          <li><a target="_blank" rel="noopener noreferrer" href="https://github.com/cure53/DOMPurify">DOMPurify</a> sanitizer</li>
-          <li>
-            <a target="_blank" rel="noopener noreferrer" title="dead link, idk what happened to the repo" href="https://github.com/mathusummut/confetti.js">confetti.js</a>
-            confetti :)
-          </li>
-          <li><a target="_blank" rel="noopener noreferrer" href="https://fonts.google.com/icons">Material Icons</a> icons</li>
-          <li>Theme switcher by <a target="_blank" rel="noopener noreferrer" href="https://codepen.io/antlio/pen/LYVVXLJ">antlio</a></li>
-          <li>Random Yea/Nay picker animation by <a target="_blank" rel="noopener noreferrer" href="https://codepen.io/seligmar/pen/RwPNQOd">seligmar</a></li>
-        </ul>
-      </div>
-    </div>
   </div>
 </div>
 
 <div class="container-fluid">
   <div class="row">
-    <div class="col-xxl-2">
-      <div aria-live="polite" aria-atomic="true" class="position-relative">
-        <div id="toastContainer" class="toast-container"></div>
-      </div>
-    </div>
+    <div class="col-xxl-2"></div>
 
     <div class="col-xxl-8">
       <div id="questionDiv" class="mb-2 mt-2">
         <div class="card bg-dark-subtle border-dark-subtle">
           <div id="questionCard" class="card-body">
-            <i id="hideQuestion" class="material-icons notranslate">arrow_drop_up</i>
+            <IcOutlineArrowDropUp id="hideQuestion" />
             <label contenteditable="true" spellcheck="false" id="questionLabel" class="pull-left" data-placeholder="Type your question here"></label>
           </div>
         </div>
@@ -2685,7 +2638,7 @@
       </div>
 
       <div class="alert alert-info alert-dismissible mb-2 mt-2" id="subOnlyAlert" role="alert" style="display: none">
-        <i class="material-icons notranslate">attach_money</i> Subscribers only poll. Click on the subscribe button, you might have a free prime sub
+        <IcBaselineAttachMoney /> Subscribers only poll. Click on the subscribe button, you might have a free prime sub
         <img src="/pics/smile.png" alt="bot" style="height: 1.5em" />
         <button type="button" class="btn btn-twitch">
           <svg width="1.5em" height="1.5em" style="fill: white" version="1.1" viewBox="0 0 20 20" x="20px" y="20px">
@@ -2701,13 +2654,13 @@
           <div class="values d-inline-flex" style="font-size: 3em"></div>
           <div class="btn-group float-end h-100" role="group" aria-label="Timer controls" id="timerControls">
             <button class="btn btn-outline-secondary" type="button" id="stopTimer" onclick={stopTimer()}>
-              <i class="material-icons notranslate">stop</i>
+              <IcBaselineStop />
             </button>
             <button class="btn btn-outline-secondary" type="button" id="pauseTimer" onclick={pauseTimer()}>
-              <i class="material-icons notranslate">pause</i>
+              <IcBaselinePause />
             </button>
             <button class="btn btn-outline-secondary" type="button" style="display: none" id="unpauseTimer" onclick={unpauseTimer()}>
-              <i class="material-icons notranslate">play_arrow</i>
+              <IcBaselinePlayArrow />
             </button>
           </div>
         </div>
@@ -2725,12 +2678,12 @@
             aria-controls="tableTab"
             aria-selected="true"
           >
-            <i class="material-icons notranslate">toc</i>Table view
+            <IcBaselineToc /> Table view
           </button>
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link main-tabs" id="chartTabButton" data-bs-toggle="tab" data-bs-target="#chartTab" type="button" role="tab" aria-controls="chartTab" aria-selected="false">
-            <i style="transform: rotateZ(90deg)" class="material-icons notranslate">stacked_bar_chart</i>Chart view
+            <IcBaselineStackedBarChart style="transform: rotateZ(90deg)" /> Chart view
           </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -2749,7 +2702,7 @@
             aria-controls="overlayTab"
             aria-selected="false"
           >
-            <i class="material-icons notranslate">layers</i> Overlay
+            <IcBaselineLayers /> Overlay
           </button>
         </li>
       </ul>
@@ -2780,16 +2733,16 @@
                 <div class="btn-group" role="group" aria-label="chart type toggles">
                   <input class="btn-check" type="radio" name="charttype" id="barChart" autocomplete="off" checked />
                   <label class="btn btn-outline-info" for="barChart" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Bar chart">
-                    <i style="transform: rotateZ(90deg)" class="material-icons notranslate">stacked_bar_chart</i>
+                    <IcBaselineStackedBarChart style="transform: rotateZ(90deg)" />
                   </label>
                   <input class="btn-check" type="radio" name="charttype" id="pieChart" autocomplete="off" />
                   <label class="btn btn-outline-info" for="pieChart" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Pie chart">
-                    <i class="material-icons notranslate">pie_chart</i>
+                    <IcBaselinePieChart />
                   </label>
                 </div>
                 <input type="checkbox" class="btn-check" id="sortChart" autocomplete="off" />
                 <label class="btn btn-outline-success" for="sortChart" id="sortChartLabel" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Sort chart">
-                  <i class="material-icons notranslate">sort</i>
+                  <IcBaselineSort />
                 </label>
                 <div class="chartStatDiv">Total votes: <span id="totalVotes">0</span></div>
 
@@ -2839,14 +2792,14 @@
                     placeholder="Click 'Generate new overlay link' to get your overlay URL"
                     aria-label="Click 'Generate new overlay link' to get your overlay URL"
                   />
-                  <button class="btn btn-outline-secondary" type="button" onclick={copyOverlayLink()}><i class="material-icons notranslate">content_copy</i></button>
+                  <button class="btn btn-outline-secondary" type="button" onclick={copyOverlayLink()}> <IcBaselineContentCopy /> </button>
                   <button class="btn btn-success" type="button" id="connectOverlayButton" onclick={connectOverlay()} disabled>
-                    <i class="material-icons notranslate">connect_without_contact</i> Connect overlay
+                    <IcBaselineConnectWithoutContact /> Connect overlay
                   </button>
                   <button class="btn btn-danger" type="button" id="generateOverlayButton" onclick={generateOverlay()}>
-                    <i class="material-icons notranslate">restart_alt</i>Generate new overlay link
+                    <IcBaselineRestartAlt /> Generate new overlay link
                   </button>
-                  <button class="btn btn-info" type="button" data-bs-toggle="modal" data-bs-target="#overlayModal"><i class="material-icons notranslate">help</i></button>
+                  <button class="btn btn-info" type="button" data-bs-toggle="modal" data-bs-target="#overlayModal"><IcBaselineHelp /></button>
                 </div>
 
                 <label for="overlayX" class="form-label">x</label>
@@ -2894,15 +2847,15 @@
                   <input class="form-check-input" type="radio" name="votingmode" id="voteWithNumbers" aria-describedby="voteWithNumbersdesc" checked />
                   <label class="form-check-label" for="voteWithNumbers">
                     Type number to vote
-                    <i
-                      class="material-icons notranslate cursor-pointer"
+
+                    <IcBaselineHelp
+                      class="cursor-pointer"
                       data-bs-toggle="tooltip"
                       data-bs-custom-class="wide-tooltip"
                       data-bs-placement="auto"
                       data-bs-html="true"
                       data-bs-title="<img src='/pics/m2.webp'/>"
-                      >help
-                    </i>
+                    />
                   </label>
                   <small id="voteWithNumbersdesc" class="text-body-secondary"> <br />Viewers vote by typing the number of the option (1, 2)</small>
                 </div>
@@ -2910,22 +2863,22 @@
                   <input class="form-check-input" type="radio" name="votingmode" id="voteWithText" aria-describedby="voteWithTextdesc" />
                   <label class="form-check-label" for="voteWithText">
                     Type option to vote
-                    <i
-                      class="material-icons notranslate cursor-pointer"
+
+                    <IcBaselineHelp
+                      class="cursor-pointer"
                       data-bs-toggle="tooltip"
                       data-bs-custom-class="wide-tooltip"
                       data-bs-placement="auto"
                       data-bs-html="true"
                       data-bs-title="<img src='/pics/m3.webp'/>"
-                      >help
-                    </i>
+                    />
                   </label>
                   <small id="voteWithTextdesc" class="text-body-secondary"> <br />Viewers vote by typing the option name (option1, option2).</small>
                 </div>
                 <hr />
 
                 <div class="mb-3">
-                  <label for="timerValueMinutes" class="form-label"><i class="material-icons notranslate">timer</i>Poll timer</label>
+                  <label for="timerValueMinutes" class="form-label"><IcBaselineTimer />Poll timer</label>
                   <div class="input-group mb-3">
                     <input type="number" min="0" value="0" class="form-control" id="timerValueMinutes" onchange={saveSettings()} aria-describedby="timerDesc" />
                     <span class="input-group-text" id="timerDesc">minutes</span>
@@ -3005,7 +2958,7 @@
               data-bs-target="#settingsOffcanvas"
               aria-controls="settingsOffcanvas"
             >
-              <i class="material-icons notranslate">settings</i>Settings
+              <IcBaselineSettings />Settings
             </button>
 
             <div class="float-end mt-2" role="group" aria-label="Restart, random option, hide score, and delete all buttons">
@@ -3019,7 +2972,7 @@
                 data-bs-title="Restart the poll with the same options"
                 style="margin-right: 1px"
               >
-                <i class="material-icons notranslate">refresh</i>
+                <IcBaselineRefresh />
               </button>
               <button
                 type="button"
@@ -3030,7 +2983,7 @@
                 data-bs-title="Pick a random option"
                 style="margin-right: 1px"
               >
-                <i class="material-icons notranslate">casino</i>
+                <IcBaselineCasino />
               </button>
               <button
                 type="button"
@@ -3041,7 +2994,7 @@
                 data-bs-title="Hide score"
                 style="margin-right: 1px"
               >
-                <i class="material-icons notranslate" id="hideScoreIcon">visibility</i>
+                <IcBaselineVisibility id="hideScoreIcon" />
               </button>
               <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove all options from the poll">
                 <a
@@ -3056,7 +3009,7 @@
                   data-bs-content="All poll options will be deleted<br><button type='button' class='btn btn-danger float-end my-3' onclick='resetPoll()'><i class='material-icons notranslate'>delete_forever</i>Delete all</button>"
                   style="padding-top: 14px"
                 >
-                  <i class="material-icons notranslate">delete_forever</i>
+                  <IcBaselineDeleteForever />
                 </a>
               </span>
             </div>
@@ -3238,18 +3191,6 @@
 
   .values {
     margin: -10px;
-  }
-
-  #toastContainer {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    z-index: 1056;
-    font-weight: bold;
-  }
-
-  #toastContainer > div > div {
-    font-size: 1.5em;
   }
 
   @media screen and (max-width: 1400px) {

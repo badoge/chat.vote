@@ -1,4 +1,143 @@
 <script>
+  import { onMount } from "svelte";
+
+  onMount(async () => {
+    loadAndConnect();
+
+    if (!USER.channel) {
+      loginButton = new bootstrap.Popover(elements.loginButton);
+    }
+
+    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
+    aboutModal = new bootstrap.Modal(elements.aboutModal);
+    settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
+
+    enableTooltips();
+    enablePopovers();
+
+    elements.channelName.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        connect();
+      }
+    });
+
+    DRAW.canvas = new fabric.Canvas("canvas", {
+      isDrawingMode: true,
+    });
+    DRAW.canvas.on("mouse:up", function () {
+      save();
+    });
+
+    elements.undo.addEventListener("click", function () {
+      replay(DRAW.undo_list, DRAW.redo_list, "redo", this);
+    });
+
+    elements.redo.addEventListener("click", function () {
+      replay(DRAW.redo_list, DRAW.undo_list, "undo", this);
+    });
+
+    fabric.Object.prototype.transparentCorners = false;
+
+    elements.clearCanvas.onclick = function () {
+      DRAW.canvas.clear();
+    };
+
+    elements.color.oninput = function () {
+      let brush = DRAW.canvas.freeDrawingBrush;
+      brush.color = this.value;
+      brush.width = parseInt(elements.LineWidth.value, 10) || 1;
+      let brushsvg = document.getElementsByClassName("brushsvg");
+      Array.from(brushsvg).forEach((element) => {
+        element.style.fill = parseInt(this.value, 10);
+      });
+    };
+    elements.LineWidth.oninput = function () {
+      elements.LineWidthLabel.innerHTML = this.value;
+      DRAW.canvas.freeDrawingBrush.width = parseInt(this.value, 10) || 1;
+      this.previousSibling.innerHTML = parseInt(this.value, 10);
+    };
+
+    if (DRAW.canvas.freeDrawingBrush) {
+      DRAW.canvas.freeDrawingBrush.color = elements.color.value;
+      DRAW.canvas.freeDrawingBrush.width = parseInt(elements.LineWidth.value, 10) || 1;
+    }
+
+    let colorbtns = document.getElementsByClassName("colorpreset");
+    Array.from(colorbtns).forEach(function (element) {
+      element.addEventListener("click", changeColor);
+    });
+    elements.twitchGlobal.onchange = function () {
+      DRAW.twitchGlobal = this.checked;
+    };
+    elements.bttvGlobal.onchange = function () {
+      DRAW.bttvGlobal = this.checked;
+    };
+    elements.ffzGlobal.onchange = function () {
+      DRAW.ffzGlobal = this.checked;
+    };
+    elements.seventvGlobal.onchange = function () {
+      DRAW.seventvGlobal = this.checked;
+    };
+    elements.twitch.onchange = function () {
+      DRAW.twitch = this.checked;
+    };
+    elements.bttv.onchange = function () {
+      DRAW.bttv = this.checked;
+    };
+    elements.ffz.onchange = function () {
+      DRAW.ffz = this.checked;
+    };
+    elements.seventv.onchange = function () {
+      DRAW.seventv = this.checked;
+    };
+    elements.emoji.onchange = function () {
+      DRAW.emoji = this.checked;
+    };
+
+    elements.turnLength.onchange = function () {
+      DRAW.turnLength = parseInt(this.value, 10);
+    };
+    elements.timerReveal.onchange = function () {
+      DRAW.timerReveal = this.checked;
+    };
+
+    elements.drawscoring1.onchange = function () {
+      DRAW.firstOnly = !this.checked;
+    };
+    elements.drawscoring2.onchange = function () {
+      DRAW.firstOnly = this.checked;
+    };
+    elements.points.onchange = function () {
+      DRAW.points = parseInt(this.value, 10);
+    };
+    elements.pointsTarget.onchange = function () {
+      DRAW.pointsTarget = parseInt(this.value, 10);
+    };
+
+    allEmotes.twitchGlobal = await getGlobalTwitchEmotes(true);
+    allEmotes.bttvGlobal = await getGlobalBTTVEmotes(true);
+    allEmotes.ffzGlobal = await getGlobalFFZEmotes(true);
+    allEmotes.seventvGlobal = await getGlobal7TVEmotes(true);
+    allEmotes.emoji = await getEmoji();
+    elements.twitchGlobalCount.innerHTML = `<br>${allEmotes.twitchGlobal.length} emotes`;
+    elements.bttvGlobalCount.innerHTML = `<br>${allEmotes.bttvGlobal.length} emotes`;
+    elements.ffzGlobalCount.innerHTML = `<br>${allEmotes.ffzGlobal.length} emotes`;
+    elements.seventvGlobalCount.innerHTML = `<br>${allEmotes.seventvGlobal.length} emotes`;
+    elements.emojiCount.innerHTML = `<br>${allEmotes.emoji.length} emoji`;
+
+    if (USER.channel) {
+      allEmotes.twitch = await getChannelTwitchEmotes(USER.channel, true);
+      allEmotes.bttv = await getChannelBTTVEmotes(USER.userID, true);
+      allEmotes.ffz = await getChannelFFZEmotes(USER.userID, true);
+      allEmotes.seventv = await getChannel7TVEmotes(USER.userID, true);
+
+      elements.twitchCount.innerHTML = `<br>${allEmotes.twitch.length} emotes`;
+      elements.bttvCount.innerHTML = `<br>${allEmotes.bttv.length} emotes`;
+      elements.ffzCount.innerHTML = `<br>${allEmotes.ffz.length} emotes`;
+      elements.seventvCount.innerHTML = `<br>${allEmotes.seventv.length} emotes`;
+    }
+  });
+
   let allEmotes = {
     twitchGlobal: [],
     bttvGlobal: [],
@@ -25,7 +164,6 @@
     darkTheme: document.getElementById("darkTheme"),
 
     //main
-    toastContainer: document.getElementById("toastContainer"),
     drawemotecardbody: document.getElementById("drawemotecardbody"),
     drawoutput: document.getElementById("drawoutput"),
     drawlblist: document.getElementById("drawlblist"),
@@ -464,152 +602,6 @@
     }
     elements.countdown.style.display = "none";
   } //stopTimer
-
-  window.onload = async function () {
-    darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
-    elements.darkTheme.checked = darkTheme ?? true;
-    switchTheme(elements.darkTheme.checked);
-
-    loadAndConnect();
-
-    if (!USER.channel) {
-      loginButton = new bootstrap.Popover(elements.loginButton);
-    }
-
-    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
-    aboutModal = new bootstrap.Modal(elements.aboutModal);
-    settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
-
-    enableTooltips();
-    enablePopovers();
-
-    elements.channelName.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        connect();
-      }
-    });
-
-    elements.darkTheme.onchange = function () {
-      switchTheme(this.checked);
-      saveSettings();
-    };
-
-    DRAW.canvas = new fabric.Canvas("canvas", {
-      isDrawingMode: true,
-    });
-    DRAW.canvas.on("mouse:up", function () {
-      save();
-    });
-
-    elements.undo.addEventListener("click", function () {
-      replay(DRAW.undo_list, DRAW.redo_list, "redo", this);
-    });
-
-    elements.redo.addEventListener("click", function () {
-      replay(DRAW.redo_list, DRAW.undo_list, "undo", this);
-    });
-
-    fabric.Object.prototype.transparentCorners = false;
-
-    elements.clearCanvas.onclick = function () {
-      DRAW.canvas.clear();
-    };
-
-    elements.color.oninput = function () {
-      let brush = DRAW.canvas.freeDrawingBrush;
-      brush.color = this.value;
-      brush.width = parseInt(elements.LineWidth.value, 10) || 1;
-      let brushsvg = document.getElementsByClassName("brushsvg");
-      Array.from(brushsvg).forEach((element) => {
-        element.style.fill = parseInt(this.value, 10);
-      });
-    };
-    elements.LineWidth.oninput = function () {
-      elements.LineWidthLabel.innerHTML = this.value;
-      DRAW.canvas.freeDrawingBrush.width = parseInt(this.value, 10) || 1;
-      this.previousSibling.innerHTML = parseInt(this.value, 10);
-    };
-
-    if (DRAW.canvas.freeDrawingBrush) {
-      DRAW.canvas.freeDrawingBrush.color = elements.color.value;
-      DRAW.canvas.freeDrawingBrush.width = parseInt(elements.LineWidth.value, 10) || 1;
-    }
-
-    let colorbtns = document.getElementsByClassName("colorpreset");
-    Array.from(colorbtns).forEach(function (element) {
-      element.addEventListener("click", changeColor);
-    });
-    elements.twitchGlobal.onchange = function () {
-      DRAW.twitchGlobal = this.checked;
-    };
-    elements.bttvGlobal.onchange = function () {
-      DRAW.bttvGlobal = this.checked;
-    };
-    elements.ffzGlobal.onchange = function () {
-      DRAW.ffzGlobal = this.checked;
-    };
-    elements.seventvGlobal.onchange = function () {
-      DRAW.seventvGlobal = this.checked;
-    };
-    elements.twitch.onchange = function () {
-      DRAW.twitch = this.checked;
-    };
-    elements.bttv.onchange = function () {
-      DRAW.bttv = this.checked;
-    };
-    elements.ffz.onchange = function () {
-      DRAW.ffz = this.checked;
-    };
-    elements.seventv.onchange = function () {
-      DRAW.seventv = this.checked;
-    };
-    elements.emoji.onchange = function () {
-      DRAW.emoji = this.checked;
-    };
-
-    elements.turnLength.onchange = function () {
-      DRAW.turnLength = parseInt(this.value, 10);
-    };
-    elements.timerReveal.onchange = function () {
-      DRAW.timerReveal = this.checked;
-    };
-
-    elements.drawscoring1.onchange = function () {
-      DRAW.firstOnly = !this.checked;
-    };
-    elements.drawscoring2.onchange = function () {
-      DRAW.firstOnly = this.checked;
-    };
-    elements.points.onchange = function () {
-      DRAW.points = parseInt(this.value, 10);
-    };
-    elements.pointsTarget.onchange = function () {
-      DRAW.pointsTarget = parseInt(this.value, 10);
-    };
-
-    allEmotes.twitchGlobal = await getGlobalTwitchEmotes(true);
-    allEmotes.bttvGlobal = await getGlobalBTTVEmotes(true);
-    allEmotes.ffzGlobal = await getGlobalFFZEmotes(true);
-    allEmotes.seventvGlobal = await getGlobal7TVEmotes(true);
-    allEmotes.emoji = await getEmoji();
-    elements.twitchGlobalCount.innerHTML = `<br>${allEmotes.twitchGlobal.length} emotes`;
-    elements.bttvGlobalCount.innerHTML = `<br>${allEmotes.bttvGlobal.length} emotes`;
-    elements.ffzGlobalCount.innerHTML = `<br>${allEmotes.ffzGlobal.length} emotes`;
-    elements.seventvGlobalCount.innerHTML = `<br>${allEmotes.seventvGlobal.length} emotes`;
-    elements.emojiCount.innerHTML = `<br>${allEmotes.emoji.length} emoji`;
-
-    if (USER.channel) {
-      allEmotes.twitch = await getChannelTwitchEmotes(USER.channel, true);
-      allEmotes.bttv = await getChannelBTTVEmotes(USER.userID, true);
-      allEmotes.ffz = await getChannelFFZEmotes(USER.userID, true);
-      allEmotes.seventv = await getChannel7TVEmotes(USER.userID, true);
-
-      elements.twitchCount.innerHTML = `<br>${allEmotes.twitch.length} emotes`;
-      elements.bttvCount.innerHTML = `<br>${allEmotes.bttv.length} emotes`;
-      elements.ffzCount.innerHTML = `<br>${allEmotes.ffz.length} emotes`;
-      elements.seventvCount.innerHTML = `<br>${allEmotes.seventv.length} emotes`;
-    }
-  }; //onload
 </script>
 
 <svelte:head>
@@ -1087,10 +1079,6 @@
   </div>
 </div>
 
-<div aria-live="polite" aria-atomic="true" class="position-relative">
-  <div id="toastContainer" class="toast-container"></div>
-</div>
-
 <style>
   body {
     margin-bottom: 300px;
@@ -1106,18 +1094,6 @@
     cursor: pointer;
     width: 100%;
     height: 230px;
-  }
-
-  #toastContainer {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    z-index: 1056;
-    font-weight: bold;
-  }
-
-  #toastContainer > div > div {
-    font-size: 1.5em;
   }
 
   .resizable {

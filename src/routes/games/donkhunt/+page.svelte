@@ -1,4 +1,30 @@
 <script>
+  import { onMount } from "svelte";
+
+  onMount(async () => {
+    loadAndConnect();
+
+    if (!USER.channel) {
+      loginButton = new bootstrap.Popover(elements.loginButton);
+    }
+
+    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
+    aboutModal = new bootstrap.Modal(elements.aboutModal);
+
+    enableTooltips();
+    enablePopovers();
+
+    elements.channelName.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        connect();
+      }
+    });
+
+    initGraph();
+
+    DONKHUNT.listeners();
+  });
+
   let voters = [];
 
   let elements = {
@@ -15,9 +41,6 @@
     loginButton: document.getElementById("loginButton"),
     channelName: document.getElementById("channelName"),
     darkTheme: document.getElementById("darkTheme"),
-
-    //main
-    toastContainer: document.getElementById("toastContainer"),
   };
 
   let loginButton;
@@ -45,39 +68,6 @@
       }
     }
   } //handleMessage
-
-  window.onload = function () {
-    darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
-    elements.darkTheme.checked = darkTheme ?? true;
-    switchTheme(elements.darkTheme.checked);
-
-    loadAndConnect();
-
-    if (!USER.channel) {
-      loginButton = new bootstrap.Popover(elements.loginButton);
-    }
-
-    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
-    aboutModal = new bootstrap.Modal(elements.aboutModal);
-
-    enableTooltips();
-    enablePopovers();
-
-    elements.channelName.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        connect();
-      }
-    });
-
-    elements.darkTheme.onchange = function () {
-      switchTheme(this.checked);
-      saveSettings();
-    };
-
-    initGraph();
-
-    DONKHUNT.listeners();
-  }; //onload
 
   function initGraph() {
     if (DONKHUNT.chart) {
@@ -1019,10 +1009,6 @@
   </div>
 </div>
 
-<div aria-live="polite" aria-atomic="true" class="position-relative">
-  <div id="toastContainer" class="toast-container"></div>
-</div>
-
 <style>
   body {
     margin-bottom: 1em;
@@ -1038,18 +1024,6 @@
     cursor: pointer;
     width: 100%;
     height: 230px;
-  }
-
-  #toastContainer {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    z-index: 1056;
-    font-weight: bold;
-  }
-
-  #toastContainer > div > div {
-    font-size: 1.5em;
   }
 
   .resizable {
