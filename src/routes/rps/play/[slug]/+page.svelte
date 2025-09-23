@@ -1,6 +1,11 @@
 <script>
+  let { data } = $props();
+  let channel = $state(data.slug.toLowerCase().replace(/\s/g, ""));
+
   let elements = {
     loginButton: document.getElementById("loginButton"),
+    me: document.getElementById("me"),
+    opponent: document.getElementById("opponent"),
     topRight: document.getElementById("topRight"),
     darkTheme: document.getElementById("darkTheme"),
     loginExpiredModal: document.getElementById("loginExpiredModal"),
@@ -10,19 +15,21 @@
     right_rock: document.getElementById("right_rock"),
     right_paper: document.getElementById("right_paper"),
     right_scissors: document.getElementById("right_scissors"),
+
+    info: document.getElementById("info"),
+    game: document.getElementById("game"),
+    rock: document.getElementById("rock"),
+    paper: document.getElementById("paper"),
+    scissors: document.getElementById("scissors"),
+
     toastContainer: document.getElementById("toastContainer"),
-    gameLink: document.getElementById("gameLink"),
-    copyLinkButton: document.getElementById("copyLinkButton"),
-    bracket: document.getElementById("bracket"),
-    start: document.getElementById("start"),
-    next: document.getElementById("next"),
   };
 
   const { animate } = anime;
 
   let darkTheme = true;
   let loginExpiredModal;
-  let copyLinkButton;
+  let streamer = "";
   let webSocket;
 
   let USER = {
@@ -74,6 +81,8 @@
     </ul>
     </div>
     </div>`;
+    elements.me.innerHTML = `<img src="${profilepicurl}" alt="profile pic" class="rounded-circle" style="height:2em;"> ${USER.channel}`;
+    elements.opponent.innerHTML = `<img src="/pics/donk.png" alt="profile pic" class="rounded-circle" style="height:2em;"> Your opponent`;
   } //loadPFP
 
   function resetSettings(logout = false) {
@@ -132,19 +141,18 @@
     </ul>
     </div>
     </div>`;
-    saveSettings();
-    loadBadges(USER.channel);
+    refreshData();
+    loadBadges(streamer);
     loadPFP();
-    sendUsername(`chat.vote/rps`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
+
+    elements.game.style.display = "";
 
     //webSocket = new WebSocket("ws://localhost:9001");
     webSocket = new WebSocket("wss://ws.chat.vote");
 
     webSocket.onopen = function (event) {
       console.log(event);
-      if (event.type == "open") {
-        showToast("Connected to server", "success", 1000);
-      }
+      webSocket.send(JSON.stringify({ command: "join", streamer: streamer, username: USER.channel, userid: USER.userID, access_token: USER.access_token }));
     };
 
     webSocket.onmessage = function (event) {
@@ -154,36 +162,33 @@
         case "toast":
           showToast(data.message, data.type, 2000);
           break;
-        case "start":
-          //sent when the game starts/resets after clicking the start new game button
+        case "starting":
+          //sent when the game starts/resets after the streamer clicks the start new game button
           showToast(data.message, data.type, 2000);
-          resetBracket();
+          resetGame();
           break;
 
-        case "update":
-          //sent when a viewer joins
-          addUser(data.username);
-          break;
-
-        case "update_move":
-          //sent when a viewer sends their move
-          updateUser(data.username);
-          break;
-
-        case "first_round":
-          //sent after clicking next round for the first time after clicking start new game
+        case "round":
+          //sent when the a new round starts
           showToast(data.message, data.type, 2000);
-          createBracket(data.bracket);
+          startRound(data.opponent);
           break;
 
-        case "next_round":
+        case "moved":
+          //sent if the move was accepted
           showToast(data.message, data.type, 2000);
-
           break;
 
-        case "game_over":
+        case "won":
+        case "lost":
+          //sent if the move was accepted
           showToast(data.message, data.type, 2000);
+          showReset();
+          break;
 
+        case "game_ended":
+          showToast(data.message, data.type, 2000);
+          resetGame();
           break;
 
         default:
@@ -194,9 +199,6 @@
     };
 
     webSocket.onclose = function (event) {
-      if (event.type == "close") {
-        showToast("disconnected from server", "danger", 2000);
-      }
       console.log(event);
     };
 
@@ -205,68 +207,46 @@
     };
   } //connect
 
-  function start() {
-    elements.start.disabled = true;
-    setTimeout(() => {
-      elements.start.disabled = false;
-    }, 2000);
-    webSocket.send(JSON.stringify({ command: "start", username: USER.channel, userid: USER.userID, access_token: USER.access_token }));
-  } //start
+  function resetGame() {
+    elements.rock.disabled = true;
+    elements.paper.disabled = true;
+    elements.scissors.disabled = true;
+    elements.opponent.innerHTML = `<img src="/pics/donk.png" alt="profile pic" class="rounded-circle" style="height:2em;"> Your opponent`;
+  } //resetGame
 
-  function next() {
-    elements.next.disabled = true;
-    setTimeout(() => {
-      elements.next.disabled = false;
-    }, 2000);
-    webSocket.send(JSON.stringify({ command: "next", username: USER.channel, userid: USER.userID, access_token: USER.access_token }));
-  } //next
+  function startRound(opponent) {
+    elements.rock.disabled = false;
+    elements.paper.disabled = false;
+    elements.scissors.disabled = false;
+    elements.opponent.innerHTML = `<img src="/pics/donk.png" alt="profile pic" class="rounded-circle" style="height:2em;"> ${escapeString(opponent)}`;
+  } //startRound
 
-  function resetBracket() {
-    elements.bracket.innerHTML = `
-  <div class="card">
-    <div class="card-header">Players</div>
-    <div class="card-body" id="players"></div>
-  </div>`;
-  } //resetBracket
+  function sendMove(move) {
+    elements.rock.disabled = true;
+    elements.paper.disabled = true;
+    elements.scissors.disabled = true;
+    webSocket.send(JSON.stringify({ command: "move", streamer: streamer, userid: USER.userid, move: move }));
+  } //sendMove
 
-  function addUser(username) {
-    document.getElementById("players").insertAdjacentHTML("afterbegin", `<span class="badge text-bg-secondary m-2" id="${username}_badge">⏳${escapeString(username)}</span>`);
-  } //addUser
-
-  function updateUser(username) {
-    document.getElementById(`${username}_badge`).innerHTML = `✔${escapeString(username)}`;
-  } //addUser
-
-  function createBracket(bracket) {
-    for (let index = 0; index < Object.keys(bracket).length; index++) {
-      let roundName = "";
-      switch (bracket[`round${index}`].length) {
-        case 2:
-          roundName = `Finals`;
-          break;
-        case 4:
-          roundName = `Semifinals`;
-          break;
-        case 8:
-          roundName = `Quarterfinals`;
-          break;
-        default:
-          roundName = `Round of ${currentBracket[`round${currentRound}`].length}`;
-          break;
-      }
-      elements.bracket.insertAdjacentHTML(
-        "beforeend",
-        `<div class="card">
-      <div class="card-header">${roundName}</div>
-      <div class="card-body" id="round${index}"></div>
-      </div>`,
-      );
-    }
-  } //createBracket
+  function showReset() {
+    elements.rock.disabled = true;
+    elements.paper.disabled = true;
+    elements.scissors.disabled = true;
+  } //showReset
 
   async function loadAndConnect() {
     load_localStorage();
     refreshData();
+
+    let input = location.hash;
+    streamer = input.replace("#", "").toLowerCase().replace(/\s/g, "");
+
+    // if (!streamer) {
+    //   elements.info.innerHTML = `<span class="text-warning">No channel provided</span> Get the game link from your streamer.<br>Example: chat.vote/rps/play#forsen`;
+    //   elements.info.style.display = "";
+    //   return;
+    // }
+
     if (USER.twitchLogin && !(await checkToken(USER.access_token))) {
       USER.channel = "";
       loginExpiredModal.show();
@@ -278,7 +258,9 @@
     }
     if (USER.channel) {
       connect();
-      elements.gameLink.value = `https://chat.vote/rps/play#${USER.channel || ""}`;
+    } else {
+      elements.info.innerHTML = `<span class="text-warning">Not signed in.</span> Sign in with the button above.`;
+      elements.info.style.display = "";
     }
   } //loadAndConnect
 
@@ -288,7 +270,6 @@
     switchTheme(elements.darkTheme.checked);
 
     loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
-    copyLinkButton = new bootstrap.Popover(elements.copyLinkButton);
 
     loadAndConnect();
 
@@ -296,7 +277,6 @@
       switchTheme(this.checked);
       saveSettings();
     };
-    randomAnimations();
   }; //onload
 
   function animateHand(hand, move) {
@@ -316,32 +296,6 @@
       },
     });
   } //animateHand
-
-  function randomAnimations() {
-    let moves = ["rock", "paper", "scissors"];
-
-    elements[`left_rock`].style.display = "";
-    elements[`left_paper`].style.display = "none";
-    elements[`left_scissors`].style.display = "none";
-    elements[`right_rock`].style.display = "";
-    elements[`right_paper`].style.display = "none";
-    elements[`right_scissors`].style.display = "none";
-
-    animateHand("left", moves[Math.floor(Math.random() * moves.length)]);
-    animateHand("right", moves[Math.floor(Math.random() * moves.length)]);
-  } //randomAnimations
-
-  let randomAnimationsInterval = setInterval(() => {
-    randomAnimations();
-  }, 4500);
-
-  function copyLink() {
-    navigator.clipboard.writeText(`https://chat.vote/rps/play#${USER.channel || ""}`);
-    copyLinkButton.show();
-    setTimeout(() => {
-      copyLinkButton.hide();
-    }, 1000);
-  } //copyLink
 </script>
 
 <svelte:head>
@@ -440,80 +394,46 @@
   <div id="toastContainer" class="toast-container"></div>
 </div>
 
-<div class="text-center">
-  not working yet <img src="https://cdn.betterttv.net/emote/54fa8f1401e468494b85b537/1x" /> submitting now so that I can finish it before stream/judging starts
-  <img src="https://cdn.7tv.app/emote/6154ecd36251d7e000db18a0/1x.webp" />
-</div>
-
-<div class="container-fluid text-center">
+<div class="container-fluid text-center" id="game" style="display: none">
   <div class="row">
-    <div class="col">
-      <div class="container-fluid text-center">
-        <div class="row">
-          <div class="col d-inline-flex">
-            <div class="p-2">
-              <img src="/pics/donk.png" alt="left donk" style="height: 100px; width: 100px" />
-              <img id="left_rock" src="/rps/left_rock.png" alt="left rock" class="left-hand-img" />
-              <img id="left_paper" src="/rps/left_paper.png" alt="left paper" style="display: none" class="left-hand-img" />
-              <img id="left_scissors" src="/rps/left_scissors.png" alt="left scissors" style="display: none" class="left-hand-img" />
-            </div>
-            <div class="p-2">
-              <img id="right_rock" src="/rps/right_rock.png" alt="right rock" class="right-hand-img" />
-              <img id="right_paper" src="/rps/right_paper.png" alt="right paper" style="display: none" class="right-hand-img" />
-              <img id="right_scissors" src="/rps/right_scissors.png" alt="right scissors" style="display: none" class="right-hand-img" />
-              <img src="/pics/donk.png" alt="right donk" style="height: 100px; width: 100px" class="mirror-img" />
-            </div>
-          </div>
+    <div class="col"></div>
+    <div class="col-auto d-inline-flex">
+      <div class="vstack gap-3">
+        <div class="p-2">
+          <img src="/pics/donk.png" alt="left donk " style="height: 100px; width: 100px" />
+          <img id="left_rock" src="/rps/left_rock.png" alt="left rock" class="left-hand-img" />
+          <img id="left_paper" src="/rps/left_paper.png" alt="left paper" style="display: none" class="left-hand-img" />
+          <img id="left_scissors" src="/rps/left_scissors.png" alt="left scissors" style="display: none" class="left-hand-img" />
         </div>
 
-        <div class="row">
-          <div class="col" id="bracket"></div>
-        </div>
-      </div>
-    </div>
-    <div class="col-4">
-      <div class="card w-75 mb-5">
-        <div class="card-header"><i class="material-icons notranslate">tune</i>Game controls</div>
-        <div class="card-body">
-          <button onclick="start()" id="start" type="button" class="btn btn-primary mb-3"><i class="material-icons notranslate">rocket_launch</i>Start new game</button>
-          <br />
-          <button onclick="next()" id="next" type="button" class="btn btn-info mb-3"><i class="material-icons notranslate">arrow_forward_ios</i>Next round</button>
-          <br />
-          <div class="input-group">
-            <span class="input-group-text">Game link</span>
-            <input disabled type="text" class="form-control" id="gameLink" onclick="copyLink()" value="https://chat.vote/rps/play#username" />
-            <button
-              type="button"
-              id="copyLinkButton"
-              class="btn btn-outline-secondary"
-              data-bs-toggle="popover"
-              data-bs-trigger="manual"
-              data-bs-placement="top"
-              data-bs-content="Link copied :)"
-              onclick="copyLink()"
-            >
-              <i class="material-icons notranslate">content_copy</i>
-            </button>
+        <div class="p-2" id="me"></div>
+        <div class="p-2">
+          Make your move<br />
+          <div class="btn-group" role="group" aria-label="move">
+            <button disabled type="button" onclick="sendMove('rock')" id="rock" class="btn btn-secondary"><span style="font-size: 2.5rem">✊</span><br />Rock</button>
+            <button disabled type="button" onclick="sendMove('paper')" id="paper" class="btn btn-light"><span style="font-size: 2.5rem">✋</span><br />Paper</button>
+            <button disabled type="button" onclick="sendMove('scissors')" id="scissors" class="btn btn-danger"><span style="font-size: 2.5rem">✌</span><br />Scissors</button>
           </div>
         </div>
       </div>
 
-      <div class="card w-75">
-        <div class="card-header"><i class="material-icons notranslate">info</i>Info</div>
-        <div class="card-body text-start">
-          <span class="text-body-secondary">What is this?</span><br />
-          This is an interactive Rock Paper Scissors game that you can play with your Twitch chat.<br />
-          <span class="text-body-secondary">How to play?</span><br />
-          Start a new game then share the link above with your viewers. After your viewers log in start the first round by clicking next round, after everyone makes a move click next round again
-          to eliminate the losers and advance the winners to the next round. Game ends once the bracket is finished.
-          <br /><br />
-          Made for <a href="https://nympts.com/gamejam" target="_blank" rel="noopener noreferrer">NymN's Game Jam</a> &
-          <a href="https://twitchstreamertools.devpost.com/" target="_blank" rel="noopener noreferrer">Twitch Streamer Tools Hackathon 2024</a> :)
+      <div class="vstack gap-3">
+        <div class="p-2">
+          <img id="right_rock" src="/rps/right_rock.png" alt="right rock" class="right-hand-img" />
+          <img id="right_paper" src="/rps/right_paper.png" alt="right paper" style="display: none" class="right-hand-img" />
+          <img id="right_scissors" src="/rps/right_scissors.png" alt="right scissors" style="display: none" class="right-hand-img" />
+          <img src="/pics/donk.png" alt="right donk" style="height: 100px; width: 100px" class="mirror-img" />
         </div>
+
+        <div class="p-2 text-body-secondary" id="opponent"></div>
+        <div class="p-2"></div>
       </div>
     </div>
+    <div class="col"></div>
   </div>
 </div>
+
+<div class="text-center m-5" id="info" style="display: none"></div>
 
 <style>
   ::-webkit-scrollbar {
