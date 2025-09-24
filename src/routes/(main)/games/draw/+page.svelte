@@ -1,6 +1,5 @@
 <script>
   import { enableTooltips } from "$lib/functions";
-  import { loadAndConnect } from "$lib/games";
   import { onMount } from "svelte";
   let elements;
   onMount(async () => {
@@ -8,7 +7,6 @@
       //modals
       grid: document.getElementById("grid"),
       gameDiv: document.getElementById("gameDiv"),
-      loginExpiredModal: document.getElementById("loginExpiredModal"),
       aboutModal: document.getElementById("aboutModal"),
 
       //navbar
@@ -56,13 +54,10 @@
       countdownValue: document.getElementById("countdownValue"),
     };
 
-    loadAndConnect();
-
     if (!USER.channel) {
       loginButton = new bootstrap.Popover(elements.loginButton);
     }
 
-    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
     aboutModal = new bootstrap.Modal(elements.aboutModal);
     settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
 
@@ -205,7 +200,7 @@
   };
 
   let loginButton;
-  let loginExpiredModal, aboutModal;
+  let aboutModal;
   let settingsOffcanvas;
   let timer;
 

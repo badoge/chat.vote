@@ -25,7 +25,6 @@
     elements = {
       //modals
       dankUpdateModal: document.getElementById("dankUpdateModal"),
-      loginExpiredModal: document.getElementById("loginExpiredModal"),
       banlistModal: document.getElementById("banlistModal"),
       bannedUsersList: document.getElementById("bannedUsersList"),
       bannedItemsList: document.getElementById("bannedItemsList"),
@@ -152,10 +151,7 @@
       volumeSliderValue: document.getElementById("volumeSliderValue"),
     };
 
-    loadAndConnect();
-
     dankUpdateModal = new bootstrap.Modal(elements.dankUpdateModal);
-    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
     banlistModal = new bootstrap.Modal(elements.banlistModal);
     settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
     copyLinkButton = new bootstrap.Popover(elements.copyLinkButton);
@@ -229,7 +225,7 @@
   let currentTime = 0;
   let loginButton;
   let settingsOffcanvas;
-  let dankUpdateModal, loginExpiredModal, banlistModal;
+  let dankUpdateModal, banlistModal;
   let copyLinkButton;
   let playlistTab, approvalTab, historyTab;
   let playlist_open = false;
@@ -765,235 +761,165 @@
     return false;
   } //resetSettings
 
-  function login() {
-    elements.topRight.innerHTML = `<div class="btn-group" role="group" aria-label="log in button group">
-    <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></button>
-    <div class="btn-group" role="group">
-        <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-      </button>
-        <ul class="dropdown-menu dropdown-menu-lg-end" aria-label="Log out">
-            <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
-        </ul>
-    </div>
-</div>`;
-    window.open("/prompt.html", "loginWindow", "toolbar=0,status=0,scrollbars=0,width=500px,height=800px");
-    return false;
-  } //login
+  async function handleMessage(target, context, msg, self) {
+    if (context["first-msg"]) {
+      firstTimeChatters.push(context.username);
+    }
+    let input = msg.split(" ").filter(Boolean);
 
-  function connect() {
-    elements.status.innerHTML = `
-  <h4>
-  <span class="badge bg-warning">Connecting... 
-  <div class="spinner-border" style="width:18px;height:18px;" role="status"><span class="visually-hidden">Loading...</span></div>
-  </span>
-  </h4>`;
-    elements.topRight.innerHTML = `
-  <div class="btn-group" role="group" aria-label="log in button group">
-  <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></button>
-  <div class="btn-group" role="group">
-  <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
-  <ul class="dropdown-menu dropdown-menu-lg-end" aria-label="Log out">
-  <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
-  </ul>
-  </div>
-  </div>`;
-
-    refreshData();
-    loadBadges(USER.channel);
-
-    let options = {
-      options: {
-        clientId: CLIENT_ID,
-        debug: false,
-      },
-      connection: {
-        secure: true,
-        reconnect: true,
-      },
-      channels: [USER.channel],
-    };
-    client = new tmi.client(options);
-
-    client.on("message", async (target, context, msg, self) => {
-      if (context["first-msg"]) {
-        firstTimeChatters.push(context.username);
+    if (PLAYLIST.noCommand && playlist_open) {
+      if (bannedUsers.get(context["user-id"])) {
+        botReply(`🚫 You are banned`, context.id, false);
+        return;
       }
-      let input = msg.split(" ").filter(Boolean);
 
-      if (PLAYLIST.noCommand && playlist_open) {
+      let request = input[0];
+      let search = false;
+      if (input[0].toLowerCase() == "youtube" || input[0].toLowerCase() == "spotify" || input[0].toLowerCase() == "vimeo") {
+        request = input.join(" ");
+        search = true;
+      }
+
+      let link = await parseLink(request);
+      if (link && input[input.length - 1]?.toLowerCase().startsWith("start=")) {
+        link.timestamp = timeToSeconds(input[input.length - 1].split("=")[1]);
+      }
+
+      if (link && linkTypeAllowed(link.type)) {
+        addRequest(context, link, context.id, search);
+        return;
+      }
+      if (link && !linkTypeAllowed(link.type)) {
+        botReply(`🚫 ${link.type} links are not enabled`, context.id, false);
+        return;
+      }
+    } //no command request
+
+    let command = input[0].toLowerCase();
+    switch (command) {
+      case PLAYLIST.requestCommand:
+      case PLAYLIST.requestCommandAlias:
+        if (!input[1]) {
+          return;
+        }
+        if (!playlist_open && (Date.now() - currentTime) / 1000 > 10) {
+          currentTime = Date.now();
+          togglePlaylistPopover.show();
+          setTimeout(function () {
+            togglePlaylistPopover.hide();
+          }, 2000);
+          return;
+        } //playlist closed popover
+
+        if (!playlist_open) {
+          return;
+        }
+
         if (bannedUsers.get(context["user-id"])) {
           botReply(`🚫 You are banned`, context.id, false);
           return;
         }
 
-        let request = input[0];
+        let request = input[1];
         let search = false;
-        if (input[0].toLowerCase() == "youtube" || input[0].toLowerCase() == "spotify" || input[0].toLowerCase() == "vimeo") {
-          request = input.join(" ");
+        if (input[1].toLowerCase() == "youtube" || input[1].toLowerCase() == "spotify" || input[1].toLowerCase() == "vimeo") {
+          request = input.slice(1).join(" ");
           search = true;
         }
 
         let link = await parseLink(request);
-        if (link && input[input.length - 1]?.toLowerCase().startsWith("start=")) {
-          link.timestamp = timeToSeconds(input[input.length - 1].split("=")[1]);
-        }
-
-        if (link && linkTypeAllowed(link.type)) {
-          addRequest(context, link, context.id, search);
+        if (!link) {
           return;
         }
-        if (link && !linkTypeAllowed(link.type)) {
+        if (!linkTypeAllowed(link.type)) {
           botReply(`🚫 ${link.type} links are not enabled`, context.id, false);
           return;
         }
-      } //no command request
+        if (input[input.length - 1]?.toLowerCase().startsWith("start=")) {
+          link.timestamp = timeToSeconds(input[input.length - 1].split("=")[1]);
+        }
+        addRequest(context, link, context.id, search);
+        break;
 
-      let command = input[0].toLowerCase();
-      switch (command) {
-        case PLAYLIST.requestCommand:
-        case PLAYLIST.requestCommandAlias:
-          if (!input[1]) {
-            return;
-          }
-          if (!playlist_open && (Date.now() - currentTime) / 1000 > 10) {
-            currentTime = Date.now();
-            togglePlaylistPopover.show();
-            setTimeout(function () {
-              togglePlaylistPopover.hide();
-            }, 2000);
-            return;
-          } //playlist closed popover
-
-          if (!playlist_open) {
-            return;
-          }
-
+      case PLAYLIST.voteskipCommand:
+      case PLAYLIST.voteskipCommandAlias:
+        if (bannedUsers.get(context["user-id"])) {
+          return;
+        }
+        voteSkip(context["user-id"]);
+        break;
+      case PLAYLIST.songCommand:
+      case PLAYLIST.songCommandAlias:
+        if (currentItem) {
           if (bannedUsers.get(context["user-id"])) {
             botReply(`🚫 You are banned`, context.id, false);
             return;
           }
 
-          let request = input[1];
-          let search = false;
-          if (input[1].toLowerCase() == "youtube" || input[1].toLowerCase() == "spotify" || input[1].toLowerCase() == "vimeo") {
-            request = input.slice(1).join(" ");
-            search = true;
-          }
-
-          let link = await parseLink(request);
-          if (!link) {
-            return;
-          }
-          if (!linkTypeAllowed(link.type)) {
-            botReply(`🚫 ${link.type} links are not enabled`, context.id, false);
-            return;
-          }
-          if (input[input.length - 1]?.toLowerCase().startsWith("start=")) {
-            link.timestamp = timeToSeconds(input[input.length - 1].split("=")[1]);
-          }
-          addRequest(context, link, context.id, search);
-          break;
-
-        case PLAYLIST.voteskipCommand:
-        case PLAYLIST.voteskipCommandAlias:
+          botReply(
+            `Now playing: ${getItemLink(currentItem)} | Requested by @${currentItem.by[0].username} ${
+              currentItem.by.length > 1 ? `and ${currentItem.by.length - 1} other ${currentItem.by.length - 1 == 1 ? "user" : "users"}` : ""
+            }`,
+            context.id,
+            true,
+          );
+        }
+        break;
+      case PLAYLIST.playlistCommand:
+      case PLAYLIST.playlistCommandAlias:
+        if (USER.access_token) {
           if (bannedUsers.get(context["user-id"])) {
+            botReply(`🚫 You are banned`, context.id, false);
             return;
           }
-          voteSkip(context["user-id"]);
-          break;
-        case PLAYLIST.songCommand:
-        case PLAYLIST.songCommandAlias:
-          if (currentItem) {
-            if (bannedUsers.get(context["user-id"])) {
-              botReply(`🚫 You are banned`, context.id, false);
-              return;
-            }
 
-            botReply(
-              `Now playing: ${getItemLink(currentItem)} | Requested by @${currentItem.by[0].username} ${
-                currentItem.by.length > 1 ? `and ${currentItem.by.length - 1} other ${currentItem.by.length - 1 == 1 ? "user" : "users"}` : ""
-              }`,
-              context.id,
-              true,
-            );
-          }
-          break;
-        case PLAYLIST.playlistCommand:
-        case PLAYLIST.playlistCommandAlias:
-          if (USER.access_token) {
-            if (bannedUsers.get(context["user-id"])) {
-              botReply(`🚫 You are banned`, context.id, false);
-              return;
-            }
+          botReply(`You can view the playlist here: https://playlist.chat.vote/${USER.channel}`, context.id, true);
+        }
+        break;
+      default:
+        break;
+    } //normal commands
 
-            botReply(`You can view the playlist here: https://playlist.chat.vote/${USER.channel}`, context.id, true);
-          }
+    if ((Date.now() - botCooldown) / 1000 > PLAYLIST.botCooldown && (context.username == USER.channel || (PLAYLIST.modCommands && context.mod))) {
+      botCooldown = Date.now();
+
+      switch (command) {
+        case PLAYLIST.openCommand:
+          openPlaylist(context.id);
+          break;
+        case PLAYLIST.closeCommand:
+          closePlaylist(context.id);
+          break;
+        case PLAYLIST.playCommand:
+          playPlaylist(context.id);
+          break;
+        case PLAYLIST.pauseCommand:
+          pausePlaylist(context.id);
+          break;
+        case PLAYLIST.autoplayCommand:
+          toggleAutoplay(context.id);
+          break;
+        case PLAYLIST.skipCommand:
+          nextItem(context.id);
+          break;
+        case PLAYLIST.rewindCommand:
+          previousItem(context.id);
+          break;
+        case PLAYLIST.deleteCommand:
+          deleteItem(input[1], context.id);
           break;
         default:
           break;
-      } //normal commands
+      } //mod/streamer commands
+    }
+  } //handleMessage
 
-      if ((Date.now() - botCooldown) / 1000 > PLAYLIST.botCooldown && (context.username == USER.channel || (PLAYLIST.modCommands && context.mod))) {
-        botCooldown = Date.now();
-
-        switch (command) {
-          case PLAYLIST.openCommand:
-            openPlaylist(context.id);
-            break;
-          case PLAYLIST.closeCommand:
-            closePlaylist(context.id);
-            break;
-          case PLAYLIST.playCommand:
-            playPlaylist(context.id);
-            break;
-          case PLAYLIST.pauseCommand:
-            pausePlaylist(context.id);
-            break;
-          case PLAYLIST.autoplayCommand:
-            toggleAutoplay(context.id);
-            break;
-          case PLAYLIST.skipCommand:
-            nextItem(context.id);
-            break;
-          case PLAYLIST.rewindCommand:
-            previousItem(context.id);
-            break;
-          case PLAYLIST.deleteCommand:
-            deleteItem(input[1], context.id);
-            break;
-          default:
-            break;
-        } //mod/streamer commands
-      }
-    }); //message
-
-    //client.on("timeout", (channel, username, reason, duration, userstate) => {}); //timeout
-
-    client.on("messagedeleted", (channel, username, deletedMessage, userstate) => {
-      const requestKey = findRequestKey("msgid", userstate["target-msg-id"]);
-      if (requestKey) {
-        deleteRequest(requestKey, false);
-      }
-    });
-
-    client.on("connected", async (address, port) => {
-      console.log(`Connected to ${address}:${port}`);
-      elements.status.innerHTML = `<h4><span class="badge bg-success">Connected :)</span></h4>`;
-      saveSettings();
-      sendUsername(`chat.vote/playlist`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
-      loadPFP();
-    }); //connected
-
-    client.on("disconnected", (reason) => {
-      elements.status.innerHTML = `<h4><span class="badge bg-danger">Disconnected: ${reason}</span></h4>`;
-    }); //disconnected
-
-    client.on("notice", (channel, msgid, message) => {
-      elements.status.innerHTML = `<h4><span class="badge bg-danger">Disconnected: ${message}</span></h4>`;
-    }); //notice
-
-    client.connect().catch(console.error);
-  } //connect
+  async function handleMessageDeleted(channel, username, deletedMessage, userstate) {
+    const requestKey = findRequestKey("msgid", userstate["target-msg-id"]);
+    if (requestKey) {
+      deleteRequest(requestKey, false);
+    }
+  } //handleMessageDeleted
 
   /**
    * @description get the index of a user from the users array - if the user is not already in then they will be added
@@ -2804,83 +2730,6 @@
       },
     });
   } //resetVoteSkip
-
-  function checkLogin() {
-    if (!USER.channel) {
-      loginButton.show();
-      setTimeout(function () {
-        loginButton.hide();
-      }, 4000);
-      return false;
-    }
-    return true;
-  } //checkLogin
-
-  function logout() {
-    elements.topRight.innerHTML = ` <div class="btn-group" role="group" aria-label="login options">
-  <a
-    role="button"
-    id="loginButton"
-    onclick="login()"
-    class="btn btn-twitch"
-    tabindex="0"
-    data-bs-container="body"
-    data-bs-custom-class="custom-popover"
-    data-bs-placement="bottom"
-    data-bs-trigger="manual"
-    data-bs-toggle="popover"
-    data-bs-title="Not signed in"
-    data-bs-content="You need sign in first before adding options or enabling voting/suggestions"
-    ><span class="twitch-icon"></span>Sign in with Twitch</a
-  >
-  <div class="btn-group" role="group">
-    <button
-      id="btnGroupDropLogin"
-      type="button"
-      class="btn btn-twitch dropdown-toggle"
-      data-bs-toggle="dropdown"
-      data-bs-auto-close="outside"
-      aria-label="other login option, connect manually"
-      aria-expanded="false"
-    ></button>
-    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="btnGroupDropLogin">
-      <div class="p-3" style="width: 300px">
-        <label for="channelName" class="form-label">Connect to chat directly</label>
-        <div class="input-group mb-3">
-          <span class="input-group-text" id="directLoginChannel">twitch.tv/</span>
-          <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
-        </div>
-        <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
-        <button type="button" onclick="connect()" class="btn btn-primary float-end">Connect</button>
-      </div>
-    </div>
-  </div>
-</div>`;
-    resetSettings(true);
-  } //logout
-
-  async function loadAndConnect() {
-    await load_localStorage();
-    refreshData();
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-      get: (searchParams, prop) => searchParams.get(prop),
-    });
-    if (params.channel && !USER.channel && !USER.twitchLogin && !USER.access_token && !USER.userID) {
-      let input = params.channel.replace(/\s+/g, "").toLowerCase();
-      elements.channelName.value = input;
-      USER.channel = input;
-      window.history.replaceState({}, document.title, "/");
-    }
-    if (USER.twitchLogin && !(await checkToken(USER.access_token))) {
-      USER.channel = "";
-      loginExpiredModal.show();
-      return;
-    }
-    if (USER.channel) {
-      connect();
-      elements.profileLink.value = `playlist.chat.vote/${USER.channel || ""}`;
-    }
-  } //loadAndConnect
 
   let botCooldown = Date.now();
   async function botReply(msg, id, followCooldown) {

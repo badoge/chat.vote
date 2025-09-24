@@ -182,7 +182,6 @@
 
     elements.pollOption.focus();
     elements.pollOption.select();
-    loadAndConnect();
     enableTooltips();
     enablePopovers();
     settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
@@ -877,359 +876,307 @@
     }, 100);
   } //pickRandomYesNo
 
-  function connect() {
-    elements.status.innerHTML = `
-  <h4>
-  <span class="badge bg-warning">Connecting... 
-  <div class="spinner-border" style="width:18px;height:18px;" role="status"><span class="visually-hidden">Loading...</span></div>
-  </span>
-  </h4>`;
-    elements.topRight.innerHTML = `
-  <div class="btn-group" role="group" aria-label="log in button group">
-  <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></button>
-  <div class="btn-group" role="group">
-  <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
-  <ul class="dropdown-menu dropdown-menu-lg-end" aria-label="Log out">
-  <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
-  </ul>
-  </div>
-  </div>`;
-    refreshData();
-    getEmotes();
-    loadBadges(USER.channel);
-    let options = {
-      options: {
-        clientId: CLIENT_ID,
-        debug: false,
-      },
-      connection: {
-        secure: true,
-        reconnect: true,
-      },
-      channels: [USER.channel],
-    };
-    client = new tmi.client(options);
+  async function handleMessage(target, context, msg, self) {
+    let input = msg.split(" ").filter(Boolean);
+    let command = input[0].toLowerCase();
 
-    client.on("message", async (target, context, msg, self) => {
-      let input = msg.split(" ").filter(Boolean);
-      let command = input[0].toLowerCase();
-
-      if (CHATVOTE.votingMode == "numbers" && voting_enabled && !yesNoMode) {
-        if (CHATVOTE.subMode && !context.subscriber) {
-          return;
-        }
-        if (input[0].toLowerCase() == "!vote") {
-          input = input.slice(1);
-          if (input.length == 0) {
-            return;
-          }
-        }
-        if (isNaN(parseInt(input[0], 10))) {
-          return;
-        }
-
-        if (voters.includes(context.username)) {
-          if (!CHATVOTE.allowChange || vote_changed.includes(context.username)) {
-            return;
-          }
-          //remove old vote
-          let index = voters.indexOf(context.username);
-          voters.splice(index, 1);
-          let votes = voters_options[index];
-          voters_options.splice(index, 1);
-          for (let index = 0; index < votes.length; index++) {
-            let pos = vote_results.findIndex((e) => e.option === votes[index]);
-            vote_results[pos].score -= 1;
-          }
-          vote_changed.push(context.username);
-          updateChart();
-        }
-
-        if (CHATVOTE.multiChoice && input[1]) {
-          let vote_input = [];
-          let voted = false;
-          let votes = [];
-          input = [...new Set([...input])];
-          for (let index = 0, j = input.length; index < j; index++) {
-            if (!isNaN(parseInt(input[index], 10))) {
-              vote_input.push(parseInt(input[index], 10));
-            }
-          }
-          for (let index = 0, j = vote_input.length; index < j; index++) {
-            let pos = vote_results.findIndex((e) => e.id === vote_input[index]);
-            if (pos != -1) {
-              votes.push(vote_results[pos].option);
-              vote_results[pos].score += 1;
-              voted = true;
-            }
-          }
-          if (voted) {
-            voters.push(context.username);
-            voters_options.push(votes);
-            updateChart();
-          }
-          return;
-        } else {
-          let pos = vote_results.findIndex((e) => e.id === parseInt(input[0], 10));
-          if (pos == -1) {
-            return;
-          }
-          voters.push(context.username);
-          voters_options.push([vote_results[pos].option]);
-          vote_results[pos].score += 1;
-          updateChart();
-          return;
-        }
-      } //vote with numbers
-
-      if (CHATVOTE.votingMode == "text" && voting_enabled && !yesNoMode) {
-        if (CHATVOTE.subMode && !context.subscriber) {
-          return;
-        }
-        if (input[0].toLowerCase() == "!vote") {
-          input = input.slice(1);
-          if (input.length == 0) {
-            return;
-          }
-        }
-        if (voters.includes(context.username)) {
-          if (!CHATVOTE.allowChange || vote_changed.includes(context.username)) {
-            return;
-          }
-          //remove old vote
-          let index = voters.indexOf(context.username);
-          voters.splice(index, 1);
-          let votes = voters_options[index];
-          voters_options.splice(index, 1);
-          for (let index = 0; index < votes.length; index++) {
-            let pos = vote_results.findIndex((e) => e.option === votes[index]);
-            vote_results[pos].score -= 1;
-          }
-          vote_changed.push(context.username);
-          updateChart();
-        }
-        if (CHATVOTE.multiChoice && input[1]) {
-          let vote_input = [];
-          let voted = false;
-          let votes = [];
-          input = [...new Set([...input])];
-          for (let index = 0, j = input.length; index < j; index++) {
-            vote_input.push(input[index].toLowerCase());
-          }
-          for (let index = 0, j = vote_input.length; index < j; index++) {
-            let pos = vote_results.findIndex((e) => e.option_clean === vote_input[index]);
-            if (pos != -1) {
-              votes.push(vote_results[pos].option);
-              vote_results[pos].score += 1;
-              voted = true;
-            }
-          }
-          if (voted) {
-            voters.push(context.username);
-            voters_options.push(votes);
-            updateChart();
-          }
-          return;
-        } else {
-          let pos = vote_results.findIndex((e) => e.option_clean === input[0].toLowerCase());
-          if (pos == -1) {
-            return;
-          }
-          voters.push(context.username);
-          voters_options.push([vote_results[pos].option]);
-          vote_results[pos].score += 1;
-          updateChart();
-          return;
-        }
-      } //vote with text
-
-      if (yesNoMode && voting_enabled && (command == "voteyea" || command == "votenay" || command == "yes" || command == "no")) {
-        if (CHATVOTE.subMode && !context.subscriber) {
-          return;
-        }
-        if (voters_yesno.includes(context.username)) {
-          return;
-        }
-        if (command == "voteyea" || command == "yes") {
-          voters_yesno.push(context.username);
-          voters_options_yesno.push("yea");
-          vote_results_yesno.yea += 1;
-          updateYesNo();
-          return;
-        }
-        voters_yesno.push(context.username);
-        voters_options_yesno.push("nay");
-        vote_results_yesno.nay += 1;
-        updateYesNo();
+    if (CHATVOTE.votingMode == "numbers" && voting_enabled && !yesNoMode) {
+      if (CHATVOTE.subMode && !context.subscriber) {
         return;
-      } //yesNoMode
-
-      if (command == CHATVOTE.suggestion_prefix && suggestions_enabled) {
-        if (CHATVOTE.subMode && !context.subscriber) {
+      }
+      if (input[0].toLowerCase() == "!vote") {
+        input = input.slice(1);
+        if (input.length == 0) {
           return;
         }
-        let suggestion = input.slice(1).join(" ");
-        let suggestion_emotes = escapeString(suggestion);
-        let suggestion_unchanged = escapeString(suggestion);
+      }
+      if (isNaN(parseInt(input[0], 10))) {
+        return;
+      }
 
-        let suggestion_clean = suggestion_unchanged.toLowerCase().replace(/\W/g, "");
-        if (CHATVOTE.votingMode == "text") {
-          suggestion_clean = suggestion_clean.replace(/[^a-zA-Z0-9]+/g, "-");
-        }
-        if (!suggestion_clean) {
+      if (voters.includes(context.username)) {
+        if (!CHATVOTE.allowChange || vote_changed.includes(context.username)) {
           return;
         }
-        if (context.emotes) {
-          let emotes = [];
-          for (const [key, value] of Object.entries(context.emotes)) {
-            for (let index = 0, j = value.length; index < j; index++) {
-              if (emotes.some((emote) => emote.id == key)) {
-                continue;
-              }
-              let limits = value[index].split("-");
-              emotes.push({ emote: [...msg].slice(parseInt(limits[0], 10), parseInt(limits[1], 10) + 1).join(""), id: key });
-            }
-          }
-          for (let index = 0, j = emotes.length; index < j; index++) {
-            let emote = `<img src="https://static-cdn.jtvnw.net/emoticons/v2/${emotes[index].id}/default/dark/1.0" title="${emotes[index].emote}" alt="${emotes[index].emote}" class="emote">`;
-            let regex = new RegExp("\\b" + emotes[index].emote + "\\b", "g");
-            suggestion_emotes = suggestion_emotes.replace(regex, emote);
-          }
-        } //emotes
-
-        suggestion_emotes = replaceEmotes(suggestion_emotes, thirdPartyEmotes);
-
-        if (CHATVOTE.suggestionLimitUser > 0 && vote_results.reduce((acc, cur) => (cur.by === context.username ? ++acc : acc), 0) >= CHATVOTE.suggestionLimitUser) {
-          return;
+        //remove old vote
+        let index = voters.indexOf(context.username);
+        voters.splice(index, 1);
+        let votes = voters_options[index];
+        voters_options.splice(index, 1);
+        for (let index = 0; index < votes.length; index++) {
+          let pos = vote_results.findIndex((e) => e.option === votes[index]);
+          vote_results[pos].score -= 1;
         }
+        vote_changed.push(context.username);
+        updateChart();
+      }
 
-        if (suggestionLimitReached) {
-          showToast("Viewer suggestion limit reached", "warning", 5000);
-          disableSuggestButton();
-          return;
-        }
-
-        if (vote_results.some((e) => e.option_clean === suggestion_clean)) {
-          return;
-        }
-
-        if (CHATVOTE.suggestionLimit > 0) {
-          numberOfSuggestions++;
-          if (numberOfSuggestions >= CHATVOTE.suggestionLimit) {
-            suggestionLimitReached = true;
+      if (CHATVOTE.multiChoice && input[1]) {
+        let vote_input = [];
+        let voted = false;
+        let votes = [];
+        input = [...new Set([...input])];
+        for (let index = 0, j = input.length; index < j; index++) {
+          if (!isNaN(parseInt(input[index], 10))) {
+            vote_input.push(parseInt(input[index], 10));
           }
         }
-        oid++;
-        pushTable(oid, suggestion_emotes, context.username, 0, context);
-        pushVoteResults(oid, suggestion_unchanged, suggestion_emotes, context.username, 0, context);
+        for (let index = 0, j = vote_input.length; index < j; index++) {
+          let pos = vote_results.findIndex((e) => e.id === vote_input[index]);
+          if (pos != -1) {
+            votes.push(vote_results[pos].option);
+            vote_results[pos].score += 1;
+            voted = true;
+          }
+        }
+        if (voted) {
+          voters.push(context.username);
+          voters_options.push(votes);
+          updateChart();
+        }
+        return;
+      } else {
+        let pos = vote_results.findIndex((e) => e.id === parseInt(input[0], 10));
+        if (pos == -1) {
+          return;
+        }
+        voters.push(context.username);
+        voters_options.push([vote_results[pos].option]);
+        vote_results[pos].score += 1;
         updateChart();
         return;
-      } //suggest
+      }
+    } //vote with numbers
 
-      if (command == CHATVOTE.suggestion_prefix && !suggestions_enabled && (Date.now() - currentTime) / 1000 > 10) {
-        currentTime = Date.now();
-        suggestPopover.show();
-        setTimeout(function () {
-          suggestPopover.hide();
-        }, 2000);
-        return;
-      } //suggestions disabled
-
-      if (command == "!confetti") {
-        if (context.username == USER.channel || context.username == "badoge") {
-          showConfetti(input[1]);
-          return;
-        }
-        return;
-      } //confetti
-
-      if (command == "!rig" && context.username == USER.channel) {
-        let option = parseInt(input[1], 10);
-        let extra = parseInt(input[2], 10);
-        if (!isNaN(option) && !isNaN(extra)) {
-          let pos = vote_results.findIndex((e) => e.id === option);
-          vote_results[pos].score += extra;
-          updateChart();
-          return;
-        }
-        return;
-      } //rig
-
-      if (command == "!restart" && context.username == USER.channel) {
-        restartPoll();
-        return;
-      } //restart poll
-
-      if (command == "!reset" && (context.username == USER.channel || context.username == "badoge")) {
-        resetSettings();
-        return;
-      } //reset settings
-
-      if (!voting_enabled && (Date.now() - currentTime) / 1000 > 10) {
-        if (input[0].toLowerCase() == "!vote") {
-          input = input.slice(1);
-        }
-        if (CHATVOTE.votingMode == "numbers" && isNaN(parseInt(input[0], 10))) {
-          return;
-        }
-        if (CHATVOTE.votingMode == "text") {
-          let pos = vote_results.findIndex((e) => e.option_clean === command);
-          if (pos == -1) {
-            return;
-          }
-        } else {
-          let pos = vote_results.findIndex((e) => e.id === parseInt(input[0], 10));
-          if (pos == -1) {
-            return;
-          }
-        }
-        currentTime = Date.now();
-        votePopover.show();
-        setTimeout(function () {
-          votePopover.hide();
-        }, 2000);
-        return;
-      } //voting disabled
-    }); //message
-
-    client.on("timeout", (channel, username, reason, duration, userstate) => {
-      if (voting_enabled) {
+    if (CHATVOTE.votingMode == "text" && voting_enabled && !yesNoMode) {
+      if (CHATVOTE.subMode && !context.subscriber) {
         return;
       }
-      for (let i = vote_results.length - 1; i >= 0; i--) {
-        if (vote_results[i].by === username && (Date.now() - vote_results[i].time) / 1000 < 5) {
-          table
-            .rows(function (idx, data, node) {
-              return data[0] == vote_results[i].id && node.children[2].firstChild.dataset.username == username;
-            })
-            .remove()
-            .draw();
-          vote_results.splice(i, 1);
-          updateChart();
-          showToast(`Removed ${username}'s suggestions because they got timed out`, "warning", 2000);
-          numberOfSuggestions--;
+      if (input[0].toLowerCase() == "!vote") {
+        input = input.slice(1);
+        if (input.length == 0) {
+          return;
         }
       }
-    }); //timeout
+      if (voters.includes(context.username)) {
+        if (!CHATVOTE.allowChange || vote_changed.includes(context.username)) {
+          return;
+        }
+        //remove old vote
+        let index = voters.indexOf(context.username);
+        voters.splice(index, 1);
+        let votes = voters_options[index];
+        voters_options.splice(index, 1);
+        for (let index = 0; index < votes.length; index++) {
+          let pos = vote_results.findIndex((e) => e.option === votes[index]);
+          vote_results[pos].score -= 1;
+        }
+        vote_changed.push(context.username);
+        updateChart();
+      }
+      if (CHATVOTE.multiChoice && input[1]) {
+        let vote_input = [];
+        let voted = false;
+        let votes = [];
+        input = [...new Set([...input])];
+        for (let index = 0, j = input.length; index < j; index++) {
+          vote_input.push(input[index].toLowerCase());
+        }
+        for (let index = 0, j = vote_input.length; index < j; index++) {
+          let pos = vote_results.findIndex((e) => e.option_clean === vote_input[index]);
+          if (pos != -1) {
+            votes.push(vote_results[pos].option);
+            vote_results[pos].score += 1;
+            voted = true;
+          }
+        }
+        if (voted) {
+          voters.push(context.username);
+          voters_options.push(votes);
+          updateChart();
+        }
+        return;
+      } else {
+        let pos = vote_results.findIndex((e) => e.option_clean === input[0].toLowerCase());
+        if (pos == -1) {
+          return;
+        }
+        voters.push(context.username);
+        voters_options.push([vote_results[pos].option]);
+        vote_results[pos].score += 1;
+        updateChart();
+        return;
+      }
+    } //vote with text
 
-    client.on("connected", async (address, port) => {
-      console.log(`Connected to ${address}:${port}`);
-      elements.status.innerHTML = `<h4><span class="badge bg-success">Connected :)</span></h4>`;
-      saveSettings();
-      sendUsername(`chat.vote`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
-      loadPFP();
-    }); //connected
+    if (yesNoMode && voting_enabled && (command == "voteyea" || command == "votenay" || command == "yes" || command == "no")) {
+      if (CHATVOTE.subMode && !context.subscriber) {
+        return;
+      }
+      if (voters_yesno.includes(context.username)) {
+        return;
+      }
+      if (command == "voteyea" || command == "yes") {
+        voters_yesno.push(context.username);
+        voters_options_yesno.push("yea");
+        vote_results_yesno.yea += 1;
+        updateYesNo();
+        return;
+      }
+      voters_yesno.push(context.username);
+      voters_options_yesno.push("nay");
+      vote_results_yesno.nay += 1;
+      updateYesNo();
+      return;
+    } //yesNoMode
 
-    client.on("disconnected", (reason) => {
-      elements.status.innerHTML = `<h4><span class="badge bg-danger">Disconnected: ${reason}</span></h4>`;
-    }); //disconnected
+    if (command == CHATVOTE.suggestion_prefix && suggestions_enabled) {
+      if (CHATVOTE.subMode && !context.subscriber) {
+        return;
+      }
+      let suggestion = input.slice(1).join(" ");
+      let suggestion_emotes = escapeString(suggestion);
+      let suggestion_unchanged = escapeString(suggestion);
 
-    client.on("notice", (channel, msgid, message) => {
-      elements.status.innerHTML = `<h4><span class="badge bg-danger">Disconnected: ${message}</span></h4>`;
-    }); //notice
+      let suggestion_clean = suggestion_unchanged.toLowerCase().replace(/\W/g, "");
+      if (CHATVOTE.votingMode == "text") {
+        suggestion_clean = suggestion_clean.replace(/[^a-zA-Z0-9]+/g, "-");
+      }
+      if (!suggestion_clean) {
+        return;
+      }
+      if (context.emotes) {
+        let emotes = [];
+        for (const [key, value] of Object.entries(context.emotes)) {
+          for (let index = 0, j = value.length; index < j; index++) {
+            if (emotes.some((emote) => emote.id == key)) {
+              continue;
+            }
+            let limits = value[index].split("-");
+            emotes.push({ emote: [...msg].slice(parseInt(limits[0], 10), parseInt(limits[1], 10) + 1).join(""), id: key });
+          }
+        }
+        for (let index = 0, j = emotes.length; index < j; index++) {
+          let emote = `<img src="https://static-cdn.jtvnw.net/emoticons/v2/${emotes[index].id}/default/dark/1.0" title="${emotes[index].emote}" alt="${emotes[index].emote}" class="emote">`;
+          let regex = new RegExp("\\b" + emotes[index].emote + "\\b", "g");
+          suggestion_emotes = suggestion_emotes.replace(regex, emote);
+        }
+      } //emotes
 
-    client.connect().catch(console.error);
-  } //connect
+      suggestion_emotes = replaceEmotes(suggestion_emotes, thirdPartyEmotes);
+
+      if (CHATVOTE.suggestionLimitUser > 0 && vote_results.reduce((acc, cur) => (cur.by === context.username ? ++acc : acc), 0) >= CHATVOTE.suggestionLimitUser) {
+        return;
+      }
+
+      if (suggestionLimitReached) {
+        showToast("Viewer suggestion limit reached", "warning", 5000);
+        disableSuggestButton();
+        return;
+      }
+
+      if (vote_results.some((e) => e.option_clean === suggestion_clean)) {
+        return;
+      }
+
+      if (CHATVOTE.suggestionLimit > 0) {
+        numberOfSuggestions++;
+        if (numberOfSuggestions >= CHATVOTE.suggestionLimit) {
+          suggestionLimitReached = true;
+        }
+      }
+      oid++;
+      pushTable(oid, suggestion_emotes, context.username, 0, context);
+      pushVoteResults(oid, suggestion_unchanged, suggestion_emotes, context.username, 0, context);
+      updateChart();
+      return;
+    } //suggest
+
+    if (command == CHATVOTE.suggestion_prefix && !suggestions_enabled && (Date.now() - currentTime) / 1000 > 10) {
+      currentTime = Date.now();
+      suggestPopover.show();
+      setTimeout(function () {
+        suggestPopover.hide();
+      }, 2000);
+      return;
+    } //suggestions disabled
+
+    if (command == "!confetti") {
+      if (context.username == USER.channel || context.username == "badoge") {
+        showConfetti(input[1]);
+        return;
+      }
+      return;
+    } //confetti
+
+    if (command == "!rig" && context.username == USER.channel) {
+      let option = parseInt(input[1], 10);
+      let extra = parseInt(input[2], 10);
+      if (!isNaN(option) && !isNaN(extra)) {
+        let pos = vote_results.findIndex((e) => e.id === option);
+        vote_results[pos].score += extra;
+        updateChart();
+        return;
+      }
+      return;
+    } //rig
+
+    if (command == "!restart" && context.username == USER.channel) {
+      restartPoll();
+      return;
+    } //restart poll
+
+    if (command == "!reset" && (context.username == USER.channel || context.username == "badoge")) {
+      resetSettings();
+      return;
+    } //reset settings
+
+    if (!voting_enabled && (Date.now() - currentTime) / 1000 > 10) {
+      if (input[0].toLowerCase() == "!vote") {
+        input = input.slice(1);
+      }
+      if (CHATVOTE.votingMode == "numbers" && isNaN(parseInt(input[0], 10))) {
+        return;
+      }
+      if (CHATVOTE.votingMode == "text") {
+        let pos = vote_results.findIndex((e) => e.option_clean === command);
+        if (pos == -1) {
+          return;
+        }
+      } else {
+        let pos = vote_results.findIndex((e) => e.id === parseInt(input[0], 10));
+        if (pos == -1) {
+          return;
+        }
+      }
+      currentTime = Date.now();
+      votePopover.show();
+      setTimeout(function () {
+        votePopover.hide();
+      }, 2000);
+      return;
+    } //voting disabled
+  } //handleMessage
+
+  async function handleTimeout(channel, username, reason, duration, userstate) {
+    if (voting_enabled) {
+      return;
+    }
+    for (let i = vote_results.length - 1; i >= 0; i--) {
+      if (vote_results[i].by === username && (Date.now() - vote_results[i].time) / 1000 < 5) {
+        table
+          .rows(function (idx, data, node) {
+            return data[0] == vote_results[i].id && node.children[2].firstChild.dataset.username == username;
+          })
+          .remove()
+          .draw();
+        vote_results.splice(i, 1);
+        updateChart();
+        showToast(`Removed ${username}'s suggestions because they got timed out`, "warning", 2000);
+        numberOfSuggestions--;
+      }
+    }
+  } //handleTimeout
 
   async function getEmotes() {
     setTimeout(async () => {
@@ -1297,17 +1244,6 @@
     elements.nayCount.innerHTML = `${vote_results_yesno.nay} ${vote_results_yesno.nay == 1 ? "Vote" : "Votes"} (${Math.round((vote_results_yesno.nay / voters_yesno.length) * 100) || 0}%)`;
     elements.yesnoTotalVotes.innerHTML = voters_yesno.length;
   } //updateYesNo
-
-  function checkLogin() {
-    if (!USER.channel) {
-      loginButton.show();
-      setTimeout(function () {
-        loginButton.hide();
-      }, 4000);
-      return false;
-    }
-    return true;
-  } //checkLogin
 
   function checkEmpty() {
     if (yesNoMode) {
@@ -1780,49 +1716,6 @@
     }
   } //hideScore
 
-  function logout() {
-    elements.topRight.innerHTML = ` <div class="btn-group" role="group" aria-label="login options">
-  <a
-    role="button"
-    id="loginButton"
-    onclick="login()"
-    class="btn btn-twitch"
-    tabindex="0"
-    data-bs-container="body"
-    data-bs-custom-class="custom-popover"
-    data-bs-placement="bottom"
-    data-bs-trigger="manual"
-    data-bs-toggle="popover"
-    data-bs-title="Not signed in"
-    data-bs-content="You need sign in first before adding options or enabling voting/suggestions"
-    ><span class="twitch-icon"></span>Sign in with Twitch</a
-  >
-  <div class="btn-group" role="group">
-    <button
-      id="btnGroupDropLogin"
-      type="button"
-      class="btn btn-twitch dropdown-toggle"
-      data-bs-toggle="dropdown"
-      data-bs-auto-close="outside"
-      aria-label="other login option, connect manually"
-      aria-expanded="false"
-    ></button>
-    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="btnGroupDropLogin">
-      <div class="p-3" style="width: 300px">
-        <label for="channelName" class="form-label">Connect to chat directly</label>
-        <div class="input-group mb-3">
-          <span class="input-group-text" id="directLoginChannel">twitch.tv/</span>
-          <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
-        </div>
-        <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
-        <button type="button" onclick="connect()" class="btn btn-primary float-end">Connect</button>
-      </div>
-    </div>
-  </div>
-</div>`;
-    resetSettings(true);
-  } //logout
-
   function showChat() {
     if (!checkLogin()) {
       return;
@@ -2163,28 +2056,6 @@
   function moveY(event) {
     dataChannel.send(JSON.stringify({ axis: "y", value: parseInt(event.target.value, 10) }));
   } //moveY
-
-  async function loadAndConnect() {
-    load_localStorage();
-    refreshData();
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-      get: (searchParams, prop) => searchParams.get(prop),
-    });
-    if (params.channel && !USER.channel && !USER.twitchLogin && !USER.access_token && !USER.userID) {
-      let input = params.channel.replace(/\s+/g, "").toLowerCase();
-      elements.channelName.value = input;
-      USER.channel = input;
-      window.history.replaceState({}, document.title, "/");
-    }
-    if (USER.twitchLogin && !(await checkToken(USER.access_token))) {
-      USER.channel = "";
-      loginExpiredModal.show();
-      return;
-    }
-    if (USER.channel) {
-      connect();
-    }
-  } //loadAndConnect
 </script>
 
 <div class="modal fade" id="randomOptionModal" tabindex="-1" aria-hidden="true">

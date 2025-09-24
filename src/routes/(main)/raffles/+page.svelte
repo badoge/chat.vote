@@ -35,7 +35,6 @@
   onMount(async () => {
     elements = {
       //modals
-      loginExpiredModal: document.getElementById("loginExpiredModal"),
       fancyRaffleModal: document.getElementById("fancyRaffleModal"),
       claw: document.getElementById("claw"),
       slot: document.getElementById("slot"),
@@ -130,7 +129,6 @@
       titleHint: document.getElementById("titleHint"),
     };
 
-    loadAndConnect();
     enableTooltips();
     enablePopovers();
 
@@ -147,7 +145,6 @@
       loginButton = new bootstrap.Popover(elements.loginButton);
     }
 
-    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
     fancyRaffleModal = new bootstrap.Modal(elements.fancyRaffleModal);
 
     settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
@@ -263,7 +260,7 @@
   let currentTime = 0;
   let rafflePopover;
   let loginButton;
-  let loginExpiredModal, fancyRaffleModal;
+  let fancyRaffleModal;
   let currentRaffleWinner = "";
   let raffleWinners = [];
   let settingsOffcanvas;
@@ -516,209 +513,142 @@
     elements.entrants.innerHTML = "Entrants: 0";
   } //restartRaffle
 
-  function login() {
-    elements.topRight.innerHTML = `<div class="btn-group" role="group" aria-label="log in button group">
-    <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></button>
-    <div class="btn-group" role="group">
-        <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-      </button>
-        <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="btnGroupDrop1">
-            <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
-        </ul>
-    </div>
-</div>`;
-    window.open("/prompt.html", "loginWindow", "toolbar=0,status=0,scrollbars=0,width=500px,height=800px");
-    return false;
-  } //login
+  async function handleMessage(target, context, msg, self) {
+    if (context.username == currentRaffleWinner) {
+      if (RAFFLES.autoRerollEnabled && timer_raffle.isRunning()) {
+        document.getElementById("countdown_raffle").remove();
+        timer_raffle.reset();
+        timer_raffle.stop();
+      }
+      raffleWinnerChat(context, msg);
+    } //raffle winner chat
 
-  function connect() {
-    elements.status.innerHTML = `
-  <h4>
-  <span class="badge bg-warning">Connecting... 
-  <div class="spinner-border" style="width:18px;height:18px;" role="status"><span class="visually-hidden">Loading...</span></div>
-  </span>
-  </h4>`;
-    elements.topRight.innerHTML = `
-  <div class="btn-group" role="group" aria-label="log in button group">
-  <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></button>
-  <div class="btn-group" role="group">
-  <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
-  <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="btnGroupDrop1">
-  <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
-  </ul>
-  </div>
-  </div>`;
-    refreshData();
-    getEmotes();
-    loadBadges(USER.channel);
-    let options = {
-      options: {
-        clientId: CLIENT_ID,
-        debug: false,
-      },
-      connection: {
-        secure: true,
-        reconnect: true,
-      },
-      channels: [USER.channel],
-    };
-    client = new tmi.client(options);
+    if (context["first-msg"]) {
+      firstTimeChatters.push(context.username);
+    }
 
-    client.on("message", async (target, context, msg, self) => {
-      if (context.username == currentRaffleWinner) {
-        if (RAFFLES.autoRerollEnabled && timer_raffle.isRunning()) {
-          document.getElementById("countdown_raffle").remove();
-          timer_raffle.reset();
-          timer_raffle.stop();
-        }
-        raffleWinnerChat(context, msg);
-      } //raffle winner chat
+    let input = msg.split(" ").filter(Boolean);
+    let command = input[0].toLowerCase();
 
-      if (context["first-msg"]) {
-        firstTimeChatters.push(context.username);
+    if (command == RAFFLES.raffleCommand && raffle_open) {
+      //check if user already joined
+      if (raffle_users.some((e) => e.username === context.username)) {
+        return;
       }
 
-      let input = msg.split(" ").filter(Boolean);
-      let command = input[0].toLowerCase();
-
-      if (command == RAFFLES.raffleCommand && raffle_open) {
-        //check if user already joined
-        if (raffle_users.some((e) => e.username === context.username)) {
-          return;
-        }
-
-        //check if multiple wins are not allowed and if user already won
-        if (RAFFLES.removeWinner && raffleWinners.includes(context.username)) {
-          return;
-        }
-
-        ////check if user is allowed to join
-        //check if sub tiers are split
-        if (RAFFLES.splitTiers) {
-          //if sub tiers are split check each tier separately
-          if (!RAFFLES.allowTier1 && context?.badges?.subscriber?.length <= 3) {
-            return;
-          }
-          if (!RAFFLES.allowTier2 && context?.badges?.subscriber?.length > 3 && context?.badges?.subscriber.startsWith("2")) {
-            return;
-          }
-          if (!RAFFLES.allowTier3 && context?.badges?.subscriber?.length > 3 && context?.badges?.subscriber.startsWith("3")) {
-            return;
-          }
-        } else {
-          if (!RAFFLES.allowSubs && context.subscriber) {
-            return;
-          }
-        }
-        //check if plebs are allowed to join
-        if (!RAFFLES.allowPlebs && !context.subscriber) {
-          return;
-        }
-        //check if mods are allowed to join
-        if (!RAFFLES.allowMods && context.mod) {
-          return;
-        }
-        //check if vips are allowed to join
-        if (!RAFFLES.allowVips && context.vip) {
-          return;
-        }
-        //check if first time chatters are allowed to join
-        if (!RAFFLES.allowFirstTimeChatters && firstTimeChatters.includes(context.username)) {
-          return;
-        }
-
-        //make user object with 1 ticket
-        let user = {
-          id: context["user-id"],
-          username: context.username,
-          displayname: context["display-name"],
-          tickets: 1,
-          color: context.color,
-          badges: context.badges,
-          emotes: context.emotes,
-          time: context["tmi-sent-ts"],
-          msg: msg,
-        };
-
-        ////add bonus tickets
-        //check if sub tiers are split
-        if (RAFFLES.splitTiers) {
-          //if sub tiers are split add bonus for each tier separately
-          if (RAFFLES.tier1Bonus > 0 && context?.badges?.subscriber?.length <= 3) {
-            user.tickets += RAFFLES.tier1Bonus;
-          }
-          if (RAFFLES.tier2Bonus > 0 && context?.badges?.subscriber?.length > 3 && context?.badges?.subscriber.startsWith("2")) {
-            user.tickets += RAFFLES.tier2Bonus;
-          }
-          if (RAFFLES.tier3Bonus > 0 && context?.badges?.subscriber?.length > 3 && context?.badges?.subscriber.startsWith("3")) {
-            user.tickets += RAFFLES.tier3Bonus;
-          }
-        } else {
-          if (RAFFLES.subBonus > 0 && context.subscriber) {
-            user.tickets += RAFFLES.subBonus;
-          }
-        }
-        //add pleb bonus
-        if (RAFFLES.plebBonus > 0 && !context.subscriber) {
-          user.tickets += RAFFLES.plebBonus;
-        }
-        //add mod bonus
-        if (RAFFLES.modBonus > 0 && context.mod) {
-          user.tickets += RAFFLES.modBonus;
-        }
-        //add vip bonus
-        if (RAFFLES.vipBonus > 0 && context.vip) {
-          user.tickets += RAFFLES.vipBonus;
-        }
-        //add first time chatter bonus
-        if (RAFFLES.firstTimeChatterBonus > 0 && firstTimeChatters.includes(context.username)) {
-          user.tickets += RAFFLES.firstTimeChatterBonus;
-        }
-
-        //add the user object to the raffle which also adds the user to the raffle_users array
-        addUserToRaffle(user);
-      } //raffle
-
-      if (command == RAFFLES.raffleCommand && !raffle_open && (Date.now() - currentTime) / 1000 > 10) {
-        currentTime = Date.now();
-        rafflePopover.show();
-        setTimeout(function () {
-          rafflePopover.hide();
-        }, 3000);
+      //check if multiple wins are not allowed and if user already won
+      if (RAFFLES.removeWinner && raffleWinners.includes(context.username)) {
         return;
-      } //raffle disabled
-
-      if (command == "!reset" && (context.username == USER.channel || context.username == "badoge")) {
-        resetSettings();
-        return;
-      } //reset settings
-    }); //message
-
-    client.on("timeout", (channel, username, reason, duration, userstate) => {
-      if (username == currentRaffleWinner) {
-        let raffleOutput = elements.raffleOutput;
-        raffleOutput.lastChild.innerHTML = `<small class="text-body-secondary">Message deleted</small>`;
       }
-    }); //timeout
 
-    client.on("connected", async (address, port) => {
-      console.log(`Connected to ${address}:${port}`);
-      elements.status.innerHTML = `<h4><span class="badge bg-success">Connected :)</span></h4>`;
-      saveSettings();
-      sendUsername(`chat.vote/raffles`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
-      loadPFP();
-    }); //connected
+      ////check if user is allowed to join
+      //check if sub tiers are split
+      if (RAFFLES.splitTiers) {
+        //if sub tiers are split check each tier separately
+        if (!RAFFLES.allowTier1 && context?.badges?.subscriber?.length <= 3) {
+          return;
+        }
+        if (!RAFFLES.allowTier2 && context?.badges?.subscriber?.length > 3 && context?.badges?.subscriber.startsWith("2")) {
+          return;
+        }
+        if (!RAFFLES.allowTier3 && context?.badges?.subscriber?.length > 3 && context?.badges?.subscriber.startsWith("3")) {
+          return;
+        }
+      } else {
+        if (!RAFFLES.allowSubs && context.subscriber) {
+          return;
+        }
+      }
+      //check if plebs are allowed to join
+      if (!RAFFLES.allowPlebs && !context.subscriber) {
+        return;
+      }
+      //check if mods are allowed to join
+      if (!RAFFLES.allowMods && context.mod) {
+        return;
+      }
+      //check if vips are allowed to join
+      if (!RAFFLES.allowVips && context.vip) {
+        return;
+      }
+      //check if first time chatters are allowed to join
+      if (!RAFFLES.allowFirstTimeChatters && firstTimeChatters.includes(context.username)) {
+        return;
+      }
 
-    client.on("disconnected", (reason) => {
-      elements.status.innerHTML = `<h4><span class="badge bg-danger">Disconnected: ${reason}</span></h4>`;
-    }); //disconnected
+      //make user object with 1 ticket
+      let user = {
+        id: context["user-id"],
+        username: context.username,
+        displayname: context["display-name"],
+        tickets: 1,
+        color: context.color,
+        badges: context.badges,
+        emotes: context.emotes,
+        time: context["tmi-sent-ts"],
+        msg: msg,
+      };
 
-    client.on("notice", (channel, msgid, message) => {
-      elements.status.innerHTML = `<h4><span class="badge bg-danger">Disconnected: ${message}</span></h4>`;
-    }); //notice
+      ////add bonus tickets
+      //check if sub tiers are split
+      if (RAFFLES.splitTiers) {
+        //if sub tiers are split add bonus for each tier separately
+        if (RAFFLES.tier1Bonus > 0 && context?.badges?.subscriber?.length <= 3) {
+          user.tickets += RAFFLES.tier1Bonus;
+        }
+        if (RAFFLES.tier2Bonus > 0 && context?.badges?.subscriber?.length > 3 && context?.badges?.subscriber.startsWith("2")) {
+          user.tickets += RAFFLES.tier2Bonus;
+        }
+        if (RAFFLES.tier3Bonus > 0 && context?.badges?.subscriber?.length > 3 && context?.badges?.subscriber.startsWith("3")) {
+          user.tickets += RAFFLES.tier3Bonus;
+        }
+      } else {
+        if (RAFFLES.subBonus > 0 && context.subscriber) {
+          user.tickets += RAFFLES.subBonus;
+        }
+      }
+      //add pleb bonus
+      if (RAFFLES.plebBonus > 0 && !context.subscriber) {
+        user.tickets += RAFFLES.plebBonus;
+      }
+      //add mod bonus
+      if (RAFFLES.modBonus > 0 && context.mod) {
+        user.tickets += RAFFLES.modBonus;
+      }
+      //add vip bonus
+      if (RAFFLES.vipBonus > 0 && context.vip) {
+        user.tickets += RAFFLES.vipBonus;
+      }
+      //add first time chatter bonus
+      if (RAFFLES.firstTimeChatterBonus > 0 && firstTimeChatters.includes(context.username)) {
+        user.tickets += RAFFLES.firstTimeChatterBonus;
+      }
 
-    client.connect().catch(console.error);
-  } //connect
+      //add the user object to the raffle which also adds the user to the raffle_users array
+      addUserToRaffle(user);
+    } //raffle
+
+    if (command == RAFFLES.raffleCommand && !raffle_open && (Date.now() - currentTime) / 1000 > 10) {
+      currentTime = Date.now();
+      rafflePopover.show();
+      setTimeout(function () {
+        rafflePopover.hide();
+      }, 3000);
+      return;
+    } //raffle disabled
+
+    if (command == "!reset" && (context.username == USER.channel || context.username == "badoge")) {
+      resetSettings();
+      return;
+    } //reset settings
+  } //handleMessage
+
+  async function handleTimeout(channel, username, reason, duration, userstate) {
+    if (username == currentRaffleWinner) {
+      let raffleOutput = elements.raffleOutput;
+      raffleOutput.lastChild.innerHTML = `<small class="text-body-secondary">Message deleted</small>`;
+    }
+  } //handleTimeout
 
   /**
    * @param {{ id: any; username: any; displayname: any; tickets: any; color: any; badges: any; emotes?: any; time?: any; msg?: any; }} user
@@ -1133,60 +1063,6 @@
     }, 3000);
   } //getEmotes
 
-  function checkLogin() {
-    if (!USER.channel) {
-      loginButton.show();
-      setTimeout(function () {
-        loginButton.hide();
-      }, 4000);
-      return false;
-    }
-    return true;
-  } //checkLogin
-
-  function logout() {
-    elements.topRight.innerHTML = ` <div class="btn-group" role="group" aria-label="login options">
-  <a
-    role="button"
-    id="loginButton"
-    onclick="login()"
-    class="btn btn-twitch"
-    tabindex="0"
-    data-bs-container="body"
-    data-bs-custom-class="custom-popover"
-    data-bs-placement="bottom"
-    data-bs-trigger="manual"
-    data-bs-toggle="popover"
-    data-bs-title="Not signed in"
-    data-bs-content="You need sign in first before enabling the raffle"
-    ><span class="twitch-icon"></span>Sign in with Twitch</a
-  >
-  <div class="btn-group" role="group">
-    <button
-      id="btnGroupDropLogin"
-      type="button"
-      class="btn btn-twitch dropdown-toggle"
-      data-bs-toggle="dropdown"
-      data-bs-auto-close="outside"
-      aria-label="other login option, connect manually"
-      aria-expanded="false"
-    ></button>
-    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="btnGroupDropLogin">
-      <div class="p-3" style="width: 300px">
-        <label for="channelName" class="form-label">Connect to chat directly</label>
-        <div class="input-group mb-3">
-          <span class="input-group-text" id="directLoginChannel">twitch.tv/</span>
-          <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
-        </div>
-        <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
-        <button type="button" onclick="connect()" class="btn btn-primary float-end">Connect</button>
-      </div>
-    </div>
-  </div>
-</div>`;
-    resetSettings(true);
-  } //logout
-
   /**
    * @param {string | any[]} msg
    */
@@ -1392,39 +1268,6 @@
     elements.stopExtraTimer.style.display = "none";
     elements.unpauseExtraTimer.style.display = "none";
   } //stopExtraTimer
-
-  async function loadAndConnect() {
-    load_localStorage();
-    refreshData();
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-      get: (searchParams, prop) => searchParams.get(prop),
-    });
-    if (params.channel && !USER.channel && !USER.twitchLogin && !USER.access_token && !USER.userID) {
-      let input = params.channel.replace(/\s+/g, "").toLowerCase();
-      elements.channelName.value = input;
-      USER.channel = input;
-      window.history.replaceState({}, document.title, "/");
-    }
-    if (USER.twitchLogin) {
-      if (!(await checkToken(USER.access_token))) {
-        USER.channel = "";
-        loginExpiredModal.show();
-        return;
-      }
-      elements.announceWinner.disabled = false;
-      elements.confirmJoin.disabled = false;
-      document.querySelectorAll(".no-twitch-warn").forEach((e) => (e.style.display = "none"));
-    } else {
-      elements.announceWinner.disabled = true;
-      elements.confirmJoin.disabled = true;
-      elements.announceWinner.checked = false;
-      elements.confirmJoin.checked = false;
-      document.querySelectorAll(".no-twitch-warn").forEach((e) => (e.style.display = "block"));
-    }
-    if (USER.channel) {
-      connect();
-    }
-  } //loadAndConnect
 
   /**
    * @param {boolean} split

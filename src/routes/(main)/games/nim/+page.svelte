@@ -1,5 +1,4 @@
 <script>
-  import { loadAndConnect } from "$lib/games";
   import { onMount } from "svelte";
   let elements;
   let NIM;
@@ -9,7 +8,6 @@
       grid: document.getElementById("grid"),
       gameDiv: document.getElementById("gameDiv"),
 
-      loginExpiredModal: document.getElementById("loginExpiredModal"),
       aboutModal: document.getElementById("aboutModal"),
 
       //navbar
@@ -53,13 +51,10 @@
       popsicles[i].style.filter = `hue-rotate(${Math.random() * 360}deg)`;
     }
 
-    loadAndConnect();
-
     if (!USER.channel) {
       loginButton = new bootstrap.Popover(elements.loginButton);
     }
 
-    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
     aboutModal = new bootstrap.Modal(elements.aboutModal);
 
     enableTooltips();
@@ -84,7 +79,7 @@
   };
 
   let loginButton;
-  let loginExpiredModal, aboutModal;
+  let aboutModal;
   let streamersTurn = true;
   let voters = [];
 

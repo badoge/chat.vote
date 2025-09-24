@@ -7,7 +7,6 @@
       grid: document.getElementById("grid"),
       gameDiv: document.getElementById("gameDiv"),
 
-      loginExpiredModal: document.getElementById("loginExpiredModal"),
       aboutModal: document.getElementById("aboutModal"),
 
       //navbar
@@ -16,13 +15,11 @@
       loginButton: document.getElementById("loginButton"),
       channelName: document.getElementById("channelName"),
     };
-    loadAndConnect();
 
     if (!USER.channel) {
       loginButton = new bootstrap.Popover(elements.loginButton);
     }
 
-    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
     aboutModal = new bootstrap.Modal(elements.aboutModal);
 
     enableTooltips();
@@ -46,7 +43,7 @@
 
   let loginButton;
 
-  let loginExpiredModal, aboutModal;
+  let aboutModal;
 
   let USER = {
     channel: "",

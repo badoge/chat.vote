@@ -1,6 +1,5 @@
 <script>
   import { enablePopovers, enableTooltips, switchGame } from "$lib/functions";
-  import { connect, loadAndConnect } from "$lib/games";
   import { onMount } from "svelte";
   let elements;
 
@@ -8,7 +7,6 @@
     elements = {
       //modals
       grid: document.getElementById("grid"),
-      loginExpiredModal: document.getElementById("loginExpiredModal"),
       aboutModal: document.getElementById("aboutModal"),
 
       //navbar
@@ -18,13 +16,10 @@
       channelName: document.getElementById("channelName"),
     };
 
-    loadAndConnect();
-
     if (!USER.channel) {
       loginButton = new bootstrap.Popover(elements.loginButton);
     }
 
-    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
     aboutModal = new bootstrap.Modal(elements.aboutModal);
 
     enableTooltips();
@@ -39,7 +34,7 @@
 
   let loginButton;
 
-  let loginExpiredModal, aboutModal;
+  let aboutModal;
 
   let USER = {
     channel: "",
@@ -48,8 +43,6 @@
     userID: "",
     platform: "",
   };
-
-  function handleMessage(target, context, msg, self) {} //handleMessage
 </script>
 
 <svelte:head>

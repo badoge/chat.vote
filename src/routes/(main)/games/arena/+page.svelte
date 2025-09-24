@@ -1,5 +1,4 @@
 <script>
-  import { loadAndConnect } from "$lib/games";
   import { onMount } from "svelte";
   let elements;
   let html;
@@ -191,8 +190,6 @@
     html.teamModeInput.addEventListener("change", (e) => {
       arena.aux.toggleTeamMode(e.target.checked);
     });
-
-    loadAndConnect();
 
     if (!USER.channel) {
       loginButton = new bootstrap.Popover(elements.loginButton);

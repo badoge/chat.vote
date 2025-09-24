@@ -1,6 +1,5 @@
 <script>
   import { enablePopovers, enableTooltips } from "$lib/functions";
-  import { connect, loadAndConnect } from "$lib/games";
   import { onMount } from "svelte";
   import { animate } from "animejs";
   let elements;
@@ -10,7 +9,6 @@
       //modals
       grid: document.getElementById("grid"),
       gameDiv: document.getElementById("gameDiv"),
-      loginExpiredModal: document.getElementById("loginExpiredModal"),
       aboutModal: document.getElementById("aboutModal"),
 
       //navbar
@@ -54,13 +52,11 @@
       timerValue: document.getElementById("timerValue"),
       start: document.getElementById("start"),
     };
-    loadAndConnect();
 
     if (!USER.channel) {
       loginButton = new bootstrap.Popover(elements.loginButton);
     }
 
-    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
     aboutModal = new bootstrap.Modal(elements.aboutModal);
     settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
 
@@ -162,7 +158,7 @@
 
   let loginButton;
   let settingsOffcanvas;
-  let loginExpiredModal, aboutModal;
+  let aboutModal;
 
   let EMOTEBENCHMARK = {
     interval: null,

@@ -7,7 +7,6 @@
   onMount(async () => {
     elements = {
       //modals
-      loginExpiredModal: document.getElementById("loginExpiredModal"),
 
       tierlistEditorModal: document.getElementById("tierlistEditorModal"),
       tierlistEditor: document.getElementById("tierlistEditor"),
@@ -227,7 +226,6 @@
       twitchClipsEmbed_trivia: document.getElementById("twitchClipsEmbed_trivia"),
       videoEmbed_trivia: document.getElementById("videoEmbed_trivia"),
     };
-    loadAndConnect();
 
     if (!USER.channel) {
       loginButton = new bootstrap.Popover(elements.loginButton);
@@ -243,7 +241,6 @@
     votePopover = new bootstrap.Popover(elements.enableVoting);
     votePopoverTierlist = new bootstrap.Popover(elements.enableVotingTierlist);
 
-    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
     tierlistEditorModal = new bootstrap.Modal(elements.tierlistEditorModal);
     previewModal = new bootstrap.Modal(elements.previewModal);
     generateChatModal = new bootstrap.Modal(elements.generateChatModal);
@@ -436,7 +433,7 @@
 
   let client;
   let loginButton;
-  let loginExpiredModal, tierlistEditorModal, previewModal, generateChatModal, generateModal, communityModal, startModal, startTriviaModal, publishedModal, importModal;
+  let tierlistEditorModal, previewModal, generateChatModal, generateModal, communityModal, startModal, startTriviaModal, publishedModal, importModal;
   let votePopover, votePopoverTierlist;
   let currentBracket = {};
   let currentTierlist = {};
@@ -498,29 +495,6 @@
     localforage.setItem("TRIVIA", JSON.stringify(TRIVIA));
   } //saveSettings
 
-  async function loadAndConnect() {
-    await load_localStorage();
-    refreshData();
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-      get: (searchParams, prop) => searchParams.get(prop),
-    });
-    if (params.channel && !USER.channel && !USER.twitchLogin && !USER.access_token && !USER.userID) {
-      let input = params.channel.replace(/\s+/g, "").toLowerCase();
-      elements.channelName.value = input;
-      USER.channel = input;
-      window.history.replaceState({}, document.title, "/");
-    }
-    if (USER.twitchLogin && !(await checkToken(USER.access_token))) {
-      USER.channel = "";
-      loginExpiredModal.show();
-      return;
-    }
-
-    if (USER.channel) {
-      connect();
-    }
-  } //loadAndConnect
-
   async function load_localStorage() {
     if (!localStorage.getItem("USER")) {
       console.log("localStorage user info not found");
@@ -564,265 +538,142 @@
     }
   } //load_localStorage
 
-  function login() {
-    elements.topRight.innerHTML = `<div class="btn-group" role="group" aria-label="log in button group">
-      <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></button>
-      <div class="btn-group" role="group">
-          <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-        </button>
-          <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="btnGroupDropLogin">
-              <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
-          </ul>
-      </div>
-  </div>`;
-    window.open("/prompt.html", "loginWindow", "toolbar=0,status=0,scrollbars=0,width=500px,height=800px");
-    return false;
-  } //login
+  async function handleMessage(target, context, msg, self) {
+    let input = msg.split(" ").filter(Boolean);
+    let command = input[0].toLowerCase();
 
-  function checkLogin() {
-    if (!USER.channel) {
-      loginButton.show();
-      setTimeout(function () {
-        loginButton.hide();
-      }, 4000);
-      return false;
-    }
-    return true;
-  } //checkLogin
+    if (triviaStarted) {
+      //skip users that already answered
+      if (triviaUsersAnswered.includes(context.username)) {
+        return;
+      }
 
-  function logout() {
-    elements.topRight.innerHTML = `<div class="btn-group" role="group" aria-label="login options">
-    <a
-      role="button"
-      id="loginButton"
-      onclick="login()"
-      class="btn btn-twitch"
-      tabindex="0"
-      data-bs-container="body"
-      data-bs-custom-class="custom-popover"
-      data-bs-placement="bottom"
-      data-bs-trigger="manual"
-      data-bs-toggle="popover"
-      data-bs-title="Not signed in"
-      data-bs-content="You need sign in first"
-      ><span class="twitch-icon"></span>Sign in with Twitch</a
-    >
-    <div class="btn-group" role="group">
-      <button
-        id="btnGroupDropLogin"
-        type="button"
-        class="btn btn-twitch dropdown-toggle"
-        data-bs-toggle="dropdown"
-        data-bs-auto-close="outside"
-        aria-label="other login option, connect manually"
-        aria-expanded="false"
-      ></button>
-      <div class="dropdown-menu dropdown-menu-end" aria-labelledby="btnGroupDropLogin">
-        <div class="p-3" style="width: 300px">
-          <label for="channelName" class="form-label">Connect to chat directly</label>
-          <div class="input-group mb-3">
-            <span class="input-group-text" id="directLoginChannel">twitch.tv/</span>
-            <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
-          </div>
-          <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
-          <button type="button" onclick="connect()" class="btn btn-primary float-end">Connect</button>
-        </div>
-      </div>
-    </div>
-  </div>`;
-    resetSettings();
-  } //logout
+      //skip user if there arent any points left to give
+      if (triviaPoints < 1) {
+        return;
+      }
 
-  function connect() {
-    elements.status.innerHTML = `
-    <h4>
-    <span class="badge bg-warning">Connecting... 
-    <div class="spinner-border" style="width:18px;height:18px;" role="status"><span class="visually-hidden">Loading...</span></div>
-    </span>
-    </h4>`;
-    elements.topRight.innerHTML = `
-    <div class="btn-group" role="group" aria-label="log in button group">
-    <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></button>
-    <div class="btn-group" role="group">
-    <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
-    <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="btnGroupDrop1">
-    <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
-    </ul>
-    </div>
-    </div>`;
-    refreshData();
-    loadBadges(USER.channel);
-
-    let options = {
-      options: {
-        clientId: CLIENT_ID,
-        debug: false,
-      },
-      connection: {
-        secure: true,
-        reconnect: true,
-      },
-      channels: [USER.channel],
-    };
-    client = new tmi.client(options);
-
-    client.on("message", async (target, context, msg, self) => {
-      let input = msg.split(" ").filter(Boolean);
-      let command = input[0].toLowerCase();
-
-      if (triviaStarted) {
-        //skip users that already answered
-        if (triviaUsersAnswered.includes(context.username)) {
-          return;
-        }
-
-        //skip user if there arent any points left to give
-        if (triviaPoints < 1) {
-          return;
-        }
-
-        //mark user as answered if one chance option is checked
-        if (elements.oneChance.checked) {
-          triviaUsersAnswered.push(context.username);
-        }
-
-        //if value is 1 then user will gain points, but if its -1 then they will lose points - timer scoring mode only
-        let modifier = 1;
-
-        //check if user has the correct answer
-        //if the scoring mode is timer then dont return so that we can punish the user
-        if (answerTypes[questionNumber - 1] == "multipleChoice") {
-          if (msg.trim() !== correctChoice) {
-            if (triviaScoring == "timer") {
-              modifier = -1;
-            } else {
-              return;
-            }
-          }
-        } else {
-          if (!triviaAnswer.includes(msg.trim().toLowerCase())) {
-            if (triviaScoring == "timer") {
-              modifier = -1;
-            } else {
-              return;
-            }
-          }
-        }
-
-        let points = triviaPoints;
-
-        //calculate points for timer mode
-        if (triviaScoring == "timer") {
-          let timeDiff = Date.now() - triviaRoundTimestamp;
-          let percentage = timeDiff / (triviaQuestionTimer * 1000);
-          points = Math.floor(triviaPoints - triviaPoints * percentage) * modifier;
-        }
-
-        let pos = triviaUsers.findIndex((element) => element.username === context.username);
-        if (pos != -1) {
-          triviaUsers[pos].points += points;
-          updateTriviaLeaderboard();
-        } else {
-          let user = {
-            points: points,
-            id: context["user-id"],
-            username: context.username,
-            displayname: context["display-name"],
-            color: context.color,
-            badges: addBadges(context.badges, context["user-id"], context["first-msg"]),
-          };
-          addTriviaUser(user);
-        }
-
+      //mark user as answered if one chance option is checked
+      if (elements.oneChance.checked) {
         triviaUsersAnswered.push(context.username);
+      }
 
-        //reduce points for next user if scoring mode is set to decay
-        if (triviaScoring == "decay") {
-          triviaPoints--;
+      //if value is 1 then user will gain points, but if its -1 then they will lose points - timer scoring mode only
+      let modifier = 1;
+
+      //check if user has the correct answer
+      //if the scoring mode is timer then dont return so that we can punish the user
+      if (answerTypes[questionNumber - 1] == "multipleChoice") {
+        if (msg.trim() !== correctChoice) {
+          if (triviaScoring == "timer") {
+            modifier = -1;
+          } else {
+            return;
+          }
         }
-
-        //setting to 0 will skip all other users bcz of if statement above - bcz scoring mode is set to first answer only
-        if (triviaScoring == "first") {
-          triviaPoints = 0;
+      } else {
+        if (!triviaAnswer.includes(msg.trim().toLowerCase())) {
+          if (triviaScoring == "timer") {
+            modifier = -1;
+          } else {
+            return;
+          }
         }
+      }
 
-        return;
-      } //trivia
+      let points = triviaPoints;
 
-      if (!voting_enabled) {
-        if (currentFormat == "single") {
-          if ((command == "1" || command == "a" || command == "2" || command == "b") && (Date.now() - currentTime) / 1000 > 10) {
-            currentTime = Date.now();
-            votePopover.show();
-            setTimeout(function () {
-              votePopover.hide();
-            }, 2000);
-          } //if chatter is trying to vote for bracket while voting is disabled show popover
-        }
-        if (currentFormat == "tierlist") {
-          if (currentTierlistCommands.includes(command) && (Date.now() - currentTime) / 1000 > 10) {
-            currentTime = Date.now();
-            votePopoverTierlist.show();
-            setTimeout(function () {
-              votePopoverTierlist.hide();
-            }, 2000);
-          } //if chatter is trying to vote for tierlist while voting is disabled show popover
-        }
-        return;
-      } //voting disabled
+      //calculate points for timer mode
+      if (triviaScoring == "timer") {
+        let timeDiff = Date.now() - triviaRoundTimestamp;
+        let percentage = timeDiff / (triviaQuestionTimer * 1000);
+        points = Math.floor(triviaPoints - triviaPoints * percentage) * modifier;
+      }
 
-      if (voters.includes(context["user-id"])) {
-        return;
-      } //chatter already voted
+      let pos = triviaUsers.findIndex((element) => element.username === context.username);
+      if (pos != -1) {
+        triviaUsers[pos].points += points;
+        updateTriviaLeaderboard();
+      } else {
+        let user = {
+          points: points,
+          id: context["user-id"],
+          username: context.username,
+          displayname: context["display-name"],
+          color: context.color,
+          badges: addBadges(context.badges, context["user-id"], context["first-msg"]),
+        };
+        addTriviaUser(user);
+      }
 
+      triviaUsersAnswered.push(context.username);
+
+      //reduce points for next user if scoring mode is set to decay
+      if (triviaScoring == "decay") {
+        triviaPoints--;
+      }
+
+      //setting to 0 will skip all other users bcz of if statement above - bcz scoring mode is set to first answer only
+      if (triviaScoring == "first") {
+        triviaPoints = 0;
+      }
+
+      return;
+    } //trivia
+
+    if (!voting_enabled) {
       if (currentFormat == "single") {
-        if (command == currentCommand.left) {
-          vote_results.left++;
-          voters.push(context["user-id"]);
-          updateScores();
-          return;
-        } //chatter voted for left option
+        if ((command == "1" || command == "a" || command == "2" || command == "b") && (Date.now() - currentTime) / 1000 > 10) {
+          currentTime = Date.now();
+          votePopover.show();
+          setTimeout(function () {
+            votePopover.hide();
+          }, 2000);
+        } //if chatter is trying to vote for bracket while voting is disabled show popover
+      }
+      if (currentFormat == "tierlist") {
+        if (currentTierlistCommands.includes(command) && (Date.now() - currentTime) / 1000 > 10) {
+          currentTime = Date.now();
+          votePopoverTierlist.show();
+          setTimeout(function () {
+            votePopoverTierlist.hide();
+          }, 2000);
+        } //if chatter is trying to vote for tierlist while voting is disabled show popover
+      }
+      return;
+    } //voting disabled
 
-        if (command == currentCommand.right) {
-          vote_results.right++;
-          voters.push(context["user-id"]);
-          updateScores();
-          return;
-        } //chatter voted for right option
-      } //bracket
+    if (voters.includes(context["user-id"])) {
+      return;
+    } //chatter already voted
 
-      if (currentFormat == "tierlist" && currentTierlistCommands.includes(command)) {
-        let pos = currentTierlistData.findIndex((e) => e.command === command);
-        if (pos == -1) {
-          return;
-        }
-        currentTierlistData[pos].score += 1;
+    if (currentFormat == "single") {
+      if (command == currentCommand.left) {
+        vote_results.left++;
         voters.push(context["user-id"]);
         updateScores();
         return;
-      } //tierlist
-    }); //message
+      } //chatter voted for left option
 
-    //client.on("timeout", (channel, username, reason, duration, userstate) => {}); //timeout
+      if (command == currentCommand.right) {
+        vote_results.right++;
+        voters.push(context["user-id"]);
+        updateScores();
+        return;
+      } //chatter voted for right option
+    } //bracket
 
-    client.on("connected", async (address, port) => {
-      console.log(`Connected to ${address}:${port}`);
-      elements.status.innerHTML = `<h4><span class="badge bg-success">Connected :)</span></h4>`;
-      saveSettings();
-      sendUsername(`chat.vote/blt`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
-      loadPFP();
-    }); //connected
-
-    client.on("disconnected", (reason) => {
-      elements.status.innerHTML = `<h4><span class="badge bg-danger">Disconnected: ${reason}</span></h4>`;
-    }); //disconnected
-
-    client.on("notice", (channel, msgid, message) => {
-      elements.status.innerHTML = `<h4><span class="badge bg-danger">Disconnected: ${message}</span></h4>`;
-    }); //notice
-
-    client.connect().catch(console.error);
-  } //connect
+    if (currentFormat == "tierlist" && currentTierlistCommands.includes(command)) {
+      let pos = currentTierlistData.findIndex((e) => e.command === command);
+      if (pos == -1) {
+        return;
+      }
+      currentTierlistData[pos].score += 1;
+      voters.push(context["user-id"]);
+      updateScores();
+      return;
+    } //tierlist
+  } //handleMessage
 
   function addTriviaUser(user) {
     user.name = user.username == user.displayname.toLowerCase() ? `${user.displayname}` : `${user.displayname} (${user.username})`;
