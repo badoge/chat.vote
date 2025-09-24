@@ -9,6 +9,7 @@
   import IcBaselineLocalActivity from "~icons/ic/baseline-local-activity";
   import StreamlineToastSolid from "~icons/streamline/toast-solid";
   import MdiTwitch from "~icons/mdi/twitch";
+  import { resetSettings } from "$lib/games";
 
   onMount(async () => {
     await import("bootstrap");
@@ -18,6 +19,37 @@
 
 <div aria-live="polite" aria-atomic="true" class="position-relative">
   <div id="toastContainer" class="toast-container"></div>
+</div>
+
+<div class="modal fade" id="loginExpiredModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Login expired</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row justify-content-center">
+          Renew login:<br />
+          <button type="button" data-bs-dismiss="modal" onclick={login} class="btn btn-twitch"><span class="twitch-icon"></span>Sign in with Twitch</button>
+          <br /><small class="text-body-secondary">Logins expire after 2 months.<br />Or after you change your password.</small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-danger"
+          data-bs-toggle="tooltip"
+          data-bs-placement="top"
+          data-bs-title="Will reset everything so you can login again."
+          data-bs-dismiss="modal"
+          onclick={() => resetSettings(true)}
+        >
+          Reset
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">

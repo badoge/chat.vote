@@ -1,7 +1,22 @@
 <script>
   import { onMount } from "svelte";
-
+  let elements;
   onMount(async () => {
+    elements = {
+      //modals
+      grid: document.getElementById("grid"),
+      gameDiv: document.getElementById("gameDiv"),
+
+      loginExpiredModal: document.getElementById("loginExpiredModal"),
+      aboutModal: document.getElementById("aboutModal"),
+
+      //navbar
+      status: document.getElementById("status"),
+      topRight: document.getElementById("topRight"),
+      loginButton: document.getElementById("loginButton"),
+      channelName: document.getElementById("channelName"),
+      darkTheme: document.getElementById("darkTheme"),
+    };
     loadAndConnect();
 
     if (!USER.channel) {
@@ -29,22 +44,6 @@
   let voters = [];
 
   const keyboardLayout = ["QWERTYUIOP", "ASDFGHJKL", "<ZXCVBNM>"].map((row) => row.split(""));
-
-  let elements = {
-    //modals
-    grid: document.getElementById("grid"),
-    gameDiv: document.getElementById("gameDiv"),
-
-    loginExpiredModal: document.getElementById("loginExpiredModal"),
-    aboutModal: document.getElementById("aboutModal"),
-
-    //navbar
-    status: document.getElementById("status"),
-    topRight: document.getElementById("topRight"),
-    loginButton: document.getElementById("loginButton"),
-    channelName: document.getElementById("channelName"),
-    darkTheme: document.getElementById("darkTheme"),
-  };
 
   let loginButton;
   let darkTheme = true;
@@ -373,37 +372,6 @@
   <script src="/games.js"></script>
 </svelte:head>
 
-<div class="modal fade" id="loginExpiredModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Login expired</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="row justify-content-center">
-          Renew login:<br />
-          <button type="button" data-bs-dismiss="modal" onclick="login()" class="btn btn-twitch"><span class="twitch-icon"></span>Sign in with Twitch</button>
-          <br /><small class="text-body-secondary">Logins expire after 2 months.<br />Or after you change your password.</small>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-danger"
-          data-bs-toggle="tooltip"
-          data-bs-placement="top"
-          data-bs-title="Will reset everything so you can login again."
-          data-bs-dismiss="modal"
-          onclick="resetSettings()"
-        >
-          Reset
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="modal fade" id="howToPlayModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -491,122 +459,7 @@
 </div>
 
 <div class="container-fluid">
-  <div id="grid" class="mt-3" style="display: none">
-    <div class="row row-cols-1 row-cols-xl-4 row-cols-lg-3 row-cols-sm-3 g-4">
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/draw.png" onclick="switchGame('draw')" class="card-img-top" alt="Draw" />
-          <div class="card-body">
-            <h5 class="card-title">Draw</h5>
-            <p class="card-text">Streamer draws a random emote, chat has to guess the emote. Can you draw well enough?</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/arena.png" onclick="switchGame('arena')" class="card-img-top" alt="Arena" />
-          <div class="card-body">
-            <h5 class="card-title">Arena</h5>
-            <p class="card-text">Fight your chatters in a "battle royale" arena, where only one can win!</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/eb.png" onclick="switchGame('eb')" class="card-img-top" alt="Emote benchmark" />
-          <div class="card-body">
-            <h5 class="card-title">Emote benchmark</h5>
-            <p class="card-text">A test of reaction speed and emote knowledge. Type the appearing emotes in chat as fast as you can.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/dh.png" onclick="switchGame('dh')" class="card-img-top" alt="Donk Hunt" />
-          <div class="card-body">
-            <h5 class="card-title">Donk Hunt</h5>
-            <p class="card-text">Scary looking creatures are trying to trap their prey. Are you the hunter or the hunted one?</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/shapes.png" onclick="switchGame('shapes')" class="card-img-top" alt="🟥⏹️🔴🔴⭕⏹️" />
-          <div class="card-body">
-            <h5 class="card-title">🟥⏹️🔴🔴⭕⏹️</h5>
-            <p class="card-text">A very weird logic puzzle. Finish the row of shapes, which has been formed using a pre-determined hidden rule.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/nim.png" onclick="switchGame('nim')" class="card-img-top" alt="Nim" />
-          <div class="card-body">
-            <h5 class="card-title">Nim</h5>
-            <p class="card-text">Classic. Remove popsicles until there's one left. Whoever takes the last one - loses!</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100 bg-body-tertiary border-light">
-          <img src="/games/pics/nw.png" onclick="toggleGrid()" class="card-img-top" alt="Not Wordle :)" />
-          <div class="card-body">
-            <h5 class="card-title">Not Wordle :)</h5>
-            <p class="card-text">A twist of a well-known game: try to guess a word in several attempts. Your chat will choose the hidden word.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/c4.png" onclick="switchGame('c4')" class="card-img-top" alt="Connect 4" />
-          <div class="card-body">
-            <h5 class="card-title">Connect 4</h5>
-            <p class="card-text">Players take turns to drop their pieces into the container, attempting to connect 4 of their pieces in a row.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/ttt.png" onclick="switchGame('ttt')" class="card-img-top" alt="tic tac toe" />
-          <div class="card-body">
-            <h5 class="card-title">tic tac toe</h5>
-            <p class="card-text">An ancient game of wits. Will you outsmart the hive mind - which is your chat?</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/guessr.png" onclick="switchGame('guessr')" class="card-img-top" alt="guessr" />
-          <div class="card-body">
-            <h5 class="card-title"><i class="material-icons notranslate">open_in_new</i> Guessr.tv</h5>
-            <p class="card-text">Guess the view count. You will be presented with a random Twitch stream and you have to guess how many viewers they have.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/pics/donk.png" style="width: 180px; height: 180px; align-self: center" onclick="switchGame('about')" class="card-img-top" alt="About" />
-          <div class="card-body">
-            <h5 class="card-title">About</h5>
-            <p class="card-text">About section</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="container-fluid p-0" id="gameDiv">
-    <div class="row mt-2 mb-2" id="navrow">
-      <div class="col">
-        <div class="card">
-          <div class="card-body p-1">
-            <button type="button" onclick="toggleGrid()" class="btn btn-primary"><i class="material-icons notranslate">arrow_back</i>Back</button>
-            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#howToPlayModal"><i class="material-icons notranslate">help_outline</i>How To Play</button>
-            <b id="gameName">Not wordle :)</b>
-          </div>
-        </div>
-      </div>
-    </div>
     <div class="row" id="gameRow">
       <div class="col-xl-8">
         <div id="nwoutput">
@@ -621,10 +474,10 @@
           <div class="card-header">Settings</div>
           <div class="card-body">
             <label for="wordlength" class="form-label">Word length: <span id="wordlengthlabel">5</span></label>
-            <input type="range" class="form-range" min="3" max="12" value="5" oninput="updateLabel(this)" onchange="loadwords()" id="wordlength" />
+            <input type="range" class="form-range" min="3" max="12" value="5" oninput={updateLabel} onchange={loadwords} id="wordlength" />
 
             <label for="guesslimit" class="form-label">Guess limit: <span id="guesslimitlabel">6</span></label>
-            <input type="range" class="form-range" min="1" max="12" value="6" oninput="updateLabel(this)" id="guesslimit" />
+            <input type="range" class="form-range" min="1" max="12" value="6" oninput={updateLabel} id="guesslimit" />
 
             <div class="form-check form-switch">
               <input type="checkbox" class="form-check-input" id="multiword" aria-describedby="multiworddesc" />
@@ -648,8 +501,8 @@
           </div>
         </div>
 
-        <button type="button" id="startnw" onclick="startnw()" class="btn btn-success">Start</button>
-        <button type="button" id="resetnw" onclick="reset()" class="btn btn-warning">Reset</button>
+        <button type="button" id="startnw" onclick={startnw} class="btn btn-success">Start</button>
+        <button type="button" id="resetnw" onclick={reset} class="btn btn-warning">Reset</button>
 
         <div id="nwoutput2"></div>
       </div>

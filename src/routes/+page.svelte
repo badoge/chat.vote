@@ -46,7 +46,6 @@
       yesnoTimeOverModal: document.getElementById("yesnoTimeOverModal"),
       yesnoTimeOverWinner: document.getElementById("yesnoTimeOverWinner"),
       restartYesno: document.getElementById("restartYesno"),
-      loginExpiredModal: document.getElementById("loginExpiredModal"),
       tieModal: document.getElementById("tieModal"),
       tieModalText: document.getElementById("tieModalText"),
       removeRandomWinner: document.getElementById("removeRandomWinner"),
@@ -212,7 +211,6 @@
     randomOptionModal = new bootstrap.Modal(elements.randomOptionModal);
     timeOverModal = new bootstrap.Modal(elements.timeOverModal);
     yesnoTimeOverModal = new bootstrap.Modal(elements.yesnoTimeOverModal);
-    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
     tieModal = new bootstrap.Modal(elements.tieModal);
     randomYesnoModal = new bootstrap.Modal(elements.randomYesnoModal);
 
@@ -460,7 +458,7 @@
   let currentTime = 0;
   let votePopover, suggestPopover;
   let loginButton;
-  let randomOptionModal, timeOverModal, yesnoTimeOverModal, loginExpiredModal, tieModal, randomYesnoModal;
+  let randomOptionModal, timeOverModal, yesnoTimeOverModal, tieModal, randomYesnoModal;
   let enableVotingDropdown, enableSuggestionsDropdown;
   let tableTab, chartTab, yesnoTab, overlayTab;
   let settingsOffcanvas;
@@ -2312,37 +2310,6 @@
       <div class="modal-footer">
         <button type="button" id="restartYesno" class="btn btn-warning">Restart</button>
         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="loginExpiredModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Login expired</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="row justify-content-center">
-          Renew login:<br />
-          <button type="button" data-bs-dismiss="modal" onclick={login()} class="btn btn-twitch"><span class="twitch-icon"></span>Sign in with Twitch</button>
-          <br /><small class="text-body-secondary">Logins expire after 2 months.<br />Or after you change your password.</small>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-danger"
-          data-bs-toggle="tooltip"
-          data-bs-placement="top"
-          data-bs-title="Will reset everything so you can login again."
-          data-bs-dismiss="modal"
-          onclick={resetSettings(true)}
-        >
-          Reset
-        </button>
       </div>
     </div>
   </div>

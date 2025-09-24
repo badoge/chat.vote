@@ -1,14 +1,204 @@
 <script>
+  import { loadAndConnect } from "$lib/games";
   import { onMount } from "svelte";
-
+  let elements;
+  let html;
   onMount(async () => {
+    html = {
+      killfeed: document.querySelector("#killfeed"),
+      autoFullscreenInput: document.querySelector("input#bAutoFullscreen"),
+      teamModeInput: document.querySelector("input#bTeamMode"),
+
+      streamerRogue: document.querySelector("button#streamerRogue"),
+      streamerHunter: document.querySelector("button#streamerHunter"),
+      streamerMage: document.querySelector("button#streamerMage"),
+      streamerPaladin: document.querySelector("button#streamerPaladin"),
+      streamerPriest: document.querySelector("button#streamerPriest"),
+      streamerShaman: document.querySelector("button#streamerShaman"),
+
+      startBtn: document.querySelector("button#bStartGame"),
+      addBotBtn: document.querySelector("button#bAddBot"),
+      bulkAddBotBtn: document.querySelector("button#bAddBots"),
+      addPassiveBotBtn: document.querySelector("button#bAddDummies"),
+      cleanUpBtn: document.querySelector("button#bCleanUp"),
+    };
+    elements = {
+      //modals
+      grid: document.getElementById("grid"),
+      gameDiv: document.getElementById("gameDiv"),
+
+      aboutModal: document.getElementById("aboutModal"),
+
+      //navbar
+      status: document.getElementById("status"),
+      topRight: document.getElementById("topRight"),
+      loginButton: document.getElementById("loginButton"),
+      channelName: document.getElementById("channelName"),
+      darkTheme: document.getElementById("darkTheme"),
+    };
+
+    // big red button which starts the game
+    html.startBtn.addEventListener("click", () => {
+      // init the arena
+
+      try {
+        arena.aux.startArena(); // this might throw error
+        html.startBtn.disabled = true;
+        html.streamerRogue.disabled = true;
+        html.streamerHunter.disabled = true;
+        html.streamerMage.disabled = true;
+        html.streamerPaladin.disabled = true;
+        html.streamerPriest.disabled = true;
+        html.streamerShaman.disabled = true;
+      } catch (error) {
+        showToast(error, "warning", 3000);
+      }
+    });
+
+    html.addBotBtn.addEventListener("click", () => {
+      // get info
+      let name = document.querySelector("input#sBotName").value.trim();
+      document.querySelector("input#sBotName").value = "";
+      let pClass = document.querySelector("select#sBotClass").value.toLowerCase();
+      // actually attempt to add unit
+      try {
+        let color = Math.round(Math.random()) ? "yellow" : null; // null = random
+        arena.aux.addUnit(name, color, pClass); // might fail if arena is full or is not ready
+      } catch (error) {
+        showToast(error, "warning", 3000);
+      }
+    });
+    html.bulkAddBotBtn.addEventListener("click", () => {
+      // get info
+      let count = parseInt(document.getElementById("botsNumber").value, 10);
+      if (isNaN(count)) return void console.warn("Bulk add: User input is NaN");
+
+      if (arena.settings.unitLimit && count > arena.settings.unitLimit) {
+        showToast(`You've requested too many units! \nWill spawn as many as possible instead.`, "warning", 6000);
+        count = arena.settings.unitLimit;
+      }
+      while (count > 0) {
+        count -= 1;
+        try {
+          arena.aux.addUnit();
+        } catch (e) {
+          // read the console for the error message
+        }
+      }
+    });
+
+    html.autoFullscreenInput.addEventListener("change", (event) => {
+      // allow user to toggle auto-fullscreen when the game starts
+      arena.settings.exitFullscreenOnEnd = event.target.checked;
+      arena.settings.goFullscreenOnStart = event.target.checked;
+    });
+
+    // button: force the restart of arena
+    // can also be used after the game ends
+    html.cleanUpBtn.addEventListener("click", () => {
+      arena.aux.resetArena();
+      html.startBtn.disabled = false;
+      html.streamerRogue.disabled = false;
+      html.streamerHunter.disabled = false;
+      html.streamerMage.disabled = false;
+      html.streamerPaladin.disabled = false;
+      html.streamerPriest.disabled = false;
+      html.streamerShaman.disabled = false;
+    });
+
+    // button: add a playable unit
+    // this unit will be controlled by user!
+    html.streamerRogue.addEventListener("click", () => {
+      if (arena.player) {
+        arena.player.destroy();
+        arena.player = null;
+      }
+      try {
+        arena.aux.addPlayer(USER.channel, "#FF0000", "rogue");
+      } catch (error) {
+        // can fail if player already joined the arena
+        showToast(error, "warning", 3000);
+      }
+    });
+    html.streamerHunter.addEventListener("click", () => {
+      if (arena.player) {
+        arena.player.destroy();
+        arena.player = null;
+      }
+      try {
+        arena.aux.addPlayer(USER.channel, "#FF0000", "hunter");
+      } catch (error) {
+        // can fail if player already joined the arena
+        showToast(error, "warning", 3000);
+      }
+    });
+    html.streamerMage.addEventListener("click", () => {
+      if (arena.player) {
+        arena.player.destroy();
+        arena.player = null;
+      }
+      try {
+        arena.aux.addPlayer(USER.channel, "#FF0000", "mage");
+      } catch (error) {
+        // can fail if player already joined the arena
+        showToast(error, "warning", 3000);
+      }
+    });
+    html.streamerPaladin.addEventListener("click", () => {
+      if (arena.player) {
+        arena.player.destroy();
+        arena.player = null;
+      }
+      try {
+        arena.aux.addPlayer(USER.channel, "#FF0000", "paladin");
+      } catch (error) {
+        // can fail if player already joined the arena
+        showToast(error, "warning", 3000);
+      }
+    });
+    html.streamerPriest.addEventListener("click", () => {
+      if (arena.player) {
+        arena.player.destroy();
+        arena.player = null;
+      }
+      try {
+        arena.aux.addPlayer(USER.channel, "#FF0000", "priest");
+      } catch (error) {
+        // can fail if player already joined the arena
+        showToast(error, "warning", 3000);
+      }
+    });
+    html.streamerShaman.addEventListener("click", () => {
+      if (arena.player) {
+        arena.player.destroy();
+        arena.player = null;
+      }
+      try {
+        arena.aux.addPlayer(USER.channel, "#FF0000", "shaman");
+      } catch (error) {
+        // can fail if player already joined the arena
+        showToast(error, "warning", 3000);
+      }
+    });
+
+    document.querySelector("#sSound").addEventListener("input", (event) => {
+      arena.settings.soundVolume = event.target.value / 100;
+      document.getElementById("sSoundlabel").innerHTML = event.target.value;
+    });
+    document.querySelector("#sMusic").addEventListener("input", (event) => {
+      arena.settings.musicVolume = event.target.value / 100;
+      document.getElementById("sMusiclabel").innerHTML = event.target.value;
+    });
+    html.teamModeInput.addEventListener("change", (e) => {
+      arena.aux.toggleTeamMode(e.target.checked);
+    });
+
     loadAndConnect();
 
     if (!USER.channel) {
       loginButton = new bootstrap.Popover(elements.loginButton);
     }
 
-    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
     aboutModal = new bootstrap.Modal(elements.aboutModal);
 
     enableTooltips();
@@ -21,26 +211,10 @@
     });
   });
 
-  let elements = {
-    //modals
-    grid: document.getElementById("grid"),
-    gameDiv: document.getElementById("gameDiv"),
-
-    loginExpiredModal: document.getElementById("loginExpiredModal"),
-    aboutModal: document.getElementById("aboutModal"),
-
-    //navbar
-    status: document.getElementById("status"),
-    topRight: document.getElementById("topRight"),
-    loginButton: document.getElementById("loginButton"),
-    channelName: document.getElementById("channelName"),
-    darkTheme: document.getElementById("darkTheme"),
-  };
-
   let loginButton;
   let darkTheme = true;
 
-  let loginExpiredModal, aboutModal;
+  let aboutModal;
 
   let USER = {
     channel: "",
@@ -347,181 +521,6 @@
   and inputs for the arena.
 */
 
-  const html = {
-    killfeed: document.querySelector("#killfeed"),
-    autoFullscreenInput: document.querySelector("input#bAutoFullscreen"),
-    teamModeInput: document.querySelector("input#bTeamMode"),
-
-    streamerRogue: document.querySelector("button#streamerRogue"),
-    streamerHunter: document.querySelector("button#streamerHunter"),
-    streamerMage: document.querySelector("button#streamerMage"),
-    streamerPaladin: document.querySelector("button#streamerPaladin"),
-    streamerPriest: document.querySelector("button#streamerPriest"),
-    streamerShaman: document.querySelector("button#streamerShaman"),
-
-    startBtn: document.querySelector("button#bStartGame"),
-    addBotBtn: document.querySelector("button#bAddBot"),
-    bulkAddBotBtn: document.querySelector("button#bAddBots"),
-    addPassiveBotBtn: document.querySelector("button#bAddDummies"),
-    cleanUpBtn: document.querySelector("button#bCleanUp"),
-  };
-
-  // big red button which starts the game
-  html.startBtn.addEventListener("click", () => {
-    // init the arena
-
-    try {
-      arena.aux.startArena(); // this might throw error
-      html.startBtn.disabled = true;
-      html.streamerRogue.disabled = true;
-      html.streamerHunter.disabled = true;
-      html.streamerMage.disabled = true;
-      html.streamerPaladin.disabled = true;
-      html.streamerPriest.disabled = true;
-      html.streamerShaman.disabled = true;
-    } catch (error) {
-      showToast(error, "warning", 3000);
-    }
-  });
-
-  html.addBotBtn.addEventListener("click", () => {
-    // get info
-    let name = document.querySelector("input#sBotName").value.trim();
-    document.querySelector("input#sBotName").value = "";
-    let pClass = document.querySelector("select#sBotClass").value.toLowerCase();
-    // actually attempt to add unit
-    try {
-      let color = Math.round(Math.random()) ? "yellow" : null; // null = random
-      arena.aux.addUnit(name, color, pClass); // might fail if arena is full or is not ready
-    } catch (error) {
-      showToast(error, "warning", 3000);
-    }
-  });
-  html.bulkAddBotBtn.addEventListener("click", () => {
-    // get info
-    let count = parseInt(document.getElementById("botsNumber").value, 10);
-    if (isNaN(count)) return void console.warn("Bulk add: User input is NaN");
-
-    if (arena.settings.unitLimit && count > arena.settings.unitLimit) {
-      showToast(`You've requested too many units! \nWill spawn as many as possible instead.`, "warning", 6000);
-      count = arena.settings.unitLimit;
-    }
-    while (count > 0) {
-      count -= 1;
-      try {
-        arena.aux.addUnit();
-      } catch (e) {
-        // read the console for the error message
-      }
-    }
-  });
-
-  html.autoFullscreenInput.addEventListener("change", (event) => {
-    // allow user to toggle auto-fullscreen when the game starts
-    arena.settings.exitFullscreenOnEnd = event.target.checked;
-    arena.settings.goFullscreenOnStart = event.target.checked;
-  });
-
-  // button: force the restart of arena
-  // can also be used after the game ends
-  html.cleanUpBtn.addEventListener("click", () => {
-    arena.aux.resetArena();
-    html.startBtn.disabled = false;
-    html.streamerRogue.disabled = false;
-    html.streamerHunter.disabled = false;
-    html.streamerMage.disabled = false;
-    html.streamerPaladin.disabled = false;
-    html.streamerPriest.disabled = false;
-    html.streamerShaman.disabled = false;
-  });
-
-  // button: add a playable unit
-  // this unit will be controlled by user!
-  html.streamerRogue.addEventListener("click", () => {
-    if (arena.player) {
-      arena.player.destroy();
-      arena.player = null;
-    }
-    try {
-      arena.aux.addPlayer(USER.channel, "#FF0000", "rogue");
-    } catch (error) {
-      // can fail if player already joined the arena
-      showToast(error, "warning", 3000);
-    }
-  });
-  html.streamerHunter.addEventListener("click", () => {
-    if (arena.player) {
-      arena.player.destroy();
-      arena.player = null;
-    }
-    try {
-      arena.aux.addPlayer(USER.channel, "#FF0000", "hunter");
-    } catch (error) {
-      // can fail if player already joined the arena
-      showToast(error, "warning", 3000);
-    }
-  });
-  html.streamerMage.addEventListener("click", () => {
-    if (arena.player) {
-      arena.player.destroy();
-      arena.player = null;
-    }
-    try {
-      arena.aux.addPlayer(USER.channel, "#FF0000", "mage");
-    } catch (error) {
-      // can fail if player already joined the arena
-      showToast(error, "warning", 3000);
-    }
-  });
-  html.streamerPaladin.addEventListener("click", () => {
-    if (arena.player) {
-      arena.player.destroy();
-      arena.player = null;
-    }
-    try {
-      arena.aux.addPlayer(USER.channel, "#FF0000", "paladin");
-    } catch (error) {
-      // can fail if player already joined the arena
-      showToast(error, "warning", 3000);
-    }
-  });
-  html.streamerPriest.addEventListener("click", () => {
-    if (arena.player) {
-      arena.player.destroy();
-      arena.player = null;
-    }
-    try {
-      arena.aux.addPlayer(USER.channel, "#FF0000", "priest");
-    } catch (error) {
-      // can fail if player already joined the arena
-      showToast(error, "warning", 3000);
-    }
-  });
-  html.streamerShaman.addEventListener("click", () => {
-    if (arena.player) {
-      arena.player.destroy();
-      arena.player = null;
-    }
-    try {
-      arena.aux.addPlayer(USER.channel, "#FF0000", "shaman");
-    } catch (error) {
-      // can fail if player already joined the arena
-      showToast(error, "warning", 3000);
-    }
-  });
-
-  document.querySelector("#sSound").addEventListener("input", (event) => {
-    arena.settings.soundVolume = event.target.value / 100;
-    document.getElementById("sSoundlabel").innerHTML = event.target.value;
-  });
-  document.querySelector("#sMusic").addEventListener("input", (event) => {
-    arena.settings.musicVolume = event.target.value / 100;
-    document.getElementById("sMusiclabel").innerHTML = event.target.value;
-  });
-  html.teamModeInput.addEventListener("change", (e) => {
-    arena.aux.toggleTeamMode(e.target.checked);
-  });
-
   /* EXAMPLES OF CALLBACKS */
   // please define these functions in donk-arena-prerequisites.js!
   // they are here just as an example
@@ -579,37 +578,6 @@
   <script src="/donk-arena-engine.min.js"></script>
   <script src="/donk-arena-better-ai.min.js"></script>
 </svelte:head>
-
-<div class="modal fade" id="loginExpiredModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Login expired</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="row justify-content-center">
-          Renew login:<br />
-          <button type="button" data-bs-dismiss="modal" onclick="login()" class="btn btn-twitch"><span class="twitch-icon"></span>Sign in with Twitch</button>
-          <br /><small class="text-body-secondary">Logins expire after 2 months.<br />Or after you change your password.</small>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-danger"
-          data-bs-toggle="tooltip"
-          data-bs-placement="top"
-          data-bs-title="Will reset everything so you can login again."
-          data-bs-dismiss="modal"
-          onclick="resetSettings()"
-        >
-          Reset
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <div class="modal fade" id="howToPlayModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
@@ -701,122 +669,7 @@
 </div>
 
 <div class="container-fluid">
-  <div id="grid" class="mt-3" style="display: none">
-    <div class="row row-cols-1 row-cols-xl-4 row-cols-lg-3 row-cols-sm-3 g-4">
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/draw.png" onclick="switchGame('draw')" class="card-img-top" alt="Draw" />
-          <div class="card-body">
-            <h5 class="card-title">Draw</h5>
-            <p class="card-text">Streamer draws a random emote, chat has to guess the emote. Can you draw well enough?</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100 bg-body-tertiary border-light">
-          <img src="/games/pics/arena.png" onclick="toggleGrid()" class="card-img-top" alt="Arena" />
-          <div class="card-body">
-            <h5 class="card-title">Arena</h5>
-            <p class="card-text">Fight your chatters in a "battle royale" arena, where only one can win!</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/eb.png" onclick="switchGame('eb')" class="card-img-top" alt="Emote benchmark" />
-          <div class="card-body">
-            <h5 class="card-title">Emote benchmark</h5>
-            <p class="card-text">A test of reaction speed and emote knowledge. Type the appearing emotes in chat as fast as you can.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/dh.png" onclick="switchGame('dh')" class="card-img-top" alt="Donk Hunt" />
-          <div class="card-body">
-            <h5 class="card-title">Donk Hunt</h5>
-            <p class="card-text">Scary looking creatures are trying to trap their prey. Are you the hunter or the hunted one?</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/shapes.png" onclick="switchGame('shapes')" class="card-img-top" alt="🟥⏹️🔴🔴⭕⏹️" />
-          <div class="card-body">
-            <h5 class="card-title">🟥⏹️🔴🔴⭕⏹️</h5>
-            <p class="card-text">A very weird logic puzzle. Finish the row of shapes, which has been formed using a pre-determined hidden rule.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/nim.png" onclick="switchGame('nim')" class="card-img-top" alt="Nim" />
-          <div class="card-body">
-            <h5 class="card-title">Nim</h5>
-            <p class="card-text">Classic. Remove popsicles until there's one left. Whoever takes the last one - loses!</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/nw.png" onclick="switchGame('nw')" class="card-img-top" alt="Not Wordle :)" />
-          <div class="card-body">
-            <h5 class="card-title">Not Wordle :)</h5>
-            <p class="card-text">A twist of a well-known game: try to guess a word in several attempts. Your chat will choose the hidden word.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/c4.png" onclick="switchGame('c4')" class="card-img-top" alt="Connect 4" />
-          <div class="card-body">
-            <h5 class="card-title">Connect 4</h5>
-            <p class="card-text">Players take turns to drop their pieces into the container, attempting to connect 4 of their pieces in a row.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/ttt.png" onclick="switchGame('ttt')" class="card-img-top" alt="tic tac toe" />
-          <div class="card-body">
-            <h5 class="card-title">tic tac toe</h5>
-            <p class="card-text">An ancient game of wits. Will you outsmart the hive mind - which is your chat?</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/guessr.png" onclick="switchGame('guessr')" class="card-img-top" alt="guessr" />
-          <div class="card-body">
-            <h5 class="card-title"><i class="material-icons notranslate">open_in_new</i> Guessr.tv</h5>
-            <p class="card-text">Guess the view count. You will be presented with a random Twitch stream and you have to guess how many viewers they have.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/pics/donk.png" style="width: 180px; height: 180px; align-self: center" onclick="switchGame('about')" class="card-img-top" alt="About" />
-          <div class="card-body">
-            <h5 class="card-title">About</h5>
-            <p class="card-text">About section</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="container-fluid p-0" id="gameDiv">
-    <div class="row mt-2 mb-2" id="navrow">
-      <div class="col">
-        <div class="card">
-          <div class="card-body p-1">
-            <button type="button" onclick="toggleGrid()" class="btn btn-primary"><i class="material-icons notranslate">arrow_back</i>Back</button>
-            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#howToPlayModal"><i class="material-icons notranslate">help_outline</i>How To Play</button>
-            <b id="gameName">Arena</b>
-          </div>
-        </div>
-      </div>
-    </div>
     <div class="row" id="gameRow">
       <div id="arena">
         <div class="main-part">

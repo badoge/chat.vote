@@ -269,18 +269,6 @@
   </div>
 </div>
 
-<div class="modal fade" id="loginExpiredModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Not logged in / Login expired</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">You need to go the <a href="/" target="_blank" rel="noopener noreferrer">main page</a> and <b>login using Twitch</b> to use this page.</div>
-    </div>
-  </div>
-</div>
-
 <div id="overlay" class="display-1 card text-bg-primary">
   <div id="overlayBody" class="card-body">dank</div>
 </div>

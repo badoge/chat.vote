@@ -62,7 +62,7 @@ wlqaw9WTLH5ZIgQjX69VmueRaYmSUMQgUVzAayGiYTyAP0M7+FNq81HwTIBVtzvM7vRa+M9ZiiyPbrVD
     editCommandModal = new bootstrap.Modal(elements.editCommandModal);
     editRewardModal = new bootstrap.Modal(elements.editRewardModal);
     confirmDeletionModal = new bootstrap.Modal(elements.confirmDeletionModal);
-    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
+    vtsLoginExpiredModal = new bootstrap.Modal(elements.vtsLoginExpiredModal);
     addSubAlertModal = new bootstrap.Modal(elements.addSubAlertModal);
     editSubAlertModal = new bootstrap.Modal(elements.editSubAlertModal);
     addGiftedSubAlertModal = new bootstrap.Modal(elements.addGiftedSubAlertModal);
@@ -90,7 +90,7 @@ wlqaw9WTLH5ZIgQjX69VmueRaYmSUMQgUVzAayGiYTyAP0M7+FNq81HwTIBVtzvM7vRa+M9ZiiyPbrVD
     editCommandModal: document.getElementById("editCommandModal"),
     editRewardModal: document.getElementById("editRewardModal"),
     confirmDeletionModal: document.getElementById("confirmDeletionModal"),
-    loginExpiredModal: document.getElementById("loginExpiredModal"),
+    vtsLoginExpiredModal: document.getElementById("vtsLoginExpiredModal"),
     addSubAlertModal: document.getElementById("addSubAlertModal"),
     editSubAlertModal: document.getElementById("editSubAlertModal"),
     addGiftedSubAlertModal: document.getElementById("addGiftedSubAlertModal"),
@@ -192,7 +192,7 @@ wlqaw9WTLH5ZIgQjX69VmueRaYmSUMQgUVzAayGiYTyAP0M7+FNq81HwTIBVtzvM7vRa+M9ZiiyPbrVD
     editCommandModal,
     editRewardModal,
     confirmDeletionModal,
-    loginExpiredModal,
+    vtsLoginExpiredModal,
     addSubAlertModal,
     editSubAlertModal,
     addGiftedSubAlertModal,
@@ -2213,7 +2213,7 @@ wlqaw9WTLH5ZIgQjX69VmueRaYmSUMQgUVzAayGiYTyAP0M7+FNq81HwTIBVtzvM7vRa+M9ZiiyPbrVD
     load_localStorage();
     if (VTS.access_token && VTS.channel && VTS.platform == "twitch" && !(await checkToken(VTS.access_token))) {
       VTS.channel = "";
-      loginExpiredModal.show();
+      vtsLoginExpiredModal.show();
       return;
     }
     loadLists();
@@ -2648,7 +2648,7 @@ wlqaw9WTLH5ZIgQjX69VmueRaYmSUMQgUVzAayGiYTyAP0M7+FNq81HwTIBVtzvM7vRa+M9ZiiyPbrVD
   </div>
 </div>
 
-<div class="modal fade" id="loginExpiredModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="vtsLoginExpiredModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">

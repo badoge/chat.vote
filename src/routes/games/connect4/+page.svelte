@@ -1,7 +1,39 @@
 <script>
+  import { enablePopovers, enableTooltips } from "$lib/functions";
+  import { loadAndConnect } from "$lib/games";
   import { onMount } from "svelte";
+  let elements;
+  let CONNECT4;
 
   onMount(async () => {
+    CONNECT4 = {
+      ctx: document.getElementById("c4chartCanvas").getContext("2d"),
+      chart: null,
+      results: [
+        { label: "1", data: 0, c1: "#f44336", c2: "#f53337" },
+        { label: "2", data: 0, c1: "#f4c236", c2: "#f5c237" },
+        { label: "3", data: 0, c1: "#a8f436", c2: "#a9e437" },
+        { label: "4", data: 0, c1: "#36f443", c2: "#37e444" },
+        { label: "5", data: 0, c1: "#36f4c2", c2: "#37e4c3" },
+        { label: "6", data: 0, c1: "#36a8f4", c2: "#3798f5" },
+        { label: "7", data: 0, c1: "#4336f4", c2: "#4426f5" },
+      ],
+    }; //CONNECT4
+    elements = {
+      //modals
+      grid: document.getElementById("grid"),
+      gameDiv: document.getElementById("gameDiv"),
+      board: document.getElementById("board"),
+      loginExpiredModal: document.getElementById("loginExpiredModal"),
+      aboutModal: document.getElementById("aboutModal"),
+
+      //navbar
+      status: document.getElementById("status"),
+      topRight: document.getElementById("topRight"),
+      loginButton: document.getElementById("loginButton"),
+      channelName: document.getElementById("channelName"),
+      darkTheme: document.getElementById("darkTheme"),
+    };
     loadAndConnect();
 
     if (!USER.channel) {
@@ -29,22 +61,6 @@
   let streamersTurn = true;
   let voters = [];
 
-  let elements = {
-    //modals
-    grid: document.getElementById("grid"),
-    gameDiv: document.getElementById("gameDiv"),
-
-    loginExpiredModal: document.getElementById("loginExpiredModal"),
-    aboutModal: document.getElementById("aboutModal"),
-
-    //navbar
-    status: document.getElementById("status"),
-    topRight: document.getElementById("topRight"),
-    loginButton: document.getElementById("loginButton"),
-    channelName: document.getElementById("channelName"),
-    darkTheme: document.getElementById("darkTheme"),
-  };
-
   let loginButton;
   let darkTheme = true;
 
@@ -57,20 +73,6 @@
     userID: "",
     platform: "",
   };
-
-  let CONNECT4 = {
-    ctx: document.getElementById("c4chartCanvas").getContext("2d"),
-    chart: null,
-    results: [
-      { label: "1", data: 0, c1: "#f44336", c2: "#f53337" },
-      { label: "2", data: 0, c1: "#f4c236", c2: "#f5c237" },
-      { label: "3", data: 0, c1: "#a8f436", c2: "#a9e437" },
-      { label: "4", data: 0, c1: "#36f443", c2: "#37e444" },
-      { label: "5", data: 0, c1: "#36f4c2", c2: "#37e4c3" },
-      { label: "6", data: 0, c1: "#36a8f4", c2: "#3798f5" },
-      { label: "7", data: 0, c1: "#4336f4", c2: "#4426f5" },
-    ],
-  }; //CONNECT4
 
   function handleMessage(target, context, msg, self) {
     let input = msg.split(" ").filter(Boolean);
@@ -174,7 +176,7 @@
   } //updateGraph
 
   function start(ai_1_strength, ai_2_strength) {
-    $("#board").empty();
+    elements.board.innerHTML = "";
     let game = new C4({
       ai_1_strength: ai_1_strength,
       ai_2_strength: ai_2_strength,
@@ -280,7 +282,7 @@
         if (!(event in _event_handlers)) return;
 
         let handlers = _event_handlers[event];
-        $.each(handlers, function (index, handler) {
+        handlers.forEach((handler, index) => {
           handler(data);
         });
       };
@@ -333,10 +335,10 @@
       ];
 
       walkRack(function (player, c, r) {
-        $.each(directions, function (i, direction) {
+        directions.forEach((direction) => {
           let result = findConnectedInDirection(c, r, direction[0], direction[1]);
           if (result.length >= 4) {
-            connected = connected.concat(result);
+            connected = [...connected, ...result];
           }
         });
       });
@@ -382,46 +384,68 @@
   };
 
   C4.UI = function (_game, _options) {
-    let $board = $(_options.container);
-    let $controls;
-    let $coins;
-    let $rack;
+    let board = document.querySelector(_options.container);
+    let controls;
+    let coins;
+    let rack;
 
     function init() {
-      $rack = $("<div class='rack'/>");
-      $coins = $("<div class='coins'></div>");
-      $controls = $("<div class='controls'></div>");
-      let overlay = $(`<div class="overlay"><img src="/games/connect4/overlay.svg" alt="overlay"></div>`);
-      for (let c = 0; c < _game.rack.length; c++) {
-        $controls.append(`<div class="control col-${c}"/><span class="collabel">${c + 1}</span><span class="collabel2">${c + 1}</span>`);
-      }
+      rack = Object.assign(document.createElement("div"), { className: "rack" });
+      coins = Object.assign(document.createElement("div"), { className: "coins" });
+      controls = Object.assign(document.createElement("div"), { className: "controls" });
 
-      $controls.on("click", ".control", function () {
+      let overlay = document.createElement("div");
+      overlay.className = "overlay";
+      overlay.innerHTML = `<img src="/games/connect4/overlay.svg" alt="overlay">`;
+
+      for (let c = 0; c < _game.rack.length; c++) {
+        controls.insertAdjacentHTML(
+          "beforeend",
+          `
+          <div class="control col-${c}"></div>
+          <span class="collabel">${c + 1}</span>
+          <span class="collabel2">${c + 1}</span>`,
+        );
+      }
+      controls.addEventListener("click", (event) => {
+        // check if a ".control" was clicked (or inside it)
+        const control = event.target.closest(".control");
+        if (!control || !controls.contains(control)) return;
+
         if (!streamersTurn) {
           return;
         }
         if (streamersTurn) {
-          document.getElementById("c4chartCanvas").classList = "";
+          document.getElementById("c4chartCanvas").className = "";
           document.getElementById("c4overlay").innerHTML = "";
           streamersTurn = false;
         }
 
-        let c = $(this).index();
+        // equivalent to $(this).index()
+        let c = Array.from(controls.querySelectorAll(".control")).indexOf(control);
+
         _game.trigger("drop", { col_index: c });
       });
 
-      $rack.append($controls);
-      $rack.append(overlay);
-
-      $rack.append($coins);
-
-      $board.append($rack);
+      rack.append(controls);
+      rack.append(overlay);
+      rack.append(coins);
+      board.append(rack);
     }
 
     function updateControls() {
-      $controls.children().removeClass(_game.current.opponent.color);
-      $controls.children().addClass(_game.current.color);
-      $controls.toggleClass("enabled", _game.current.human);
+      const children = controls.children;
+      for (let child of children) {
+        child.classList.remove(_game.current.opponent.color);
+      }
+      for (let child of children) {
+        child.classList.add(_game.current.color);
+      }
+      if (_game.current.human) {
+        controls.classList.add("enabled");
+      } else {
+        controls.classList.remove("enabled");
+      }
     }
 
     function showLastMove() {
@@ -431,9 +455,11 @@
       let move = _game.moves[_game.moves.length - 1];
       let c = move.col_index;
       let r = move.row_index;
-      let coin = $('<div class="coin col-' + c + " " + move.player.color + '" id="cell-' + c + "-" + r + '"/>');
+      let coin = document.createElement("div");
+      coin.className = `coin col-${c} ${move.player.color}`;
+      coin.id = `cell-${c}-${r}`;
 
-      $coins.append(coin);
+      coins.append(coin);
 
       setTimeout(function () {
         coin.addClass("row-" + r);
@@ -445,9 +471,10 @@
     _game.on("waitingForDrop", showLastMove);
 
     _game.on("done", function (data) {
-      let $message = $('<div class="message"/>');
-      $rack.prepend($message);
-      $controls.remove();
+      let messageDiv = document.createElement("div");
+      messageDiv.className = "message";
+      rack.prepend(messageDiv);
+      controls.remove();
       let message = "Draw";
 
       showLastMove();
@@ -456,13 +483,13 @@
         for (let i = 0; i < data.connected.length; i++) {
           let col_index = data.connected[i][0];
           let row_index = data.connected[i][1];
-          let cell = $("#cell-" + col_index + "-" + row_index);
+          let cell = document.getElementById(`cell-${col_index}-${row_index}`);
           cell.addClass("connected");
         }
         message = data.winner.color + " wins!";
       }
 
-      $message.text(message);
+      messageDiv.textContent = message;
       document.getElementById("c4output").innerHTML = `<h4>${message}</h4><br> <button type="button" onclick="resetGame()" class="btn btn-primary">Play again</button>`;
     });
 
@@ -492,37 +519,6 @@
 
   <script src="/games.js"></script>
 </svelte:head>
-
-<div class="modal fade" id="loginExpiredModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Login expired</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="row justify-content-center">
-          Renew login:<br />
-          <button type="button" data-bs-dismiss="modal" onclick="login()" class="btn btn-twitch"><span class="twitch-icon"></span>Sign in with Twitch</button>
-          <br /><small class="text-body-secondary">Logins expire after 2 months.<br />Or after you change your password.</small>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-danger"
-          data-bs-toggle="tooltip"
-          data-bs-placement="top"
-          data-bs-title="Will reset everything so you can login again."
-          data-bs-dismiss="modal"
-          onclick="resetSettings()"
-        >
-          Reset
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <div class="modal fade" id="howToPlayModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
@@ -608,122 +604,7 @@
 </div>
 
 <div class="container-fluid">
-  <div id="grid" class="mt-3" style="display: none">
-    <div class="row row-cols-1 row-cols-xl-4 row-cols-lg-3 row-cols-sm-3 g-4">
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/draw.png" onclick="switchGame('draw')" class="card-img-top" alt="Draw" />
-          <div class="card-body">
-            <h5 class="card-title">Draw</h5>
-            <p class="card-text">Streamer draws a random emote, chat has to guess the emote. Can you draw well enough?</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/arena.png" onclick="switchGame('arena')" class="card-img-top" alt="Arena" />
-          <div class="card-body">
-            <h5 class="card-title">Arena</h5>
-            <p class="card-text">Fight your chatters in a "battle royale" arena, where only one can win!</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/eb.png" onclick="switchGame('eb')" class="card-img-top" alt="Emote benchmark" />
-          <div class="card-body">
-            <h5 class="card-title">Emote benchmark</h5>
-            <p class="card-text">A test of reaction speed and emote knowledge. Type the appearing emotes in chat as fast as you can.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/dh.png" onclick="switchGame('dh')" class="card-img-top" alt="Donk Hunt" />
-          <div class="card-body">
-            <h5 class="card-title">Donk Hunt</h5>
-            <p class="card-text">Scary looking creatures are trying to trap their prey. Are you the hunter or the hunted one?</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/shapes.png" onclick="switchGame('shapes')" class="card-img-top" alt="🟥⏹️🔴🔴⭕⏹️" />
-          <div class="card-body">
-            <h5 class="card-title">🟥⏹️🔴🔴⭕⏹️</h5>
-            <p class="card-text">A very weird logic puzzle. Finish the row of shapes, which has been formed using a pre-determined hidden rule.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/nim.png" onclick="switchGame('nim')" class="card-img-top" alt="Nim" />
-          <div class="card-body">
-            <h5 class="card-title">Nim</h5>
-            <p class="card-text">Classic. Remove popsicles until there's one left. Whoever takes the last one - loses!</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/nw.png" onclick="switchGame('nw')" class="card-img-top" alt="Not Wordle :)" />
-          <div class="card-body">
-            <h5 class="card-title">Not Wordle :)</h5>
-            <p class="card-text">A twist of a well-known game: try to guess a word in several attempts. Your chat will choose the hidden word.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100 bg-body-tertiary border-light">
-          <img src="/games/pics/c4.png" onclick="toggleGrid()" class="card-img-top" alt="Connect 4" />
-          <div class="card-body">
-            <h5 class="card-title">Connect 4</h5>
-            <p class="card-text">Players take turns to drop their pieces into the container, attempting to connect 4 of their pieces in a row.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/ttt.png" onclick="switchGame('ttt')" class="card-img-top" alt="tic tac toe" />
-          <div class="card-body">
-            <h5 class="card-title">tic tac toe</h5>
-            <p class="card-text">An ancient game of wits. Will you outsmart the hive mind - which is your chat?</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/guessr.png" onclick="switchGame('guessr')" class="card-img-top" alt="guessr" />
-          <div class="card-body">
-            <h5 class="card-title"><i class="material-icons notranslate">open_in_new</i> Guessr.tv</h5>
-            <p class="card-text">Guess the view count. You will be presented with a random Twitch stream and you have to guess how many viewers they have.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/pics/donk.png" style="width: 180px; height: 180px; align-self: center" onclick="switchGame('about')" class="card-img-top" alt="About" />
-          <div class="card-body">
-            <h5 class="card-title">About</h5>
-            <p class="card-text">About section</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="container-fluid p-0" id="gameDiv">
-    <div class="row mt-2 mb-2" id="navrow">
-      <div class="col">
-        <div class="card">
-          <div class="card-body p-1">
-            <button type="button" onclick="toggleGrid()" class="btn btn-primary"><i class="material-icons notranslate">arrow_back</i>Back</button>
-            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#howToPlayModal"><i class="material-icons notranslate">help_outline</i>How To Play</button>
-            <b id="gameName">Connect 4</b>
-          </div>
-        </div>
-      </div>
-    </div>
     <div class="row" id="gameRow">
       <div class="col"></div>
       <div class="col-auto">
@@ -740,7 +621,7 @@
         </div>
       </div>
       <div class="col">
-        <button type="button" onclick="playTurn()" class="btn btn-lg btn-success">Play chat's turn</button><br />
+        <button type="button" onclick={playTurn} class="btn btn-lg btn-success">Play chat's turn</button><br />
         <span id="totalvotesc4">Total votes: 0</span>
         <div id="c4output"></div>
       </div>

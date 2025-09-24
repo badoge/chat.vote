@@ -1,6 +1,6 @@
-let client;
+import { loadBadges } from "./functions";
 
-async function refreshData() {
+export async function refreshData() {
   darkTheme = elements.darkTheme.checked ?? true;
 
   if (!USER.twitchLogin) {
@@ -12,13 +12,13 @@ async function refreshData() {
   }
 } //refreshdata
 
-function saveSettings() {
+export function saveSettings() {
   refreshData();
   localStorage.setItem("USER", JSON.stringify(USER));
   localStorage.setItem("darkTheme", darkTheme);
 } //saveSettings
 
-function load_localStorage() {
+export function load_localStorage() {
   if (!localStorage.getItem("USER")) {
     console.log("localStorage user info not found");
   } else {
@@ -27,7 +27,7 @@ function load_localStorage() {
   }
 } //load_localStorage
 
-function resetSettings() {
+export function resetSettings() {
   localStorage.setItem(
     "USER",
     JSON.stringify({
@@ -36,14 +36,14 @@ function resetSettings() {
       access_token: "",
       userID: "",
       platform: "",
-    })
+    }),
   );
 
   location.reload();
   return false;
 } //resetSettings
 
-function login() {
+export function login() {
   elements.topRight.innerHTML = `<div class="btn-group" role="group" aria-label="log in button group">
     <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></button>
     <div class="btn-group" role="group">
@@ -58,7 +58,7 @@ function login() {
   return false;
 } //login
 
-async function loadPFP() {
+export async function loadPFP() {
   if (!USER.channel) {
     elements.topRight.innerHTML = ` <div class="btn-group" role="group" aria-label="login options">
     <a
@@ -119,7 +119,7 @@ async function loadPFP() {
   </div>`;
 } //loadPFP
 
-function checkLogin() {
+export function checkLogin() {
   if (!USER.channel) {
     loginButton.show();
     setTimeout(function () {
@@ -130,7 +130,7 @@ function checkLogin() {
   return true;
 } //checkLogin
 
-function logout() {
+export function logout() {
   elements.topRight.innerHTML = ` <div class="btn-group" role="group" aria-label="login options">
   <a
     role="button"
@@ -173,9 +173,7 @@ function logout() {
   resetSettings();
 } //logout
 
-
-
-async function loadAndConnect() {
+export async function loadAndConnect() {
   load_localStorage();
   refreshData();
   const params = new Proxy(new URLSearchParams(window.location.search), {
@@ -197,12 +195,12 @@ async function loadAndConnect() {
   }
 } //loadAndConnect
 
-function toggleGrid() {
+export function toggleGrid() {
   elements.grid.style.display = elements.grid.style.display == "none" ? "" : "none";
   elements.gameDiv.style.display = elements.gameDiv.style.display == "" ? "none" : "";
 } //toggleGrid
 
-function connect() {
+export function connect() {
   elements.status.innerHTML = `
   <h4>
   <span class="badge bg-warning">Connecting... 
@@ -233,7 +231,7 @@ function connect() {
     },
     channels: [USER.channel],
   };
-  client = new tmi.client(options);
+  let client = new tmi.client(options);
 
   client.on("message", handleMessage);
 

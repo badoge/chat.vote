@@ -1,7 +1,62 @@
 <script>
+  import { enableTooltips } from "$lib/functions";
+  import { loadAndConnect } from "$lib/games";
   import { onMount } from "svelte";
-
+  let elements;
   onMount(async () => {
+    elements = {
+      //modals
+      grid: document.getElementById("grid"),
+      gameDiv: document.getElementById("gameDiv"),
+      loginExpiredModal: document.getElementById("loginExpiredModal"),
+      aboutModal: document.getElementById("aboutModal"),
+
+      //navbar
+      status: document.getElementById("status"),
+      topRight: document.getElementById("topRight"),
+      loginButton: document.getElementById("loginButton"),
+      channelName: document.getElementById("channelName"),
+      darkTheme: document.getElementById("darkTheme"),
+
+      //main
+      drawemotecardbody: document.getElementById("drawemotecardbody"),
+      drawoutput: document.getElementById("drawoutput"),
+      drawlblist: document.getElementById("drawlblist"),
+      twitchGlobal: document.getElementById("twitchGlobal"),
+      bttvGlobal: document.getElementById("bttvGlobal"),
+      ffzGlobal: document.getElementById("ffzGlobal"),
+      seventvGlobal: document.getElementById("seventvGlobal"),
+      twitch: document.getElementById("twitch"),
+      bttv: document.getElementById("bttv"),
+      ffz: document.getElementById("ffz"),
+      seventv: document.getElementById("seventv"),
+      emoji: document.getElementById("emoji"),
+      drawscoring1: document.getElementById("drawscoring1"),
+      drawscoring2: document.getElementById("drawscoring2"),
+      turnLength: document.getElementById("turnLength"),
+      timerReveal: document.getElementById("timerReveal"),
+      points: document.getElementById("points"),
+      pointsTarget: document.getElementById("pointsTarget"),
+      twitchGlobalCount: document.getElementById("twitchGlobalCount"),
+      bttvGlobalCount: document.getElementById("bttvGlobalCount"),
+      ffzGlobalCount: document.getElementById("ffzGlobalCount"),
+      seventvGlobalCount: document.getElementById("seventvGlobalCount"),
+      emojiCount: document.getElementById("emojiCount"),
+      twitchCount: document.getElementById("twitchCount"),
+      bttvCount: document.getElementById("bttvCount"),
+      ffzCount: document.getElementById("ffzCount"),
+      seventvCount: document.getElementById("seventvCount"),
+      color: document.getElementById("color"),
+      LineWidth: document.getElementById("LineWidth"),
+      LineWidthLabel: document.getElementById("LineWidthLabel"),
+      clearCanvas: document.getElementById("clearCanvas"),
+      redo: document.getElementById("redo"),
+      undo: document.getElementById("undo"),
+      settingsOffcanvas: document.getElementById("settingsOffcanvas"),
+      countdown: document.getElementById("countdown"),
+      countdownValue: document.getElementById("countdownValue"),
+    };
+
     loadAndConnect();
 
     if (!USER.channel) {
@@ -148,58 +203,6 @@
     ffz: [],
     seventv: [],
     emoji: [],
-  };
-  let elements = {
-    //modals
-    grid: document.getElementById("grid"),
-    gameDiv: document.getElementById("gameDiv"),
-    loginExpiredModal: document.getElementById("loginExpiredModal"),
-    aboutModal: document.getElementById("aboutModal"),
-
-    //navbar
-    status: document.getElementById("status"),
-    topRight: document.getElementById("topRight"),
-    loginButton: document.getElementById("loginButton"),
-    channelName: document.getElementById("channelName"),
-    darkTheme: document.getElementById("darkTheme"),
-
-    //main
-    drawemotecardbody: document.getElementById("drawemotecardbody"),
-    drawoutput: document.getElementById("drawoutput"),
-    drawlblist: document.getElementById("drawlblist"),
-    twitchGlobal: document.getElementById("twitchGlobal"),
-    bttvGlobal: document.getElementById("bttvGlobal"),
-    ffzGlobal: document.getElementById("ffzGlobal"),
-    seventvGlobal: document.getElementById("seventvGlobal"),
-    twitch: document.getElementById("twitch"),
-    bttv: document.getElementById("bttv"),
-    ffz: document.getElementById("ffz"),
-    seventv: document.getElementById("seventv"),
-    emoji: document.getElementById("emoji"),
-    drawscoring1: document.getElementById("drawscoring1"),
-    drawscoring2: document.getElementById("drawscoring2"),
-    turnLength: document.getElementById("turnLength"),
-    timerReveal: document.getElementById("timerReveal"),
-    points: document.getElementById("points"),
-    pointsTarget: document.getElementById("pointsTarget"),
-    twitchGlobalCount: document.getElementById("twitchGlobalCount"),
-    bttvGlobalCount: document.getElementById("bttvGlobalCount"),
-    ffzGlobalCount: document.getElementById("ffzGlobalCount"),
-    seventvGlobalCount: document.getElementById("seventvGlobalCount"),
-    emojiCount: document.getElementById("emojiCount"),
-    twitchCount: document.getElementById("twitchCount"),
-    bttvCount: document.getElementById("bttvCount"),
-    ffzCount: document.getElementById("ffzCount"),
-    seventvCount: document.getElementById("seventvCount"),
-    color: document.getElementById("color"),
-    LineWidth: document.getElementById("LineWidth"),
-    LineWidthLabel: document.getElementById("LineWidthLabel"),
-    clearCanvas: document.getElementById("clearCanvas"),
-    redo: document.getElementById("redo"),
-    undo: document.getElementById("undo"),
-    settingsOffcanvas: document.getElementById("settingsOffcanvas"),
-    countdown: document.getElementById("countdown"),
-    countdownValue: document.getElementById("countdownValue"),
   };
 
   let loginButton;
@@ -620,37 +623,6 @@
   <script src="/games.js"></script>
 </svelte:head>
 
-<div class="modal fade" id="loginExpiredModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Login expired</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="row justify-content-center">
-          Renew login:<br />
-          <button type="button" data-bs-dismiss="modal" onclick="login()" class="btn btn-twitch"><span class="twitch-icon"></span>Sign in with Twitch</button>
-          <br /><small class="text-body-secondary">Logins expire after 2 months.<br />Or after you change your password.</small>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-danger"
-          data-bs-toggle="tooltip"
-          data-bs-placement="top"
-          data-bs-title="Will reset everything so you can login again."
-          data-bs-dismiss="modal"
-          onclick="resetSettings()"
-        >
-          Reset
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="modal fade" id="howToPlayModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -838,122 +810,7 @@
 </div>
 
 <div class="container-fluid">
-  <div id="grid" class="mt-3" style="display: none">
-    <div class="row row-cols-1 row-cols-xl-4 row-cols-lg-3 row-cols-sm-3 g-4">
-      <div class="col">
-        <div class="card h-100 bg-body-tertiary border-light">
-          <img src="/games/pics/draw.png" onclick="toggleGrid()" class="card-img-top" alt="Draw" />
-          <div class="card-body">
-            <h5 class="card-title">Draw</h5>
-            <p class="card-text">Streamer draws a random emote, chat has to guess the emote. Can you draw well enough?</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/arena.png" onclick="switchGame('arena')" class="card-img-top" alt="Arena" />
-          <div class="card-body">
-            <h5 class="card-title">Arena</h5>
-            <p class="card-text">Fight your chatters in a "battle royale" arena, where only one can win!</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/eb.png" onclick="switchGame('eb')" class="card-img-top" alt="Emote benchmark" />
-          <div class="card-body">
-            <h5 class="card-title">Emote benchmark</h5>
-            <p class="card-text">A test of reaction speed and emote knowledge. Type the appearing emotes in chat as fast as you can.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/dh.png" onclick="switchGame('dh')" class="card-img-top" alt="Donk Hunt" />
-          <div class="card-body">
-            <h5 class="card-title">Donk Hunt</h5>
-            <p class="card-text">Scary looking creatures are trying to trap their prey. Are you the hunter or the hunted one?</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/shapes.png" onclick="switchGame('shapes')" class="card-img-top" alt="🟥⏹️🔴🔴⭕⏹️" />
-          <div class="card-body">
-            <h5 class="card-title">🟥⏹️🔴🔴⭕⏹️</h5>
-            <p class="card-text">A very weird logic puzzle. Finish the row of shapes, which has been formed using a pre-determined hidden rule.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/nim.png" onclick="switchGame('nim')" class="card-img-top" alt="Nim" />
-          <div class="card-body">
-            <h5 class="card-title">Nim</h5>
-            <p class="card-text">Classic. Remove popsicles until there's one left. Whoever takes the last one - loses!</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/nw.png" onclick="switchGame('nw')" class="card-img-top" alt="Not Wordle :)" />
-          <div class="card-body">
-            <h5 class="card-title">Not Wordle :)</h5>
-            <p class="card-text">A twist of a well-known game: try to guess a word in several attempts. Your chat will choose the hidden word.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/c4.png" onclick="switchGame('c4')" class="card-img-top" alt="Connect 4" />
-          <div class="card-body">
-            <h5 class="card-title">Connect 4</h5>
-            <p class="card-text">Players take turns to drop their pieces into the container, attempting to connect 4 of their pieces in a row.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/ttt.png" onclick="switchGame('ttt')" class="card-img-top" alt="tic tac toe" />
-          <div class="card-body">
-            <h5 class="card-title">tic tac toe</h5>
-            <p class="card-text">An ancient game of wits. Will you outsmart the hive mind - which is your chat?</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/games/pics/guessr.png" onclick="switchGame('guessr')" class="card-img-top" alt="guessr" />
-          <div class="card-body">
-            <h5 class="card-title"><i class="material-icons notranslate">open_in_new</i> Guessr.tv</h5>
-            <p class="card-text">Guess the view count. You will be presented with a random Twitch stream and you have to guess how many viewers they have.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100">
-          <img src="/pics/donk.png" style="width: 180px; height: 180px; align-self: center" onclick="switchGame('about')" class="card-img-top" alt="About" />
-          <div class="card-body">
-            <h5 class="card-title">About</h5>
-            <p class="card-text">About section</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="container-fluid p-0" id="gameDiv">
-    <div class="row mt-2 mb-2" id="navrow">
-      <div class="col">
-        <div class="card">
-          <div class="card-body p-1">
-            <button type="button" onclick="toggleGrid()" class="btn btn-primary"><i class="material-icons notranslate">arrow_back</i>Back</button>
-            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#howToPlayModal"><i class="material-icons notranslate">help_outline</i>How To Play</button>
-            <b id="gameName">Draw</b>
-          </div>
-        </div>
-      </div>
-    </div>
     <div class="row">
       <div class="col">
         <div class="canvas-container" style="z-index: 1000; width: 850px; height: 850px; position: relative; user-select: none; background: #666666">
@@ -973,31 +830,31 @@
         <label for="LineWidth" class="form-label"><i class="material-icons notranslate">brush</i>Brush size: <span id="LineWidthLabel">5</span></label>
         <br />
         <div class="btn-group" role="group" aria-label="brush size presets" id="brushpresetsgroup">
-          <input onclick="changeBrush(this);" value="1" class="btn-check" type="radio" name="brushpresets" id="brush1" />
+          <input onclick={() => changeBrush()} value="1" class="btn-check" type="radio" name="brushpresets" id="brush1" />
           <label class="btn btn-outline-secondary" for="brush1" title="brush1">
             <svg class="brushsvg" style="height: 5px; width: 5px; fill: #22b14c" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <circle cx="50" cy="50" r="50" />
             </svg>
           </label>
-          <input onclick="changeBrush(this);" value="5" class="btn-check" type="radio" name="brushpresets" id="brush2" checked />
+          <input onclick={() => changeBrush()} value="5" class="btn-check" type="radio" name="brushpresets" id="brush2" checked />
           <label class="btn btn-outline-secondary" for="brush2" title="brush2">
             <svg class="brushsvg" style="height: 10px; width: 10px; fill: #22b14c" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <circle cx="50" cy="50" r="50" />
             </svg>
           </label>
-          <input onclick="changeBrush(this);" value="10" class="btn-check" type="radio" name="brushpresets" id="brush3" />
+          <input onclick={() => changeBrush()} value="10" class="btn-check" type="radio" name="brushpresets" id="brush3" />
           <label class="btn btn-outline-secondary" for="brush3" title="brush3">
             <svg class="brushsvg" style="height: 20px; width: 20px; fill: #22b14c" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <circle cx="50" cy="50" r="50" />
             </svg>
           </label>
-          <input onclick="changeBrush(this);" value="20" class="btn-check" type="radio" name="brushpresets" id="brush4" />
+          <input onclick={() => changeBrush()} value="20" class="btn-check" type="radio" name="brushpresets" id="brush4" />
           <label class="btn btn-outline-secondary" for="brush4" title="brush4">
             <svg class="brushsvg" style="height: 30px; width: 30px; fill: #22b14c" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <circle cx="50" cy="50" r="50" />
             </svg>
           </label>
-          <input onclick="changeBrush(this);" value="40" class="btn-check" type="radio" name="brushpresets" id="brush5" />
+          <input onclick={() => changeBrush()} value="40" class="btn-check" type="radio" name="brushpresets" id="brush5" />
           <label class="btn btn-outline-secondary" for="brush5" title="brush5">
             <svg id="dank" class="brushsvg" style="height: 40px; width: 40px; fill: #22b14c" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <circle cx="50" cy="50" r="50" />
@@ -1010,26 +867,26 @@
 
         <label for="color"><i class="material-icons notranslate">palette</i> Colors</label><br />
         <div class="colorpresetgroup" aria-label="color presets">
-          <button type="button" class="btn btn-primary colorpreset" value="#000000" style="background-color: #000000"></button>
-          <button type="button" class="btn btn-primary colorpreset" value="#404040" style="background-color: #404040"></button>
-          <button type="button" class="btn btn-primary colorpreset" value="#AAAAAA" style="background-color: #aaaaaa"></button>
-          <button type="button" class="btn btn-primary colorpreset" value="#FFFFFF" style="background-color: #ffffff"></button>
-          <button type="button" class="btn btn-primary colorpreset" value="#B0701C" style="background-color: #b0701c"></button>
-          <button type="button" class="btn btn-primary colorpreset" value="#99004E" style="background-color: #99004e"></button>
-          <button type="button" class="btn btn-primary colorpreset" value="#400085" style="background-color: #400085"></button>
-          <button type="button" class="btn btn-primary colorpreset" value="#004FCD" style="background-color: #004fcd"></button>
-          <button type="button" class="btn btn-primary colorpreset" value="#1ECBFF" style="background-color: #1ecbff"></button>
-          <button type="button" class="btn btn-primary colorpreset" value="#FF7829" style="background-color: #ff7829"></button>
-          <button type="button" class="btn btn-primary colorpreset" value="#990000" style="background-color: #990000"></button>
-          <button type="button" class="btn btn-primary colorpreset" value="#FF0013" style="background-color: #ff0013"></button>
-          <button type="button" class="btn btn-primary colorpreset" value="#FF0090" style="background-color: #ff0090"></button>
-          <button type="button" class="btn btn-primary colorpreset" value="#99FF00" style="background-color: #99ff00"></button>
-          <button type="button" class="btn btn-primary colorpreset" value="#FFC226" style="background-color: #ffc226"></button>
-          <button type="button" class="btn btn-primary colorpreset" value="#964112" style="background-color: #964112"></button>
-          <button type="button" class="btn btn-primary colorpreset" value="#CB5B57" style="background-color: #cb5b57"></button>
-          <button type="button" class="btn btn-primary colorpreset" value="#FEAFA8" style="background-color: #feafa8"></button>
-          <button type="button" class="btn btn-primary colorpreset" value="#11B03C" style="background-color: #11b03c"></button>
-          <button type="button" class="btn btn-primary colorpreset" value="#017420" style="background-color: #017420"></button>
+          <button type="button" class="btn btn-primary colorpreset" aria-label="color" value="#000000" style="background-color: #000000"></button>
+          <button type="button" class="btn btn-primary colorpreset" aria-label="color" value="#404040" style="background-color: #404040"></button>
+          <button type="button" class="btn btn-primary colorpreset" aria-label="color" value="#AAAAAA" style="background-color: #aaaaaa"></button>
+          <button type="button" class="btn btn-primary colorpreset" aria-label="color" value="#FFFFFF" style="background-color: #ffffff"></button>
+          <button type="button" class="btn btn-primary colorpreset" aria-label="color" value="#B0701C" style="background-color: #b0701c"></button>
+          <button type="button" class="btn btn-primary colorpreset" aria-label="color" value="#99004E" style="background-color: #99004e"></button>
+          <button type="button" class="btn btn-primary colorpreset" aria-label="color" value="#400085" style="background-color: #400085"></button>
+          <button type="button" class="btn btn-primary colorpreset" aria-label="color" value="#004FCD" style="background-color: #004fcd"></button>
+          <button type="button" class="btn btn-primary colorpreset" aria-label="color" value="#1ECBFF" style="background-color: #1ecbff"></button>
+          <button type="button" class="btn btn-primary colorpreset" aria-label="color" value="#FF7829" style="background-color: #ff7829"></button>
+          <button type="button" class="btn btn-primary colorpreset" aria-label="color" value="#990000" style="background-color: #990000"></button>
+          <button type="button" class="btn btn-primary colorpreset" aria-label="color" value="#FF0013" style="background-color: #ff0013"></button>
+          <button type="button" class="btn btn-primary colorpreset" aria-label="color" value="#FF0090" style="background-color: #ff0090"></button>
+          <button type="button" class="btn btn-primary colorpreset" aria-label="color" value="#99FF00" style="background-color: #99ff00"></button>
+          <button type="button" class="btn btn-primary colorpreset" aria-label="color" value="#FFC226" style="background-color: #ffc226"></button>
+          <button type="button" class="btn btn-primary colorpreset" aria-label="color" value="#964112" style="background-color: #964112"></button>
+          <button type="button" class="btn btn-primary colorpreset" aria-label="color" value="#CB5B57" style="background-color: #cb5b57"></button>
+          <button type="button" class="btn btn-primary colorpreset" aria-label="color" value="#FEAFA8" style="background-color: #feafa8"></button>
+          <button type="button" class="btn btn-primary colorpreset" aria-label="color" value="#11B03C" style="background-color: #11b03c"></button>
+          <button type="button" class="btn btn-primary colorpreset" aria-label="color" value="#017420" style="background-color: #017420"></button>
         </div>
 
         <input type="color" value="#22b14c" id="color" /><br />
@@ -1053,9 +910,9 @@
       <div class="col">
         <div class="card mt-1">
           <div class="btn-group" role="group" aria-label="Basic example">
-            <button type="button" onclick="start()" class="btn btn-success"><i class="material-icons notranslate">play_arrow</i>Start</button>
-            <button type="button" onclick="start()" class="btn btn-warning"><i class="material-icons notranslate">skip_next</i>Skip emote</button>
-            <button type="button" onclick="reset()" class="btn btn-danger"><i class="material-icons notranslate">clear</i>Reset</button>
+            <button type="button" onclick={start} class="btn btn-success"><i class="material-icons notranslate">play_arrow</i>Start</button>
+            <button type="button" onclick={start} class="btn btn-warning"><i class="material-icons notranslate">skip_next</i>Skip emote</button>
+            <button type="button" onclick={() => reset()} class="btn btn-danger"><i class="material-icons notranslate">clear</i>Reset</button>
             <button type="button" class="btn btn-secondary" data-bs-toggle="offcanvas" data-bs-target="#settingsOffcanvas" aria-controls="settingsOffcanvas">
               <i class="material-icons notranslate">settings</i> Settings
             </button>
