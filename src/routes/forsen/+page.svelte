@@ -4,8 +4,29 @@
   onDestroy(() => {
     return "Are you sure?";
   });
-
+  let elements;
   onMount(async () => {
+    elements = {
+      //modals
+      restartRaffleModal: document.getElementById("restartRaffleModal"),
+      restartTier3RaffleModal: document.getElementById("restartTier3RaffleModal"),
+      fancyRaffleModal: document.getElementById("fancyRaffleModal"),
+      slot: document.getElementById("slot"),
+      claw: document.getElementById("claw"),
+      gameWinner: document.getElementById("gameWinner"),
+      //navbar
+      status: document.getElementById("status"),
+      topRight: document.getElementById("topRight"),
+      //raffle
+      raffleUsers: document.getElementById("raffleUsers"),
+      raffleUsersTier3: document.getElementById("raffleUsersTier3"),
+      entrants: document.getElementById("entrants"),
+      entrantsTier3: document.getElementById("entrantsTier3"),
+      raffleOutput: document.getElementById("raffleOutput"),
+      raffleOutputTier3: document.getElementById("raffleOutputTier3"),
+      emotes: document.getElementById("emotes"),
+      animationSelect: document.getElementById("animationSelect"),
+    };
     connect();
     fpsBenchmark();
 
@@ -29,28 +50,6 @@
   const userid = 22484632;
   const raffle_command1 = "!join";
   const raffle_command2 = "!ticket";
-
-  let elements = {
-    //modals
-    restartRaffleModal: document.getElementById("restartRaffleModal"),
-    restartTier3RaffleModal: document.getElementById("restartTier3RaffleModal"),
-    fancyRaffleModal: document.getElementById("fancyRaffleModal"),
-    slot: document.getElementById("slot"),
-    claw: document.getElementById("claw"),
-    gameWinner: document.getElementById("gameWinner"),
-    //navbar
-    status: document.getElementById("status"),
-    topRight: document.getElementById("topRight"),
-    //raffle
-    raffleUsers: document.getElementById("raffleUsers"),
-    raffleUsersTier3: document.getElementById("raffleUsersTier3"),
-    entrants: document.getElementById("entrants"),
-    entrantsTier3: document.getElementById("entrantsTier3"),
-    raffleOutput: document.getElementById("raffleOutput"),
-    raffleOutputTier3: document.getElementById("raffleOutputTier3"),
-    emotes: document.getElementById("emotes"),
-    animationSelect: document.getElementById("animationSelect"),
-  };
 
   let client;
   let raffle_users = [];
@@ -845,7 +844,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-warning" data-bs-dismiss="modal" onclick="restartRaffle()">Restart raffle</button>
+        <button type="button" class="btn btn-warning" data-bs-dismiss="modal" onclick={restartRaffle}>Restart raffle</button>
       </div>
     </div>
   </div>
@@ -863,7 +862,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-warning" data-bs-dismiss="modal" onclick="restartTier3Raffle()">Restart raffle</button>
+        <button type="button" class="btn btn-warning" data-bs-dismiss="modal" onclick={restartTier3Raffle}>Restart raffle</button>
       </div>
     </div>
   </div>
@@ -895,7 +894,7 @@
     <div class="col">
       <div class="card">
         <div class="card-body bg-body-tertiary rounded">
-          <a role="button" tabindex="0" onclick="drawRaffleWinner()" class="btn btn-lg btn-info me-3"><i class="material-icons notranslate">celebration</i> Draw A Winner</a>
+          <a role="button" tabindex="0" onclick={drawRaffleWinner} class="btn btn-lg btn-info me-3"><i class="material-icons notranslate">celebration</i> Draw A Winner</a>
           <a role="button" tabindex="0" class="btn btn-sm btn-outline-warning me-5" data-bs-toggle="modal" data-bs-target="#restartRaffleModal">
             <i class="material-icons notranslate">refresh</i>Restart raffle
           </a>
@@ -925,7 +924,7 @@
     <div class="col">
       <div class="card">
         <div class="card-body bg-body-tertiary rounded">
-          <a role="button" tabindex="0" onclick="drawRaffleWinnerTier3()" class="btn btn-lg btn-info me-3">
+          <a role="button" tabindex="0" onclick={drawRaffleWinnerTier3} class="btn btn-lg btn-info me-3">
             <i class="material-icons notranslate">celebration</i> Draw A Winner (tier 3)
           </a>
           <a role="button" tabindex="0" class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#restartTier3RaffleModal">

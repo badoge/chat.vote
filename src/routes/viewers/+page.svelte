@@ -4,8 +4,35 @@
   onDestroy(() => {
     return "dank";
   });
-
+  let elements;
   onMount(async () => {
+    elements = {
+      settingsModal: document.getElementById("settingsModal"),
+      loginExpiredModal: document.getElementById("loginExpiredModal"),
+      ctx: document.getElementById("myChart").getContext("2d"),
+      overlay: document.getElementById("overlay"),
+      overlayBody: document.getElementById("overlayBody"),
+
+      targetCount: document.getElementById("targetCount"),
+      chartWidth: document.getElementById("chartWidth"),
+      updateRate: document.getElementById("updateRate"),
+      updateOnChange: document.getElementById("updateOnChange"),
+      recoveryDelay: document.getElementById("recoveryDelay"),
+      showViewcount: document.getElementById("showViewcount"),
+      autoColor: document.getElementById("autoColor"),
+      lineColor: document.getElementById("lineColor"),
+      fillColor: document.getElementById("fillColor"),
+      backgroundColor: document.getElementById("backgroundColor"),
+      transparentBG: document.getElementById("transparentBG"),
+      noFill: document.getElementById("noFill"),
+
+      serverIP: document.getElementById("serverIP"),
+      serverPort: document.getElementById("serverPort"),
+      serverPassword: document.getElementById("serverPassword"),
+      connectOBS: document.getElementById("connectOBS"),
+      stopDelay: document.getElementById("stopDelay"),
+    };
+
     settingsModal = new bootstrap.Modal(elements.settingsModal);
     loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
     loadAndConnect();
@@ -83,33 +110,6 @@
   let updateRate = 5;
   let channel;
   let updateOnChange = true;
-
-  let elements = {
-    settingsModal: document.getElementById("settingsModal"),
-    loginExpiredModal: document.getElementById("loginExpiredModal"),
-    ctx: document.getElementById("myChart").getContext("2d"),
-    overlay: document.getElementById("overlay"),
-    overlayBody: document.getElementById("overlayBody"),
-
-    targetCount: document.getElementById("targetCount"),
-    chartWidth: document.getElementById("chartWidth"),
-    updateRate: document.getElementById("updateRate"),
-    updateOnChange: document.getElementById("updateOnChange"),
-    recoveryDelay: document.getElementById("recoveryDelay"),
-    showViewcount: document.getElementById("showViewcount"),
-    autoColor: document.getElementById("autoColor"),
-    lineColor: document.getElementById("lineColor"),
-    fillColor: document.getElementById("fillColor"),
-    backgroundColor: document.getElementById("backgroundColor"),
-    transparentBG: document.getElementById("transparentBG"),
-    noFill: document.getElementById("noFill"),
-
-    serverIP: document.getElementById("serverIP"),
-    serverPort: document.getElementById("serverPort"),
-    serverPassword: document.getElementById("serverPassword"),
-    connectOBS: document.getElementById("connectOBS"),
-    stopDelay: document.getElementById("stopDelay"),
-  };
 
   let USER = {
     channel: "",

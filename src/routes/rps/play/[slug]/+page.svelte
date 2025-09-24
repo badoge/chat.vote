@@ -1,7 +1,29 @@
 <script>
   import { onMount } from "svelte";
 
+  import { animate } from "animejs";
+
+  let elements;
   onMount(async () => {
+    elements = {
+      loginButton: document.getElementById("loginButton"),
+      me: document.getElementById("me"),
+      opponent: document.getElementById("opponent"),
+      topRight: document.getElementById("topRight"),
+      loginExpiredModal: document.getElementById("loginExpiredModal"),
+      left_rock: document.getElementById("left_rock"),
+      left_paper: document.getElementById("left_paper"),
+      left_scissors: document.getElementById("left_scissors"),
+      right_rock: document.getElementById("right_rock"),
+      right_paper: document.getElementById("right_paper"),
+      right_scissors: document.getElementById("right_scissors"),
+
+      info: document.getElementById("info"),
+      game: document.getElementById("game"),
+      rock: document.getElementById("rock"),
+      paper: document.getElementById("paper"),
+      scissors: document.getElementById("scissors"),
+    };
     loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
 
     loadAndConnect();
@@ -9,28 +31,6 @@
 
   let { data } = $props();
   let channel = $state(data.slug.toLowerCase().replace(/\s/g, ""));
-
-  let elements = {
-    loginButton: document.getElementById("loginButton"),
-    me: document.getElementById("me"),
-    opponent: document.getElementById("opponent"),
-    topRight: document.getElementById("topRight"),
-    loginExpiredModal: document.getElementById("loginExpiredModal"),
-    left_rock: document.getElementById("left_rock"),
-    left_paper: document.getElementById("left_paper"),
-    left_scissors: document.getElementById("left_scissors"),
-    right_rock: document.getElementById("right_rock"),
-    right_paper: document.getElementById("right_paper"),
-    right_scissors: document.getElementById("right_scissors"),
-
-    info: document.getElementById("info"),
-    game: document.getElementById("game"),
-    rock: document.getElementById("rock"),
-    paper: document.getElementById("paper"),
-    scissors: document.getElementById("scissors"),
-  };
-
-  const { animate } = anime;
 
   let darkTheme = true;
   let loginExpiredModal;
@@ -297,7 +297,7 @@
       </a>
 
       <div id="topRight">
-        <a role="button" id="loginButton" onclick="login()" class="btn btn-twitch" tabindex="0"> <span class="twitch-icon"></span>Sign in with Twitch </a>
+        <a role="button" id="loginButton" onclick={login} class="btn btn-twitch" tabindex="0"> <span class="twitch-icon"></span>Sign in with Twitch </a>
       </div>
 
       <div id="theme-label-container">
@@ -352,9 +352,9 @@
         <div class="p-2">
           Make your move<br />
           <div class="btn-group" role="group" aria-label="move">
-            <button disabled type="button" onclick="sendMove('rock')" id="rock" class="btn btn-secondary"><span style="font-size: 2.5rem">✊</span><br />Rock</button>
-            <button disabled type="button" onclick="sendMove('paper')" id="paper" class="btn btn-light"><span style="font-size: 2.5rem">✋</span><br />Paper</button>
-            <button disabled type="button" onclick="sendMove('scissors')" id="scissors" class="btn btn-danger"><span style="font-size: 2.5rem">✌</span><br />Scissors</button>
+            <button disabled type="button" onclick={() => sendMove("rock")} id="rock" class="btn btn-secondary"><span style="font-size: 2.5rem">✊</span><br />Rock</button>
+            <button disabled type="button" onclick={() => sendMove("paper")} id="paper" class="btn btn-light"><span style="font-size: 2.5rem">✋</span><br />Paper</button>
+            <button disabled type="button" onclick={() => sendMove("scissors")} id="scissors" class="btn btn-danger"><span style="font-size: 2.5rem">✌</span><br />Scissors</button>
           </div>
         </div>
       </div>

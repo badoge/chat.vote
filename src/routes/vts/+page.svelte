@@ -50,8 +50,107 @@ xjggDjHBMEGOeYIMA4xwQBKhk5OHAnCFCx0EGfn7VwWQhgjNsjucseIiAxLrw1WzGybQmbWAUqV8h4O9
 wlqaw9WTLH5ZIgQjX69VmueRaYmSUMQgUVzAayGiYTyAP0M7+FNq81HwTIBVtzvM7vRa+M9ZiiyPbrVDQTOSa8rRC4cYynVUP1YzjvZC4U8P8g1JQBQws33wAAAABJRU5ErkJggg==`;
 
   import { onMount } from "svelte";
-
+  let elements;
   onMount(async () => {
+    elements = {
+      //modals
+      connectVTSModal: document.getElementById("connectVTSModal"),
+      resetModal: document.getElementById("resetModal"),
+      addCommandModal: document.getElementById("addCommandModal"),
+      addExistingRewardModal: document.getElementById("addExistingRewardModal"),
+      createNewRewardModal: document.getElementById("createNewRewardModal"),
+      editCommandModal: document.getElementById("editCommandModal"),
+      editRewardModal: document.getElementById("editRewardModal"),
+      confirmDeletionModal: document.getElementById("confirmDeletionModal"),
+      vtsLoginExpiredModal: document.getElementById("vtsLoginExpiredModal"),
+      addSubAlertModal: document.getElementById("addSubAlertModal"),
+      editSubAlertModal: document.getElementById("editSubAlertModal"),
+      addGiftedSubAlertModal: document.getElementById("addGiftedSubAlertModal"),
+      editGiftedSubAlertModal: document.getElementById("editGiftedSubAlertModal"),
+      addBitsAlertModal: document.getElementById("addBitsAlertModal"),
+      editBitsAlertModal: document.getElementById("editBitsAlertModal"),
+      addRewardModal: document.getElementById("addRewardModal"),
+      youtubeModal: document.getElementById("youtubeModal"),
+
+      modal9footer: document.getElementById("modal9footer"),
+      modal9body: document.getElementById("modal9body"),
+      youtubeModalBody: document.getElementById("youtubeModalBody"),
+      youtubeModalTitle: document.getElementById("youtubeModalTitle"),
+      port: document.getElementById("port"),
+
+      //commands
+      commandName: document.getElementById("commandName"),
+      commandNameEdit: document.getElementById("commandNameEdit"),
+      commandCooldown: document.getElementById("commandCooldown"),
+      commandCooldownEdit: document.getElementById("commandCooldownEdit"),
+      addCommandSubmit: document.getElementById("addCommandSubmit"),
+      modal7body: document.getElementById("modal7body"),
+      modal7footer: document.getElementById("modal7footer"),
+
+      //rewards
+      addRewardSubmit: document.getElementById("addRewardSubmit"),
+      newRewardName: document.getElementById("newRewardName"),
+      newRewardDesc: document.getElementById("newRewardDesc"),
+      newRewardCost: document.getElementById("newRewardCost"),
+      newRewardColor: document.getElementById("newRewardColor"),
+      newRewardCooldown: document.getElementById("newRewardCooldown"),
+      newRewardCooldownUnit: document.getElementById("newRewardCooldownUnit"),
+      newRewardLimit: document.getElementById("newRewardLimit"),
+      newRewardUserLimit: document.getElementById("newRewardUserLimit"),
+      createRewardSubmit: document.getElementById("createRewardSubmit"),
+      modal8body: document.getElementById("modal8body"),
+      modal8footer: document.getElementById("modal8footer"),
+      existingRewardsList: document.getElementById("existingRewardsList"),
+
+      //sub alerts
+      subAlertMonths: document.getElementById("subAlertMonths"),
+      subAlertMonthsEdit: document.getElementById("subAlertMonthsEdit"),
+      addSubAlertSubmit: document.getElementById("addSubAlertSubmit"),
+      modal12footer: document.getElementById("modal12footer"),
+
+      //gifted sub alerts
+      giftedSubsNumber: document.getElementById("giftedSubsNumber"),
+      giftedSubsNumberEdit: document.getElementById("giftedSubsNumberEdit"),
+      addGiftedSubAlertSubmit: document.getElementById("addGiftedSubAlertSubmit"),
+      modal14footer: document.getElementById("modal14footer"),
+
+      //bits alerts
+      bitsNumber: document.getElementById("bitsNumber"),
+      bitsNumberEdit: document.getElementById("bitsNumberEdit"),
+      addBitsAlertSubmit: document.getElementById("addBitsAlertSubmit"),
+      modal16footer: document.getElementById("modal16footer"),
+
+      //navbar
+      VTSstatus: document.getElementById("VTSstatus"),
+      chatStatus: document.getElementById("chatStatus"),
+      eventsubStatus: document.getElementById("eventsubStatus"),
+      topright1: document.getElementById("topright1"),
+      topright2: document.getElementById("topright2"),
+      topright3: document.getElementById("topright3"),
+      darkTheme: document.getElementById("darkTheme"),
+
+      //settings
+      createChannelPointsButton: document.getElementById("createChannelPointsButton"),
+      addSubAlert: document.getElementById("addSubAlert"),
+      addGiftedSubAlert: document.getElementById("addGiftedSubAlert"),
+      addBitsAlert: document.getElementById("addBitsAlert"),
+      commandCooldownGlobal: document.getElementById("commandCooldownGlobal"),
+      hideDefault: document.getElementById("hideDefault"),
+      backupInput: document.getElementById("backupInput"),
+
+      //body
+      commandsList: document.getElementById("commandsList"),
+      rewardsListHeader: document.getElementById("rewardsListHeader"),
+      rewardsList: document.getElementById("rewardsList"),
+      subsListHeader: document.getElementById("subsListHeader"),
+      subsList: document.getElementById("subsList"),
+      giftsListHeader: document.getElementById("giftsListHeader"),
+      giftsList: document.getElementById("giftsList"),
+      bitsListHeader: document.getElementById("bitsListHeader"),
+      bitsList: document.getElementById("bitsList"),
+      logs: document.getElementById("logs"),
+    };
+
     loadAndConnect();
 
     connectVTSModal = new bootstrap.Modal(elements.connectVTSModal);
@@ -79,105 +178,6 @@ wlqaw9WTLH5ZIgQjX69VmueRaYmSUMQgUVzAayGiYTyAP0M7+FNq81HwTIBVtzvM7vRa+M9ZiiyPbrVD
     enableTooltips();
     enablePopovers();
   });
-
-  let elements = {
-    //modals
-    connectVTSModal: document.getElementById("connectVTSModal"),
-    resetModal: document.getElementById("resetModal"),
-    addCommandModal: document.getElementById("addCommandModal"),
-    addExistingRewardModal: document.getElementById("addExistingRewardModal"),
-    createNewRewardModal: document.getElementById("createNewRewardModal"),
-    editCommandModal: document.getElementById("editCommandModal"),
-    editRewardModal: document.getElementById("editRewardModal"),
-    confirmDeletionModal: document.getElementById("confirmDeletionModal"),
-    vtsLoginExpiredModal: document.getElementById("vtsLoginExpiredModal"),
-    addSubAlertModal: document.getElementById("addSubAlertModal"),
-    editSubAlertModal: document.getElementById("editSubAlertModal"),
-    addGiftedSubAlertModal: document.getElementById("addGiftedSubAlertModal"),
-    editGiftedSubAlertModal: document.getElementById("editGiftedSubAlertModal"),
-    addBitsAlertModal: document.getElementById("addBitsAlertModal"),
-    editBitsAlertModal: document.getElementById("editBitsAlertModal"),
-    addRewardModal: document.getElementById("addRewardModal"),
-    youtubeModal: document.getElementById("youtubeModal"),
-
-    modal9footer: document.getElementById("modal9footer"),
-    modal9body: document.getElementById("modal9body"),
-    youtubeModalBody: document.getElementById("youtubeModalBody"),
-    youtubeModalTitle: document.getElementById("youtubeModalTitle"),
-    port: document.getElementById("port"),
-
-    //commands
-    commandName: document.getElementById("commandName"),
-    commandNameEdit: document.getElementById("commandNameEdit"),
-    commandCooldown: document.getElementById("commandCooldown"),
-    commandCooldownEdit: document.getElementById("commandCooldownEdit"),
-    addCommandSubmit: document.getElementById("addCommandSubmit"),
-    modal7body: document.getElementById("modal7body"),
-    modal7footer: document.getElementById("modal7footer"),
-
-    //rewards
-    addRewardSubmit: document.getElementById("addRewardSubmit"),
-    newRewardName: document.getElementById("newRewardName"),
-    newRewardDesc: document.getElementById("newRewardDesc"),
-    newRewardCost: document.getElementById("newRewardCost"),
-    newRewardColor: document.getElementById("newRewardColor"),
-    newRewardCooldown: document.getElementById("newRewardCooldown"),
-    newRewardCooldownUnit: document.getElementById("newRewardCooldownUnit"),
-    newRewardLimit: document.getElementById("newRewardLimit"),
-    newRewardUserLimit: document.getElementById("newRewardUserLimit"),
-    createRewardSubmit: document.getElementById("createRewardSubmit"),
-    modal8body: document.getElementById("modal8body"),
-    modal8footer: document.getElementById("modal8footer"),
-    existingRewardsList: document.getElementById("existingRewardsList"),
-
-    //sub alerts
-    subAlertMonths: document.getElementById("subAlertMonths"),
-    subAlertMonthsEdit: document.getElementById("subAlertMonthsEdit"),
-    addSubAlertSubmit: document.getElementById("addSubAlertSubmit"),
-    modal12footer: document.getElementById("modal12footer"),
-
-    //gifted sub alerts
-    giftedSubsNumber: document.getElementById("giftedSubsNumber"),
-    giftedSubsNumberEdit: document.getElementById("giftedSubsNumberEdit"),
-    addGiftedSubAlertSubmit: document.getElementById("addGiftedSubAlertSubmit"),
-    modal14footer: document.getElementById("modal14footer"),
-
-    //bits alerts
-    bitsNumber: document.getElementById("bitsNumber"),
-    bitsNumberEdit: document.getElementById("bitsNumberEdit"),
-    addBitsAlertSubmit: document.getElementById("addBitsAlertSubmit"),
-    modal16footer: document.getElementById("modal16footer"),
-
-    //navbar
-    VTSstatus: document.getElementById("VTSstatus"),
-    chatStatus: document.getElementById("chatStatus"),
-    eventsubStatus: document.getElementById("eventsubStatus"),
-    topright1: document.getElementById("topright1"),
-    topright2: document.getElementById("topright2"),
-    topright3: document.getElementById("topright3"),
-    darkTheme: document.getElementById("darkTheme"),
-
-    //settings
-    createChannelPointsButton: document.getElementById("createChannelPointsButton"),
-    addSubAlert: document.getElementById("addSubAlert"),
-    addGiftedSubAlert: document.getElementById("addGiftedSubAlert"),
-    addBitsAlert: document.getElementById("addBitsAlert"),
-    commandCooldownGlobal: document.getElementById("commandCooldownGlobal"),
-    hideDefault: document.getElementById("hideDefault"),
-    backupInput: document.getElementById("backupInput"),
-
-    //body
-    commandsList: document.getElementById("commandsList"),
-    rewardsListHeader: document.getElementById("rewardsListHeader"),
-    rewardsList: document.getElementById("rewardsList"),
-    subsListHeader: document.getElementById("subsListHeader"),
-    subsList: document.getElementById("subsList"),
-    giftsListHeader: document.getElementById("giftsListHeader"),
-    giftsList: document.getElementById("giftsList"),
-    bitsListHeader: document.getElementById("bitsListHeader"),
-    bitsList: document.getElementById("bitsList"),
-    logs: document.getElementById("logs"),
-  };
 
   let client;
   let EventSub;

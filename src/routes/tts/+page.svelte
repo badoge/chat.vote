@@ -2,7 +2,7 @@
   let client;
   let synth;
   let username;
-  synth = window.speechSynthesis;
+  //synth = window.speechSynthesis;
 
   function connect() {
     username = document.getElementById("username").value;
@@ -75,6 +75,6 @@
 
   <div class="input-group mt-3">
     <input type="text" id="username" class="form-control" placeholder="username" aria-label="username text" aria-describedby="usernamebtn" />
-    <button class="btn btn-outline-primary" type="button" onclick={connect()} id="usernamebtn">connect</button>
+    <button class="btn btn-outline-primary" type="button" onclick={connect} id="usernamebtn">connect</button>
   </div>
 </div>

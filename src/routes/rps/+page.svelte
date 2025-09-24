@@ -1,7 +1,27 @@
 <script>
   import { onMount } from "svelte";
 
+  import { animate } from "animejs";
+
+  let elements;
   onMount(async () => {
+    elements = {
+      loginButton: document.getElementById("loginButton"),
+      topRight: document.getElementById("topRight"),
+      darkTheme: document.getElementById("darkTheme"),
+      loginExpiredModal: document.getElementById("loginExpiredModal"),
+      left_rock: document.getElementById("left_rock"),
+      left_paper: document.getElementById("left_paper"),
+      left_scissors: document.getElementById("left_scissors"),
+      right_rock: document.getElementById("right_rock"),
+      right_paper: document.getElementById("right_paper"),
+      right_scissors: document.getElementById("right_scissors"),
+      gameLink: document.getElementById("gameLink"),
+      copyLinkButton: document.getElementById("copyLinkButton"),
+      bracket: document.getElementById("bracket"),
+      start: document.getElementById("start"),
+      next: document.getElementById("next"),
+    };
     loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
     copyLinkButton = new bootstrap.Popover(elements.copyLinkButton);
 
@@ -9,26 +29,6 @@
 
     randomAnimations();
   });
-
-  let elements = {
-    loginButton: document.getElementById("loginButton"),
-    topRight: document.getElementById("topRight"),
-    darkTheme: document.getElementById("darkTheme"),
-    loginExpiredModal: document.getElementById("loginExpiredModal"),
-    left_rock: document.getElementById("left_rock"),
-    left_paper: document.getElementById("left_paper"),
-    left_scissors: document.getElementById("left_scissors"),
-    right_rock: document.getElementById("right_rock"),
-    right_paper: document.getElementById("right_paper"),
-    right_scissors: document.getElementById("right_scissors"),
-    gameLink: document.getElementById("gameLink"),
-    copyLinkButton: document.getElementById("copyLinkButton"),
-    bracket: document.getElementById("bracket"),
-    start: document.getElementById("start"),
-    next: document.getElementById("next"),
-  };
-
-  const { animate } = anime;
 
   let darkTheme = true;
   let loginExpiredModal;
@@ -349,7 +349,7 @@
       </a>
 
       <div id="topRight">
-        <a role="button" id="loginButton" onclick="login()" class="btn btn-twitch" tabindex="0"> <span class="twitch-icon"></span>Sign in with Twitch </a>
+        <a role="button" id="loginButton" onclick={login} class="btn btn-twitch" tabindex="0"> <span class="twitch-icon"></span>Sign in with Twitch </a>
       </div>
 
       <div id="theme-label-container">
@@ -423,13 +423,13 @@
       <div class="card w-75 mb-5">
         <div class="card-header"><i class="material-icons notranslate">tune</i>Game controls</div>
         <div class="card-body">
-          <button onclick="start()" id="start" type="button" class="btn btn-primary mb-3"><i class="material-icons notranslate">rocket_launch</i>Start new game</button>
+          <button onclick={start} id="start" type="button" class="btn btn-primary mb-3"><i class="material-icons notranslate">rocket_launch</i>Start new game</button>
           <br />
-          <button onclick="next()" id="next" type="button" class="btn btn-info mb-3"><i class="material-icons notranslate">arrow_forward_ios</i>Next round</button>
+          <button onclick={next} id="next" type="button" class="btn btn-info mb-3"><i class="material-icons notranslate">arrow_forward_ios</i>Next round</button>
           <br />
           <div class="input-group">
             <span class="input-group-text">Game link</span>
-            <input disabled type="text" class="form-control" id="gameLink" onclick="copyLink()" value="https://chat.vote/rps/play#username" />
+            <input disabled type="text" class="form-control" id="gameLink" onclick={copyLink} value="https://chat.vote/rps/play#username" />
             <button
               type="button"
               id="copyLinkButton"
@@ -438,7 +438,7 @@
               data-bs-trigger="manual"
               data-bs-placement="top"
               data-bs-content="Link copied :)"
-              onclick="copyLink()"
+              onclick={copyLink}
             >
               <i class="material-icons notranslate">content_copy</i>
             </button>

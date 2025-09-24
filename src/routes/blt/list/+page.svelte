@@ -1,7 +1,17 @@
 <script>
   import { onMount } from "svelte";
-
+  let elements;
   onMount(async () => {
+    elements = {
+      blacklistModal: document.getElementById("blacklistModal"),
+      reason: document.getElementById("reason"),
+      optionsModal: document.getElementById("optionsModal"),
+      optionsModalBody: document.getElementById("optionsModalBody"),
+
+      main: document.getElementById("main"),
+      list: document.getElementById("list"),
+      blacklisted: document.getElementById("blacklisted"),
+    };
     let requestOptions = {
       headers: {
         Accept: "application/json",
@@ -24,17 +34,6 @@
     blacklistModal = new bootstrap.Modal(elements.blacklistModal);
     optionsModal = new bootstrap.Modal(elements.optionsModal);
   });
-
-  let elements = {
-    blacklistModal: document.getElementById("blacklistModal"),
-    reason: document.getElementById("reason"),
-    optionsModal: document.getElementById("optionsModal"),
-    optionsModalBody: document.getElementById("optionsModalBody"),
-
-    main: document.getElementById("main"),
-    list: document.getElementById("list"),
-    blacklisted: document.getElementById("blacklisted"),
-  };
 
   let blacklistModal, optionsModal;
 
@@ -222,7 +221,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-danger" onclick="blacklistSubmit()">Blacklist</button>
+        <button type="button" class="btn btn-danger" onclick={blacklistSubmit}>Blacklist</button>
       </div>
     </div>
   </div>

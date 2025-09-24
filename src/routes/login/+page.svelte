@@ -1,13 +1,15 @@
 <script>
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
 
   onDestroy(() => {
-    window.opener.loadAndConnect();
+    //window.opener.loadAndConnect();
   });
-
-  let url = window.location.href;
-  let access_token = url.match(/\#(?:access_token)\=([\S\s]*?)\&/)[1];
-  getUsername();
+  let access_token;
+  onMount(() => {
+    let url = window.location.href;
+    access_token = url.match(/\#(?:access_token)\=([\S\s]*?)\&/)[1];
+    getUsername();
+  });
 
   async function getUsername() {
     let requestOptions = {
@@ -27,10 +29,10 @@
           platform: "twitch",
         }),
       );
-      window.close();
+      //window.close();
     } catch (error) {
       console.log("error", error);
-      window.close();
+      //window.close();
     }
   }
 </script>

@@ -2,7 +2,7 @@
   import { onDestroy } from "svelte";
 
   onDestroy(() => {
-    window.opener.loadPFP();
+    // window.opener.loadPFP();
   });
 </script>
 
