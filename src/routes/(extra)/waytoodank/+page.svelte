@@ -1,5 +1,8 @@
 <script>
   import { onMount } from "svelte";
+
+  import IcBaselineHelp from "~icons/ic/baseline-help";
+
   let elements;
   onMount(async () => {
     elements = {
@@ -317,15 +320,14 @@
           <div class="form-group">
             <label for="serverIP"
               >OBS WebSocket Server IP
-              <i
-                class="material-icons notranslate"
+
+              <IcBaselineHelp
                 data-bs-toggle="tooltip"
                 data-bs-custom-class="wide-tooltip"
                 data-bs-placement="left"
                 data-bs-html="true"
                 data-bs-title="<img src='/waytoodank/obsinfo.png'/>"
-                >help
-              </i>
+              />
             </label>
             <input type="text" class="form-control" id="serverIP" value="localhost" aria-describedby="description1" />
             <small id="description1" class="form-text text-body-secondary">donk</small>
@@ -333,15 +335,14 @@
           <div class="form-group">
             <label for="serverPort"
               >OBS WebSocket Server Port
-              <i
-                class="material-icons notranslate"
+
+              <IcBaselineHelp
                 data-bs-toggle="tooltip"
                 data-bs-custom-class="wide-tooltip"
                 data-bs-placement="left"
                 data-bs-html="true"
                 data-bs-title="<img src='/waytoodank/obsinfo.png'/>"
-                >help
-              </i>
+              />
             </label>
             <input type="text" class="form-control" id="serverPort" value="4455" aria-describedby="description2" />
             <small id="description2" class="form-text text-body-secondary">donk</small>
@@ -349,15 +350,14 @@
           <div class="form-group">
             <label for="serverPassword"
               >OBS WebSocket Server Password
-              <i
-                class="material-icons notranslate"
+
+              <IcBaselineHelp
                 data-bs-toggle="tooltip"
                 data-bs-custom-class="wide-tooltip"
                 data-bs-placement="left"
                 data-bs-html="true"
                 data-bs-title="<img src='/waytoodank/obsinfo.png'/>"
-                >help
-              </i>
+              />
             </label>
             <input type="password" class="form-control" id="serverPassword" aria-describedby="description3" />
             <small id="description3" class="form-text text-body-secondary">donk</small>

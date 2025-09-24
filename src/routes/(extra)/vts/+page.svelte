@@ -49,6 +49,17 @@ fQnvdI0C+p8ujyBMr29HcrxmsqzhGhdyaXe1xofwy/qtd7u4HOGEwTjOgxMlzrvdLU6V3bkRO9vwzwv8
 xjggDjHBMEGOeYIMA4xwQBKhk5OHAnCFCx0EGfn7VwWQhgjNsjucseIiAxLrw1WzGybQmbWAUqV8h4O9b9D2aTPgsBnE1gbJ/QAuUIB+zDWeXOpgF2g/n0xHJwGSJPx8erA4ivAI6o3NEMHhGq9qBvBmZUfq2WEY
 wlqaw9WTLH5ZIgQjX69VmueRaYmSUMQgUVzAayGiYTyAP0M7+FNq81HwTIBVtzvM7vRa+M9ZiiyPbrVDQTOSa8rRC4cYynVUP1YzjvZC4U8P8g1JQBQws33wAAAABJRU5ErkJggg==`;
 
+  import IcBaselineFileUpload from "~icons/ic/baseline-file-upload";
+  import IcBaselineVisibilityOff from "~icons/ic/baseline-visibility-off";
+
+  import IcBaselineSettings from "~icons/ic/baseline-settings";
+
+  import IcBaselineFileDownload from "~icons/ic/baseline-file-download";
+
+  import IcBaselineChat from "~icons/ic/baseline-chat";
+  import IcBaselineHelpOutline from "~icons/ic/baseline-help-outline";
+  import IcBaselineHelp from "~icons/ic/baseline-help";
+
   import { onMount } from "svelte";
   let elements;
   onMount(async () => {
@@ -2423,27 +2434,27 @@ wlqaw9WTLH5ZIgQjX69VmueRaYmSUMQgUVzAayGiYTyAP0M7+FNq81HwTIBVtzvM7vRa+M9ZiiyPbrVD
       <div class="modal-body">
         <p>
           Enable "Start API (allow plugins)" in VTS settings then click the Connect button below
-          <i
-            class="material-icons notranslate cursor-pointer"
+
+          <IcBaselineHelp
+            class="cursor-pointer"
             data-bs-toggle="tooltip"
             data-bs-custom-class="wide-tooltip"
             data-bs-placement="auto"
             data-bs-html="true"
             data-bs-title="<img src='/vts/pics/start.png'/>"
-            >help
-          </i>
+          />
         </p>
         <p>
           Make sure that the Port number is the same
-          <i
-            class="material-icons notranslate cursor-pointer"
+
+          <IcBaselineHelp
+            class="cursor-pointer"
             data-bs-toggle="tooltip"
             data-bs-custom-class="wide-tooltip"
             data-bs-placement="auto"
             data-bs-html="true"
             data-bs-title="<img src='/vts/pics/port.png'/>"
-            >help
-          </i>
+          />
         </p>
         <div class="input-group mb-3">
           <span class="input-group-text">Port</span>
@@ -2452,15 +2463,15 @@ wlqaw9WTLH5ZIgQjX69VmueRaYmSUMQgUVzAayGiYTyAP0M7+FNq81HwTIBVtzvM7vRa+M9ZiiyPbrVD
         </div>
         <p>
           Allow connection in VTS
-          <i
-            class="material-icons notranslate cursor-pointer"
+
+          <IcBaselineHelp
+            class="cursor-pointer"
             data-bs-toggle="tooltip"
             data-bs-custom-class="wide-tooltip"
             data-bs-placement="auto"
             data-bs-html="true"
             data-bs-title="<img src='/vts/pics/allow.png'/>"
-            >help
-          </i>
+          />
         </p>
       </div>
       <div class="modal-footer">
@@ -2893,7 +2904,7 @@ wlqaw9WTLH5ZIgQjX69VmueRaYmSUMQgUVzAayGiYTyAP0M7+FNq81HwTIBVtzvM7vRa+M9ZiiyPbrVD
     <div class="col-lg-4 maincol">
       <div class="card infocard">
         <div class="card-body">
-          <button class="btn btn-info mainbuttons" onclick={addCommand()}><i class="material-icons notranslate">chat</i> Create New Chat Command</button>
+          <button class="btn btn-info mainbuttons" onclick={addCommand()}><IcBaselineChat /> Create New Chat Command</button>
 
           <button class="btn btn-info mainbuttons" id="createChannelPointsButton" data-bs-toggle="modal" data-bs-target="#addRewardModal">
             <svg type="color-fill-current" width="25px" height="25px" version="1.1" viewBox="0 0 20 20" x="0px" y="0px">
@@ -2941,7 +2952,7 @@ wlqaw9WTLH5ZIgQjX69VmueRaYmSUMQgUVzAayGiYTyAP0M7+FNq81HwTIBVtzvM7vRa+M9ZiiyPbrVD
             <div class="accordion-item">
               <h2 class="accordion-header" id="settingsAccordionHeader">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#settingsCollapse" aria-expanded="false" aria-controls="settingsCollapse">
-                  <i class="material-icons notranslate">settings</i>Settings
+                  <IcBaselineSettings />Settings
                 </button>
               </h2>
               <div id="settingsCollapse" class="accordion-collapse collapse" aria-labelledby="settingsAccordionHeader" data-bs-parent="#settingsAccordion">
@@ -2965,12 +2976,12 @@ wlqaw9WTLH5ZIgQjX69VmueRaYmSUMQgUVzAayGiYTyAP0M7+FNq81HwTIBVtzvM7vRa+M9ZiiyPbrVD
                               <small class="text-body-secondary">How long viewers have to wait before using another chat command</small>
                               <div class="form-check form-switch mt-3">
                                 <input class="form-check-input" type="checkbox" id="hideDefault" onchange={saveSettings()} checked />
-                                <label class="form-check-label" for="hideDefault"><i class="material-icons notranslate">visibility_off</i> Hide default models</label><br />
+                                <label class="form-check-label" for="hideDefault"><IcBaselineVisibilityOff /> Hide default models</label><br />
                                 <small class="text-body-secondary">Hides the pre-installed models that come with VTS and only shows your models</small>
                               </div>
                               <hr />
                               <button type="button" id="exportBackup" onclick={exportBackup()} class="btn btn-primary mt-3">
-                                <i class="material-icons notranslate">file_download</i> Export backup
+                                <IcBaselineFileDownload /> Export backup
                               </button>
                               <br />
                               <small class="text-body-secondary"> Makes a backup of all your commands/rewards/alerts</small>
@@ -2978,7 +2989,7 @@ wlqaw9WTLH5ZIgQjX69VmueRaYmSUMQgUVzAayGiYTyAP0M7+FNq81HwTIBVtzvM7vRa+M9ZiiyPbrVD
                               <div class="input-group mt-3">
                                 <input type="file" accept=".json" class="form-control" id="backupInput" aria-describedby="importBackup" aria-label="Upload" />
                                 <button class="btn btn-outline-success" type="button" data-bs-toggle="modal" data-bs-target="#importModal">
-                                  <i class="material-icons notranslate">file_upload</i> Import backup
+                                  <IcBaselineFileUpload /> Import backup
                                 </button>
                               </div>
                               <small class="text-body-secondary"> Restores your commands/rewards/alerts from a backup</small>
@@ -3050,7 +3061,7 @@ wlqaw9WTLH5ZIgQjX69VmueRaYmSUMQgUVzAayGiYTyAP0M7+FNq81HwTIBVtzvM7vRa+M9ZiiyPbrVD
             <li>The site needs to be open during your stream so that it can listen to commands/rewards and execute them.</li>
           </ul>
           More info and hotkey examples can be found on the
-          <a target="_blank" rel="noopener noreferrer" href="/vts/help"><i class="material-icons notranslate">help_outline</i> help page</a>.
+          <a target="_blank" rel="noopener noreferrer" href="/vts/help"><IcBaselineHelpOutline /> help page</a>.
         </div>
       </div>
     </div>

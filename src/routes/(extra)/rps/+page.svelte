@@ -1,7 +1,13 @@
 <script>
   import { onMount } from "svelte";
-
   import { animate } from "animejs";
+
+  import IcBaselineTune from "~icons/ic/baseline-tune";
+  import IcBaselineRocketLaunch from "~icons/ic/baseline-rocket-launch";
+  import IcBaselineArrowForwardIos from "~icons/ic/baseline-arrow-forward-ios";
+  import IcBaselineInfo from "~icons/ic/baseline-info";
+
+  import IcBaselineContentCopy from "~icons/ic/baseline-content-copy";
 
   let elements;
   onMount(async () => {
@@ -421,11 +427,11 @@
     </div>
     <div class="col-4">
       <div class="card w-75 mb-5">
-        <div class="card-header"><i class="material-icons notranslate">tune</i>Game controls</div>
+        <div class="card-header"><IcBaselineTune /> Game controls</div>
         <div class="card-body">
-          <button onclick={start} id="start" type="button" class="btn btn-primary mb-3"><i class="material-icons notranslate">rocket_launch</i>Start new game</button>
+          <button onclick={start} id="start" type="button" class="btn btn-primary mb-3"><IcBaselineRocketLaunch />Start new game</button>
           <br />
-          <button onclick={next} id="next" type="button" class="btn btn-info mb-3"><i class="material-icons notranslate">arrow_forward_ios</i>Next round</button>
+          <button onclick={next} id="next" type="button" class="btn btn-info mb-3"><IcBaselineArrowForwardIos />Next round</button>
           <br />
           <div class="input-group">
             <span class="input-group-text">Game link</span>
@@ -440,14 +446,14 @@
               data-bs-content="Link copied :)"
               onclick={copyLink}
             >
-              <i class="material-icons notranslate">content_copy</i>
+              <IcBaselineContentCopy />
             </button>
           </div>
         </div>
       </div>
 
       <div class="card w-75">
-        <div class="card-header"><i class="material-icons notranslate">info</i>Info</div>
+        <div class="card-header"><IcBaselineInfo />Info</div>
         <div class="card-body text-start">
           <span class="text-body-secondary">What is this?</span><br />
           This is an interactive Rock Paper Scissors game that you can play with your Twitch chat.<br />

@@ -1,20 +1,60 @@
 <script>
-  import {
-    checkToken,
-    convertTwitchVODDuration,
-    enableTooltips,
-    escapeString,
-    formatViewCount,
-    get7TVPFP,
-    getTwitchPFP,
-    loadBadges,
-    replacer,
-    secondsToTimeString,
-    sendUsername,
-    showToast,
-    timeStringToSeconds,
-    timeToSeconds,
-  } from "$lib/functions";
+  import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
+  import IcBaselineVisibility from "~icons/ic/baseline-visibility";
+  import IcBaselineSettings from "~icons/ic/baseline-settings";
+  import IcBaselinePlaylistAddCheck from "~icons/ic/baseline-playlist-add-check";
+  import IcBaselinePlaylistPlay from "~icons/ic/baseline-playlist-play";
+  import IcBaselinePlaylistRemove from "~icons/ic/baseline-playlist-remove";
+  import IcBaselineDeleteSweep from "~icons/ic/baseline-delete-sweep";
+  import IcBaselineFileDownload from "~icons/ic/baseline-file-download";
+  import IcBaselineAdd from "~icons/ic/baseline-add";
+  import IcBaselineHelp from "~icons/ic/baseline-help";
+  import IcBaselineSkipNext from "~icons/ic/baseline-skip-next";
+  import IcBaselineSkipPrevious from "~icons/ic/baseline-skip-previous";
+  import IcBaselineContentCopy from "~icons/ic/baseline-content-copy";
+  import IcBaselineVolumeUp from "~icons/ic/baseline-volume-up";
+  import IcBaselinePause from "~icons/ic/baseline-pause";
+  import IcBaselinePlayArrow from "~icons/ic/baseline-play-arrow";
+  import IcBaselineAccessTimeFilled from "~icons/ic/baseline-access-time-filled";
+  import IcBaselineFavorite from "~icons/ic/baseline-favorite";
+  import IcBaselineFavoriteBorder from "~icons/ic/baseline-favorite-border";
+  import IcBaselineHeartBroken from "~icons/ic/baseline-heart-broken";
+  import IcBaselineHistory from "~icons/ic/baseline-history";
+  import IcBaselineAccountCircle from "~icons/ic/baseline-account-circle";
+  import IcBaselineInfo from "~icons/ic/baseline-info";
+  import IcBaselineDelete from "~icons/ic/baseline-delete";
+  import IcBaselinePlayCircle from "~icons/ic/baseline-play-circle";
+  import IcBaselineDoubleArrow from "~icons/ic/baseline-double-arrow";
+  import IcBaselineMoreVert from "~icons/ic/baseline-more-vert";
+  import IcBaselineSmartToy from "~icons/ic/baseline-smart-toy";
+  import IcBaselineLink from "~icons/ic/baseline-link";
+  import IcBaselineLanguage from "~icons/ic/baseline-language";
+  import IcBaselineGroup from "~icons/ic/baseline-group";
+  import IcBaselineHourglassTop from "~icons/ic/baseline-hourglass-top";
+  import IcBaselineGavel from "~icons/ic/baseline-gavel";
+  import IcBaselineRule from "~icons/ic/baseline-rule";
+  import IcBaselineFormatListNumbered from "~icons/ic/baseline-format-list-numbered";
+  import IcBaselineLightbulb from "~icons/ic/baseline-lightbulb";
+  import IcBaselineVerifiedUser from "~icons/ic/baseline-verified-user";
+  import IcBaselineShield from "~icons/ic/baseline-shield";
+  import IcBaselineIncompleteCircle from "~icons/ic/baseline-incomplete-circle";
+  import IcBaselineHowToVote from "~icons/ic/baseline-how-to-vote";
+  import IcBaselineChat from "~icons/ic/baseline-chat";
+  import IcBaselineHistoryToggleOff from "~icons/ic/baseline-history-toggle-off";
+  import IcBaselineCalendarMonth from "~icons/ic/baseline-calendar-month";
+  import IcBaselineDateRange from "~icons/ic/baseline-date-range";
+  import IcBaselineCalendarToday from "~icons/ic/baseline-calendar-today";
+  import IcBaselineTimelapse from "~icons/ic/baseline-timelapse";
+  import IcBaselineSchedule from "~icons/ic/baseline-schedule";
+  import IcBaselineChecklist from "~icons/ic/baseline-checklist";
+  import IcBaselineLiveTv from "~icons/ic/baseline-live-tv";
+  import MdiTwitch from "~icons/mdi/twitch";
+  import MdiYoutube from "~icons/mdi/youtube";
+  import MdiSpotify from "~icons/mdi/spotify";
+  import MdiVimeo from "~icons/mdi/vimeo";
+  import IcBaselineTiktok from "~icons/ic/baseline-tiktok";
+
+  import { convertTwitchVODDuration, enableTooltips, escapeString, formatViewCount, replacer, secondsToTimeString, showToast, timeStringToSeconds, timeToSeconds } from "$lib/functions";
   import { animate } from "animejs";
   import { onMount } from "svelte";
   import localforage from "localforage";
@@ -3316,7 +3356,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick={clearHistory}><i class="material-icons notranslate">delete_forever</i>Clear</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick={clearHistory}><IcBaselineDeleteForever />Clear</button>
       </div>
     </div>
   </div>
@@ -3334,7 +3374,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick={clearFavorites}><i class="material-icons notranslate">heart_broken</i>Clear</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick={clearFavorites}><IcBaselineHeartBroken />Clear</button>
       </div>
     </div>
   </div>
@@ -3452,19 +3492,19 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title"><i class="material-icons notranslate">gavel</i>Ban list</h5>
+        <h5 class="modal-title"><IcBaselineGavel />Ban list</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body p-0">
         <ul class="nav nav-tabs bg-body-tertiary" role="tablist">
           <li class="nav-item" role="presentation">
             <button class="nav-link active" id="usersTab" data-bs-toggle="tab" data-bs-target="#users-tab-pane" type="button" role="tab" aria-controls="users-tab-pane" aria-selected="true">
-              <i class="material-icons notranslate">people</i>Users
+              <IcBaselineGroup />Users
             </button>
           </li>
           <li class="nav-item" role="presentation">
             <button class="nav-link" id="itemsTab" data-bs-toggle="tab" data-bs-target="#items-tab-pane" type="button" role="tab" aria-controls="items-tab-pane" aria-selected="false">
-              <i class="material-icons notranslate">play_arrow</i>Videos/Songs
+              <IcBaselinePlayArrow />Videos/Songs
             </button>
           </li>
           <li class="nav-item" role="presentation">
@@ -3478,14 +3518,14 @@
               aria-controls="channels-tab-pane"
               aria-selected="false"
             >
-              <i class="material-icons notranslate">live_tv</i>Channels/Artists
+              <IcBaselineLiveTv />Channels/Artists
             </button>
           </li>
         </ul>
         <div class="tab-content">
           <div class="tab-pane fade show active" id="users-tab-pane" role="tabpanel" aria-labelledby="usersTab" tabindex="0">
             <button class="btn btn-outline-warning m-2" type="button" onclick={unbanAllUsers}>
-              <i class="material-icons notranslate">delete_forever</i>Unban all (<span id="bannedUserCount">0 Users</span>)
+              <IcBaselineDeleteForever />Unban all (<span id="bannedUserCount">0 Users</span>)
             </button>
 
             <div id="bannedUsersListDiv">
@@ -3494,7 +3534,7 @@
           </div>
           <div class="tab-pane fade" id="items-tab-pane" role="tabpanel" aria-labelledby="itemsTab" tabindex="0">
             <button class="btn btn-outline-warning m-2" type="button" onclick={unbanAllItems}>
-              <i class="material-icons notranslate">delete_forever</i>Unban all (<span id="bannedItemCount">0 Videos/Songs</span>)
+              <IcBaselineDeleteForever />Unban all (<span id="bannedItemCount">0 Videos/Songs</span>)
             </button>
 
             <div id="bannedItemsListDiv">
@@ -3503,7 +3543,7 @@
           </div>
           <div class="tab-pane fade" id="channels-tab-pane" role="tabpanel" aria-labelledby="channelsTab" tabindex="0">
             <button class="btn btn-outline-warning m-2" type="button" onclick={unbanAllChannels}>
-              <i class="material-icons notranslate">delete_forever</i>Unban all (<span id="bannedChannelCount">0 Channels/Artists</span>)
+              <IcBaselineDeleteForever />Unban all (<span id="bannedChannelCount">0 Channels/Artists</span>)
             </button>
 
             <div id="bannedChannelsListDiv">
@@ -3529,22 +3569,22 @@
 
 <div class="offcanvas offcanvas-start" tabindex="-1" id="settingsOffcanvas" aria-labelledby="settingsOffcanvasLabel">
   <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="settingsOffcanvasLabel"><i class="material-icons notranslate">settings</i>Settings</h5>
+    <h5 class="offcanvas-title" id="settingsOffcanvasLabel"><IcBaselineSettings />Settings</h5>
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
     <div class="card mb-3">
       <div class="card-header">
-        <span class="align-middle"><i class="material-icons notranslate">checklist</i>Enabled Platforms</span>
+        <span class="align-middle"><IcBaselineChecklist />Enabled Platforms</span>
         <button type="button" class="btn btn-sm btn-primary float-end" data-bs-toggle="modal" data-bs-target="#platformsInfoModal">
-          <i class="material-icons notranslate">info</i> Platform support details
+          <IcBaselineInfo /> Platform support details
         </button>
       </div>
       <div class="card-body">
         <div class="container-fluid">
           <div class="row">
             <div class="col-xl-4">
-              <h6>Spotify</h6>
+              <h6><MdiSpotify />Spotify</h6>
               <div class="form-check form-switch mb-3">
                 <input class="form-check-input" type="checkbox" role="switch" id="allowSpotifySongs" onchange={saveSettings} checked />
                 <label class="form-check-label" for="allowSpotifySongs">Songs</label>
@@ -3556,14 +3596,14 @@
                 <label class="form-check-label" for="allowStreamable">Videos</label>
               </div>
 
-              <h6>TikTok</h6>
+              <h6><IcBaselineTiktok />TikTok</h6>
               <div class="form-check form-switch mb-3">
                 <input class="form-check-input" type="checkbox" role="switch" id="allowTiktokVideos" onchange={saveSettings} checked />
                 <label class="form-check-label" for="allowTiktokVideos">Videos</label>
               </div>
             </div>
             <div class="col-xl-4">
-              <h6>Twitch</h6>
+              <h6><MdiTwitch />Twitch</h6>
               <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchClips" onchange={saveSettings} checked />
                 <label class="form-check-label" for="allowTwitchClips">Clips</label>
@@ -3577,14 +3617,14 @@
                 <label class="form-check-label" for="allowTwitchVODs">VODs</label>
               </div>
 
-              <h6>Vimeo</h6>
+              <h6><MdiVimeo />Vimeo</h6>
               <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" role="switch" id="allowVimeoVideos" onchange={saveSettings} checked />
                 <label class="form-check-label" for="allowVimeoVideos">Videos</label>
               </div>
             </div>
             <div class="col-xl-4">
-              <h6>YouTube</h6>
+              <h6><MdiYoutube />YouTube</h6>
               <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" role="switch" id="allowYTStreams" onchange={saveSettings} checked />
                 <label class="form-check-label" for="allowYTStreams">Live Streams</label>
@@ -3604,10 +3644,10 @@
     </div>
 
     <div class="card mb-3">
-      <div class="card-header"><i class="material-icons notranslate">settings</i>Playlist limits</div>
+      <div class="card-header"><IcBaselineSettings />Playlist limits</div>
       <div class="card-body">
         <div class="input-group">
-          <span class="input-group-text"><i class="material-icons notranslate">schedule</i>Max playlist duration</span>
+          <span class="input-group-text"><IcBaselineSchedule />Max playlist duration</span>
           <input type="number" aria-label="Max playlist duration" id="maxDuration" placeholder="Unlimited" min="1" class="form-control" onchange={saveSettings} />
           <select class="form-select" id="maxDurationUnit" onchange={saveSettings}>
             <option selected value="m">Minutes</option>
@@ -3617,38 +3657,36 @@
         <small class="text-body-secondary">The max duration of all requests added up</small>
 
         <div class="input-group mt-3">
-          <span class="input-group-text"><i class="material-icons notranslate">timelapse</i>Max song/video length</span>
+          <span class="input-group-text"><IcBaselineTimelapse />Max song/video length</span>
           <input type="number" aria-label="Max song/video length" id="maxLength" placeholder="Unlimited" min="1" class="form-control" onchange={saveSettings} />
           <span class="input-group-text">Minutes</span>
         </div>
         <small class="text-body-secondary">How long a single request can be</small>
 
         <div class="input-group mt-3">
-          <span class="input-group-text"><i class="material-icons notranslate">format_list_numbered</i>Max playlist size</span>
+          <span class="input-group-text"><IcBaselineFormatListNumbered />Max playlist size</span>
           <input type="number" aria-label="Max playlist length" id="maxSize" placeholder="Unlimited" min="1" class="form-control" onchange={saveSettings} />
         </div>
         <small class="text-body-secondary">How many requests are allowed to be in the playlist</small>
 
         <div class="input-group mt-3">
-          <span class="input-group-text"><i class="material-icons notranslate">visibility</i>Min view count</span>
+          <span class="input-group-text"><IcBaselineVisibility />Min view count</span>
           <input type="number" aria-label="Minimum view count" id="minViewCount" placeholder="Unlimited" min="1" class="form-control" onchange={saveSettings} />
         </div>
         <small class="text-body-secondary">Requests that have a view count lower than the limit will be blocked</small>
 
         <p class="mt-3 mb-0">
-          <i class="material-icons notranslate">calendar_today</i>Content age limits
-          <i
-            class="material-icons notranslate"
+          <IcBaselineCalendarToday />Content age limits
+
+          <IcBaselineHelp
             data-bs-toggle="tooltip"
             data-bs-placement="top"
             data-bs-html="true"
             data-bs-title="Set one or both fields to limit how old or new a request can be<br><i>Leave empty to disable</i>"
-          >
-            help
-          </i>
+          />
         </p>
         <div class="input-group">
-          <span class="input-group-text"><i class="material-icons notranslate">date_range</i>Older than</span>
+          <span class="input-group-text"><IcBaselineDateRange />Older than</span>
           <input type="number" aria-label="Min upload age" id="minUploadAge" placeholder="Unlimited" min="1" class="form-control" onchange={saveSettings} />
           <select class="form-select" id="minUploadAgeUnit" onchange={saveSettings}>
             <option selected value="h">Hours</option>
@@ -3658,7 +3696,7 @@
           </select>
         </div>
         <div class="input-group mt-1">
-          <span class="input-group-text"><i class="material-icons notranslate">calendar_month</i>Newer than</span>
+          <span class="input-group-text"><IcBaselineCalendarMonth />Newer than</span>
           <input type="number" aria-label="Max upload age" id="maxUploadAge" placeholder="Unlimited" min="1" class="form-control" onchange={saveSettings} />
           <select class="form-select" id="maxUploadAgeUnit" onchange={saveSettings}>
             <option selected value="h">Hours</option>
@@ -3671,10 +3709,10 @@
 
         <div class="form-check form-switch mt-3">
           <input class="form-check-input" type="checkbox" role="switch" id="uniqueOnly" onchange={saveSettings} />
-          <label class="form-check-label" for="uniqueOnly"><i class="material-icons notranslate">history_toggle_off</i>Skip non unique requests</label>
+          <label class="form-check-label" for="uniqueOnly"><IcBaselineHistoryToggleOff />Skip non unique requests</label>
           <br />
           <small class="text-body-secondary">
-            Any request found in the <span class="text-primary"><i class="material-icons notranslate">history</i>History</span> tab will be skipped
+            Any request found in the <span class="text-primary"><IcBaselineHistory />History</span> tab will be skipped
           </small>
         </div>
       </div>
@@ -3687,24 +3725,24 @@
     </div>
 
     <div class="card mb-3">
-      <div class="card-header"><i class="material-icons notranslate">chat</i>Chat Commands</div>
+      <div class="card-header"><IcBaselineChat />Chat Commands</div>
       <div class="card-body">
         <div class="input-group">
-          <span class="input-group-text"><i class="material-icons notranslate">add</i>Request</span>
+          <span class="input-group-text"><IcBaselineAdd />Request</span>
           <input type="text" id="requestCommand" data-default="!request" value="!request" aria-label="Request command" placeholder="command" class="form-control" onchange={saveSettings} />
           <input type="text" id="requestCommandAlias" data-default="!r" value="!r" aria-label="Request command alias" placeholder="alias" class="form-control" onchange={saveSettings} />
         </div>
         <div class="form-check form-switch">
           <input class="form-check-input" type="checkbox" role="switch" id="noCommand" onchange={saveSettings} />
-          <label class="form-check-label" for="noCommand"><i class="material-icons notranslate">link</i>Add any supported link in chat to the playlist</label>
+          <label class="form-check-label" for="noCommand"><IcBaselineLink />Add any supported link in chat to the playlist</label>
         </div>
 
         <div class="form-check form-switch mt-5">
           <input class="form-check-input" type="checkbox" role="switch" id="allowVoteSkip" onchange={saveSettings} />
-          <label class="form-check-label" for="allowVoteSkip"><i class="material-icons notranslate">how_to_vote</i>Allow viewers to vote skip</label>
+          <label class="form-check-label" for="allowVoteSkip"><IcBaselineHowToVote />Allow viewers to vote skip</label>
         </div>
         <div class="input-group mb-1">
-          <span class="input-group-text"><i class="material-icons notranslate">double_arrow</i> Vote Skip command</span>
+          <span class="input-group-text"><IcBaselineDoubleArrow /> Vote Skip command</span>
           <input
             type="text"
             id="voteskipCommand"
@@ -3718,14 +3756,14 @@
           <input type="text" id="voteskipCommandAlias" data-default="!vs" value="!vs" aria-label="vote skip command alias" placeholder="alias" class="form-control" onchange={saveSettings} />
         </div>
         <div class="input-group mb-5">
-          <span class="input-group-text"><i class="material-icons notranslate">incomplete_circle</i> Skip after</span>
+          <span class="input-group-text"><IcBaselineIncompleteCircle /> Skip after</span>
           <input type="number" aria-label="vote skip votes needed" id="voteskipCount" placeholder="100" value="100" min="1" class="form-control" onchange={saveSettings} />
           <span class="input-group-text">votes</span>
         </div>
 
         <div class="form-check form-switch mb-3">
           <input class="form-check-input" type="checkbox" role="switch" id="enableBot" onchange={saveSettings} />
-          <label class="form-check-label" for="enableBot"><i class="material-icons notranslate">smart_toy</i>Enable chat bot</label>
+          <label class="form-check-label" for="enableBot"><IcBaselineSmartToy />Enable chat bot</label>
           <br />
           <small class="text-body-secondary">
             Enables the bot commands below and adds confirmation replies for some commands - Make sure to mod the bot <kbd>/mod chatvote</kbd> so that it can post links without getting timed
@@ -3733,13 +3771,13 @@
           </small>
         </div>
         <div class="input-group mb-3">
-          <span class="input-group-text"><i class="material-icons notranslate">hourglass_top</i>Bot commands cooldown</span>
+          <span class="input-group-text"><IcBaselineHourglassTop />Bot commands cooldown</span>
           <input type="number" aria-label="Bot commands cooldown" id="botCooldown" placeholder="1" value="1" min="1" class="form-control" onchange={saveSettings} />
           <span class="input-group-text">seconds</span>
         </div>
         <h6>Bot Commands</h6>
         <div class="input-group mb-3">
-          <span class="input-group-text"><i class="material-icons notranslate">link</i>Request name & link</span>
+          <span class="input-group-text"><IcBaselineLink />Request name & link</span>
           <input type="text" id="songCommand" data-default="!song" value="!song" aria-label="Song name command" placeholder="command" class="form-control" onchange={saveSettings} />
           <input
             type="text"
@@ -3753,7 +3791,7 @@
           />
         </div>
         <div class="input-group mb-3">
-          <span class="input-group-text"><i class="material-icons notranslate">language</i>Playlist link</span>
+          <span class="input-group-text"><IcBaselineLanguage />Playlist link</span>
           <input
             type="text"
             id="playlistCommand"
@@ -3770,7 +3808,7 @@
     </div>
 
     <div class="card mb-3">
-      <div class="card-header"><i class="material-icons notranslate">group</i>Who can send requests</div>
+      <div class="card-header"><IcBaselineGroup />Who can send requests</div>
       <div class="card-body">
         <p id="whoCanRequest">Everyone will be able to request.<br />Everyone will get 1 request.</p>
         <table class="table table-hover">
@@ -3779,15 +3817,13 @@
               <th scope="col">Role</th>
               <th scope="col">
                 Request limit
-                <i
-                  class="material-icons notranslate"
+
+                <IcBaselineInfo
                   data-bs-toggle="tooltip"
                   data-bs-placement="top"
                   data-bs-html="true"
                   data-bs-title="<i>Leave empty for unlimited requests</i><br>The final limit for each user will be based on the highest role limit they have"
-                >
-                  info
-                </i>
+                />
               </th>
             </tr>
           </thead>
@@ -3858,19 +3894,19 @@
     </div>
 
     <div class="card mb-3">
-      <div class="card-header"><i class="material-icons notranslate">shield</i>Moderation Settings</div>
+      <div class="card-header"><IcBaselineShield />Moderation Settings</div>
       <div class="card-body">
-        <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#banlistModal"><i class="material-icons notranslate">gavel</i>Ban list</button>
+        <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#banlistModal"><IcBaselineGavel />Ban list</button>
 
         <div class="form-check form-switch mb-3" style="display: none">
           <input disabled class="form-check-input" type="checkbox" role="switch" id="approvalQueue" />
-          <label class="form-check-label" for="approvalQueue"><i class="material-icons notranslate">rule</i>Approval queue</label>
+          <label class="form-check-label" for="approvalQueue"><IcBaselineRule />Approval queue</label>
           <br /><small class="text-body-secondary">Requests will have to be manually approved by you before they get added to the playlist</small>
         </div>
 
         <h6>Moderation Commands</h6>
         <div class="input-group mb-1">
-          <span class="input-group-text"><i class="material-icons notranslate">playlist_add_check</i>Open playlist</span>
+          <span class="input-group-text"><IcBaselinePlaylistAddCheck />Open playlist</span>
           <input
             type="text"
             id="openCommand"
@@ -3883,7 +3919,7 @@
           />
         </div>
         <div class="input-group mb-1">
-          <span class="input-group-text"><i class="material-icons notranslate">playlist_remove</i>Close playlist</span>
+          <span class="input-group-text"><IcBaselinePlaylistRemove />Close playlist</span>
           <input
             type="text"
             id="closeCommand"
@@ -3896,15 +3932,15 @@
           />
         </div>
         <div class="input-group mb-1">
-          <span class="input-group-text"><i class="material-icons notranslate">play_arrow</i>Play current request</span>
+          <span class="input-group-text"><IcBaselinePlayArrow />Play current request</span>
           <input type="text" id="playCommand" data-default="!play" value="!play" aria-label="Play command" placeholder="Play command" class="form-control" onchange={saveSettings} />
         </div>
         <div class="input-group mb-1">
-          <span class="input-group-text"><i class="material-icons notranslate">pause</i>Pause current request</span>
+          <span class="input-group-text"><IcBaselinePause />Pause current request</span>
           <input type="text" id="pauseCommand" data-default="!pause" value="!pause" aria-label="Pause command" placeholder="Pause command" class="form-control" onchange={saveSettings} />
         </div>
         <div class="input-group mb-1">
-          <span class="input-group-text"><i class="material-icons notranslate">playlist_play</i>Toggle autoplay</span>
+          <span class="input-group-text"><IcBaselinePlaylistPlay />Toggle autoplay</span>
           <input
             type="text"
             id="autoplayCommand"
@@ -3917,11 +3953,11 @@
           />
         </div>
         <div class="input-group mb-1">
-          <span class="input-group-text"><i class="material-icons notranslate">skip_next</i>Skip current request</span>
+          <span class="input-group-text"><IcBaselineSkipNext />Skip current request</span>
           <input type="text" id="skipCommand" data-default="!skip" value="!skip" aria-label="Skip command" placeholder="Skip command" class="form-control" onchange={saveSettings} />
         </div>
         <div class="input-group mb-1">
-          <span class="input-group-text"><i class="material-icons notranslate">skip_previous</i>Go back to previous request</span>
+          <span class="input-group-text"><IcBaselineSkipPrevious />Go back to previous request</span>
           <input
             type="text"
             id="rewindCommand"
@@ -3935,15 +3971,14 @@
         </div>
         <div class="input-group mb-1">
           <span class="input-group-text">
-            <i class="material-icons notranslate">delete</i>Delete request by ID
-            <i
-              class="material-icons notranslate cursor-pointer"
+            <IcBaselineDelete />Delete request by ID
+
+            <IcBaselineHelp
+              class="cursor-pointer"
               data-bs-toggle="tooltip"
               data-bs-placement="top"
               data-bs-title="Mods will be able to delete requests by copying the command from your playlist.chat.vote/username page"
-            >
-              help
-            </i>
+            />
           </span>
           <input
             type="text"
@@ -3958,22 +3993,22 @@
         </div>
         <div class="form-check form-switch mb-3">
           <input class="form-check-input" type="checkbox" role="switch" id="modCommands" onchange={saveSettings} checked />
-          <label class="form-check-label" for="modCommands"><i class="material-icons notranslate">verified_user</i>Allow mods to use moderation commands</label>
+          <label class="form-check-label" for="modCommands"><IcBaselineVerifiedUser />Allow mods to use moderation commands</label>
         </div>
 
         <div class="form-check form-switch mb-3">
           <input class="form-check-input" type="checkbox" role="switch" id="enableFavorites" onchange={saveSettings} />
-          <label class="form-check-label" for="enableFavorites"><i class="material-icons notranslate">favorite</i>Enable request favoriting</label>
+          <label class="form-check-label" for="enableFavorites"><IcBaselineFavorite />Enable request favoriting</label>
           <br />
           <small class="text-body-secondary">
             Adds a button to the bottom bar that allows you to favorite a request<br />
-            Favorited requests can be seen in the <span class="text-primary"><i class="material-icons notranslate">history</i>History</span> tab<br />
+            Favorited requests can be seen in the <span class="text-primary"><IcBaselineHistory />History</span> tab<br />
             Clearing history will also clear favorites
           </small>
         </div>
 
         <small class="text-body-secondary">
-          <i class="material-icons notranslate">lightbulb</i> Tip: Mods can delete a request by
+          <IcBaselineLightbulb /> Tip: Mods can delete a request by
           <a class="link-body-emphasis" href="https://twitter.com/TwitchSupport/status/1070135668980871168" target="_blank" rel="noopener noreferrer"> deleteing the message in chat </a>
         </small>
       </div>
@@ -3988,7 +4023,7 @@
       data-bs-trigger="focus"
       data-bs-title="Are you sure?"
       data-bs-content="All settings will be reset and the page will reload<br><button type='button' class='btn btn-danger float-end my-3' onclick='resetSettings()'><i class='material-icons notranslate'>delete_forever</i>Reset settings</button>"
-      ><i class="material-icons notranslate">delete_forever</i>Reset all settings</a
+      ><IcBaselineDeleteForever />Reset all settings</a
     >
     <br />
     <small class="text-body-secondary">Resets all settings and reloads the page.</small>
@@ -4028,7 +4063,7 @@
           </h4>
           <div class="input-group mt-3">
             <input type="text" id="link" class="form-control" placeholder="Link" aria-label="Add link input text field" aria-describedby="addLink" />
-            <button class="btn btn-secondary" type="button" id="addLink" onclick={addLink} title="Or just press enter :)"><i class="material-icons notranslate">add</i>Add</button>
+            <button class="btn btn-secondary" type="button" id="addLink" onclick={addLink} title="Or just press enter :)"><IcBaselineAdd />Add</button>
           </div>
         </div>
       </div>
@@ -4047,7 +4082,7 @@
                 aria-controls="playlist-tab-pane"
                 aria-selected="true"
               >
-                <i class="material-icons notranslate">format_list_numbered</i>Playlist
+                <IcBaselineFormatListNumbered />Playlist
               </button>
             </li>
             <li class="nav-item" role="presentation" id="approvalTabButton" style="display: none">
@@ -4061,7 +4096,7 @@
                 aria-controls="approval-tab-pane"
                 aria-selected="false"
               >
-                <i class="material-icons notranslate">rule</i>Approval queue
+                <IcBaselineRule />Approval queue
               </button>
             </li>
             <li class="nav-item" role="presentation">
@@ -4075,7 +4110,7 @@
                 aria-controls="history-tab-pane"
                 aria-selected="false"
               >
-                <i class="material-icons notranslate">history</i>History
+                <IcBaselineHistory />History
               </button>
             </li>
           </ul>
@@ -4091,30 +4126,30 @@
             <div class="tab-pane fade" id="history-tab-pane" role="tabpanel" aria-labelledby="historyTab" tabindex="0">
               <div class="hstack gap-1 mt-2">
                 <div class="p-1 align-self-start">
-                  <h5 class="mb-2"><i class="material-icons notranslate">history</i>History (<span id="historyCount">0 requests</span>)</h5>
+                  <h5 class="mb-2"><IcBaselineHistory />History (<span id="historyCount">0 requests</span>)</h5>
 
                   <button class="btn btn-outline-warning" type="button" data-bs-toggle="modal" data-bs-target="#clearHistoryModal">
-                    <i class="material-icons notranslate">delete_forever</i>Clear history
+                    <IcBaselineDeleteForever />Clear history
                   </button>
                   <br /><small class="text-body-secondary">Will clear favorites also</small>
-                  <h6 class="mt-2"><i class="material-icons notranslate">download</i>Download history</h6>
+                  <h6 class="mt-2"><IcBaselineFileDownload />Download history</h6>
                   <div class="btn-group" role="group" aria-label="Download history">
-                    <button class="btn btn-outline-success" type="button" onclick={() => downloadHistory("json")}><i class="material-icons notranslate">download</i>JSON</button>
-                    <button class="btn btn-outline-success" type="button" onclick={() => downloadHistory("csv")}><i class="material-icons notranslate">download</i>CSV</button>
+                    <button class="btn btn-outline-success" type="button" onclick={() => downloadHistory("json")}><IcBaselineFileDownload />JSON</button>
+                    <button class="btn btn-outline-success" type="button" onclick={() => downloadHistory("csv")}><IcBaselineFileDownload />CSV</button>
                   </div>
                 </div>
                 <div class="vr"></div>
                 <div class="p-1 align-self-start">
-                  <h5 class="mb-2"><i class="material-icons notranslate">favorite</i>Favorites (<span id="favoriteCount">0 requests</span>)</h5>
+                  <h5 class="mb-2"><IcBaselineFavorite />Favorites (<span id="favoriteCount">0 requests</span>)</h5>
 
                   <button class="btn btn-outline-warning mb-2" type="button" data-bs-toggle="modal" data-bs-target="#clearFavoritesModal">
-                    <i class="material-icons notranslate">heart_broken</i>Clear favorites
+                    <IcBaselineHeartBroken />Clear favorites
                   </button>
 
-                  <h6><i class="material-icons notranslate">download</i>Download favorites</h6>
+                  <h6><IcBaselineFileDownload />Download favorites</h6>
                   <div class="btn-group mb-2" role="group" aria-label="Download favorites">
-                    <button class="btn btn-outline-success" type="button" onclick={() => downloadFavorites("json")}><i class="material-icons notranslate">download</i>JSON</button>
-                    <button class="btn btn-outline-success" type="button" onclick={() => downloadFavorites("csv")}><i class="material-icons notranslate">download</i>CSV</button>
+                    <button class="btn btn-outline-success" type="button" onclick={() => downloadFavorites("json")}><IcBaselineFileDownload />JSON</button>
+                    <button class="btn btn-outline-success" type="button" onclick={() => downloadFavorites("csv")}><IcBaselineFileDownload />CSV</button>
                   </div>
 
                   <div class="form-check form-switch">
@@ -4138,7 +4173,7 @@
       <div class="hstack gap-2">
         <div class="p-1">
           <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#settingsOffcanvas" aria-controls="settingsOffcanvas">
-            <i class="material-icons notranslate">settings</i> Settings
+            <IcBaselineSettings /> Settings
           </button>
         </div>
 
@@ -4157,7 +4192,7 @@
               data-bs-placement="top"
               data-bs-content="Link copied :)"
             >
-              <i class="material-icons notranslate">content_copy</i>
+              <IcBaselineContentCopy />
             </button>
           </div>
         </div>
@@ -4166,13 +4201,13 @@
 
         <div class="hstack gap-3 me-auto">
           <div>
-            <small class="bottomBarLabel"><i class="material-icons notranslate" style="font-size: 1rem; vertical-align: middle">play_circle_filled</i>Now playing</small>
+            <small class="bottomBarLabel"><IcBaselinePlayCircle style="font-size: 1rem; vertical-align: middle" />Now playing</small>
             <br />
             <span id="nowPlaying"><span class="text-body-secondary">Nothing <img src="/pics/donk.png" alt="donk" style="width: 16px; vertical-align: middle" /></span></span>
           </div>
 
           <div>
-            <small class="bottomBarLabel"><i class="material-icons notranslate" style="font-size: 1rem; vertical-align: middle">account_circle</i>Requested by</small>
+            <small class="bottomBarLabel"><IcBaselineAccountCircle style="font-size: 1rem; vertical-align: middle" />Requested by</small>
             <br />
             <span id="nowPlayingRequester"><span class="text-body-secondary">No one <img src="/pics/donk.png" alt="donk" style="width: 16px; vertical-align: middle" /></span></span>
           </div>
@@ -4182,16 +4217,14 @@
           <div id="nowPlayingBanButtons"></div>
 
           <div id="favoriteButtonDiv" style="display: none">
-            <i id="favoriteButton" onclick={favorite} class="material-icons notranslate" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Add to favorites">
-              favorite_border
-            </i>
+            <IcBaselineFavoriteBorder id="favoriteButton" onclick={favorite} data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Add to favorites" />
           </div>
         </div>
 
         <div class="vr"></div>
 
         <div>
-          <small class="bottomBarLabel"><i class="material-icons notranslate" style="font-size: 1rem; vertical-align: middle">access_time_filled</i>Playlist length</small><br />
+          <small class="bottomBarLabel"><IcBaselineAccessTimeFilled style="font-size: 1rem; vertical-align: middle" />Playlist length</small><br />
           <span id="playlistLength">00:00 (0 requests)</span>
         </div>
 
@@ -4210,7 +4243,7 @@
             data-bs-content="All videos/songs will be removed from the playlist including the current playing video <br>
                 <button type='button' class='btn btn-danger float-end mb-3' onclick='clearPlaylist()'><i class='material-icons notranslate'>delete_sweep</i>Clear</button>"
           >
-            <i class="material-icons notranslate">delete_sweep</i>Clear playlist
+            <IcBaselineDeleteSweep />Clear playlist
           </a>
 
           <button
@@ -4225,14 +4258,14 @@
             data-bs-title="Playlist closed"
             data-bs-content="A viewer is trying to request something but the playlist is closed"
           >
-            <i class="material-icons notranslate">playlist_add_check</i> Open Playlist
+            <IcBaselinePlaylistAddCheck /> Open Playlist
           </button>
         </div>
 
         <div class="vr"></div>
 
         <div>
-          <label class="bottomBarLabel" for="autoplay"><i class="material-icons notranslate">playlist_play</i>Autoplay</label><br />
+          <label class="bottomBarLabel" for="autoplay"><IcBaselinePlaylistPlay />Autoplay</label><br />
           <div class="form-check form-switch ms-4">
             <input class="form-check-input" type="checkbox" role="switch" id="autoplay" onchange={saveSettings} checked />
           </div>
@@ -4240,13 +4273,13 @@
 
         <div class="p-1">
           <div class="btn-group" role="group" aria-label="Playback controls">
-            <button type="button" class="btn btn-secondary" onclick={previousItem}><i class="material-icons notranslate">skip_previous</i></button>
-            <button type="button" class="btn btn-secondary" onclick={nextItem}><i class="material-icons notranslate">skip_next</i></button>
+            <button type="button" class="btn btn-secondary" onclick={previousItem}><IcBaselineSkipPrevious /></button>
+            <button type="button" class="btn btn-secondary" onclick={nextItem}><IcBaselineSkipNext /></button>
           </div>
         </div>
         <div class="p-1" style="display: none">
           <div class="hstack gap-1">
-            <i class="material-icons notranslate cursor-pointer" id="volumeSliderIcon" onclick={toggleMute}>volume_up</i>
+            <IcBaselineVolumeUp class="cursor-pointer" id="volumeSliderIcon" onclick={toggleMute} />
             <input type="range" class="form-range" min="0" value="50" max="100" id="volumeSlider" oninput={() => changeVolume} />
             <span id="volumeSliderValue">50</span>
           </div>

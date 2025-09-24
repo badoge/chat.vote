@@ -2,7 +2,38 @@
   import { onMount } from "svelte";
 
   import { animate, createTimeline, utils, createDraggable } from "animejs";
+  import IcBaselineRefresh from "~icons/ic/baseline-refresh";
+  import IcBaselineVisibility from "~icons/ic/baseline-visibility";
+  import IcBaselineSettings from "~icons/ic/baseline-settings";
+  import IcBaselineFileDownload from "~icons/ic/baseline-file-download";
+  import IcBaselineAdd from "~icons/ic/baseline-add";
+  import IcBaselineHelp from "~icons/ic/baseline-help";
+  import IcBaselineClose from "~icons/ic/baseline-close";
+  import IcBaselineAddCircleOutline from "~icons/ic/baseline-add-circle-outline";
+  import IcBaselineArrowForwardIos from "~icons/ic/baseline-arrow-forward-ios";
+  import IcBaselineLeaderboard from "~icons/ic/baseline-leaderboard";
+  import IcBaselineNavigateNext from "~icons/ic/baseline-navigate-next";
+  import IcBaselineLightbulb from "~icons/ic/baseline-lightbulb";
+  import IcBaselineThumbUp from "~icons/ic/baseline-thumb-up";
+  import IcBaselineZoomIn from "~icons/ic/baseline-zoom-in";
+  import IcBaselineZoomOut from "~icons/ic/baseline-zoom-out";
+  import IcBaselineLogin from "~icons/ic/baseline-login";
+  import IcBaselineWarning from "~icons/ic/baseline-warning";
+  import IcBaselineVolumeUp from "~icons/ic/baseline-volume-up";
+  import IcBaselineSearch from "~icons/ic/baseline-search";
+  import IcBaselineArrowBack from "~icons/ic/baseline-arrow-back";
+  import IcBaselineAutoAwesome from "~icons/ic/baseline-auto-awesome";
+  import IcBaselineWarningAmber from "~icons/ic/baseline-warning-amber";
+  import IcBaselineQueueMusic from "~icons/ic/baseline-queue-music";
+  import IcBaselineCreate from "~icons/ic/baseline-create";
+  import IcBaselineChat from "~icons/ic/baseline-chat";
 
+  import { addBadges, changeSiteLinkTarget, enablePopovers, enableTooltips, escapeString, getUserID, ISO8601ToSeconds, showToast } from "$lib/functions";
+  import localforage from "localforage";
+
+  /**
+   * @type {{ [x: string]: { classList: { contains: (arg0: string) => any; }; }; loginButton: any; enableVoting: any; enableVotingTierlist: any; tierlistEditorModal: any; previewModal: any; generateChatModal: any; generateModal: any; communityModal: any; startModal: any; startTriviaModal: any; publishedModal: any; importModal: any; previewModalBody: any; channelName: any; generateBracketType: any; formatSelect: any; bracketSettings: any; changeCommand: any; changeCommandCopy: any; averageScore: any; averageScoreCopy: any; keepVotingEnabled: any; keepVotingEnabledCopy: any; disableAnimations: any; disableAnimationsCopy: any; triviaPoints: any; questionTimer: any; questionTimerValue: any; triviaScoring: any; questionTimerDiv: any; oneChance: any; hideScore: any; hideScoreTierlist: any; importBracket: any; addBracketOption: any; addTriviaQuestion: any; tierlistItem: any; myBrackets: any; myTrivia: any; triviaUsers: any; bracketOptionsContainer: any; triviaQuestionsContainer: any; bracketTitle: any; triviaTitle: any; bracketDescription: any; triviaDescription: any; spotifyWarning: any; optionLimit: any; editor: any; bracket: any; title: any; winner: any; pickWinner: any; restart: any; left_card_header: any; right_card_header: any; left_title: any; right_title: any; centerTitle: any; winnerTitle: any; right_card: any; left_card: any; tierlistContainer: any; upcoming_thumbnails: any; tierlist: any; upcoming: any; triviaTitleCard: any; triviaDescriptionCard: any; trivia: any; triviaSettingsWarning: any; startTriviaButton: any; dismissTriviaSettingsButton: any; questionNumber: any; question: any; triviaAnswer: any; triviaChoices: any; triviaTimerDiv: any; showHint: any; choice1A: any; choice2A: any; choice3A: any; choice4A: any; choice1B: any; choice2B: any; choice3B: any; choice4B: any; round: any; left_command: any; right_command: any; currentTierlistItemName: any; text_image_tierlist: any; youtubeEmbedContainer_tierlist: any; twitchClipsEmbed_tierlist: any; spotifyEmbedContainer_tierlist: any; videoEmbed_tierlist: any; currentTierlistItem: any; triviaMedia: any; image_trivia: any; youtubeEmbedContainer_trivia: any; twitchClipsEmbed_trivia: any; spotifyEmbedContainer_trivia: any; videoEmbed_trivia: any; left_score: any; right_score: any; triviaEditor: any; bracketEditor: any; bracketEditorHeader: any; triviaEditorHeader: any; spotifyPlaylistLink: any; spotifyPlaylistPreview: any; tiermakerLink: any; tiermakerPreview: any; clipsChannel: any; clipsPreview: any; emotesChannel: any; emotesPreview: any; uwufufuLink: any; uwufufuPreview: any; ytchannelLink: any; ytchannelPreview: any; ytplaylistLink: any; ytplaylistPreview: any; bracketCode: any; bracketLink: any; importModalBody: any; shareCode: any; playlist: any; left_card_zoom_icon: any; right_card_zoom_icon: any; hideScoreIcon: any; hideScoreTierlistIcon: any; tierlistEditor: any; text_image_left: any; youtubeEmbedContainer_left: any; spotifyEmbedContainer_left: any; twitchClipsEmbed_left: any; videoEmbed_left: any; text_image_right: any; youtubeEmbedContainer_right: any; spotifyEmbedContainer_right: any; twitchClipsEmbed_right: any; videoEmbed_right: any; left_value: any; right_value: any; spotifyplaylistSettings?: HTMLElement | null; tiermakerSettings?: HTMLElement | null; clipsSettings?: HTMLElement | null; emotesSettings?: HTMLElement | null; uwufufuSettings?: HTMLElement | null; ytchannelSettings?: HTMLElement | null; ytplaylistSettings?: HTMLElement | null; communityModalBody?: HTMLElement | null; myBracketsModal?: HTMLElement | null; myBracketsModalBody?: HTMLElement | null; tierlistSettings?: NodeListOf<Element>; status?: HTMLElement | null; topRight?: HTMLElement | null; importTrivia?: HTMLElement | null; left_container?: HTMLElement | null; right_container?: HTMLElement | null; left_name?: HTMLElement | null; right_name?: HTMLElement | null; youtubeEmbed_left?: HTMLElement | null; spotifyEmbed_left?: HTMLElement | null; youtubeEmbed_right?: HTMLElement | null; spotifyEmbed_right?: HTMLElement | null; left_info?: HTMLElement | null; right_info?: HTMLElement | null; tierlistItemDrag?: HTMLElement | null; tierlistLabel0?: HTMLElement | null; tierlistLabel1?: HTMLElement | null; tierlistLabel2?: HTMLElement | null; tierlistLabel3?: HTMLElement | null; tierlistLabel4?: HTMLElement | null; tierlistLabel5?: HTMLElement | null; tierlistScore0?: HTMLElement | null; tierlistScore1?: HTMLElement | null; tierlistScore2?: HTMLElement | null; tierlistScore3?: HTMLElement | null; tierlistScore4?: HTMLElement | null; tierlistScore5?: HTMLElement | null; pickWinnerTierlist?: HTMLElement | null; youtubeEmbed_tierlist?: HTMLElement | null; spotifyEmbed_tierlist?: HTMLElement | null; triviaTimer?: HTMLElement | null; triviaUsersDiv?: HTMLElement | null; youtubeEmbed_trivia?: HTMLElement | null; spotifyEmbed_trivia?: HTMLElement | null; }}
+   */
   let elements;
   onMount(async () => {
     elements = {
@@ -3676,42 +3707,42 @@
       <div class="modal-body">
         <div class="hstack gap-3 mb-5">
           <button type="button" class="btn btn-info btn-lg" data-bs-dismiss="modal" id="importBracket">
-            <div class="hstack"><i class="material-icons notranslate">auto_awesome</i> Generate bracket</div>
+            <div class="hstack"><IcBaselineAutoAwesome /> Generate bracket</div>
           </button>
           Automatically generates a bracket from 3rd party sources
-          <i
-            class="material-icons notranslate cursor-pointer"
+
+          <IcBaselineHelp
+            class="cursor-pointer"
             data-bs-toggle="tooltip"
             data-bs-placement="top"
             data-bs-title="Sources include: Spotify playlists, TierMaker.com tier list, Twitch clips & emotes, UwUFUFU.com brackets, YouTube channels & playlists"
-            >help
-          </i>
+          />
         </div>
 
         <div class="hstack gap-3 mb-5">
           <button type="button" class="btn btn-success btn-lg" data-bs-dismiss="modal" onclick={createBracket()}>
-            <div class="hstack"><i class="material-icons notranslate">create</i> Create empty bracket</div>
+            <div class="hstack"><IcBaselineCreate /> Create empty bracket</div>
           </button>
           Creates an empty bracket that you have to fill out manually
         </div>
 
         <div class="hstack gap-3 mb-5">
           <button type="button" class="btn btn-secondary btn-lg" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#generateChatModal">
-            <div class="hstack"><i class="material-icons notranslate">chat</i> Chat bracket</div>
+            <div class="hstack"><IcBaselineChat /> Chat bracket</div>
           </button>
           Generates a bracket from chat's requests
-          <i
-            class="material-icons notranslate cursor-pointer"
+
+          <IcBaselineHelp
+            class="cursor-pointer"
             data-bs-toggle="tooltip"
             data-bs-placement="top"
             data-bs-title="Viewers will be able to add YouTube videos, Twitch clips, Spotify songs, Streamable videos"
-            >help
-          </i>
+          />
         </div>
 
         <div class="hstack gap-3">
           <button type="button" class="btn btn-primary btn-lg" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#communityModal">
-            <div class="hstack"><i class="material-icons notranslate">search</i> Import bracket</div>
+            <div class="hstack"><IcBaselineSearch /> Import bracket</div>
           </button>
           Download brackets created by other users
         </div>
@@ -3733,21 +3764,21 @@
       <div class="modal-body">
         <div class="hstack gap-3 mb-5">
           <button type="button" class="btn btn-info btn-lg" data-bs-dismiss="modal" id="importTrivia" disabled>
-            <div class="hstack"><i class="material-icons notranslate">auto_awesome</i> Generate trivia</div>
+            <div class="hstack"><IcBaselineAutoAwesome /> Generate trivia</div>
           </button>
           not working yet :) - Automatically generates trivia from 3rd party sources
         </div>
 
         <div class="hstack gap-3 mb-5">
           <button type="button" class="btn btn-success btn-lg" data-bs-dismiss="modal" onclick={createTrivia()}>
-            <div class="hstack"><i class="material-icons notranslate">create</i> Create empty trivia</div>
+            <div class="hstack"><IcBaselineCreate /> Create empty trivia</div>
           </button>
           Creates an empty trivia that you have to fill out manually
         </div>
 
         <div class="hstack gap-3">
           <button type="button" class="btn btn-primary btn-lg" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#communityModal" disabled>
-            <div class="hstack"><i class="material-icons notranslate">search</i> Import trivia</div>
+            <div class="hstack"><IcBaselineSearch /> Import trivia</div>
           </button>
           not working yet :) - Download trivia created by other users
         </div>
@@ -3770,17 +3801,15 @@
         <h4>How to use:</h4>
         <ul>
           <li>
-            Go to the <a href="/playlist/" target="_blank" rel="noopener noreferrer">chat.vote <i class="material-icons notranslate">queue_music</i> Playlist site</a>
+            Go to the <a href="/playlist/" target="_blank" rel="noopener noreferrer">chat.vote <IcBaselineQueueMusic /> Playlist site</a>
           </li>
           <li>
             Adjust settings (limits, platforms, etc)
-            <i class="material-icons notranslate text-warning cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Brackets don't support Twitch streams and VODs">
-              warning_amber
-            </i>
+            <IcBaselineWarningAmber class="text-warning cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Brackets don't support Twitch streams and VODs" />
           </li>
           <li>Viewers send requests on the Playlist site</li>
           <li>
-            <button type="button" class="btn btn-success" onclick={loadPlaylist()}><i class="material-icons notranslate">file_download</i> Load playlist</button>
+            <button type="button" class="btn btn-success" onclick={loadPlaylist()}><IcBaselineFileDownload /> Load playlist</button>
           </li>
         </ul>
 
@@ -3790,9 +3819,9 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#createBracketModal">
-          <i class="material-icons notranslate">arrow_back</i> Back
+          <IcBaselineArrowBack /> Back
         </button>
-        <button type="button" class="btn btn-success" onclick={generateChatBracket()}><i class="material-icons notranslate">auto_awesome</i> Generate</button>
+        <button type="button" class="btn btn-success" onclick={generateChatBracket()}><IcBaselineAutoAwesome /> Generate</button>
       </div>
     </div>
   </div>
@@ -3832,7 +3861,7 @@
               aria-label="Spotify Playlist link"
               aria-describedby="spotifyPlaylistLinkLabel"
             />
-            <button type="button" class="btn btn-outline-info" onclick={previewSpotifyPlaylist()}><i class="material-icons notranslate">file_download</i> Load</button>
+            <button type="button" class="btn btn-outline-info" onclick={previewSpotifyPlaylist()}><IcBaselineFileDownload /> Load</button>
           </div>
           <div id="spotifyPlaylistPreview" class="generate-preview"></div>
         </div>
@@ -3849,7 +3878,7 @@
               aria-label="TierMaker.com link"
               aria-describedby="tiermakerLinkLabel"
             />
-            <button type="button" class="btn btn-outline-info" onclick={previewTiermaker()}><i class="material-icons notranslate">file_download</i> Load</button>
+            <button type="button" class="btn btn-outline-info" onclick={previewTiermaker()}><IcBaselineFileDownload /> Load</button>
           </div>
           <div id="tiermakerPreview" class="generate-preview"></div>
         </div>
@@ -3859,7 +3888,7 @@
           <div class="input-group mb-3">
             <span class="input-group-text" id="clipsChannelLabel">twitch.tv/</span>
             <input type="text" class="form-control generate-value" id="clipsChannel" placeholder="username" aria-label="Twitch username" aria-describedby="clipsChannelLabel" />
-            <button type="button" class="btn btn-outline-info" onclick={previewClips()}><i class="material-icons notranslate">file_download</i> Load</button>
+            <button type="button" class="btn btn-outline-info" onclick={previewClips()}><IcBaselineFileDownload /> Load</button>
           </div>
           <div id="clipsPreview" class="generate-preview"></div>
         </div>
@@ -3869,7 +3898,7 @@
           <div class="input-group mb-3">
             <span class="input-group-text" id="emotesChannelLabel">twitch.tv/</span>
             <input type="text" class="form-control generate-value" id="emotesChannel" placeholder="username" aria-label="Twitch username" aria-describedby="emotesChannelLabel" />
-            <button type="button" class="btn btn-outline-info" onclick={previewEmotes()}><i class="material-icons notranslate">file_download</i> Load</button>
+            <button type="button" class="btn btn-outline-info" onclick={previewEmotes()}><IcBaselineFileDownload /> Load</button>
           </div>
           <div id="emotesPreview" class="generate-preview"></div>
         </div>
@@ -3886,7 +3915,7 @@
               aria-label="uwufufu URL"
               aria-describedby="uwufufuLinkLabel"
             />
-            <button type="button" class="btn btn-outline-info" onclick={previewUwufufu()}><i class="material-icons notranslate">file_download</i> Load</button>
+            <button type="button" class="btn btn-outline-info" onclick={previewUwufufu()}><IcBaselineFileDownload /> Load</button>
           </div>
           <div id="uwufufuPreview" class="generate-preview"></div>
         </div>
@@ -3896,7 +3925,7 @@
           <div class="input-group mb-3">
             <span class="input-group-text" id="ytchannelLinkLabel">YouTube handle</span>
             <input type="text" class="form-control generate-value" id="ytchannelLink" placeholder="@username" aria-label="YouTube channel URL" aria-describedby="ytchannelLinkLabel" />
-            <button type="button" class="btn btn-outline-info" onclick={previewYTChannel()}><i class="material-icons notranslate">file_download</i> Load</button>
+            <button type="button" class="btn btn-outline-info" onclick={previewYTChannel()}><IcBaselineFileDownload /> Load</button>
           </div>
           <div id="ytchannelPreview" class="generate-preview"></div>
         </div>
@@ -3913,16 +3942,16 @@
               aria-label="YouTube playlist URL"
               aria-describedby="ytplaylistLinkLabel"
             />
-            <button type="button" class="btn btn-outline-info" onclick={previewYTPlaylist()}><i class="material-icons notranslate">file_download</i> Load</button>
+            <button type="button" class="btn btn-outline-info" onclick={previewYTPlaylist()}><IcBaselineFileDownload /> Load</button>
           </div>
           <div id="ytplaylistPreview" class="generate-preview"></div>
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#createBracketModal">
-          <i class="material-icons notranslate">arrow_back</i> Back
+          <IcBaselineArrowBack /> Back
         </button>
-        <button type="button" class="btn btn-success" onclick={generateBracket()}><i class="material-icons notranslate">auto_awesome</i> Generate</button>
+        <button type="button" class="btn btn-success" onclick={generateBracket()}><IcBaselineAutoAwesome /> Generate</button>
       </div>
     </div>
   </div>
@@ -3940,7 +3969,7 @@
         <div class="input-group">
           <span class="input-group-text">Bracket code</span>
           <input type="text" class="form-control" placeholder="XXXX" id="shareCode" />
-          <button class="btn btn-outline-success" type="button" onclick={importCode()}><i class="material-icons notranslate">download</i>Import</button>
+          <button class="btn btn-outline-success" type="button" onclick={importCode()}><IcBaselineFileDownload />Import</button>
         </div>
         <!-- <hr />
             <button type="button" class="btn btn-info" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#myBracketsModal">
@@ -3949,7 +3978,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#createBracketModal">
-          <i class="material-icons notranslate">arrow_back</i> Back
+          <IcBaselineArrowBack /> Back
         </button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
@@ -3967,7 +3996,7 @@
       <div class="modal-body" style="max-height: 80vh; overflow: auto" id="importModalBody"></div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#communityModal">
-          <i class="material-icons notranslate">arrow_back</i> Back
+          <IcBaselineArrowBack /> Back
         </button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
@@ -3985,7 +4014,7 @@
       <div class="modal-body" style="max-height: 80vh; overflow: auto" id="myBracketsModalBody">not working yet :)</div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#communityModal">
-          <i class="material-icons notranslate">arrow_back</i> Back
+          <IcBaselineArrowBack /> Back
         </button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
@@ -4003,9 +4032,7 @@
       <div class="modal-body">
         Share your bracket with other users using the code
         <h2><kbd id="bracketCode"></kbd></h2>
-        <small class="text-body-secondary"
-          >To use the code click on <i class="material-icons notranslate">add_circle_outline</i> Create new bracket → <i class="material-icons notranslate">search</i> Import bracket</small
-        >
+        <small class="text-body-secondary">To use the code click on <IcBaselineAddCircleOutline /> Create new bracket → <IcBaselineSearch /> Import bracket</small>
         <hr />
         You can also share the bracket using this link
         <h3><kbd id="bracketLink"></kbd></h3>
@@ -4086,11 +4113,10 @@
 
         <div id="spotifyWarning" class="mt-5" style="display: none">
           <div class="alert alert-danger" role="alert">
-            <i class="material-icons notranslate">warning</i><i class="material-icons notranslate">volume_up</i> Spotify embeds don't have a volume slider; make sure to lower your volume before
-            starting
+            <IcBaselineWarning /><IcBaselineVolumeUp /> Spotify embeds don't have a volume slider; make sure to lower your volume before starting
           </div>
           <div class="alert alert-warning mt-1" role="alert">
-            <i class="material-icons notranslate">login</i> You must be logged in to Spotify on this browser to listen to the full songs; you will be given a 30s preview otherwise
+            <IcBaselineLogin /> You must be logged in to Spotify on this browser to listen to the full songs; you will be given a 30s preview otherwise
           </div>
         </div>
       </div>
@@ -4255,7 +4281,7 @@
       <div class="card option-card" id="left_card">
         <div class="card-header" id="left_card_header">
           Type <strong id="left_command">"1"</strong> in chat to vote for this option
-          <i class="material-icons notranslate float-end" id="left_card_zoom_icon" style="cursor: pointer" onclick={zoomCard("left_card")}>zoom_in</i>
+          <IcBaselineZoomIn class="notranslate float-end" id="left_card_zoom_icon" style="cursor: pointer" onclick={zoomCard("left_card")} />
         </div>
         <div class="card-body p-0" id="left_value">
           <div id="text_image_left" style="display: none"></div>
@@ -4273,7 +4299,7 @@
         data-bs-title="Vote for this option"
         onclick={streamerVote("left")}
       >
-        <i class="material-icons notranslate">thumb_up</i>
+        <IcBaselineThumbUp />
       </button>
       <button type="button" class="btn btn-success float-start mt-2" onclick={pickWinner("left")} style="display: none">Pick winner</button>
     </div>
@@ -4281,7 +4307,7 @@
       <div class="card option-card" id="right_card">
         <div class="card-header" id="right_card_header">
           Type <strong id="right_command">"2"</strong> in chat to vote for this option
-          <i class="material-icons notranslate float-start" id="right_card_zoom_icon" style="cursor: pointer" onclick={zoomCard("right_card")}>zoom_in</i>
+          <IcBaselineZoomIn class="float-start" id="right_card_zoom_icon" style="cursor: pointer" onclick={zoomCard("right_card")} />
         </div>
         <div class="card-body p-0" id="right_value">
           <div id="text_image_right" style="display: none"></div>
@@ -4300,7 +4326,7 @@
         data-bs-title="Vote for this option"
         onclick={streamerVote("right")}
       >
-        <i class="material-icons notranslate">thumb_up</i>
+        <IcBaselineThumbUp />
       </button>
       <button type="button" class="btn btn-success float-end mt-2" onclick={pickWinner("right")} style="display: none">Pick winner</button>
     </div>
@@ -4320,19 +4346,19 @@
           data-bs-title="Are you sure?"
           data-bs-content="Results will be lost if you quit<br> <button type='button' class='btn btn-danger float-end my-3' onclick='quit()'><i class='material-icons notranslate'>delete_forever</i>Quit</button>"
         >
-          <i class="material-icons notranslate">close</i>
+          <IcBaselineClose />
         </a>
       </span>
       <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Settings">
         <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#changeSettingsModal">
-          <i class="material-icons notranslate">settings</i>
+          <IcBaselineSettings />
         </button>
       </span>
       <button type="button" id="restart" class="btn btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Restart match" onclick={restartMatch()}>
-        <i class="material-icons notranslate">refresh</i>
+        <IcBaselineRefresh />
       </button>
       <button type="button" id="hideScore" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Hide score">
-        <i class="material-icons notranslate" id="hideScoreIcon">visibility</i>
+        <IcBaselineVisibility id="hideScoreIcon" />
       </button>
       <button
         type="button"
@@ -4348,7 +4374,7 @@
       >
         Start Voting
       </button>
-      <button type="button" id="pickWinner" class="btn btn-info" onclick={pickWinner()}><i class="material-icons notranslate">navigate_next</i>Next match</button>
+      <button type="button" id="pickWinner" class="btn btn-info" onclick={pickWinner()}><IcBaselineNavigateNext />Next match</button>
     </div>
   </div>
 </div>
@@ -4410,15 +4436,15 @@
         </button>
 
         <button type="button" id="hideScoreTierlist" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Hide score">
-          <i class="material-icons notranslate" id="hideScoreTierlistIcon">visibility</i>
+          <IcBaselineVisibility id="hideScoreTierlistIcon" />
         </button>
 
         <button type="button" class="btn btn-warning" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Restart round" onclick={restartMatch()}>
-          <i class="material-icons notranslate">refresh</i>
+          <IcBaselineRefresh />
         </button>
 
         <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#changeSettingsModal">
-          <i class="material-icons notranslate">settings</i>
+          <IcBaselineSettings />
         </button>
 
         <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Quit tier list">
@@ -4433,7 +4459,7 @@
             data-bs-title="Are you sure?"
             data-bs-content="Results will be lost if you quit<br> <button type='button' class='btn btn-danger float-end my-3' onclick='quit()'><i class='material-icons notranslate'>delete_forever</i>Quit</button>"
           >
-            <i class="material-icons notranslate">close</i>
+            <IcBaselineClose />
           </a>
         </span>
 
@@ -4452,10 +4478,10 @@
                       R: <strong>reset card position</strong><br>
                     </p>"
         >
-          <i class="material-icons notranslate">lightbulb</i>
+          <IcBaselineLightbulb />
         </button>
 
-        <button type="button" id="pickWinnerTierlist" class="btn btn-info" onclick={pickWinnerTierlist()}><i class="material-icons notranslate">navigate_next</i>Next item</button>
+        <button type="button" id="pickWinnerTierlist" class="btn btn-info" onclick={pickWinnerTierlist()}><IcBaselineNavigateNext />Next item</button>
       </div>
     </div>
   </div>
@@ -4533,7 +4559,7 @@
         <div class="accordion-item">
           <h2 class="accordion-header">
             <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#scoreCollapse" aria-expanded="true" aria-controls="scoreCollapse">
-              <i class="material-icons notranslate">leaderboard</i>Scores
+              <IcBaselineLeaderboard />Scores
             </button>
           </h2>
           <div id="scoreCollapse" class="accordion-collapse collapse show" data-bs-parent="#scoreAccordion">
@@ -4560,16 +4586,16 @@
           data-bs-title="Are you sure?"
           data-bs-content="Results will be lost if you quit<br> <button type='button' class='btn btn-danger float-end my-3' onclick='quit()'><i class='material-icons notranslate'>delete_forever</i>Quit</button>"
         >
-          <i class="material-icons notranslate">close</i>
+          <IcBaselineClose />
         </a>
       </span>
       <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Settings">
         <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#startTriviaModal">
-          <i class="material-icons notranslate">settings</i>
+          <IcBaselineSettings />
         </button>
       </span>
-      <button type="button" id="showAnswer" class="btn btn-warning" onclick={showAnswer()}><i class="material-icons notranslate">visibility</i>Show answer</button>
-      <button type="button" id="nextQuestion" class="btn btn-primary" onclick={nextQuestion()}><i class="material-icons notranslate">arrow_forward_ios</i>Next question</button>
+      <button type="button" id="showAnswer" class="btn btn-warning" onclick={showAnswer()}><IcBaselineVisibility />Show answer</button>
+      <button type="button" id="nextQuestion" class="btn btn-primary" onclick={nextQuestion()}><IcBaselineArrowForwardIos />Next question</button>
     </div>
   </div>
 </div>
@@ -4579,7 +4605,7 @@
     <div class="col-md-1"></div>
     <div class="col-md-5" id="lists">
       <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#createBracketModal">
-        <i class="material-icons notranslate">add_circle_outline</i> Create new bracket/tierlist
+        <IcBaselineAddCircleOutline /> Create new bracket/tierlist
       </button>
 
       <h1 class="display-3">My brackets/tierlists</h1>
@@ -4588,7 +4614,7 @@
       </div>
       <hr />
       <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#createTriviaModal">
-        <i class="material-icons notranslate">add_circle_outline</i> Create new trivia
+        <IcBaselineAddCircleOutline /> Create new trivia
       </button>
 
       <h1 class="display-3">My trivia</h1>
@@ -4599,7 +4625,7 @@
     <div class="col-md-5">
       <div class="card mt-3" id="bracketEditor" style="display: none">
         <div class="card-header">
-          Editing bracket <span id="bracketEditorHeader"></span><i class="material-icons notranslate float-end" style="cursor: pointer" onclick={closeBracketEditor()}>close</i>
+          Editing bracket <span id="bracketEditorHeader"></span><IcBaselineClose class="float-end" style="cursor: pointer" onclick={closeBracketEditor()} />
         </div>
         <div class="card-body" id="bracketEditorBody">
           <div class="mb-3">
@@ -4612,7 +4638,7 @@
             <textarea class="form-control" id="bracketDescription" onchange={saveBracket(true)} rows="2" placeholder="Bracket description"></textarea>
           </div>
 
-          <button type="button" class="btn btn-secondary btn-sm" id="addBracketOption"><i class="material-icons notranslate">add</i>Add option</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="addBracketOption"><IcBaselineAdd />Add option</button>
           <br /><small class="text-body-secondary">Tip: Preview the option to automatically populate the name and thumbnail if both are empty</small>
           <div id="bracketOptionsContainer" class="mb-3 mt-3"></div>
         </div>
@@ -4620,7 +4646,7 @@
 
       <div class="card mt-3" id="triviaEditor" style="display: none">
         <div class="card-header">
-          Editing trivia <span id="triviaEditorHeader"></span><i class="material-icons notranslate float-end" style="cursor: pointer" onclick={closeTriviaEditor()}>close</i>
+          Editing trivia <span id="triviaEditorHeader"></span><IcBaselineClose class="float-end" style="cursor: pointer" onclick={closeTriviaEditor()} />
         </div>
         <div class="card-body" id="triviaEditorBody">
           <div class="mb-3">
@@ -4647,7 +4673,7 @@
             </strong>
           </p>
 
-          <button type="button" class="btn btn-secondary btn-sm" id="addTriviaQuestion"><i class="material-icons notranslate">add</i>Add question</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="addTriviaQuestion"><IcBaselineAdd />Add question</button>
           <div id="triviaQuestionsContainer" class="mb-3 mt-3"></div>
         </div>
       </div>

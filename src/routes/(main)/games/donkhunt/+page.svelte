@@ -1,6 +1,34 @@
 <script>
   import { enablePopovers, enableTooltips } from "$lib/functions";
   import { onMount } from "svelte";
+  import IcBaselineRefresh from "~icons/ic/baseline-refresh";
+  import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
+  import IcBaselineVisibility from "~icons/ic/baseline-visibility";
+  import IcBaselineCasino from "~icons/ic/baseline-casino";
+  import IcBaselineSettings from "~icons/ic/baseline-settings";
+  import IcOutlineArrowDropUp from "~icons/ic/outline-arrow-drop-up";
+  import IcBaselineArrowDropDown from "~icons/ic/baseline-arrow-drop-down";
+  import IcBaselineStackedBarChart from "~icons/ic/baseline-stacked-bar-chart";
+  import IcBaselineToc from "~icons/ic/baseline-toc";
+  import IcBaselinePlusOne from "~icons/ic/baseline-plus-one";
+  import IcBaselineSwapHoriz from "~icons/ic/baseline-swap-horiz";
+  import IcBaselineAttachMoney from "~icons/ic/baseline-attach-money";
+  import IcBaselineNotificationImportant from "~icons/ic/baseline-notification-important";
+  import IcBaselinePreview from "~icons/ic/baseline-preview";
+  import IcBaselineCelebration from "~icons/ic/baseline-celebration";
+  import IcBaselineFileDownload from "~icons/ic/baseline-file-download";
+  import IcBaselineTimer from "~icons/ic/baseline-timer";
+  import IcBaselineAdd from "~icons/ic/baseline-add";
+  import IcBaselineHelp from "~icons/ic/baseline-help";
+  import IcBaselineRestartAlt from "~icons/ic/baseline-restart-alt";
+  import IcBaselineConnectWithoutContact from "~icons/ic/baseline-connect-without-contact";
+  import IcBaselineContentCopy from "~icons/ic/baseline-content-copy";
+  import IcBaselineSort from "~icons/ic/baseline-sort";
+  import IcBaselinePieChart from "~icons/ic/baseline-pie-chart";
+  import IcBaselineLayers from "~icons/ic/baseline-layers";
+  import IcBaselineStop from "~icons/ic/baseline-stop";
+  import IcBaselinePause from "~icons/ic/baseline-pause";
+  import IcBaselinePlayArrow from "~icons/ic/baseline-play-arrow";
   let elements;
   let DONKHUNT;
   onMount(async () => {

@@ -1,7 +1,7 @@
 <script>
   import { switchGame } from "$lib/functions";
   import { onMount } from "svelte";
-
+  import IcRoundOpenInNew from "~icons/ic/round-open-in-new";
   let { children } = $props();
 </script>
 
@@ -93,7 +93,7 @@
         <div class="card h-100">
           <img src="/gamespics/guessr.png" onclick={() => switchGame("guessr")} class="card-img-top" alt="guessr" />
           <div class="card-body">
-            <h5 class="card-title"><i class="material-icons notranslate">open_in_new</i> Guessr.tv</h5>
+            <h5 class="card-title"><IcRoundOpenInNew /> Guessr.tv</h5>
             <p class="card-text">Guess the view count. You will be presented with a random Twitch stream and you have to guess how many viewers they have.</p>
           </div>
         </div>

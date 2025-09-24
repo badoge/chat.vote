@@ -2,6 +2,10 @@
   import { enablePopovers, enableTooltips } from "$lib/functions";
   import { onMount } from "svelte";
   import { animate } from "animejs";
+  import IcBaselineDone from "~icons/ic/baseline-done";
+  import IcBaselineSettings from "~icons/ic/baseline-settings";
+  import IcBaselineTimer from "~icons/ic/baseline-timer";
+  import IcBaselineVideogameAsset from "~icons/ic/baseline-videogame-asset";
   let elements;
 
   onMount(async () => {
@@ -532,7 +536,7 @@
 <div class="container-fluid">
   <div class="offcanvas offcanvas-bottom" data-bs-scroll="true" tabindex="-1" id="settingsOffcanvas" aria-labelledby="settingsOffcanvasLabel">
     <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="settingsOffcanvasLabel"><i class="material-icons notranslate">settings</i>Settings</h5>
+      <h5 class="offcanvas-title" id="settingsOffcanvasLabel"><IcBaselineSettings />Settings</h5>
       <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
@@ -540,7 +544,7 @@
         <div class="row">
           <div class="col-3">
             <div class="card mb-1">
-              <div class="card-header"><i class="material-icons notranslate">done</i>Enabled emotes</div>
+              <div class="card-header"><IcBaselineDone />Enabled emotes</div>
               <div class="card-body">
                 <div class="container-fluid">
                   <div class="row">
@@ -601,7 +605,7 @@
           </div>
           <div class="col-auto">
             <div class="card mb-1">
-              <div class="card-header"><i class="material-icons notranslate">videogame_asset</i>Game settings</div>
+              <div class="card-header"><IcBaselineVideogameAsset />Game settings</div>
               <div class="card-body">
                 <div class="form-check form-switch">
                   <input type="checkbox" class="form-check-input" id="hideName" aria-describedby="hideNameDesc" />
@@ -618,7 +622,7 @@
           </div>
           <div class="col-auto">
             <div class="card mb-1">
-              <div class="card-header"><i class="material-icons notranslate">timer</i>Time settings</div>
+              <div class="card-header"><IcBaselineTimer />Time settings</div>
               <div class="card-body">
                 <label for="emotesPerRound" class="form-label">Emotes per round: <span id="emotesPerRoundLabel">1</span></label>
                 <input type="range" class="form-range" min="1" max="5" value="1" id="emotesPerRound" />
@@ -680,7 +684,7 @@
         <button class="btn btn-lg btn-success float-end m-1" type="button" id="start" onclick={start}>Start</button>
 
         <button class="btn btn-lg btn-secondary float-end m-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#settingsOffcanvas" aria-controls="settingsOffcanvas">
-          <i class="material-icons notranslate">settings</i>Settings
+          <IcBaselineSettings />Settings
         </button>
       </div>
     </div>

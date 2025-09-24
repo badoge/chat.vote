@@ -1,6 +1,7 @@
 <script>
   import { enablePopovers, enableTooltips } from "$lib/functions";
   import { onMount } from "svelte";
+
   let elements;
   let CONNECT4;
 

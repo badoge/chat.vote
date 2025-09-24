@@ -1,4 +1,21 @@
 <script>
+  import IcBaselineRefresh from "~icons/ic/baseline-refresh";
+  import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
+  import IcBaselineAccountCircle from "~icons/ic/baseline-account-circle";
+  import IcBaselineSettings from "~icons/ic/baseline-settings";
+
+  import IcBaselineNotificationImportant from "~icons/ic/baseline-notification-important";
+  import IcBaselinePreview from "~icons/ic/baseline-preview";
+  import IcBaselineCelebration from "~icons/ic/baseline-celebration";
+  import IcBaselineTimer from "~icons/ic/baseline-timer";
+  import IcBaselineSmartToy from "~icons/ic/baseline-smart-toy";
+  import IcBaselinePause from "~icons/ic/baseline-pause";
+  import IcBaselinePlayArrow from "~icons/ic/baseline-play-arrow";
+  import IcBaselineStar from "~icons/ic/baseline-star";
+  import IcBaselineCallSplit from "~icons/ic/baseline-call-split";
+  import IcBaselineBlock from "~icons/ic/baseline-block";
+  import IcBaselineTimerOff from "~icons/ic/baseline-timer-off";
+
   import {
     addBadges,
     changeSiteLinkTarget,
@@ -1423,7 +1440,7 @@
             <span id="enableRaffleText">Open Raffle</span><br /><small id="raffleCommandButton" class="notranslate">!join</small>
           </a>
           <br />
-          <a role="button" tabindex="0" onclick={drawRaffleWinner} class="btn btn-info m-1"> <i class="material-icons notranslate">celebration</i> Draw A Winner </a>
+          <a role="button" tabindex="0" onclick={drawRaffleWinner} class="btn btn-info m-1"> <IcBaselineCelebration /> Draw A Winner </a>
           <br />
           <br />
           <br />
@@ -1438,11 +1455,11 @@
             data-bs-title="Are you sure?"
             data-bs-content="All winners and entrants will be removed from the raffle.<br><button type='button' class='btn btn-warning float-end my-3' onclick='restartRaffle()'><i class='material-icons notranslate'>refresh</i>Restart raffle</button>"
           >
-            <i class="material-icons notranslate">refresh</i>Restart raffle
+            <IcBaselineRefresh />Restart raffle
           </a>
           <br />
           <button class="btn btn-secondary m-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#settingsOffcanvas" aria-controls="settingsOffcanvas">
-            <i class="material-icons notranslate">settings</i> Settings
+            <IcBaselineSettings /> Settings
           </button>
 
           <div id="extraTimerDiv" class="mt-3" style="display: none">
@@ -1450,15 +1467,15 @@
               <label class="input-group-text" for="extraTimerMins">Timer</label>
               <input type="number" style="max-width: 5em" class="form-control" id="extraTimerMins" min="0" placeholder="0" aria-label="minutes" />
               <button class="btn btn-outline-secondary" type="button" id="stopExtraTimer" onclick={stopExtraTimer} style="display: none">
-                Stop<i class="material-icons notranslate">timer_off</i>
+                Stop<IcBaselineTimerOff />
               </button>
               <button class="btn btn-outline-secondary" type="button" id="pauseExtraTimer" onclick={pauseExtraTimer} style="display: none">
-                <i class="material-icons notranslate">pause</i>
+                <IcBaselinePause />
               </button>
               <button class="btn btn-outline-secondary" type="button" id="unpauseExtraTimer" onclick={unpauseExtraTimer} style="display: none">
-                <i class="material-icons notranslate">play_arrow</i>
+                <IcBaselinePlayArrow />
               </button>
-              <button class="btn btn-outline-secondary" type="button" id="startExtraTimer" onclick={startExtraTimer}>Start <i class="material-icons notranslate">timer</i></button>
+              <button class="btn btn-outline-secondary" type="button" id="startExtraTimer" onclick={startExtraTimer}>Start <IcBaselineTimer /></button>
             </div>
             <div class="card border-danger" id="extraCountdown" style="display: none; font-size: 3em">
               <div class="card-body">
@@ -1509,7 +1526,7 @@
 
 <div class="offcanvas offcanvas-start" tabindex="-1" id="settingsOffcanvas" aria-labelledby="settingsOffcanvasLabel">
   <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="settingsOffcanvasLabel"><i class="material-icons notranslate">settings</i> Raffle Settings</h5>
+    <h5 class="offcanvas-title" id="settingsOffcanvasLabel"><IcBaselineSettings /> Raffle Settings</h5>
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
@@ -1526,7 +1543,7 @@
           <div class="col">
             <div class="form-check form-switch mb-3">
               <input type="checkbox" class="form-check-input" id="removeWinner" onchange={saveSettings} aria-describedby="removeWinnerDesc" checked />
-              <label class="form-check-label" for="removeWinner"><i class="material-icons notranslate">block</i> Remove winner from raffle</label>
+              <label class="form-check-label" for="removeWinner"><IcBaselineBlock /> Remove winner from raffle</label>
               <small id="removeWinnerDesc" class="text-body-secondary">
                 <br />Removes the winner from the raffle and prevents them from joining again. If this is off then a viewer can win multiple times
               </small>
@@ -1757,7 +1774,7 @@
         </div>
         <div class="form-check form-switch mb-3">
           <input type="checkbox" class="form-check-input" id="splitTiers" aria-describedby="splitTiersDesc" />
-          <label class="form-check-label" for="splitTiers"><i class="material-icons notranslate">call_split</i>Split Tier 1/2/3 subscribers into separate roles</label>
+          <label class="form-check-label" for="splitTiers"><IcBaselineCallSplit />Split Tier 1/2/3 subscribers into separate roles</label>
           <br />
           <small id="splitTiersDesc" class="text-body-secondary">
             Adds separate roles for each tier so that you can give each role a different amount of bonus tickets or only allow some of them to join
@@ -1771,13 +1788,13 @@
       <div class="card-body">
         <div class="form-check form-switch mb-3">
           <input type="checkbox" class="form-check-input" id="announceWinner" onchange={saveSettings} aria-describedby="announceWinnerDesc" disabled />
-          <label class="form-check-label" for="announceWinner"><i class="material-icons notranslate">smart_toy</i> Announce winner in chat</label><br />
+          <label class="form-check-label" for="announceWinner"><IcBaselineSmartToy /> Announce winner in chat</label><br />
           <small id="announceWinnerDesc" class="text-body-secondary"> Posts a message in chat to notify the winner </small><br />
           <small class="text-warning no-twitch-warn">You need to sign in using Twitch to use this feature</small>
         </div>
         <div class="form-check form-switch mb-3">
           <input type="checkbox" class="form-check-input" id="confirmJoin" onchange={saveSettings} aria-describedby="confirmJoinDesc" disabled />
-          <label class="form-check-label" for="confirmJoin"><i class="material-icons notranslate">smart_toy</i> Confirm joining in chat</label><br />
+          <label class="form-check-label" for="confirmJoin"><IcBaselineSmartToy /> Confirm joining in chat</label><br />
           <small id="confirmJoinDesc" class="text-body-secondary">
             Notifies each viewer that joins the raffle in chat to confirm that they joined.<br />
             Make sure to mod the bot (@chatvote) so that it does not get timed out by other bots for spamming :)</small
@@ -1792,7 +1809,7 @@
       <div class="card-body">
         <div class="form-check form-switch mb-3">
           <input type="checkbox" class="form-check-input" id="animateDrawing" onchange={saveSettings} aria-describedby="animateDrawingDesc" checked />
-          <label class="form-check-label" for="animateDrawing"><i class="material-icons notranslate">star</i> Animate raffle drawing</label><br />
+          <label class="form-check-label" for="animateDrawing"><IcBaselineStar /> Animate raffle drawing</label><br />
           <small id="animateDrawingDesc" class="text-body-secondary">
             Plays a CS:GO style case unboxing animation when drawing the winner using placeholder
             <img src="/pics/donk.png" alt="donk" style="height: 22px; width: 22px" /> avatars that use the chatters' chat color
@@ -1800,7 +1817,7 @@
         </div>
         <div class="form-check form-switch ms-5">
           <input type="checkbox" class="form-check-input" id="useTwitchPFP" onchange={saveSettings} aria-describedby="useTwitchPFPDesc" />
-          <label class="form-check-label" for="useTwitchPFP"><i class="material-icons notranslate">account_circle</i> Use Twitch profile pictures</label>
+          <label class="form-check-label" for="useTwitchPFP"><IcBaselineAccountCircle /> Use Twitch profile pictures</label>
           <small id="useTwitchPFPDesc" class="text-body-secondary"><br />Replaces the placeholder avatars with the viewers' Twitch avatars </small><br />
           <small class="text-danger">Use with caution; Some viewers might have avatars that break Twitch's TOS.</small> <br />
         </div>
@@ -1833,7 +1850,7 @@
 
         <div class="form-check form-switch mt-3">
           <input type="checkbox" class="form-check-input" id="extraTimerEnabled" aria-describedby="extratimerswitchdesc" />
-          <label class="form-check-label" for="extraTimerEnabled"><i class="material-icons notranslate">timer</i> Extra countdown timer</label>
+          <label class="form-check-label" for="extraTimerEnabled"><IcBaselineTimer /> Extra countdown timer</label>
           <small id="extratimerswitchdesc" class="text-body-secondary"><br />A separate timer that you control manually.</small>
         </div>
       </div>
@@ -1843,17 +1860,17 @@
       <div class="card-body">
         <div class="form-check form-switch mb-3">
           <input class="form-check-input" type="checkbox" id="linkPreviewThumbnailsEnabled" />
-          <label class="form-check-label" for="linkPreviewThumbnailsEnabled"> <i class="material-icons notranslate">preview</i>Show thumbnails in link preview </label>
+          <label class="form-check-label" for="linkPreviewThumbnailsEnabled"> <IcBaselinePreview />Show thumbnails in link preview </label>
           <br /><small class="text-body-secondary"><b class="text-danger">Use with caution; viewers might link images that break Twitch's TOS</b></small>
         </div>
         <div class="form-check form-switch mb-3">
           <input class="form-check-input" type="checkbox" id="refreshWarningEnabled" onchange={saveSettings} />
-          <label class="form-check-label" for="refreshWarningEnabled"><i class="material-icons notranslate">notification_important</i>Enable close/refresh warning</label>
+          <label class="form-check-label" for="refreshWarningEnabled"><IcBaselineNotificationImportant />Enable close/refresh warning</label>
           <br /><small class="text-body-secondary">Shows a warning before leaving/refreshing the site so that you don't accidentally lose your raffle results.</small>
         </div>
         <div class="input-group mb-0">
           <span class="input-group-text blueborder">Refresh 3rd party emotes</span>
-          <button class="btn btn-outline-info" type="button" onclick={getEmotes}><i class="material-icons notranslate">refresh</i></button>
+          <button class="btn btn-outline-info" type="button" onclick={getEmotes}><IcBaselineRefresh /></button>
         </div>
         <div class="text-body-secondary mb-3">
           Loaded emotes (global/channel): BTTV: <span id="bttvGlobalEmotes">0</span>/<span id="bttvChannelEmotes">0</span> | FFZ: <span id="ffzGlobalEmotes">0</span>/<span
@@ -1871,7 +1888,7 @@
           data-bs-trigger="focus"
           data-bs-title="Are you sure?"
           data-bs-content="All settings will be reset and the page will reload<br><button type='button' class='btn btn-danger float-end my-3' onclick='resetSettings()'><i class='material-icons notranslate'>delete_forever</i>Reset settings</button>"
-          ><i class="material-icons notranslate">delete_forever</i>Reset all settings</a
+          ><IcBaselineDeleteForever />Reset all settings</a
         >
         <br />
         <small class="text-body-secondary">Resets all settings and reloads the page.</small>

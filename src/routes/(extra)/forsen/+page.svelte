@@ -1,5 +1,8 @@
 <script>
   import { onMount, onDestroy } from "svelte";
+  import IcBaselineRefresh from "~icons/ic/baseline-refresh";
+
+  import IcBaselineCelebration from "~icons/ic/baseline-celebration";
 
   onDestroy(() => {
     return "Are you sure?";
@@ -894,9 +897,9 @@
     <div class="col">
       <div class="card">
         <div class="card-body bg-body-tertiary rounded">
-          <a role="button" tabindex="0" onclick={drawRaffleWinner} class="btn btn-lg btn-info me-3"><i class="material-icons notranslate">celebration</i> Draw A Winner</a>
+          <a role="button" tabindex="0" onclick={drawRaffleWinner} class="btn btn-lg btn-info me-3"><IcBaselineCelebration /> Draw A Winner</a>
           <a role="button" tabindex="0" class="btn btn-sm btn-outline-warning me-5" data-bs-toggle="modal" data-bs-target="#restartRaffleModal">
-            <i class="material-icons notranslate">refresh</i>Restart raffle
+            <IcBaselineRefresh />Restart raffle
           </a>
 
           <div class="form-floating d-inline-flex">
@@ -925,10 +928,10 @@
       <div class="card">
         <div class="card-body bg-body-tertiary rounded">
           <a role="button" tabindex="0" onclick={drawRaffleWinnerTier3} class="btn btn-lg btn-info me-3">
-            <i class="material-icons notranslate">celebration</i> Draw A Winner (tier 3)
+            <IcBaselineCelebration /> Draw A Winner (tier 3)
           </a>
           <a role="button" tabindex="0" class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#restartTier3RaffleModal">
-            <i class="material-icons notranslate">refresh</i>Restart raffle (tier 3)
+            <IcBaselineRefresh />Restart raffle (tier 3)
           </a>
           <h2>
             Type a tier 3 emote (<span id="emotes"> <span class="text-success">Loading...</span></span>) in chat to join

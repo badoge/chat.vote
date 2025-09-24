@@ -1,4 +1,25 @@
 <script>
+  import IcBaselineSettings from "~icons/ic/baseline-settings";
+
+  import IcBaselineTimer from "~icons/ic/baseline-timer";
+  import IcBaselineUndo from "~icons/ic/baseline-undo";
+  import IcBaselineRedo from "~icons/ic/baseline-redo";
+  import IcBaselineSort from "~icons/ic/baseline-sort";
+  import IcBaselinePhotoCamera from "~icons/ic/baseline-photo-camera";
+  import IcBaselineLeaderboard from "~icons/ic/baseline-leaderboard";
+  import IcBaselineClear from "~icons/ic/baseline-clear";
+  import IcBaselineSkipNext from "~icons/ic/baseline-skip-next";
+  import IcBaselinePalette from "~icons/ic/baseline-palette";
+  import IcBaselineBrush from "~icons/ic/baseline-brush";
+  import IcBaselineEditOff from "~icons/ic/baseline-edit-off";
+  import IcBaselineDelete from "~icons/ic/baseline-delete";
+  import IcBaselinePlayArrow from "~icons/ic/baseline-play-arrow";
+  import IcBaselineEmojiEvents from "~icons/ic/baseline-emoji-events";
+  import IcBaselineScoreboard from "~icons/ic/baseline-scoreboard";
+  import IcBaselineBolt from "~icons/ic/baseline-bolt";
+  import IcBaselineVisibilityOff from "~icons/ic/baseline-visibility-off";
+  import IcBaselineCheck from "~icons/ic/baseline-check";
+
   import { enableTooltips } from "$lib/functions";
   import { onMount } from "svelte";
   let elements;
@@ -624,8 +645,8 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body" id="howToPlayBody">
-        <p>1. Open the settings using the <i class="material-icons notranslate">settings</i> button on the right and pick the emotes that you want to draw and adjust other settings</p>
-        <p>2. <i class="material-icons notranslate">play_arrow</i> Start the game. A random emote will be shown bottom right that you have to draw</p>
+        <p>1. Open the settings using the <IcBaselineSettings /> button on the right and pick the emotes that you want to draw and adjust other settings</p>
+        <p>2. <IcBaselinePlayArrow /> Start the game. A random emote will be shown bottom right that you have to draw</p>
         <p>3. Viewers guess the emote by typing in chat</p>
       </div>
       <div class="modal-footer">
@@ -700,11 +721,11 @@
 
 <div class="offcanvas offcanvas-end" tabindex="-1" id="settingsOffcanvas" aria-labelledby="settingsOffcanvasLabel">
   <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="settingsOffcanvasLabel"><i class="material-icons notranslate">settings</i>Settings</h5>
+    <h5 class="offcanvas-title" id="settingsOffcanvasLabel"><IcBaselineSettings />Settings</h5>
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
-    <h4><i class="material-icons notranslate">check</i>Enabled emotes</h4>
+    <h4><IcBaselineCheck />Enabled emotes</h4>
     <div class="row">
       <div class="col-auto">
         <div class="form-check form-switch">
@@ -767,7 +788,7 @@
     <br />
 
     <div class="mb-3">
-      <label for="turnLength" class="form-label"><i class="material-icons notranslate">timer</i>Round timer</label>
+      <label for="turnLength" class="form-label"><IcBaselineTimer />Round timer</label>
       <div class="input-group">
         <input type="number" min="0" value="0" max="300" class="form-control" id="turnLength" aria-describedby="timerDesc" />
         <span class="input-group-text" id="timerDesc">seconds</span>
@@ -775,28 +796,28 @@
       <small>Set to 0 to disable the timer</small>
       <div class="form-check form-switch mt-3">
         <input class="form-check-input" type="checkbox" role="switch" id="timerReveal" />
-        <label class="form-check-label" for="timerReveal"><i class="material-icons notranslate">visibility_off</i>Show answer after timer runs out only</label>
+        <label class="form-check-label" for="timerReveal"><IcBaselineVisibilityOff />Show answer after timer runs out only</label>
       </div>
     </div>
 
     <br />
-    <h4><i class="material-icons notranslate">scoreboard</i>Scoring & Points</h4>
+    <h4><IcBaselineScoreboard />Scoring & Points</h4>
     <div class="form-check mb-3">
       <input class="form-check-input" type="radio" name="drawscoring" id="drawscoring1" checked />
-      <label class="form-check-label" for="drawscoring1"><i class="material-icons notranslate">sort</i>Fastest answer</label>
+      <label class="form-check-label" for="drawscoring1"><IcBaselineSort />Fastest answer</label>
       <br /><small>First correct guess is worth 10 points, 2nd is worth 9 and so on.</small>
     </div>
     <div class="form-check mb-5">
       <input class="form-check-input" type="radio" name="drawscoring" id="drawscoring2" />
-      <label class="form-check-label" for="drawscoring2"><i class="material-icons notranslate">bolt</i>First answer only</label>
+      <label class="form-check-label" for="drawscoring2"><IcBaselineBolt />First answer only</label>
       <br /><small>Only the first viewer to guess correctly will get points.</small>
     </div>
     <div class="input-group mb-3">
-      <span class="input-group-text"><i class="material-icons notranslate">scoreboard</i>Points per round</span>
+      <span class="input-group-text"><IcBaselineScoreboard />Points per round</span>
       <input id="points" type="number" min="1" max="1000000" value="10" class="form-control" />
     </div>
     <div class="input-group mb-3">
-      <span class="input-group-text"><i class="material-icons notranslate">emoji_events</i>Points needed to win</span>
+      <span class="input-group-text"><IcBaselineEmojiEvents />Points needed to win</span>
       <input id="pointsTarget" type="number" min="1" max="1000000" value="100" class="form-control" />
     </div>
   </div>
@@ -820,7 +841,7 @@
       </div>
 
       <div class="col-auto">
-        <label for="LineWidth" class="form-label"><i class="material-icons notranslate">brush</i>Brush size: <span id="LineWidthLabel">5</span></label>
+        <label for="LineWidth" class="form-label"><IcBaselineBrush />Brush size: <span id="LineWidthLabel">5</span></label>
         <br />
         <div class="btn-group" role="group" aria-label="brush size presets" id="brushpresetsgroup">
           <input onclick={() => changeBrush()} value="1" class="btn-check" type="radio" name="brushpresets" id="brush1" />
@@ -858,7 +879,7 @@
         <input type="range" class="form-range" min="1" max="40" value="5" id="LineWidth" />
         <br />
 
-        <label for="color"><i class="material-icons notranslate">palette</i> Colors</label><br />
+        <label for="color"><IcBaselinePalette /> Colors</label><br />
         <div class="colorpresetgroup" aria-label="color presets">
           <button type="button" class="btn btn-primary colorpreset" aria-label="color" value="#000000" style="background-color: #000000"></button>
           <button type="button" class="btn btn-primary colorpreset" aria-label="color" value="#404040" style="background-color: #404040"></button>
@@ -883,13 +904,13 @@
         </div>
 
         <input type="color" value="#22b14c" id="color" /><br />
-        <button type="button" id="eraser" class="btn btn-warning colorpreset" value="#666666"><i class="material-icons notranslate">edit_off</i>Eraser</button>
-        <button type="button" id="clearCanvas" class="btn btn-danger"><i class="material-icons notranslate">delete</i>Clear</button>
+        <button type="button" id="eraser" class="btn btn-warning colorpreset" value="#666666"><IcBaselineEditOff />Eraser</button>
+        <button type="button" id="clearCanvas" class="btn btn-danger"><IcBaselineDelete />Clear</button>
         <br />
 
         <div class="btn-group" role="group" id="undoredo" aria-label="undo redo">
-          <button type="button" title="undo" id="undo" class="btn btn-primary"><i class="material-icons notranslate">undo</i></button>
-          <button type="button" title="redo" id="redo" class="btn btn-primary"><i class="material-icons notranslate">redo</i></button>
+          <button type="button" title="undo" id="undo" class="btn btn-primary"><IcBaselineUndo /></button>
+          <button type="button" title="redo" id="redo" class="btn btn-primary"><IcBaselineRedo /></button>
         </div>
         <br />
         <div class="card border-danger mt-3" id="countdown" style="display: none">
@@ -903,23 +924,23 @@
       <div class="col">
         <div class="card mt-1">
           <div class="btn-group" role="group" aria-label="Basic example">
-            <button type="button" onclick={start} class="btn btn-success"><i class="material-icons notranslate">play_arrow</i>Start</button>
-            <button type="button" onclick={start} class="btn btn-warning"><i class="material-icons notranslate">skip_next</i>Skip emote</button>
-            <button type="button" onclick={() => reset()} class="btn btn-danger"><i class="material-icons notranslate">clear</i>Reset</button>
+            <button type="button" onclick={start} class="btn btn-success"><IcBaselinePlayArrow />Start</button>
+            <button type="button" onclick={start} class="btn btn-warning"><IcBaselineSkipNext />Skip emote</button>
+            <button type="button" onclick={() => reset()} class="btn btn-danger"><IcBaselineClear />Reset</button>
             <button type="button" class="btn btn-secondary" data-bs-toggle="offcanvas" data-bs-target="#settingsOffcanvas" aria-controls="settingsOffcanvas">
-              <i class="material-icons notranslate">settings</i> Settings
+              <IcBaselineSettings /> Settings
             </button>
           </div>
 
           <div class="card-body">
-            <h4><i class="material-icons notranslate">leaderboard</i>Leaderboard</h4>
+            <h4><IcBaselineLeaderboard />Leaderboard</h4>
             <div id="drawlb">
               <ul class="list-group" id="drawlblist"></ul>
             </div>
 
             <div class="card border-danger" id="drawemotecard">
               <div class="card-body" id="drawemotecardbody">
-                <span style="font-size: 4vh">Place your facecam here<br /><i class="material-icons notranslate" style="font-size: 6vh">photo_camera</i></span>
+                <span style="font-size: 4vh">Place your facecam here<br /><IcBaselinePhotoCamera style="font-size: 6vh" /></span>
               </div>
             </div>
           </div>

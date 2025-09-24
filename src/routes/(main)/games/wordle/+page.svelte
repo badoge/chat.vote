@@ -1,5 +1,8 @@
 <script>
   import { onMount } from "svelte";
+
+  import IcBaselinePlusOne from "~icons/ic/baseline-plus-one";
+  import IcBaselineSpellcheck from "~icons/ic/baseline-spellcheck";
   let elements;
   onMount(async () => {
     elements = {
@@ -476,13 +479,13 @@
 
             <div class="form-check form-switch">
               <input type="checkbox" class="form-check-input" id="multiword" aria-describedby="multiworddesc" />
-              <label class="form-check-label" for="multiword"><i class="material-icons notranslate">plus_one</i> Allow each viewer to suggest more than 1 word</label>
+              <label class="form-check-label" for="multiword"><IcBaselinePlusOne /> Allow each viewer to suggest more than 1 word</label>
               <small id="multiworddesc" class="form-text text-body-secondary"><br />Each viewer can submit 1 word only by default.</small>
             </div>
 
             <div class="form-check form-switch">
               <input checked type="checkbox" class="form-check-input" id="verifywords" aria-describedby="verifywordsdesc" />
-              <label class="form-check-label" for="verifywords"><i class="material-icons notranslate">spellcheck</i> Check if words are real</label>
+              <label class="form-check-label" for="verifywords"><IcBaselineSpellcheck /> Check if words are real</label>
               <small id="verifywordsdesc" class="form-text text-body-secondary"
                 ><br />If this option is disabled viewers will be able to add any word even if it does not exist in the dictionary.</small
               >

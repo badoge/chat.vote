@@ -1,6 +1,10 @@
 <script>
   import { onMount, onDestroy } from "svelte";
 
+  import IcBaselineSettings from "~icons/ic/baseline-settings";
+  import IcBaselineArrowForwardIos from "~icons/ic/baseline-arrow-forward-ios";
+  import IcBaselineHelp from "~icons/ic/baseline-help";
+
   onDestroy(() => {
     return "dank";
   });
@@ -276,12 +280,12 @@
 <canvas id="myChart"></canvas>
 
 <button id="openOffcanvasbtn" title="Settings" class="btn btn-warning" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" aria-controls="offcanvas">
-  <i class="material-icons notranslate">settings</i> Settings<i class="material-icons notranslate">arrow_forward_ios</i>
+  <IcBaselineSettings /> Settings<IcBaselineArrowForwardIos />
 </button>
 
 <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas" data-bs-backdrop="false" aria-labelledby="offcanvasLabel">
   <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="offcanvasLabel"><i class="material-icons notranslate">settings</i> Settings</h5>
+    <h5 class="offcanvas-title" id="offcanvasLabel"><IcBaselineSettings /> Settings</h5>
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
@@ -363,45 +367,23 @@
         <div class="form-group">
           <label for="serverIP"
             >OBS WebSocket Server IP
-            <i
-              class="material-icons notranslate"
-              data-bs-toggle="tooltip"
-              data-bs-custom-class="wide-tooltip"
-              data-bs-placement="right"
-              data-bs-html="true"
-              data-bs-title="<img src='/waytoodank/obsinfo.png'/>"
-              >help
-            </i>
+
+            <IcBaselineHelp data-bs-toggle="tooltip" data-bs-custom-class="wide-tooltip" data-bs-placement="right" data-bs-html="true" data-bs-title="<img src='/waytoodank/obsinfo.png'/>" />
           </label>
           <input disabled type="text" class="form-control" id="serverIP" value="localhost" />
         </div>
         <div class="form-group">
           <label for="serverPort"
             >OBS WebSocket Server Port
-            <i
-              class="material-icons notranslate"
-              data-bs-toggle="tooltip"
-              data-bs-custom-class="wide-tooltip"
-              data-bs-placement="right"
-              data-bs-html="true"
-              data-bs-title="<img src='/waytoodank/obsinfo.png'/>"
-              >help
-            </i>
+
+            <IcBaselineHelp data-bs-toggle="tooltip" data-bs-custom-class="wide-tooltip" data-bs-placement="right" data-bs-html="true" data-bs-title="<img src='/waytoodank/obsinfo.png'/>" />
           </label>
           <input disabled type="text" class="form-control" id="serverPort" value="4455" />
         </div>
         <div class="form-group mb-3">
           <label for="serverPassword">
             OBS WebSocket Server Password
-            <i
-              class="material-icons notranslate"
-              data-bs-toggle="tooltip"
-              data-bs-custom-class="wide-tooltip"
-              data-bs-placement="right"
-              data-bs-html="true"
-              data-bs-title="<img src='/waytoodank/obsinfo.png'/>"
-              >help
-            </i>
+            <IcBaselineHelp data-bs-toggle="tooltip" data-bs-custom-class="wide-tooltip" data-bs-placement="right" data-bs-html="true" data-bs-title="<img src='/waytoodank/obsinfo.png'/>" />
           </label>
           <input disabled type="password" class="form-control" id="serverPassword" />
         </div>

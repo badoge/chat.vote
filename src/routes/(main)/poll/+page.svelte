@@ -1,6 +1,17 @@
 <script>
   import { changeSiteLinkTarget, enablePopovers, enableTooltips, escapeString, showToast } from "$lib/functions";
   import { onMount } from "svelte";
+  import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
+  import IcBaselineVisibility from "~icons/ic/baseline-visibility";
+  import IcBaselineSettings from "~icons/ic/baseline-settings";
+  import IcBaselinePerson from "~icons/ic/baseline-person";
+  import IcBaselinePlusOne from "~icons/ic/baseline-plus-one";
+  import IcBaselineRemoveModerator from "~icons/ic/baseline-remove-moderator";
+  import IcBaselineTimer from "~icons/ic/baseline-timer";
+  import IcBaselineAdd from "~icons/ic/baseline-add";
+  import IcBaselineSecurity from "~icons/ic/baseline-security";
+  import IcBaselineHowToVote from "~icons/ic/baseline-how-to-vote";
+  import IcBaselineCreate from "~icons/ic/baseline-create";
 
   let elements;
   onMount(async () => {
@@ -755,7 +766,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-success" onclick={addOptionBulk} data-bs-dismiss="modal"><i class="material-icons notranslate">add</i>Add</button>
+        <button type="button" class="btn btn-success" onclick={addOptionBulk} data-bs-dismiss="modal"><IcBaselineAdd />Add</button>
       </div>
     </div>
   </div>
@@ -786,17 +797,17 @@
       <div id="underOptions">
         <div class="btn-group dropdown-center">
           <button type="button" id="createpollbtn" class="btn btn-success btn-lg" onclick={createPoll}>
-            <i class="material-icons notranslate" style="vertical-align: text-bottom">create</i>Create Poll
+            <IcBaselineCreate style="vertical-align: text-bottom" />Create Poll
           </button>
           <button type="button" class="btn btn-success btn-lg dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-            <i class="material-icons notranslate" style="vertical-align: text-bottom">settings</i><span class="visually-hidden">Poll settings</span>
+            <IcBaselineSettings style="vertical-align: text-bottom" /><span class="visually-hidden">Poll settings</span>
           </button>
           <form class="container-fluid dropdown-menu p-4 bg-body-tertiary" style="width: 35vw">
             <div class="row">
               <div class="col">
                 <div class="form-check form-switch">
                   <input class="form-check-input" type="checkbox" id="multipleAnswersAllowed" onchange={saveSettings} />
-                  <label class="form-check-label" for="multipleAnswersAllowed"><i class="material-icons notranslate">plus_one</i>Allow multiple answers</label>
+                  <label class="form-check-label" for="multipleAnswersAllowed"><IcBaselinePlusOne />Allow multiple answers</label>
                   <br /><small class="form-text text-body-secondary">Lets users vote for more than 1 option from the poll.</small>
                 </div>
                 <hr />
@@ -817,19 +828,19 @@
                 <h4>Results visibility</h4>
                 <div class="form-check">
                   <input class="form-check-input" type="radio" name="resultsVisibility" value="everyone" id="results_anyone" onchange={saveSettings} checked />
-                  <label class="form-check-label" for="results_anyone"><i class="material-icons notranslate">visibility</i>Visible to anyone</label>
+                  <label class="form-check-label" for="results_anyone"><IcBaselineVisibility />Visible to anyone</label>
                 </div>
                 <div class="form-check">
                   <input class="form-check-input" type="radio" name="resultsVisibility" value="voters" id="results_voters" onchange={saveSettings} />
-                  <label class="form-check-label" for="results_voters"><i class="material-icons notranslate">how_to_vote</i>Visible after voting</label>
+                  <label class="form-check-label" for="results_voters"><IcBaselineHowToVote />Visible after voting</label>
                 </div>
                 <div class="form-check">
                   <input class="form-check-input" type="radio" name="resultsVisibility" value="timer" id="results_timer" onchange={saveSettings} disabled />
-                  <label class="form-check-label" for="results_timer"><i class="material-icons notranslate">timer</i>Reveal after timer runs out</label>
+                  <label class="form-check-label" for="results_timer"><IcBaselineTimer />Reveal after timer runs out</label>
                 </div>
                 <div class="form-check">
                   <input class="form-check-input" type="radio" name="resultsVisibility" value="creator" id="results_creator" onchange={saveSettings} />
-                  <label class="form-check-label" for="results_creator"><i class="material-icons notranslate">person</i>Visible to me only</label>
+                  <label class="form-check-label" for="results_creator"><IcBaselinePerson />Visible to me only</label>
                 </div>
                 <hr />
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bulkModal">Add multiple options</button>
@@ -838,12 +849,12 @@
                 <h4>Duplicate detection level</h4>
                 <div class="form-check">
                   <input class="form-check-input" type="radio" name="duplicateDetectionLevel" value="low" id="detect_low" />
-                  <label class="form-check-label" for="detect_low"><i class="material-icons notranslate">remove_moderator</i>Low</label>
+                  <label class="form-check-label" for="detect_low"><IcBaselineRemoveModerator />Low</label>
                   <br /><small class="form-text text-body-secondary">Low protection against duplicate votes, only very obvious bots will be blocked.</small>
                 </div>
                 <div class="form-check">
                   <input class="form-check-input" type="radio" name="duplicateDetectionLevel" value="high" id="detect_high" checked />
-                  <label class="form-check-label" for="detect_high"><i class="material-icons notranslate">security</i>High</label>
+                  <label class="form-check-label" for="detect_high"><IcBaselineSecurity />High</label>
                   <br /><small class="form-text text-body-secondary">Users on the same network might not be able to vote.</small>
                 </div>
               </div>
@@ -864,7 +875,7 @@
               data-bs-title="Are you sure?"
               data-bs-content="All poll options will be deleted<br><button type='button' class='btn btn-danger float-end my-3' onclick='{reset}'><i class='material-icons notranslate'>delete_forever</i>Delete all</button>"
             >
-              <i class="material-icons notranslate">delete_forever</i>All
+              <IcBaselineDeleteForever />All
             </a>
           </span>
         </div>
