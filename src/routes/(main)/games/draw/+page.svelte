@@ -23,7 +23,9 @@
   import { enableTooltips } from "$lib/functions";
   import { onMount } from "svelte";
   let elements;
+  let bootstrap;
   onMount(async () => {
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
     elements = {
       //modals
       grid: document.getElementById("grid"),
@@ -633,8 +635,6 @@
   <meta property="og:image" content="https://screenshot.donk.workers.dev/?url=https://chat.vote/games/draw" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:description" content="Streamer draws a random emote, chat has to guess the emote. Can you draw well enough?" />
-
-  <script src="/games.js"></script>
 </svelte:head>
 
 <div class="modal fade" id="howToPlayModal" tabindex="-1" aria-hidden="true">

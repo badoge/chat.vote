@@ -4,7 +4,9 @@
   import { onMount } from "svelte";
   let elements;
   let SHAPES;
+  let bootstrap;
   onMount(async () => {
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
     elements = {
       //modals
       grid: document.getElementById("grid"),
@@ -498,8 +500,6 @@
   <meta property="og:image" content="https://screenshot.donk.workers.dev/?url=https://chat.vote/games/shapes" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:description" content="A very weird logic puzzle. Finish the row of shapes, which has been formed using a pre-determined hidden rule." />
-
-  <script src="/games.js"></script>
 </svelte:head>
 
 <div class="modal fade" id="howToPlayModal" tabindex="-1" aria-hidden="true">

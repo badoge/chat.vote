@@ -31,7 +31,9 @@
   import IcBaselinePlayArrow from "~icons/ic/baseline-play-arrow";
   let elements;
   let DONKHUNT;
+  let bootstrap;
   onMount(async () => {
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
     elements = {
       //modals
       grid: document.getElementById("grid"),
@@ -714,8 +716,6 @@
   <meta property="og:image" content="https://screenshot.donk.workers.dev/?url=https://chat.vote/games/donkhunt" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:description" content="Scary looking creatures are trying to trap their prey. Are you the hunter or the hunted one?" />
-
-  <script src="/games.js"></script>
 </svelte:head>
 
 <div class="modal fade" id="howToPlayModal" tabindex="-1" aria-hidden="true">

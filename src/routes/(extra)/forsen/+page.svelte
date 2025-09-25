@@ -8,7 +8,9 @@
     return "Are you sure?";
   });
   let elements;
+  let bootstrap;
   onMount(async () => {
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
     elements = {
       //modals
       restartRaffleModal: document.getElementById("restartRaffleModal"),

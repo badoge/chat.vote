@@ -10,7 +10,9 @@
   import IcBaselineContentCopy from "~icons/ic/baseline-content-copy";
 
   let elements;
+  let bootstrap;
   onMount(async () => {
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
     elements = {
       loginButton: document.getElementById("loginButton"),
       topRight: document.getElementById("topRight"),

@@ -58,10 +58,11 @@
   import { animate } from "animejs";
   import { onMount } from "svelte";
   import localforage from "localforage";
-
   let elements;
-
+  let bootstrap;
   onMount(async () => {
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
+
     elements = {
       //modals
       dankUpdateModal: document.getElementById("dankUpdateModal"),

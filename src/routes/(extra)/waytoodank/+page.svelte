@@ -4,7 +4,9 @@
   import IcBaselineHelp from "~icons/ic/baseline-help";
 
   let elements;
+  let bootstrap;
   onMount(async () => {
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
     elements = {
       connect: document.getElementById("connect"),
       serverIP: document.getElementById("serverIP"),

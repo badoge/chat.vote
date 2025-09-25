@@ -62,7 +62,9 @@ wlqaw9WTLH5ZIgQjX69VmueRaYmSUMQgUVzAayGiYTyAP0M7+FNq81HwTIBVtzvM7vRa+M9ZiiyPbrVD
 
   import { onMount } from "svelte";
   let elements;
+  let bootstrap;
   onMount(async () => {
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
     elements = {
       //modals
       connectVTSModal: document.getElementById("connectVTSModal"),

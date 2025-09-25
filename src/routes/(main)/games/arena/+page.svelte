@@ -2,7 +2,9 @@
   import { onMount } from "svelte";
   let elements;
   let html;
+  let bootstrap;
   onMount(async () => {
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
     html = {
       killfeed: document.querySelector("#killfeed"),
       autoFullscreenInput: document.querySelector("input#bAutoFullscreen"),
@@ -568,7 +570,6 @@
   <meta property="og:locale" content="en_US" />
   <meta property="og:description" content="Fight your chatters in a 'battle royale' arena, where only one can win!" />
 
-  <script src="/games.js"></script>
   <script src="/donk-arena-classes.min.js"></script>
   <script src="/donk-arena-engine.min.js"></script>
   <script src="/donk-arena-better-ai.min.js"></script>

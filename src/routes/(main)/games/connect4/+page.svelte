@@ -5,7 +5,9 @@
   let elements;
   let CONNECT4;
 
+  let bootstrap;
   onMount(async () => {
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
     CONNECT4 = {
       ctx: document.getElementById("c4chartCanvas").getContext("2d"),
       chart: null,
@@ -511,8 +513,6 @@
   <meta property="og:image" content="https://screenshot.donk.workers.dev/?url=https://chat.vote/games/connect4" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:description" content="Players take turns to drop their pieces into the container, attempting to connect 4 of their pieces in a row." />
-
-  <script src="/games.js"></script>
 </svelte:head>
 
 <div class="modal fade" id="howToPlayModal" tabindex="-1" aria-hidden="true">

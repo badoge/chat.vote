@@ -1,7 +1,9 @@
 <script>
   import { onMount } from "svelte";
   let elements;
+  let bootstrap;
   onMount(async () => {
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
     elements = {
       blacklistModal: document.getElementById("blacklistModal"),
       reason: document.getElementById("reason"),

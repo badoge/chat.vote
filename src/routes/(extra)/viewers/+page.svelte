@@ -9,7 +9,9 @@
     return "dank";
   });
   let elements;
+  let bootstrap;
   onMount(async () => {
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
     elements = {
       settingsModal: document.getElementById("settingsModal"),
       loginExpiredModal: document.getElementById("loginExpiredModal"),

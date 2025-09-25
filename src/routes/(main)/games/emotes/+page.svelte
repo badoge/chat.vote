@@ -8,7 +8,9 @@
   import IcBaselineVideogameAsset from "~icons/ic/baseline-videogame-asset";
   let elements;
 
+  let bootstrap;
   onMount(async () => {
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
     elements = {
       //modals
       grid: document.getElementById("grid"),
@@ -445,8 +447,6 @@
   <meta property="og:image" content="https://screenshot.donk.workers.dev/?url=https://chat.vote/games/emotes" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:description" content="A test of reaction speed and emote knowledge. Type the appearing emotes in chat as fast as you can." />
-
-  <script src="/games.js"></script>
 </svelte:head>
 
 <div class="modal fade" id="howToPlayModal" tabindex="-1" aria-hidden="true">

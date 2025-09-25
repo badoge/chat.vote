@@ -4,7 +4,9 @@
   import { animate } from "animejs";
 
   let elements;
+  let bootstrap;
   onMount(async () => {
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
     elements = {
       loginButton: document.getElementById("loginButton"),
       me: document.getElementById("me"),

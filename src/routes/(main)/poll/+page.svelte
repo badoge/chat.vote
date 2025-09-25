@@ -14,7 +14,9 @@
   import IcBaselineCreate from "~icons/ic/baseline-create";
 
   let elements;
+  let bootstrap;
   onMount(async () => {
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
     elements = {
       //modals
       pollModal: document.getElementById("pollModal"),

@@ -2,7 +2,9 @@
   import { onMount } from "svelte";
   let elements;
   let TTT;
+  let bootstrap;
   onMount(async () => {
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
     elements = {
       //modals
       grid: document.getElementById("grid"),
@@ -366,8 +368,6 @@
   <meta property="og:image" content="https://screenshot.donk.workers.dev/?url=https://chat.vote/games/tictactoe" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:description" content="An ancient game of wits. Will you outsmart the hive mind - which is your chat?" />
-
-  <script src="/games.js"></script>
 </svelte:head>
 
 <div class="modal fade" id="howToPlayModal" tabindex="-1" aria-hidden="true">

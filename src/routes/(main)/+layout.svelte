@@ -8,7 +8,6 @@
   import IcBaselineLocalActivity from "~icons/ic/baseline-local-activity";
   import StreamlineToastSolid from "~icons/streamline/toast-solid";
   import MdiTwitch from "~icons/mdi/twitch";
-  import { resetSettings } from "$lib/games";
 
   onMount(async () => {
     await import("bootstrap");

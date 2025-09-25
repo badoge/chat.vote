@@ -3,7 +3,9 @@
   import { onMount } from "svelte";
   let elements;
 
+  let bootstrap;
   onMount(async () => {
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
     elements = {
       //modals
       grid: document.getElementById("grid"),

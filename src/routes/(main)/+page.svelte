@@ -1,5 +1,5 @@
 <script>
-  import { enablePopovers, enableTooltips, sendData } from "$lib/functions";
+  import { enablePopovers, enableTooltips, escapeString, getUserID, sendData } from "$lib/functions";
   import { onMount, onDestroy } from "svelte";
   import IcBaselineRefresh from "~icons/ic/baseline-refresh";
   import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
@@ -29,9 +29,41 @@
   import IcBaselineStop from "~icons/ic/baseline-stop";
   import IcBaselinePause from "~icons/ic/baseline-pause";
   import IcBaselinePlayArrow from "~icons/ic/baseline-play-arrow";
-
+  import Chart from "chart.js/auto";
   let elements;
+  let bootstrap;
+  import { createGrid, themeQuartz, ModuleRegistry, AllCommunityModule } from "ag-grid-community";
+
   onMount(async () => {
+    ModuleRegistry.registerModules([AllCommunityModule]);
+
+    const gridOptions = {
+      overlayNoRowsTemplate: `<h3>Nothing here <img src="/pics/donk.png" alt="donk" style="height:28px; width:28px;"></h3>`,
+      columnDefs: [
+        { field: "Command", flex: 1 },
+        { field: "Option", flex: 5 },
+        { field: "By", flex: 2 },
+        { field: "Score", flex: 1 },
+        { field: "Delete", flex: 1 },
+      ],
+      suppressMovableColumns: true,
+      theme: themeQuartz.withParams(
+        {
+          backgroundColor: "#1a1d20",
+          foregroundColor: "#ffffff",
+          browserColorScheme: "dark",
+        },
+        "bs-dark",
+      ),
+      rowData: [
+        // { Command: "Tesla", Option: "Model Y", By: 64950, Score: 64950, Delete: 64950 },
+        // { Command: "Ford", Option: "F-Series", By: 33850, Score: 64950, Delete: 64950 },
+        // { Command: "Toyota", Option: "Corolla", By: 29600, Score: 64950, Delete: 64950 },
+      ],
+    };
+    createGrid(document.querySelector("#table"), gridOptions);
+
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
     elements = {
       //modals
       randomOptionModal: document.getElementById("randomOptionModal"),
@@ -146,44 +178,12 @@
       generateOverlayButton: document.getElementById("generateOverlayButton"),
     };
 
-    table = new DataTable("#options", {
-      autoWidth: false,
-      responsive: true,
-      retrieve: true,
-      paging: false,
-      ordering: false,
-      searching: false,
-      info: false,
-      columns: [
-        {
-          visible: false,
-        },
-        {
-          width: "5%",
-        },
-        {
-          width: "60%",
-        },
-        {
-          width: "20%",
-        },
-        {
-          width: "10%",
-        },
-        {
-          width: "5%",
-          className: "remove-option-cell",
-        },
-      ],
-      language: {
-        emptyTable: 'Nothing here <img src="/pics/donk.png" alt="donk" style="height:28px; width:28px;">',
-      },
-    });
+    refreshData();
 
     elements.pollOption.focus();
     elements.pollOption.select();
-    enableTooltips();
-    enablePopovers();
+    //enableTooltips();
+    //enablePopovers();
     settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
     votePopover = new bootstrap.Popover(elements.enableVoting);
     suggestPopover = new bootstrap.Popover(elements.enableSuggestions);
@@ -2473,7 +2473,8 @@
       </ul>
       <div class="tab-content bg-dark-subtle">
         <div class="tab-pane fade show active" id="tableTab" role="tabpanel" aria-labelledby="tableTabButton" tabindex="0">
-          <table id="options" class="table table-bordered" style="width: 100%">
+          <div id="table" data-ag-theme-mode="bs-dark" style="height:50vh;"></div>
+          <!-- <table id="options" class="table table-bordered" style="width: 100%">
             <thead>
               <tr>
                 <th>ID</th>
@@ -2485,7 +2486,7 @@
               </tr>
             </thead>
             <tbody></tbody>
-          </table>
+          </table> -->
         </div>
         <div class="tab-pane fade" id="chartTab" role="tabpanel" aria-labelledby="chartTabButton" tabindex="0">
           <div class="container-fluid p-0">
@@ -2792,56 +2793,6 @@
 <style>
   body {
     margin-bottom: 300px;
-  }
-
-  table {
-    word-break: break-all;
-  }
-
-  table.table.dataTable > :not(caption) > * > * {
-    background-color: var(--bs-dark-bg-subtle);
-  }
-
-  #options > thead > tr > *,
-  #options > tbody > * > td:nth-child(1),
-  #options > tbody > * > td:nth-child(4) {
-    text-align: center;
-    vertical-align: middle;
-  }
-
-  #options > tbody > * > td:nth-child(1),
-  #options > tbody > * > td:nth-child(4) {
-    font-size: 2rem;
-    line-height: 1rem;
-  }
-
-  #options > tbody > * > td:nth-child(2),
-  #options > tbody > * > td:nth-child(3) {
-    text-align: start;
-    vertical-align: middle;
-  }
-
-  /* .remove-option-button {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 0;
-} */
-  .remove-option-button > i {
-    font-size: 36px;
-  }
-
-  /* td.remove-option-cell {
-  padding: 0;
-  position: relative;
-} */
-
-  .dt-column-title {
-    text-align: center;
-  }
-
-  th {
-    white-space: nowrap;
   }
 
   .main-tabs.active {

@@ -2,7 +2,9 @@
   import { enableTooltips, showToast } from "$lib/functions.js";
   import { onMount } from "svelte";
 
+  let bootstrap;
   onMount(async () => {
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
     enableTooltips();
   });
 
