@@ -1,4 +1,7 @@
 <script>
+  import NavbarLinks from "$lib/NavbarLinks.svelte";
+  import ThemeSwitcher from "$lib/ThemeSwitcher.svelte";
+  import Login from "$lib/Login.svelte";
   import { onMount } from "svelte";
 
   import { animate, createTimeline, utils, createDraggable } from "animejs";
@@ -31,9 +34,6 @@
   import { addBadges, changeSiteLinkTarget, enablePopovers, enableTooltips, escapeString, getUserID, ISO8601ToSeconds, showToast } from "$lib/functions";
   import localforage from "localforage";
 
-  /**
-   * @type {{ [x: string]: { classList: { contains: (arg0: string) => any; }; }; loginButton: any; enableVoting: any; enableVotingTierlist: any; tierlistEditorModal: any; previewModal: any; generateChatModal: any; generateModal: any; communityModal: any; startModal: any; startTriviaModal: any; publishedModal: any; importModal: any; previewModalBody: any; channelName: any; generateBracketType: any; formatSelect: any; bracketSettings: any; changeCommand: any; changeCommandCopy: any; averageScore: any; averageScoreCopy: any; keepVotingEnabled: any; keepVotingEnabledCopy: any; disableAnimations: any; disableAnimationsCopy: any; triviaPoints: any; questionTimer: any; questionTimerValue: any; triviaScoring: any; questionTimerDiv: any; oneChance: any; hideScore: any; hideScoreTierlist: any; importBracket: any; addBracketOption: any; addTriviaQuestion: any; tierlistItem: any; myBrackets: any; myTrivia: any; triviaUsers: any; bracketOptionsContainer: any; triviaQuestionsContainer: any; bracketTitle: any; triviaTitle: any; bracketDescription: any; triviaDescription: any; spotifyWarning: any; optionLimit: any; editor: any; bracket: any; title: any; winner: any; pickWinner: any; restart: any; left_card_header: any; right_card_header: any; left_title: any; right_title: any; centerTitle: any; winnerTitle: any; right_card: any; left_card: any; tierlistContainer: any; upcoming_thumbnails: any; tierlist: any; upcoming: any; triviaTitleCard: any; triviaDescriptionCard: any; trivia: any; triviaSettingsWarning: any; startTriviaButton: any; dismissTriviaSettingsButton: any; questionNumber: any; question: any; triviaAnswer: any; triviaChoices: any; triviaTimerDiv: any; showHint: any; choice1A: any; choice2A: any; choice3A: any; choice4A: any; choice1B: any; choice2B: any; choice3B: any; choice4B: any; round: any; left_command: any; right_command: any; currentTierlistItemName: any; text_image_tierlist: any; youtubeEmbedContainer_tierlist: any; twitchClipsEmbed_tierlist: any; spotifyEmbedContainer_tierlist: any; videoEmbed_tierlist: any; currentTierlistItem: any; triviaMedia: any; image_trivia: any; youtubeEmbedContainer_trivia: any; twitchClipsEmbed_trivia: any; spotifyEmbedContainer_trivia: any; videoEmbed_trivia: any; left_score: any; right_score: any; triviaEditor: any; bracketEditor: any; bracketEditorHeader: any; triviaEditorHeader: any; spotifyPlaylistLink: any; spotifyPlaylistPreview: any; tiermakerLink: any; tiermakerPreview: any; clipsChannel: any; clipsPreview: any; emotesChannel: any; emotesPreview: any; uwufufuLink: any; uwufufuPreview: any; ytchannelLink: any; ytchannelPreview: any; ytplaylistLink: any; ytplaylistPreview: any; bracketCode: any; bracketLink: any; importModalBody: any; shareCode: any; playlist: any; left_card_zoom_icon: any; right_card_zoom_icon: any; hideScoreIcon: any; hideScoreTierlistIcon: any; tierlistEditor: any; text_image_left: any; youtubeEmbedContainer_left: any; spotifyEmbedContainer_left: any; twitchClipsEmbed_left: any; videoEmbed_left: any; text_image_right: any; youtubeEmbedContainer_right: any; spotifyEmbedContainer_right: any; twitchClipsEmbed_right: any; videoEmbed_right: any; left_value: any; right_value: any; spotifyplaylistSettings?: HTMLElement | null; tiermakerSettings?: HTMLElement | null; clipsSettings?: HTMLElement | null; emotesSettings?: HTMLElement | null; uwufufuSettings?: HTMLElement | null; ytchannelSettings?: HTMLElement | null; ytplaylistSettings?: HTMLElement | null; communityModalBody?: HTMLElement | null; myBracketsModal?: HTMLElement | null; myBracketsModalBody?: HTMLElement | null; tierlistSettings?: NodeListOf<Element>; status?: HTMLElement | null; topRight?: HTMLElement | null; importTrivia?: HTMLElement | null; left_container?: HTMLElement | null; right_container?: HTMLElement | null; left_name?: HTMLElement | null; right_name?: HTMLElement | null; youtubeEmbed_left?: HTMLElement | null; spotifyEmbed_left?: HTMLElement | null; youtubeEmbed_right?: HTMLElement | null; spotifyEmbed_right?: HTMLElement | null; left_info?: HTMLElement | null; right_info?: HTMLElement | null; tierlistItemDrag?: HTMLElement | null; tierlistLabel0?: HTMLElement | null; tierlistLabel1?: HTMLElement | null; tierlistLabel2?: HTMLElement | null; tierlistLabel3?: HTMLElement | null; tierlistLabel4?: HTMLElement | null; tierlistLabel5?: HTMLElement | null; tierlistScore0?: HTMLElement | null; tierlistScore1?: HTMLElement | null; tierlistScore2?: HTMLElement | null; tierlistScore3?: HTMLElement | null; tierlistScore4?: HTMLElement | null; tierlistScore5?: HTMLElement | null; pickWinnerTierlist?: HTMLElement | null; youtubeEmbed_tierlist?: HTMLElement | null; spotifyEmbed_tierlist?: HTMLElement | null; triviaTimer?: HTMLElement | null; triviaUsersDiv?: HTMLElement | null; youtubeEmbed_trivia?: HTMLElement | null; spotifyEmbed_trivia?: HTMLElement | null; }}
-   */
   let elements;
   let bootstrap;
   onMount(async () => {
@@ -101,12 +101,6 @@
       spotifyWarning: document.getElementById("spotifyWarning"),
 
       startTriviaModal: document.getElementById("startTriviaModal"),
-
-      //navbar
-      status: document.getElementById("status"),
-      topRight: document.getElementById("topRight"),
-      loginButton: document.getElementById("loginButton"),
-      channelName: document.getElementById("channelName"),
 
       myBrackets: document.getElementById("myBrackets"),
       myTrivia: document.getElementById("myTrivia"),
@@ -260,10 +254,6 @@
       videoEmbed_trivia: document.getElementById("videoEmbed_trivia"),
     };
 
-    if (!USER.channel) {
-      loginButton = new bootstrap.Popover(elements.loginButton);
-    }
-
     enableTooltips();
     enablePopovers();
 
@@ -374,6 +364,9 @@
       triviaQuestionTimer = parseInt(this.value, 10);
       elements.questionTimerValue.innerText = `${triviaQuestionTimer}s`;
     };
+    /**
+     * @type {any}
+     */
     let oldOneChanceValue;
     elements.triviaScoring.onchange = function () {
       triviaScoring = this.value;
@@ -465,7 +458,6 @@
   const spotifyURLRegex = /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:(album|track|playlist|episode)\/|\?uri=spotify:track:)((\w|-){22})/;
 
   let client;
-  let loginButton;
   let tierlistEditorModal, previewModal, generateChatModal, generateModal, communityModal, startModal, startTriviaModal, publishedModal, importModal;
   let votePopover, votePopoverTierlist;
   let currentBracket = {};
@@ -571,6 +563,12 @@
     }
   } //load_localStorage
 
+  /**
+   * @param {any} target
+   * @param {{ [x: string]: any; username: any; color: any; badges: any; }} context
+   * @param {string} msg
+   * @param {any} self
+   */
   async function handleMessage(target, context, msg, self) {
     let input = msg.split(" ").filter(Boolean);
     let command = input[0].toLowerCase();
@@ -708,6 +706,9 @@
     } //tierlist
   } //handleMessage
 
+  /**
+   * @param {{ points?: number; id?: any; username: any; displayname: any; color: any; badges?: string; name?: any; }} user
+   */
   function addTriviaUser(user) {
     user.name = user.username == user.displayname.toLowerCase() ? `${user.displayname}` : `${user.displayname} (${user.username})`;
     user.color = !user.color ? "#FFFFFF" : user.color;
@@ -857,6 +858,9 @@
     );
   } //addTriviaQuestion
 
+  /**
+   * @param {string | number} id
+   */
   function deleteBracketOption(id) {
     id = parseInt(id, 10);
     let bracketID = parseInt(elements.bracketTitle.dataset.bracketId, 10);
@@ -867,6 +871,9 @@
     saveBracket(true);
   } //deleteBracketOption
 
+  /**
+   * @param {string | number} id
+   */
   function deleteTriviaQuestion(id) {
     id = parseInt(id, 10);
     let triviaID = parseInt(elements.triviaTitle.dataset.triviaId, 10);
@@ -877,6 +884,10 @@
     saveTrivia(true);
   } //deleteTriviaQuestion
 
+  /**
+   * @param {string | number} id
+   * @param {{ innerHTML: string; }} button
+   */
   async function previewOption(id, button) {
     button.innerHTML = spinner;
     id = parseInt(id, 10);
@@ -1407,6 +1418,9 @@
     saveSettings();
   } //saveTrivia
 
+  /**
+   * @type {string}
+   */
   let startID;
   function showStartModal(id) {
     startID = id;
@@ -1487,6 +1501,9 @@
     changeSiteLinkTarget("_blank");
   } //startBracket
 
+  /**
+   * @param {{ options: string | any[]; title: any; } | undefined} bracket
+   */
   function startSingleElimination(bracket) {
     let numberOfOptions = bracket.options.length;
     let numberOfRounds = Math.ceil(Math.log2(numberOfOptions));
@@ -1551,6 +1568,9 @@
     nextMatch();
   } //startSingleElimination
 
+  /**
+   * @param {{ options: string | any[]; } | undefined} bracket
+   */
   function startTierlist(bracket) {
     console.log(bracket);
     elements.tierlistContainer.innerHTML = "";
@@ -1589,18 +1609,45 @@
     nextTierlistItem();
   } //startTierlist
 
+  /**
+   * @type {number}
+   */
   let triviaPoints;
   let triviaScoring = "first";
+  /**
+   * @type {number}
+   */
   let triviaRoundTimestamp;
   let triviaQuestionTimer = 10;
   let questionNumber = 1;
+  /**
+   * @type {string | any[]}
+   */
   let triviaAnswer = [];
   let triviaStarted = false;
+  /**
+   * @type {any[]}
+   */
   let triviaUsersAnswered = [];
+  /**
+   * @type {any[]}
+   */
   let triviaUsers = [];
+  /**
+   * @type {any[]}
+   */
   let questionsArray = [];
+  /**
+   * @type {any[]}
+   */
   let answersArrays = [];
+  /**
+   * @type {any[]}
+   */
   let mediaArray = [];
+  /**
+   * @type {string[]}
+   */
   let answerTypes = [];
   function startTrivia() {
     if (!checkLogin()) {
@@ -1716,7 +1763,13 @@
   } //getHint
 
   let triviaChoices = ["1", "2", "3", "4"];
+  /**
+   * @type {string}
+   */
   let correctChoice;
+  /**
+   * @type {number}
+   */
   let correctChoiceIndex;
   function getChoices() {
     if (triviaAnswer.length < 4) {
@@ -1743,7 +1796,13 @@
     elements.choice4B.innerText = shuffled[3];
   } //getChoices
 
+  /**
+   * @type {import("animejs").JSAnimation}
+   */
   let timerAnimation1;
+  /**
+   * @type {import("animejs").JSAnimation}
+   */
   let timerAnimation2;
   function startTimer() {
     timerAnimation1 = animate("#triviaTimer", {
@@ -1790,6 +1849,9 @@
     }
   } //showAnswer
 
+  /**
+   * @param {string | any[]} array
+   */
   function shuffle(array) {
     let currentIndex = array.length;
     let randomIndex;
@@ -1805,6 +1867,9 @@
   let currentOption = 0;
   let currentScores = { left: 0, right: 0 };
   let currentCommand = { left: "a", right: "b" };
+  /**
+   * @type {import("animejs").Timeline}
+   */
   let nextMatchAnimation;
   function nextMatch() {
     //check if current round is done
@@ -1917,8 +1982,14 @@
     { name: "f", command: "f", score: 0, weight: 0 },
     { name: "idk", command: "idk", score: 0 },
   ];
+  /**
+   * @type {string | any[]}
+   */
   let currentTierlistCommands = [];
   let tierlist_player;
+  /**
+   * @type {{ thumbnail: string; type: any; id: any; }}
+   */
   let currentTierlistItem;
   async function nextTierlistItem() {
     resetPlayers();
@@ -2006,6 +2077,9 @@
     elements.upcoming.style.display = "none";
   } //endTierlist
 
+  /**
+   * @param {string} position
+   */
   function streamerVote(position) {
     vote_results[position]++;
     voters.push(USER.userID);
@@ -2080,6 +2154,9 @@
     updateScores();
   } //resetScores
 
+  /**
+   * @type {import("animejs").Timeline}
+   */
   let promoteOptionAnimation;
   function promoteOption(option, position = null) {
     let index = currentBracket[`round${currentRound + 1}`].findIndex((e) => e === undefined);
@@ -2346,7 +2423,18 @@
     }
   } //updateScores
 
-  let showWinnerAnimation1, showWinnerAnimation2, showWinnerAnimation3;
+  /**
+   * @type {import("animejs").Timeline}
+   */
+  let showWinnerAnimation1;
+  /**
+   * @type {import("animejs").Timeline}
+   */
+  let showWinnerAnimation2;
+  /**
+   * @type {import("animejs").Timeline}
+   */
+  let showWinnerAnimation3;
   function showWinner(first, firstAndSecond) {
     elements.winner.innerHTML += `<strong>${escapeString(first[0].name)}</strong>`;
 
@@ -3280,21 +3368,21 @@
   } //generateChatBracket
 
   function zoomCard(id) {
-    elements[id].classList.toggle(`zoomed`);
-    elements[`${id}_zoom_icon`].innerHTML = elements[id].classList.contains(`zoomed`) ? "zoom_out" : "zoom_in";
-    if (elements[id].classList.contains(`zoomed`)) {
-      animate(`#${id}`, {
-        ease: "outElastic(1, .5)",
-        translateX: `${id == "left_card" ? "+=50%" : "-=50%"}`,
-        scale: 1.4,
-      });
-    } else {
-      animate(`#${id}`, {
-        ease: "outElastic(1, .5)",
-        translateX: 0,
-        scale: 1,
-      });
-    }
+    // elements[id].classList.toggle(`zoomed`);
+    // elements[`${id}_zoom_icon`].innerHTML = elements[id].classList.contains(`zoomed`) ? "zoom_out" : "zoom_in";
+    // if (elements[id].classList.contains(`zoomed`)) {
+    //   animate(`#${id}`, {
+    //     ease: "outElastic(1, .5)",
+    //     translateX: `${id == "left_card" ? "+=50%" : "-=50%"}`,
+    //     scale: 1.4,
+    //   });
+    // } else {
+    //   animate(`#${id}`, {
+    //     ease: "outElastic(1, .5)",
+    //     translateX: 0,
+    //     scale: 1,
+    //   });
+    // }
   } //zoomCard
 
   function zoomOut(event) {
@@ -3515,6 +3603,9 @@
 
   let youtubePlayer_left;
   let youtubePlayer_right;
+  /**
+   * @type {{ loadVideoById: (arg0: string) => void; }}
+   */
   let youtubePlayer_tierlist;
   let youtubePlayer_trivia;
 
@@ -3659,7 +3750,7 @@
   <meta property="og:title" content="chat.vote Brackets, (tier)Lists & Trivia" />
   <meta property="og:site_name" content="chat.vote Brackets, (tier)Lists & Trivia" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://chat.vote/blt/" />
+  <meta property="og:url" content="https://chat.vote/blt" />
   <meta property="og:image" content="https://screenshot.donk.workers.dev/?url=https://chat.vote/blt" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:description" content="Brackets, (tier)Lists & Trivia" /></svelte:head
@@ -3722,7 +3813,7 @@
         </div>
 
         <div class="hstack gap-3 mb-5">
-          <button type="button" class="btn btn-success btn-lg" data-bs-dismiss="modal" onclick={createBracket()}>
+          <button type="button" class="btn btn-success btn-lg" data-bs-dismiss="modal" onclick={createBracket}>
             <div class="hstack"><IcBaselineCreate /> Create empty bracket</div>
           </button>
           Creates an empty bracket that you have to fill out manually
@@ -3772,7 +3863,7 @@
         </div>
 
         <div class="hstack gap-3 mb-5">
-          <button type="button" class="btn btn-success btn-lg" data-bs-dismiss="modal" onclick={createTrivia()}>
+          <button type="button" class="btn btn-success btn-lg" data-bs-dismiss="modal" onclick={createTrivia}>
             <div class="hstack"><IcBaselineCreate /> Create empty trivia</div>
           </button>
           Creates an empty trivia that you have to fill out manually
@@ -3803,7 +3894,7 @@
         <h4>How to use:</h4>
         <ul>
           <li>
-            Go to the <a href="/playlist/" target="_blank" rel="noopener noreferrer">chat.vote <IcBaselineQueueMusic /> Playlist site</a>
+            Go to the <a href="/playlist" target="_blank">chat.vote <IcBaselineQueueMusic /> Playlist site</a>
           </li>
           <li>
             Adjust settings (limits, platforms, etc)
@@ -3811,7 +3902,7 @@
           </li>
           <li>Viewers send requests on the Playlist site</li>
           <li>
-            <button type="button" class="btn btn-success" onclick={loadPlaylist()}><IcBaselineFileDownload /> Load playlist</button>
+            <button type="button" class="btn btn-success" onclick={loadPlaylist}><IcBaselineFileDownload /> Load playlist</button>
           </li>
         </ul>
 
@@ -3823,7 +3914,7 @@
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#createBracketModal">
           <IcBaselineArrowBack /> Back
         </button>
-        <button type="button" class="btn btn-success" onclick={generateChatBracket()}><IcBaselineAutoAwesome /> Generate</button>
+        <button type="button" class="btn btn-success" onclick={generateChatBracket}><IcBaselineAutoAwesome /> Generate</button>
       </div>
     </div>
   </div>
@@ -3863,7 +3954,7 @@
               aria-label="Spotify Playlist link"
               aria-describedby="spotifyPlaylistLinkLabel"
             />
-            <button type="button" class="btn btn-outline-info" onclick={previewSpotifyPlaylist()}><IcBaselineFileDownload /> Load</button>
+            <button type="button" class="btn btn-outline-info" onclick={previewSpotifyPlaylist}><IcBaselineFileDownload /> Load</button>
           </div>
           <div id="spotifyPlaylistPreview" class="generate-preview"></div>
         </div>
@@ -3880,7 +3971,7 @@
               aria-label="TierMaker.com link"
               aria-describedby="tiermakerLinkLabel"
             />
-            <button type="button" class="btn btn-outline-info" onclick={previewTiermaker()}><IcBaselineFileDownload /> Load</button>
+            <button type="button" class="btn btn-outline-info" onclick={previewTiermaker}><IcBaselineFileDownload /> Load</button>
           </div>
           <div id="tiermakerPreview" class="generate-preview"></div>
         </div>
@@ -3890,7 +3981,7 @@
           <div class="input-group mb-3">
             <span class="input-group-text" id="clipsChannelLabel">twitch.tv/</span>
             <input type="text" class="form-control generate-value" id="clipsChannel" placeholder="username" aria-label="Twitch username" aria-describedby="clipsChannelLabel" />
-            <button type="button" class="btn btn-outline-info" onclick={previewClips()}><IcBaselineFileDownload /> Load</button>
+            <button type="button" class="btn btn-outline-info" onclick={previewClips}><IcBaselineFileDownload /> Load</button>
           </div>
           <div id="clipsPreview" class="generate-preview"></div>
         </div>
@@ -3900,7 +3991,7 @@
           <div class="input-group mb-3">
             <span class="input-group-text" id="emotesChannelLabel">twitch.tv/</span>
             <input type="text" class="form-control generate-value" id="emotesChannel" placeholder="username" aria-label="Twitch username" aria-describedby="emotesChannelLabel" />
-            <button type="button" class="btn btn-outline-info" onclick={previewEmotes()}><IcBaselineFileDownload /> Load</button>
+            <button type="button" class="btn btn-outline-info" onclick={previewEmotes}><IcBaselineFileDownload /> Load</button>
           </div>
           <div id="emotesPreview" class="generate-preview"></div>
         </div>
@@ -3917,7 +4008,7 @@
               aria-label="uwufufu URL"
               aria-describedby="uwufufuLinkLabel"
             />
-            <button type="button" class="btn btn-outline-info" onclick={previewUwufufu()}><IcBaselineFileDownload /> Load</button>
+            <button type="button" class="btn btn-outline-info" onclick={previewUwufufu}><IcBaselineFileDownload /> Load</button>
           </div>
           <div id="uwufufuPreview" class="generate-preview"></div>
         </div>
@@ -3927,7 +4018,7 @@
           <div class="input-group mb-3">
             <span class="input-group-text" id="ytchannelLinkLabel">YouTube handle</span>
             <input type="text" class="form-control generate-value" id="ytchannelLink" placeholder="@username" aria-label="YouTube channel URL" aria-describedby="ytchannelLinkLabel" />
-            <button type="button" class="btn btn-outline-info" onclick={previewYTChannel()}><IcBaselineFileDownload /> Load</button>
+            <button type="button" class="btn btn-outline-info" onclick={previewYTChannel}><IcBaselineFileDownload /> Load</button>
           </div>
           <div id="ytchannelPreview" class="generate-preview"></div>
         </div>
@@ -3944,7 +4035,7 @@
               aria-label="YouTube playlist URL"
               aria-describedby="ytplaylistLinkLabel"
             />
-            <button type="button" class="btn btn-outline-info" onclick={previewYTPlaylist()}><IcBaselineFileDownload /> Load</button>
+            <button type="button" class="btn btn-outline-info" onclick={previewYTPlaylist}><IcBaselineFileDownload /> Load</button>
           </div>
           <div id="ytplaylistPreview" class="generate-preview"></div>
         </div>
@@ -3953,7 +4044,7 @@
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#createBracketModal">
           <IcBaselineArrowBack /> Back
         </button>
-        <button type="button" class="btn btn-success" onclick={generateBracket()}><IcBaselineAutoAwesome /> Generate</button>
+        <button type="button" class="btn btn-success" onclick={generateBracket}><IcBaselineAutoAwesome /> Generate</button>
       </div>
     </div>
   </div>
@@ -3971,7 +4062,7 @@
         <div class="input-group">
           <span class="input-group-text">Bracket code</span>
           <input type="text" class="form-control" placeholder="XXXX" id="shareCode" />
-          <button class="btn btn-outline-success" type="button" onclick={importCode()}><IcBaselineFileDownload />Import</button>
+          <button class="btn btn-outline-success" type="button" onclick={importCode}><IcBaselineFileDownload />Import</button>
         </div>
         <!-- <hr />
             <button type="button" class="btn btn-info" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#myBracketsModal">
@@ -4123,7 +4214,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick={startBracket()}>Start bracket</button>
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick={startBracket}>Start bracket</button>
       </div>
     </div>
   </div>
@@ -4190,7 +4281,7 @@
       </div>
       <div class="modal-footer">
         <button id="dismissTriviaSettingsButton" type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="display: none">OK</button>
-        <button id="startTriviaButton" type="button" class="btn btn-success" data-bs-dismiss="modal" onclick={startTrivia()}>Start Trivia</button>
+        <button id="startTriviaButton" type="button" class="btn btn-success" data-bs-dismiss="modal" onclick={startTrivia}>Start Trivia</button>
       </div>
     </div>
   </div>
@@ -4242,6 +4333,32 @@
     </div>
   </div>
 </div>
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
+  <div class="container-fluid">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLinks" aria-controls="navbarLinks" aria-expanded="false" aria-label="Toggle site links">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand notranslate site-link" href="/home" target="_self" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Home page">
+      <img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" />
+    </a>
+    <a class="navbar-brand notranslate site-link" href="/blt" target="_self"> chat.vote Brackets, (tier)Lists & Trivia</a>
+
+    <div class="collapse navbar-collapse" id="navbarLinks">
+      <ul class="navbar-nav">
+        <NavbarLinks />
+      </ul>
+    </div>
+
+    <div class="navbar-nav">
+      <Login />
+    </div>
+
+    <div class="navbar-nav">
+      <ThemeSwitcher />
+    </div>
+  </div>
+</nav>
 
 <div class="container-fluid" id="bracket" style="display: none">
   <div class="row align-items-start text-center" style="height: 10vh">
@@ -4356,7 +4473,7 @@
           <IcBaselineSettings />
         </button>
       </span>
-      <button type="button" id="restart" class="btn btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Restart match" onclick={restartMatch()}>
+      <button type="button" id="restart" class="btn btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Restart match" onclick={restartMatch}>
         <IcBaselineRefresh />
       </button>
       <button type="button" id="hideScore" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Hide score">
@@ -4372,11 +4489,11 @@
         data-bs-toggle="popover"
         data-bs-title="Voting disabled"
         data-bs-content="A viewer is trying to vote but voting is disabled"
-        onclick={toggleVoting()}
+        onclick={toggleVoting}
       >
         Start Voting
       </button>
-      <button type="button" id="pickWinner" class="btn btn-info" onclick={pickWinner()}><IcBaselineNavigateNext />Next match</button>
+      <button type="button" id="pickWinner" class="btn btn-info" onclick={pickWinner}><IcBaselineNavigateNext />Next match</button>
     </div>
   </div>
 </div>
@@ -4432,7 +4549,7 @@
           data-bs-toggle="popover"
           data-bs-title="Voting disabled"
           data-bs-content="A viewer is trying to vote but voting is disabled"
-          onclick={toggleVoting()}
+          onclick={toggleVoting}
         >
           Start Voting
         </button>
@@ -4441,7 +4558,7 @@
           <IcBaselineVisibility id="hideScoreTierlistIcon" />
         </button>
 
-        <button type="button" class="btn btn-warning" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Restart round" onclick={restartMatch()}>
+        <button type="button" class="btn btn-warning" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Restart round" onclick={restartMatch}>
           <IcBaselineRefresh />
         </button>
 
@@ -4483,7 +4600,7 @@
           <IcBaselineLightbulb />
         </button>
 
-        <button type="button" id="pickWinnerTierlist" class="btn btn-info" onclick={pickWinnerTierlist()}><IcBaselineNavigateNext />Next item</button>
+        <button type="button" id="pickWinnerTierlist" class="btn btn-info" onclick={pickWinnerTierlist}><IcBaselineNavigateNext />Next item</button>
       </div>
     </div>
   </div>
@@ -4596,8 +4713,8 @@
           <IcBaselineSettings />
         </button>
       </span>
-      <button type="button" id="showAnswer" class="btn btn-warning" onclick={showAnswer()}><IcBaselineVisibility />Show answer</button>
-      <button type="button" id="nextQuestion" class="btn btn-primary" onclick={nextQuestion()}><IcBaselineArrowForwardIos />Next question</button>
+      <button type="button" id="showAnswer" class="btn btn-warning" onclick={showAnswer}><IcBaselineVisibility />Show answer</button>
+      <button type="button" id="nextQuestion" class="btn btn-primary" onclick={nextQuestion}><IcBaselineArrowForwardIos />Next question</button>
     </div>
   </div>
 </div>
@@ -4627,7 +4744,7 @@
     <div class="col-md-5">
       <div class="card mt-3" id="bracketEditor" style="display: none">
         <div class="card-header">
-          Editing bracket <span id="bracketEditorHeader"></span><IcBaselineClose class="float-end" style="cursor: pointer" onclick={closeBracketEditor()} />
+          Editing bracket <span id="bracketEditorHeader"></span><IcBaselineClose class="float-end" style="cursor: pointer" onclick={closeBracketEditor} />
         </div>
         <div class="card-body" id="bracketEditorBody">
           <div class="mb-3">
@@ -4648,7 +4765,7 @@
 
       <div class="card mt-3" id="triviaEditor" style="display: none">
         <div class="card-header">
-          Editing trivia <span id="triviaEditorHeader"></span><IcBaselineClose class="float-end" style="cursor: pointer" onclick={closeTriviaEditor()} />
+          Editing trivia <span id="triviaEditorHeader"></span><IcBaselineClose class="float-end" style="cursor: pointer" onclick={closeTriviaEditor} />
         </div>
         <div class="card-body" id="triviaEditorBody">
           <div class="mb-3">

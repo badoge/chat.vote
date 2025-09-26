@@ -1,9 +1,89 @@
 <script>
+  import NavbarLinks from "$lib/NavbarLinks.svelte";
+  import ThemeSwitcher from "$lib/ThemeSwitcher.svelte";
+  import Login from "$lib/Login.svelte";
   import { switchGame } from "$lib/functions";
   import { onMount } from "svelte";
   import IcRoundOpenInNew from "~icons/ic/round-open-in-new";
   let { children } = $props();
+
+  let elements;
+
+  let bootstrap;
+  let aboutModal;
+
+  onMount(async () => {
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
+    elements = {
+      //modals
+      aboutModal: document.getElementById("aboutModal"),
+    };
+
+    aboutModal = new bootstrap.Modal(elements.aboutModal);
+  });
 </script>
+
+<div class="modal fade" id="aboutModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">About</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="card mb-3">
+          <div class="card-body">
+            <h5>Contact info:</h5>
+            <p>
+              Site by <a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/badoge">badoge</a> :) <br />If you find any issues or if you have suggestions or questions, you
+              can contact me: <br /><a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/popout/badoge/chat?popout=">in this chat</a> <br />or on
+              <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/FR8bgQdPUT">discord</a> <br />or by <a href="mailto:games@chat.vote">email</a>
+            </p>
+          </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-body">
+            <p>tictactoe based on <a target="_blank" rel="noopener noreferrer" href="https://github.com/michaelwhyte/tic_tac_toe">github.com/michaelwhyte/tic_tac_toe</a></p>
+            <p>connect4 based on <a target="_blank" rel="noopener noreferrer" href="https://github.com/mennovanslooten/connect4">github.com/mennovanslooten/connect4</a></p>
+            <p>not wordle based on <a target="_blank" rel="noopener noreferrer" href="https://www.nytimes.com/games/wordle/index.html">wordle</a></p>
+            <p>🟥⏹️🔴🔴⭕⏹️, Donk Hunt, Nim and Arena by <a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/g7eternal">g7eternal</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
+  <div class="container-fluid">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLinks" aria-controls="navbarLinks" aria-expanded="false" aria-label="Toggle site links">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand notranslate site-link" href="/home" target="_self" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Home page">
+      <img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" />
+    </a>
+    <a class="navbar-brand notranslate site-link" href="/games" target="_self"> chat.vote Games</a>
+
+    <div class="collapse navbar-collapse" id="navbarLinks">
+      <ul class="navbar-nav">
+        <NavbarLinks />
+      </ul>
+    </div>
+
+    <div class="navbar-nav">
+      <Login />
+    </div>
+
+    <div class="navbar-nav">
+      <ThemeSwitcher />
+    </div>
+  </div>
+</nav>
 
 <div class="container-fluid">
   <div id="grid" class="mt-3" style="display: none;">

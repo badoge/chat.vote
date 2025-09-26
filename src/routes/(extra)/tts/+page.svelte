@@ -59,7 +59,7 @@
   <meta name="keywords" content="twitch, chat, poll, chatvote, chat.vote, TTS" />
   <meta property="og:title" content="chat.vote TTS" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://chat.vote/tts/" />
+  <meta property="og:url" content="https://chat.vote/tts" />
   <meta property="og:image" content="https://chat.vote/pics/ogimage.png" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:description" content="chat.vote TTS test site" /></svelte:head

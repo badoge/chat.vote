@@ -1,4 +1,7 @@
 <script>
+  import NavbarLinks from "$lib/NavbarLinks.svelte";
+  import ThemeSwitcher from "$lib/ThemeSwitcher.svelte";
+  import Login from "$lib/Login.svelte";
   import { changeSiteLinkTarget, enablePopovers, enableTooltips, escapeString, showToast } from "$lib/functions";
   import { onMount } from "svelte";
   import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
@@ -773,6 +776,32 @@
     </div>
   </div>
 </div>
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
+  <div class="container-fluid">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLinks" aria-controls="navbarLinks" aria-expanded="false" aria-label="Toggle site links">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand notranslate site-link" href="/home" target="_self" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Home page">
+      <img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" />
+    </a>
+    <a class="navbar-brand notranslate site-link" href="/poll" target="_self"> chat.vote Polls</a>
+
+    <div class="collapse navbar-collapse" id="navbarLinks">
+      <ul class="navbar-nav">
+        <NavbarLinks />
+      </ul>
+    </div>
+
+    <div class="navbar-nav">
+      <Login />
+    </div>
+
+    <div class="navbar-nav">
+      <ThemeSwitcher />
+    </div>
+  </div>
+</nav>
 
 <div class="container-fluid">
   <div class="row" id="mainrow">

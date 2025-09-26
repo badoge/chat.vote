@@ -1,4 +1,7 @@
 <script>
+  import NavbarLinks from "$lib/NavbarLinks.svelte";
+  import ThemeSwitcher from "$lib/ThemeSwitcher.svelte";
+  import Login from "$lib/Login.svelte";
   import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
   import IcBaselineVisibility from "~icons/ic/baseline-visibility";
   import IcBaselineSettings from "~icons/ic/baseline-settings";
@@ -77,12 +80,6 @@
       voteSkipDiv: document.getElementById("voteSkipDiv"),
       voteSkipHint: document.getElementById("voteSkipHint"),
       voteSkipVotes: document.getElementById("voteSkipVotes"),
-
-      //navbar
-      status: document.getElementById("status"),
-      topRight: document.getElementById("topRight"),
-      loginButton: document.getElementById("loginButton"),
-      channelName: document.getElementById("channelName"),
 
       //settings
       settingsOffcanvas: document.getElementById("settingsOffcanvas"),
@@ -215,10 +212,6 @@
     approvalTab = new bootstrap.Tab(elements.approvalTab);
     historyTab = new bootstrap.Tab(elements.historyTab);
 
-    if (!USER.channel) {
-      loginButton = new bootstrap.Popover(elements.loginButton);
-    }
-
     elements.approvalQueue.onchange = function () {
       saveSettings();
       if (elements.approvalTab.classList.contains("active")) {
@@ -264,7 +257,6 @@
 
   let client;
   let currentTime = 0;
-  let loginButton;
   let settingsOffcanvas;
   let dankUpdateModal, banlistModal;
   let copyLinkButton;
@@ -4031,6 +4023,32 @@
   </div>
 </div>
 
+<nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
+  <div class="container-fluid">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLinks" aria-controls="navbarLinks" aria-expanded="false" aria-label="Toggle site links">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand notranslate site-link" href="/home" target="_self" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Home page">
+      <img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" />
+    </a>
+    <a class="navbar-brand notranslate site-link" href="/playlist" target="_self"> chat.vote Playlist</a>
+
+    <div class="collapse navbar-collapse" id="navbarLinks">
+      <ul class="navbar-nav">
+        <NavbarLinks />
+      </ul>
+    </div>
+
+    <div class="navbar-nav">
+      <Login />
+    </div>
+
+    <div class="navbar-nav">
+      <ThemeSwitcher />
+    </div>
+  </div>
+</nav>
+
 <div class="container-fluid">
   <div class="row" id="mainRow">
     <div class="col p-0 m-2">
@@ -4281,7 +4299,7 @@
         <div class="p-1" style="display: none">
           <div class="hstack gap-1">
             <IcBaselineVolumeUp class="cursor-pointer" id="volumeSliderIcon" onclick={toggleMute} />
-            <input type="range" class="form-range" min="0" value="50" max="100" id="volumeSlider" oninput={() => changeVolume} />
+            <input type="range" class="form-range" min="0" value="50" max="100" id="volumeSlider" oninput={changeVolume} />
             <span id="volumeSliderValue">50</span>
           </div>
         </div>

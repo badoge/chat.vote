@@ -1,4 +1,7 @@
 <script>
+  import NavbarLinks from "$lib/NavbarLinks.svelte";
+  import ThemeSwitcher from "$lib/ThemeSwitcher.svelte";
+  import Login from "$lib/Login.svelte";
   import IcBaselineRefresh from "~icons/ic/baseline-refresh";
   import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
   import IcBaselineAccountCircle from "~icons/ic/baseline-account-circle";
@@ -58,12 +61,6 @@
       claw: document.getElementById("claw"),
       slot: document.getElementById("slot"),
       fancyRaffleWinner: document.getElementById("fancyRaffleWinner"),
-
-      //navbar
-      status: document.getElementById("status"),
-      topRight: document.getElementById("topRight"),
-      loginButton: document.getElementById("loginButton"),
-      channelName: document.getElementById("channelName"),
 
       //raffle
       enableRaffle: document.getElementById("enableRaffle"),
@@ -159,10 +156,6 @@
     });
 
     rafflePopover = new bootstrap.Popover(elements.enableRaffle);
-
-    if (!USER.channel) {
-      loginButton = new bootstrap.Popover(elements.loginButton);
-    }
 
     fancyRaffleModal = new bootstrap.Modal(elements.fancyRaffleModal);
 
@@ -278,7 +271,6 @@
   let timer_raffle;
   let currentTime = 0;
   let rafflePopover;
-  let loginButton;
   let fancyRaffleModal;
   let currentRaffleWinner = "";
   let raffleWinners = [];
@@ -1408,6 +1400,32 @@
     </div>
   </div>
 </div>
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
+  <div class="container-fluid">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLinks" aria-controls="navbarLinks" aria-expanded="false" aria-label="Toggle site links">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand notranslate site-link" href="/home" target="_self" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Home page">
+      <img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" />
+    </a>
+    <a class="navbar-brand notranslate site-link" href="/raffles" target="_self"> chat.vote Raffles</a>
+
+    <div class="collapse navbar-collapse" id="navbarLinks">
+      <ul class="navbar-nav">
+        <NavbarLinks />
+      </ul>
+    </div>
+
+    <div class="navbar-nav">
+      <Login />
+    </div>
+
+    <div class="navbar-nav">
+      <ThemeSwitcher />
+    </div>
+  </div>
+</nav>
 
 <div class="container-fluid mt-3">
   <div class="row">

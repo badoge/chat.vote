@@ -279,7 +279,7 @@
   <meta name="keywords" content="OBS, WAYTOODANK, music, visualizer, chatvote, chat.vote" />
   <meta property="og:title" content="chat.vote - WAYTOODANK" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://chat.vote/waytoodank/" />
+  <meta property="og:url" content="https://chat.vote/waytoodank" />
   <meta property="og:image" content="https://chat.vote/pics/ogimage.png" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:description" content="A WAYTOODANK OBS music visualizer" />

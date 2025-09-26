@@ -1,4 +1,8 @@
 <script>
+  import NavbarLinks from "$lib/NavbarLinks.svelte";
+  import ThemeSwitcher from "$lib/ThemeSwitcher.svelte";
+  import Login from "$lib/Login.svelte";
+
   import { enablePopovers, enableTooltips, escapeString, getUserID, sendData } from "$lib/functions";
   import { onMount, onDestroy } from "svelte";
   import IcBaselineRefresh from "~icons/ic/baseline-refresh";
@@ -38,10 +42,10 @@
     ModuleRegistry.registerModules([AllCommunityModule]);
 
     const gridOptions = {
-      overlayNoRowsTemplate: `<h3>Nothing here <img src="/pics/donk.png" alt="donk" style="height:28px; width:28px;"></h3>`,
+      overlayNoRowsTemplate: `<div><h3>Nothing here <img src="/pics/donk.png" alt="donk" style="height:28px; width:28px;"></h3><br><small>Add options using the text field above</small></div>`,
       columnDefs: [
         { field: "Command", flex: 1 },
-        { field: "Option", flex: 5 },
+        { field: "Option", flex: 5, editable: true },
         { field: "By", flex: 2 },
         { field: "Score", flex: 1 },
         { field: "Delete", flex: 1 },
@@ -56,9 +60,9 @@
         "bs-dark",
       ),
       rowData: [
-        // { Command: "Tesla", Option: "Model Y", By: 64950, Score: 64950, Delete: 64950 },
-        // { Command: "Ford", Option: "F-Series", By: 33850, Score: 64950, Delete: 64950 },
-        // { Command: "Toyota", Option: "Corolla", By: 29600, Score: 64950, Delete: 64950 },
+        { Command: "Tesla", Option: "Model Y", By: 64950, Score: 64950, Delete: 64950 },
+        { Command: "Ford", Option: "F-Series", By: 33850, Score: 64950, Delete: 64950 },
+        { Command: "Toyota", Option: "Corolla", By: 29600, Score: 64950, Delete: 64950 },
       ],
     };
     createGrid(document.querySelector("#table"), gridOptions);
@@ -78,12 +82,6 @@
       removeRandomWinner: document.getElementById("removeRandomWinner"),
       randomYesnoModal: document.getElementById("randomYesnoModal"),
       coin: document.getElementById("coin"),
-
-      //navbar
-      status: document.getElementById("status"),
-      topRight: document.getElementById("topRight"),
-      loginButton: document.getElementById("loginButton"),
-      channelName: document.getElementById("channelName"),
 
       //settings
       settingsOffcanvas: document.getElementById("settingsOffcanvas"),
@@ -187,10 +185,6 @@
     settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
     votePopover = new bootstrap.Popover(elements.enableVoting);
     suggestPopover = new bootstrap.Popover(elements.enableSuggestions);
-
-    if (!USER.channel) {
-      loginButton = new bootstrap.Popover(elements.loginButton);
-    }
 
     let resetSettingsPopover = new bootstrap.Popover("#resetSettingsPopover", {
       trigger: "focus",
@@ -448,7 +442,6 @@
   let timer;
   let currentTime = 0;
   let votePopover, suggestPopover;
-  let loginButton;
   let randomOptionModal, timeOverModal, yesnoTimeOverModal, tieModal, randomYesnoModal;
   let enableVotingDropdown, enableSuggestionsDropdown;
   let tableTab, chartTab, yesnoTab, overlayTab;
@@ -2069,7 +2062,7 @@
         <p id="randomOptionWinner"></p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick={pickRandomOption()}><IcBaselineRefresh />reroll</button>
+        <button type="button" class="btn btn-secondary" onclick={pickRandomOption}><IcBaselineRefresh />reroll</button>
         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
       </div>
     </div>
@@ -2087,8 +2080,8 @@
         <p id="timeOverWinner"></p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-info" data-bs-dismiss="modal" onclick={removeWinner()}>Remove winner and restart</button>
-        <button type="button" class="btn btn-warning" data-bs-dismiss="modal" onclick={restartPoll()}><IcBaselineRefresh />Restart</button>
+        <button type="button" class="btn btn-info" data-bs-dismiss="modal" onclick={removeWinner}>Remove winner and restart</button>
+        <button type="button" class="btn btn-warning" data-bs-dismiss="modal" onclick={restartPoll}><IcBaselineRefresh />Restart</button>
         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
       </div>
     </div>
@@ -2124,9 +2117,9 @@
         <p id="tieModalText">Winner and runner up are tied, unable to pick a winner</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-info" id="removeRandomWinner" style="display: none" data-bs-dismiss="modal" onclick={removeRandomWinner()}>Remove winner and restart</button>
-        <button type="button" class="btn btn-primary" onclick={pickRandomTiedOption()}><IcBaselineCasino />Pick a random option</button>
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick={enableVoteButton()}><IcBaselineTimer />Keep voting</button>
+        <button type="button" class="btn btn-info" id="removeRandomWinner" style="display: none" data-bs-dismiss="modal" onclick={removeRandomWinner}>Remove winner and restart</button>
+        <button type="button" class="btn btn-primary" onclick={pickRandomTiedOption}><IcBaselineCasino />Pick a random option</button>
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick={enableVoteButton}><IcBaselineTimer />Keep voting</button>
       </div>
     </div>
   </div>
@@ -2140,14 +2133,14 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <div id="coin" onclick={pickRandomYesNo()}>
+        <div id="coin" onclick={pickRandomYesNo}>
           <div class="side-a"><img src="/pics/yea.webp" alt="yea" width="150" height="150" /></div>
           <div class="side-b"><img src="/pics/nay.webp" alt="nay" width="150" height="150" /></div>
         </div>
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick={pickRandomYesNo()}><IcBaselineRefresh />reroll</button>
+        <button type="button" class="btn btn-secondary" onclick={pickRandomYesNo}><IcBaselineRefresh />reroll</button>
       </div>
     </div>
   </div>
@@ -2165,7 +2158,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick={addOptionBulk()}><IcBaselineAdd /> Add</button>
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick={addOptionBulk}><IcBaselineAdd /> Add</button>
       </div>
     </div>
   </div>
@@ -2219,7 +2212,7 @@
               <option value="10">10</option>
             </select>
             <label class="input-group-text text-light" for="remove">options and</label>
-            <button class="btn btn-secondary" type="button" onclick={removeAndRestart()}>restart<IcBaselineRefresh /></button>
+            <button class="btn btn-secondary" type="button" onclick={removeAndRestart}>restart<IcBaselineRefresh /></button>
           </div>
         </div>
       </div>
@@ -2238,7 +2231,7 @@
           <small class="yesno-warning text-warning" style="display: none"> Does not support <img src="/pics/yeanay.webp" alt="yeanay" style="height: 1.2em" />Mode </small>
         </div>
         <div class="form-check form-switch mb-3">
-          <input type="checkbox" class="form-check-input" id="allowChange" onchange={saveSettings()} aria-describedby="allowChangeDesc" />
+          <input type="checkbox" class="form-check-input" id="allowChange" onchange={saveSettings} aria-describedby="allowChangeDesc" />
           <label class="form-check-label" for="allowChange"> <IcBaselineSwapHoriz /> Allow vote changing</label><br />
           <small id="allowChangeDesc" class="text-body-secondary"> Viewers will be able to change the option they selected by voting again. They can change their vote only once.</small><br
           />
@@ -2263,7 +2256,7 @@
         </div>
 
         <div class="form-check form-switch mb-3">
-          <input class="form-check-input" type="checkbox" id="refreshWarningEnabled" onchange={saveSettings()} />
+          <input class="form-check-input" type="checkbox" id="refreshWarningEnabled" onchange={saveSettings} />
           <label class="form-check-label" for="refreshWarningEnabled"> <IcBaselineNotificationImportant /> Enable close/refresh warning</label>
           <br /><small class="text-body-secondary">Shows a warning before leaving/refreshing the site so that you don't accidentally lose your poll results.</small>
         </div>
@@ -2292,7 +2285,7 @@
       <div class="card-body">
         <div class="input-group mb-0">
           <span class="input-group-text blueborder">Refresh 3rd party emotes</span>
-          <button class="btn btn-outline-info" type="button" onclick={getEmotes()}><IcBaselineRefresh /></button>
+          <button class="btn btn-outline-info" type="button" onclick={getEmotes}><IcBaselineRefresh /></button>
         </div>
         <div class="text-body-secondary mb-3">
           Loaded emotes (global/channel): BTTV: <span id="bttvGlobalEmotes">0</span>/<span id="bttvChannelEmotes">0</span> | FFZ: <span id="ffzGlobalEmotes">0</span>/<span
@@ -2344,7 +2337,7 @@
           </div>
         </div>
 
-        <button type="button" onclick={download()} class="btn btn-primary"><IcBaselineFileDownload /> Download</button>
+        <button type="button" onclick={download} class="btn btn-primary"><IcBaselineFileDownload /> Download</button>
       </div>
     </div>
 
@@ -2361,6 +2354,32 @@
     </div>
   </div>
 </div>
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
+  <div class="container-fluid">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLinks" aria-controls="navbarLinks" aria-expanded="false" aria-label="Toggle site links">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand notranslate site-link" href="/home" target="_self" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Home page">
+      <img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" />
+    </a>
+    <a class="navbar-brand notranslate site-link" href="/" target="_self"> chat.vote </a>
+
+    <div class="collapse navbar-collapse" id="navbarLinks">
+      <ul class="navbar-nav">
+        <NavbarLinks />
+      </ul>
+    </div>
+
+    <div class="navbar-nav">
+      <Login />
+    </div>
+
+    <div class="navbar-nav">
+      <ThemeSwitcher />
+    </div>
+  </div>
+</nav>
 
 <div class="container-fluid">
   <div class="row">
@@ -2385,7 +2404,7 @@
               class="btn btn-outline-secondary"
               type="button"
               id="addOption"
-              onclick={addOption()}
+              onclick={addOption}
               data-bs-toggle="tooltip"
               data-bs-placement="top"
               data-bs-title="or just press enter :)"
@@ -2418,13 +2437,13 @@
         <div class="card-body">
           <div class="values d-inline-flex" style="font-size: 3em"></div>
           <div class="btn-group float-end h-100" role="group" aria-label="Timer controls" id="timerControls">
-            <button class="btn btn-outline-secondary" type="button" id="stopTimer" onclick={stopTimer()}>
+            <button class="btn btn-outline-secondary" type="button" id="stopTimer" onclick={stopTimer}>
               <IcBaselineStop />
             </button>
-            <button class="btn btn-outline-secondary" type="button" id="pauseTimer" onclick={pauseTimer()}>
+            <button class="btn btn-outline-secondary" type="button" id="pauseTimer" onclick={pauseTimer}>
               <IcBaselinePause />
             </button>
-            <button class="btn btn-outline-secondary" type="button" style="display: none" id="unpauseTimer" onclick={unpauseTimer()}>
+            <button class="btn btn-outline-secondary" type="button" style="display: none" id="unpauseTimer" onclick={unpauseTimer}>
               <IcBaselinePlayArrow />
             </button>
           </div>
@@ -2558,11 +2577,11 @@
                     placeholder="Click 'Generate new overlay link' to get your overlay URL"
                     aria-label="Click 'Generate new overlay link' to get your overlay URL"
                   />
-                  <button class="btn btn-outline-secondary" type="button" onclick={copyOverlayLink()}> <IcBaselineContentCopy /> </button>
-                  <button class="btn btn-success" type="button" id="connectOverlayButton" onclick={connectOverlay()} disabled>
+                  <button class="btn btn-outline-secondary" type="button" onclick={copyOverlayLink}> <IcBaselineContentCopy /> </button>
+                  <button class="btn btn-success" type="button" id="connectOverlayButton" onclick={connectOverlay} disabled>
                     <IcBaselineConnectWithoutContact /> Connect overlay
                   </button>
-                  <button class="btn btn-danger" type="button" id="generateOverlayButton" onclick={generateOverlay()}>
+                  <button class="btn btn-danger" type="button" id="generateOverlayButton" onclick={generateOverlay}>
                     <IcBaselineRestartAlt /> Generate new overlay link
                   </button>
                   <button class="btn btn-info" type="button" data-bs-toggle="modal" data-bs-target="#overlayModal"><IcBaselineHelp /></button>
@@ -2646,7 +2665,7 @@
                 <div class="mb-3">
                   <label for="timerValueMinutes" class="form-label"><IcBaselineTimer />Poll timer</label>
                   <div class="input-group mb-3">
-                    <input type="number" min="0" value="0" class="form-control" id="timerValueMinutes" onchange={saveSettings()} aria-describedby="timerDesc" />
+                    <input type="number" min="0" value="0" class="form-control" id="timerValueMinutes" onchange={saveSettings} aria-describedby="timerDesc" />
                     <span class="input-group-text" id="timerDesc">minutes</span>
                   </div>
                   <div class="form-text">Timer automatically starts when you start voting. Set to 0 to disable the timer</div>
@@ -2685,7 +2704,7 @@
                   <input
                     type="number"
                     id="suggestionLimitUser"
-                    onchange={saveSettings()}
+                    onchange={saveSettings}
                     style="max-width: 5em"
                     class="form-control"
                     min="0"
@@ -2712,7 +2731,7 @@
                 <small class="text-body-secondary">The total amount of suggestions from all viewers. 0=unlimited</small>
                 <hr />
                 The suggestion command can be changed
-                <span onclick={changeSuggestionCommand()} style="color: #00bc8c; cursor: pointer">here</span>
+                <span onclick={changeSuggestionCommand} style="color: #00bc8c; cursor: pointer">here</span>
               </div>
             </div>
 
@@ -2732,7 +2751,7 @@
                 type="button"
                 class="btn btn-outline-warning quick-actions"
                 id="restartPoll"
-                onclick={restartPoll()}
+                onclick={restartPoll}
                 data-bs-toggle="tooltip"
                 data-bs-placement="bottom"
                 data-bs-title="Restart the poll with the same options"

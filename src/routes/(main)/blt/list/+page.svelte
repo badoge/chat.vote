@@ -202,7 +202,7 @@
 
 <nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
   <div class="container-fluid">
-    <a class="navbar-brand notranslate" href="/blt/">
+    <a class="navbar-brand notranslate" href="/blt">
       <img src="/pics/donk.png" alt="donk" style="height: 24px; width: 24px" class="d-inline-block align-top" /> chat.vote Brackets - Community brackets
     </a>
   </div>

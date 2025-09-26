@@ -2418,7 +2418,7 @@ wlqaw9WTLH5ZIgQjX69VmueRaYmSUMQgUVzAayGiYTyAP0M7+FNq81HwTIBVtzvM7vRa+M9ZiiyPbrVD
   <meta property="og:title" content="chat.vote VTS" />
   <meta property="og:site_name" content="chat.vote VTS" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://chat.vote/vts/" />
+  <meta property="og:url" content="https://chat.vote/vts" />
   <meta property="og:image" content="https://chat.vote/pics/ogimage.png" />
   <meta property="og:locale" content="en_US" />
   <meta

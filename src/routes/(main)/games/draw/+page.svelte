@@ -30,13 +30,6 @@
       //modals
       grid: document.getElementById("grid"),
       gameDiv: document.getElementById("gameDiv"),
-      aboutModal: document.getElementById("aboutModal"),
-
-      //navbar
-      status: document.getElementById("status"),
-      topRight: document.getElementById("topRight"),
-      loginButton: document.getElementById("loginButton"),
-      channelName: document.getElementById("channelName"),
 
       //main
       drawemotecardbody: document.getElementById("drawemotecardbody"),
@@ -77,11 +70,6 @@
       countdownValue: document.getElementById("countdownValue"),
     };
 
-    if (!USER.channel) {
-      loginButton = new bootstrap.Popover(elements.loginButton);
-    }
-
-    aboutModal = new bootstrap.Modal(elements.aboutModal);
     settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
 
     enableTooltips();
@@ -222,8 +210,6 @@
     emoji: [],
   };
 
-  let loginButton;
-  let aboutModal;
   let settingsOffcanvas;
   let timer;
 
@@ -656,69 +642,6 @@
   </div>
 </div>
 
-<div class="modal fade" id="aboutModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">About</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="card mb-3">
-          <div class="card-body">
-            <h5>Contact info:</h5>
-            <p>
-              Site by <a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/badoge">badoge</a> :) <br />If you find any issues or if you have suggestions or questions, you
-              can contact me: <br /><a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/popout/badoge/chat?popout=">in this chat</a> <br />or on
-              <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/FR8bgQdPUT">discord</a> <br />or by <a href="mailto:games@chat.vote">email</a>
-            </p>
-          </div>
-        </div>
-        <div class="card mb-3">
-          <div class="card-body">
-            <h5>Other stuff by me :)</h5>
-            <p>
-              <a target="_blank" rel="noopener noreferrer" href="https://chat.vote/">chat.vote</a><br />
-              <small>Polls that you vote on by typing in Twitch chat.</small><br />
-              <a target="_blank" rel="noopener noreferrer" href="https://chat.vote/poll/">chat.vote/poll</a><br />
-              <small>Like normal chat.vote but you vote by visiting the site instead of typing in chat.</small><br />
-              <a target="_blank" rel="noopener noreferrer" href="https://okayeg.com">OkayegBOT</a><br />
-              <small>Fun/utility Twitch chat bot.</small><br />
-              <a target="_blank" rel="noopener noreferrer" href="https://zero.chat.vote">0weebs</a><br />
-              <small>Twitch moderation bot that bans weebs.</small><br />
-            </p>
-          </div>
-        </div>
-
-        <div class="card mb-3">
-          <div class="card-body">
-            <p>more games soon™ :)</p>
-            <p>tictactoe based on <a target="_blank" rel="noopener noreferrer" href="https://github.com/michaelwhyte/tic_tac_toe">github.com/michaelwhyte/tic_tac_toe</a></p>
-            <p>connect4 based on <a target="_blank" rel="noopener noreferrer" href="https://github.com/mennovanslooten/connect4">github.com/mennovanslooten/connect4</a></p>
-            <p>not wordle based on <a target="_blank" rel="noopener noreferrer" href="https://www.nytimes.com/games/wordle/index.html">wordle</a></p>
-            <p>🟥⏹️🔴🔴⭕⏹️, Donk Hunt, Nim and Arena by <a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/g7eternal">g7eternal</a></p>
-            <h5>Stuff used:</h5>
-            <ul>
-              <li><a target="_blank" rel="noopener noreferrer" href="https://getbootstrap.com/">Bootstrap</a></li>
-              <li><a target="_blank" rel="noopener noreferrer" href="https://tmijs.com/">tmi.js</a> to read twitch chat</li>
-              <li><a target="_blank" rel="noopener noreferrer" href="http://fabricjs.com/">Fabric.js</a> Drawing canvas</li>
-              <li><a target="_blank" rel="noopener noreferrer" href="https://github.com/twitter/twemoji">Twemoji</a> emoji</li>
-              <li><a target="_blank" rel="noopener noreferrer" href="https://phaser.io/">Phaser</a> Arena engine</li>
-              <li><a target="_blank" rel="noopener noreferrer" href="https://www.chartjs.org/">Chart.js</a> to display the results graphs</li>
-              <li><a target="_blank" rel="noopener noreferrer" href="https://github.com/albert-gonzalez/easytimer.js">EasyTimer.js</a> for the countdown timers</li>
-              <li><a target="_blank" rel="noopener noreferrer" href="https://fonts.google.com/icons">Material Icons</a> icons</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="offcanvas offcanvas-end" tabindex="-1" id="settingsOffcanvas" aria-labelledby="settingsOffcanvasLabel">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title" id="settingsOffcanvasLabel"><IcBaselineSettings />Settings</h5>
@@ -844,31 +767,31 @@
         <label for="LineWidth" class="form-label"><IcBaselineBrush />Brush size: <span id="LineWidthLabel">5</span></label>
         <br />
         <div class="btn-group" role="group" aria-label="brush size presets" id="brushpresetsgroup">
-          <input onclick={() => changeBrush()} value="1" class="btn-check" type="radio" name="brushpresets" id="brush1" />
+          <input onclick={changeBrush} value="1" class="btn-check" type="radio" name="brushpresets" id="brush1" />
           <label class="btn btn-outline-secondary" for="brush1" title="brush1">
             <svg class="brushsvg" style="height: 5px; width: 5px; fill: #22b14c" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <circle cx="50" cy="50" r="50" />
             </svg>
           </label>
-          <input onclick={() => changeBrush()} value="5" class="btn-check" type="radio" name="brushpresets" id="brush2" checked />
+          <input onclick={changeBrush} value="5" class="btn-check" type="radio" name="brushpresets" id="brush2" checked />
           <label class="btn btn-outline-secondary" for="brush2" title="brush2">
             <svg class="brushsvg" style="height: 10px; width: 10px; fill: #22b14c" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <circle cx="50" cy="50" r="50" />
             </svg>
           </label>
-          <input onclick={() => changeBrush()} value="10" class="btn-check" type="radio" name="brushpresets" id="brush3" />
+          <input onclick={changeBrush} value="10" class="btn-check" type="radio" name="brushpresets" id="brush3" />
           <label class="btn btn-outline-secondary" for="brush3" title="brush3">
             <svg class="brushsvg" style="height: 20px; width: 20px; fill: #22b14c" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <circle cx="50" cy="50" r="50" />
             </svg>
           </label>
-          <input onclick={() => changeBrush()} value="20" class="btn-check" type="radio" name="brushpresets" id="brush4" />
+          <input onclick={changeBrush} value="20" class="btn-check" type="radio" name="brushpresets" id="brush4" />
           <label class="btn btn-outline-secondary" for="brush4" title="brush4">
             <svg class="brushsvg" style="height: 30px; width: 30px; fill: #22b14c" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <circle cx="50" cy="50" r="50" />
             </svg>
           </label>
-          <input onclick={() => changeBrush()} value="40" class="btn-check" type="radio" name="brushpresets" id="brush5" />
+          <input onclick={changeBrush} value="40" class="btn-check" type="radio" name="brushpresets" id="brush5" />
           <label class="btn btn-outline-secondary" for="brush5" title="brush5">
             <svg id="dank" class="brushsvg" style="height: 40px; width: 40px; fill: #22b14c" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <circle cx="50" cy="50" r="50" />

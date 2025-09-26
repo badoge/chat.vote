@@ -1,3 +1,9 @@
+<script>
+  import NavbarLinks from "$lib/NavbarLinks.svelte";
+  import ThemeSwitcher from "$lib/ThemeSwitcher.svelte";
+  import Login from "$lib/Login.svelte";
+</script>
+
 <svelte:head>
   <title>chat.vote Homepage</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
@@ -6,11 +12,37 @@
   <meta property="og:title" content="chat.vote Homepage" />
   <meta property="og:site_name" content="chat.vote Homepage" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://chat.vote/home/" />
+  <meta property="og:url" content="https://chat.vote/home" />
   <meta property="og:image" content="https://chat.vote/pics/ogimage.png" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:description" content="Learn about all the features of chat.vote" />
 </svelte:head>
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
+  <div class="container-fluid">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLinks" aria-controls="navbarLinks" aria-expanded="false" aria-label="Toggle site links">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand notranslate site-link" href="/home" target="_self" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Home page">
+      <img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" />
+    </a>
+    <a class="navbar-brand notranslate site-link" href="/home" target="_self"> chat.vote Homepage</a>
+
+    <div class="collapse navbar-collapse" id="navbarLinks">
+      <ul class="navbar-nav">
+        <NavbarLinks />
+      </ul>
+    </div>
+
+    <div class="navbar-nav">
+      <Login />
+    </div>
+
+    <div class="navbar-nav">
+      <ThemeSwitcher />
+    </div>
+  </div>
+</nav>
 
 <h1 class="display-4 text-center">chat.vote pages</h1>
 
