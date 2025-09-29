@@ -1,4 +1,5 @@
 <script>
+  import { enablePopovers, enableTooltips } from "$lib/functions";
   import { onMount } from "svelte";
   let elements;
   let TTT;
@@ -45,8 +46,8 @@
       },
     }; //TTT
 
-    enableTooltips();
-    enablePopovers();
+    enableTooltips(bootstrap);
+    enablePopovers(bootstrap);
 
     initGraph();
     listeners();

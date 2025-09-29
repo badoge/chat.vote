@@ -10,7 +10,6 @@ const defaultSettings = {
     platform: "",
   },
   CHATVOTE: {
-    chartType: "bar",
     sortChart: false,
     showChat: false,
     multiChoice: false,
@@ -156,4 +155,12 @@ export class DonkStorage {
  */
 export function donkStorage(key, value) {
   return new DonkStorage(key, value);
+}
+
+/**
+ * @param {string} key the localstorage key that you want to reset to default settings
+ */
+export function resetSettings(key) {
+  localStorage.setItem(key, JSON.stringify(defaultSettings[key]));
+  location.reload();
 }

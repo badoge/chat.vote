@@ -1,4 +1,5 @@
 <script>
+  import { enablePopovers, enableTooltips } from "$lib/functions";
   import { onMount } from "svelte";
 
   import IcBaselinePlusOne from "~icons/ic/baseline-plus-one";
@@ -13,8 +14,8 @@
       gameDiv: document.getElementById("gameDiv"),
     };
 
-    enableTooltips();
-    enablePopovers();
+    enableTooltips(bootstrap);
+    enablePopovers(bootstrap);
 
     listeners();
     loadwords();

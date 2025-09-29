@@ -28,8 +28,8 @@
       board: document.getElementById("board"),
     };
 
-    enableTooltips();
-    enablePopovers();
+    enableTooltips(bootstrap);
+    enablePopovers(bootstrap);
 
     resetGame();
     initGraph();

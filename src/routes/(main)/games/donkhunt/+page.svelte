@@ -497,8 +497,8 @@
       },
     }; //DONKHUNT
 
-    enableTooltips();
-    enablePopovers();
+    enableTooltips(bootstrap);
+    enablePopovers(bootstrap);
 
     initGraph();
 

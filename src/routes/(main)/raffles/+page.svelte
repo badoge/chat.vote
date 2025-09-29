@@ -18,6 +18,7 @@
   import IcBaselineCallSplit from "~icons/ic/baseline-call-split";
   import IcBaselineBlock from "~icons/ic/baseline-block";
   import IcBaselineTimerOff from "~icons/ic/baseline-timer-off";
+  import { Howl } from "howler";
 
   import {
     addBadges,
@@ -139,8 +140,8 @@
       titleHint: document.getElementById("titleHint"),
     };
 
-    enableTooltips();
-    enablePopovers();
+    enableTooltips(bootstrap);
+    enablePopovers(bootstrap);
 
     let resetSettingsPopover = new bootstrap.Popover("#resetSettingsPopover", {
       trigger: "focus",
@@ -148,6 +149,7 @@
       sanitize: false,
       container: ".offcanvas-body",
     });
+    loginButtonPopover = new bootstrap.Popover(document.getElementById("loginButtonSpan"));
 
     rafflePopover = new bootstrap.Popover(elements.enableRaffle);
 
@@ -258,6 +260,7 @@
       return null;
     }; //onbeforeunload
   }); //onMount
+  let loginButtonPopover;
 
   let raffle_users = [];
   let raffle_tickets = [];
@@ -273,6 +276,17 @@
   let tickSound, revealSound;
   let thirdPartyEmotes = [];
   let firstTimeChatters = [];
+
+  function checkLogin() {
+    if (!USER.channel) {
+      loginButtonPopover.show();
+      setTimeout(function () {
+        loginButtonPopover.hide();
+      }, 4000);
+      return false;
+    }
+    return true;
+  } //checkLogin
 
   async function refreshData() {
     RAFFLES.raffleCommand = elements.raffleCommand.value.replace(/\s+/g, "").toLowerCase() ?? "!join";
@@ -1337,7 +1351,17 @@
     </div>
 
     <div class="navbar-nav">
-      <Login messageHandler={handleMessage} timeoutHandler={handleTimeout} />
+      <span
+        id="loginButtonSpan"
+        data-bs-container="body"
+        data-bs-placement="bottom"
+        data-bs-trigger="manual"
+        data-bs-toggle="popover"
+        data-bs-title="Not signed in"
+        data-bs-content="You need sign in before doing that"
+      >
+        <Login messageHandler={handleMessage} timeoutHandler={handleTimeout} />
+      </span>
     </div>
 
     <div class="navbar-nav">

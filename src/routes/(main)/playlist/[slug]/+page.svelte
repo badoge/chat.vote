@@ -5,7 +5,7 @@
   let bootstrap;
   onMount(async () => {
     bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
-    enableTooltips();
+    enableTooltips(bootstrap);
   });
 
   let { data } = $props();

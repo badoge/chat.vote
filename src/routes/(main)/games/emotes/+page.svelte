@@ -54,8 +54,8 @@
 
     settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
 
-    enableTooltips();
-    enablePopovers();
+    enableTooltips(bootstrap);
+    enablePopovers(bootstrap);
 
     elements.twitchGlobal.onchange = function () {
       EMOTEBENCHMARK.twitchGlobal = this.checked;

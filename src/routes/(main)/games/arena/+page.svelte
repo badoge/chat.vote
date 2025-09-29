@@ -185,8 +185,8 @@
       arena.aux.toggleTeamMode(e.target.checked);
     });
 
-    enableTooltips();
-    enablePopovers();
+    enableTooltips(bootstrap);
+    enablePopovers(bootstrap);
   });
 
   let USER = {

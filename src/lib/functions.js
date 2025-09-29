@@ -712,7 +712,7 @@ export function linkifyElementID(id, allowThumbnails) {
   });
 } //linkifyElementID
 
-export function enableTooltips() {
+export function enableTooltips(bootstrap) {
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
   const tooltipList = [...tooltipTriggerList].map(
     (tooltipTriggerEl) =>
@@ -722,7 +722,7 @@ export function enableTooltips() {
   );
 } //enableTooltips
 
-export function enablePopovers() {
+export function enablePopovers(bootstrap) {
   const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
   for (let index = 0; index < popoverTriggerList.length; index++) {
     if (popoverTriggerList[index].classList.contains("html-popover")) {

@@ -68,8 +68,8 @@
     pollModal = new bootstrap.Modal(elements.pollModal);
     captchaModal = new bootstrap.Modal(elements.captchaModal);
 
-    enableTooltips();
-    enablePopovers();
+    enableTooltips(bootstrap);
+    enablePopovers(bootstrap);
 
     elements.pollTitle.addEventListener("keydown", function (event) {
       if (event.key === "Tab") {

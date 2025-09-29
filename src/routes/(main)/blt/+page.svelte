@@ -260,8 +260,8 @@
       videoEmbed_trivia: document.getElementById("videoEmbed_trivia"),
     };
 
-    enableTooltips();
-    enablePopovers();
+    enableTooltips(bootstrap);
+    enablePopovers(bootstrap);
 
     document.addEventListener("click", (event) => {
       zoomOut(event);
@@ -269,6 +269,8 @@
 
     votePopover = new bootstrap.Popover(elements.enableVoting);
     votePopoverTierlist = new bootstrap.Popover(elements.enableVotingTierlist);
+
+    loginButtonPopover = new bootstrap.Popover(document.getElementById("loginButtonSpan"));
 
     tierlistEditorModal = new bootstrap.Modal(elements.tierlistEditorModal);
     previewModal = new bootstrap.Modal(elements.previewModal);
@@ -456,6 +458,7 @@
     streamable: `<i class="material-icons notranslate">play_arrow</i>`,
   };
   const spotifyURLRegex = /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:(album|track|playlist|episode)\/|\?uri=spotify:track:)((\w|-){22})/;
+  let loginButtonPopover;
 
   let tierlistEditorModal, previewModal, generateChatModal, generateModal, communityModal, startModal, startTriviaModal, publishedModal, importModal;
   let votePopover, votePopoverTierlist;
@@ -475,6 +478,17 @@
   let TRIVIA = {
     trivia: [],
   };
+
+  function checkLogin() {
+    if (!USER.channel) {
+      loginButtonPopover.show();
+      setTimeout(function () {
+        loginButtonPopover.hide();
+      }, 4000);
+      return false;
+    }
+    return true;
+  } //checkLogin
 
   function resetSettings() {
     logout();
@@ -2561,7 +2575,7 @@
     loadBrackets();
     saveSettings();
     elements.bracketEditor.style.display = "none";
-    enableTooltips();
+    enableTooltips(bootstrap);
   } //deleteBracket
 
   function deleteTrivia(id) {
@@ -2573,7 +2587,7 @@
     loadTrivia();
     saveSettings();
     elements.triviaEditor.style.display = "none";
-    enableTooltips();
+    enableTooltips(bootstrap);
   } //deleteTrivia
 
   function loadBrackets() {
@@ -2628,8 +2642,8 @@
   </div>`;
     }
     elements.myBrackets.innerHTML = html;
-    enableTooltips();
-    enablePopovers();
+    enableTooltips(bootstrap);
+    enablePopovers(bootstrap);
   } //loadBrackets
 
   function loadTrivia() {
@@ -2683,8 +2697,8 @@
   </div>`;
     }
     elements.myTrivia.innerHTML = html;
-    enableTooltips();
-    enablePopovers();
+    enableTooltips(bootstrap);
+    enablePopovers(bootstrap);
   } //loadTrivia
 
   function closeBracketEditor() {
@@ -4312,7 +4326,17 @@
     </div>
 
     <div class="navbar-nav">
-      <Login messageHandler={handleMessage} />
+      <span
+        id="loginButtonSpan"
+        data-bs-container="body"
+        data-bs-placement="bottom"
+        data-bs-trigger="manual"
+        data-bs-toggle="popover"
+        data-bs-title="Not signed in"
+        data-bs-content="You need sign in before doing that"
+      >
+        <Login messageHandler={handleMessage} />
+      </span>
     </div>
 
     <div class="navbar-nav">

@@ -3,7 +3,7 @@
   import ThemeSwitcher from "$lib/ThemeSwitcher.svelte";
   import Login from "$lib/Login.svelte";
 
-  import { enablePopovers, enableTooltips, escapeString, getUserID, sendData } from "$lib/functions";
+  import { enablePopovers, enableTooltips, escapeString, getStreamerColor, getUserID, sendData } from "$lib/functions";
   import { onMount } from "svelte";
   import IcBaselineRefresh from "~icons/ic/baseline-refresh";
   import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
@@ -28,7 +28,6 @@
   import IcBaselineConnectWithoutContact from "~icons/ic/baseline-connect-without-contact";
   import IcBaselineContentCopy from "~icons/ic/baseline-content-copy";
   import IcBaselineSort from "~icons/ic/baseline-sort";
-  import IcBaselinePieChart from "~icons/ic/baseline-pie-chart";
   import IcBaselineLayers from "~icons/ic/baseline-layers";
   import IcBaselineStop from "~icons/ic/baseline-stop";
   import IcBaselinePause from "~icons/ic/baseline-pause";
@@ -38,7 +37,7 @@
 
   import Chart from "chart.js/auto";
   import { createGrid, themeQuartz, ModuleRegistry, AllCommunityModule } from "ag-grid-community";
-  import { donkStorage } from "$lib/donkStorage.svelte";
+  import { donkStorage, resetSettings } from "$lib/donkStorage.svelte";
 
   let elements;
   let bootstrap;
@@ -150,8 +149,6 @@
       countdown: document.getElementById("countdown"),
       voteHint: document.getElementById("voteHint"),
       chartCanvas: document.getElementById("chartCanvas"),
-      barChart: document.getElementById("barChart"),
-      pieChart: document.getElementById("pieChart"),
       sortChart: document.getElementById("sortChart"),
       sortChartLabel: document.getElementById("sortChartLabel"),
       totalVotes: document.getElementById("totalVotes"),
@@ -184,12 +181,12 @@
       generateOverlayButton: document.getElementById("generateOverlayButton"),
     };
 
-    refreshData();
+    applySettings();
 
     elements.pollOption.focus();
     elements.pollOption.select();
-    //enableTooltips();
-    //enablePopovers();
+    enableTooltips(bootstrap);
+    enablePopovers(bootstrap);
     settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
     votePopover = new bootstrap.Popover(elements.enableVoting);
     suggestPopover = new bootstrap.Popover(elements.enableSuggestions);
@@ -200,6 +197,10 @@
       sanitize: false,
       container: ".offcanvas-body",
     });
+
+    loginButtonPopover = new bootstrap.Popover(document.getElementById("loginButtonSpan"));
+
+    sortChartTooltip = new bootstrap.Tooltip("#sortChartLabel");
 
     randomOptionModal = new bootstrap.Modal(elements.randomOptionModal);
     timeOverModal = new bootstrap.Modal(elements.timeOverModal);
@@ -301,19 +302,8 @@
       updateHint();
     };
 
-    elements.barChart.onchange = function () {
-      saveSettings();
-      loadChart();
-      updateChart();
-    };
-    elements.pieChart.onchange = function () {
-      saveSettings();
-      loadChart();
-      updateChart();
-    };
     elements.sortChart.onchange = function () {
-      const tooltip = bootstrap.Tooltip.getInstance("#sortChartLabel");
-      tooltip.setContent({ ".tooltip-inner": this.checked ? "Unsort chart" : "Sort chart" });
+      sortChartTooltip.setContent({ ".tooltip-inner": this.checked ? "Unsort chart" : "Sort chart" });
       saveSettings();
       loadChart();
       updateChart();
@@ -416,6 +406,8 @@
     }; //onbeforeunload
   }); //onMount
 
+  let loginButtonPopover;
+  let sortChartTooltip;
   let voters = [];
   let voters_options = [];
   let vote_results = [];
@@ -446,11 +438,21 @@
 
   let streamerColor = "";
 
+  function checkLogin() {
+    if (!USER.channel) {
+      loginButtonPopover.show();
+      setTimeout(function () {
+        loginButtonPopover.hide();
+      }, 4000);
+      return false;
+    }
+    return true;
+  } //checkLogin
+
   async function refreshData() {
     CHATVOTE.suggestion_prefix = elements.suggestionPrefix.value.replace(/\s+/g, "").toLowerCase();
 
     CHATVOTE.votingMode = elements.voteWithText.checked ? "text" : "numbers";
-    CHATVOTE.chartType = elements.pieChart.checked ? "pie" : "bar";
     CHATVOTE.sortChart = elements.sortChart.checked;
 
     if (!CHATVOTE.suggestion_prefix) {
@@ -476,61 +478,53 @@
     refreshData();
   } //saveSettings
 
-  function load_localStorage() {
-    if (!CHATVOTE) {
-      console.log("localStorage settings not found");
+  function applySettings() {
+    if (CHATVOTE.votingMode !== "numbers" && CHATVOTE.votingMode !== "text") {
+      CHATVOTE.votingMode = "numbers";
+    }
+    elements.voteWithNumbers.checked = CHATVOTE.votingMode === "numbers";
+    elements.voteWithText.checked = CHATVOTE.votingMode === "text";
+
+    elements.sortChart.checked = CHATVOTE.sortChart ?? false;
+    elements.suggestionPrefix.value = CHATVOTE.suggestion_prefix || "!suggest";
+    elements.suggestionLimitUser.value = parseInt(CHATVOTE.suggestionLimitUser, 10) ?? 1;
+    elements.suggestionLimit.value = parseInt(CHATVOTE.suggestionLimit, 10) || 0;
+    elements.timerValueMinutes.value = parseFloat(CHATVOTE.timerValueMinutes) || 0;
+
+    elements.showChat.checked = CHATVOTE.showChat ?? false;
+    elements.multiChoice.checked = CHATVOTE.multiChoice ?? false;
+    elements.allowChange.checked = CHATVOTE.allowChange ?? false;
+    elements.subMode.checked = CHATVOTE.subMode ?? false;
+    elements.confettiLevel.value = CHATVOTE.confettiLevel || 0;
+    elements.refreshWarningEnabled.checked = CHATVOTE.refreshWarningEnabled ?? false;
+    elements.linkPreviewThumbnailsEnabled.checked = CHATVOTE.linkPreviewThumbnailsEnabled ?? false;
+
+    if (CHATVOTE.questionHidden) {
+      elements.hideQuestion.innerHTML = "arrow_drop_down";
+      elements.questionLabel.style.display = "none";
     } else {
-      if (CHATVOTE.votingMode !== "numbers" && CHATVOTE.votingMode !== "text") {
-        CHATVOTE.votingMode = "numbers";
-      }
-      elements.voteWithNumbers.checked = CHATVOTE.votingMode === "numbers";
-      elements.voteWithText.checked = CHATVOTE.votingMode === "text";
-      if (CHATVOTE.chartType !== "bar" && CHATVOTE.chartType !== "pie") {
-        CHATVOTE.chartType = "bar";
-      }
-      elements.barChart.checked = CHATVOTE.chartType === "bar";
-      elements.pieChart.checked = CHATVOTE.chartType === "pie";
-      elements.sortChart.checked = CHATVOTE.sortChart ?? false;
-      elements.suggestionPrefix.value = CHATVOTE.suggestion_prefix || "!suggest";
-      elements.suggestionLimitUser.value = parseInt(CHATVOTE.suggestionLimitUser, 10) ?? 1;
-      elements.suggestionLimit.value = parseInt(CHATVOTE.suggestionLimit, 10) || 0;
-      elements.timerValueMinutes.value = parseFloat(CHATVOTE.timerValueMinutes) || 0;
+      elements.hideQuestion.innerHTML = "arrow_drop_up";
+      elements.questionLabel.style.display = "block";
+    }
 
-      elements.showChat.checked = CHATVOTE.showChat ?? false;
-      elements.multiChoice.checked = CHATVOTE.multiChoice ?? false;
-      elements.allowChange.checked = CHATVOTE.allowChange ?? false;
-      elements.subMode.checked = CHATVOTE.subMode ?? false;
-      elements.confettiLevel.value = CHATVOTE.confettiLevel || 0;
-      elements.refreshWarningEnabled.checked = CHATVOTE.refreshWarningEnabled ?? false;
-      elements.linkPreviewThumbnailsEnabled.checked = CHATVOTE.linkPreviewThumbnailsEnabled ?? false;
+    if (CHATVOTE.votingMode === "numbers") {
+      elements.multiChoiceExample.innerText = `Example: "1 2 3"`;
+    } else {
+      elements.multiChoiceExample.innerText = `Example: "option1 option2 option3"`;
+    }
 
-      if (CHATVOTE.questionHidden) {
-        elements.hideQuestion.innerHTML = "arrow_drop_down";
-        elements.questionLabel.style.display = "none";
-      } else {
-        elements.hideQuestion.innerHTML = "arrow_drop_up";
-        elements.questionLabel.style.display = "block";
-      }
+    if (CHATVOTE.subMode) {
+      elements.subOnlyAlert.style.display = "";
+    } else {
+      elements.subOnlyAlert.style.display = "none";
+    }
 
-      if (CHATVOTE.votingMode === "numbers") {
-        elements.multiChoiceExample.innerText = `Example: "1 2 3"`;
-      } else {
-        elements.multiChoiceExample.innerText = `Example: "option1 option2 option3"`;
-      }
+    if (CHATVOTE.showChat) {
+      showChat();
+    }
 
-      if (CHATVOTE.subMode) {
-        elements.subOnlyAlert.style.display = "";
-      } else {
-        elements.subOnlyAlert.style.display = "none";
-      }
-
-      if (CHATVOTE.showChat) {
-        showChat();
-      }
-
-      if (elements.sortChart.checked) {
-        elements.sortChartLabel.setAttribute("data-bs-title", "Unsort chart");
-      }
+    if (elements.sortChart.checked) {
+      elements.sortChartLabel.setAttribute("data-bs-title", "Unsort chart");
     }
 
     if (!localStorage.getItem("OVERLAY")) {
@@ -540,35 +534,7 @@
       elements.overlayLink.value = `https://chat.vote/overlay#${overlayID}`;
       elements.connectOverlayButton.disabled = false;
     }
-  } //load_localStorage
-
-  function resetSettings(logout = false) {
-    if (logout) {
-      logout();
-    }
-    localStorage.setItem(
-      "CHATVOTE",
-      JSON.stringify({
-        chartType: "bar",
-        sortChart: false,
-        showChat: false,
-        multiChoice: false,
-        allowChange: false,
-        subMode: false,
-        questionHidden: false,
-        suggestion_prefix: "!suggest",
-        votingMode: "numbers",
-        confettiLevel: 0,
-        suggestionLimitUser: 1,
-        suggestionLimit: 0,
-        timerValueMinutes: 0,
-        refreshWarningEnabled: false,
-        linkPreviewThumbnailsEnabled: false,
-      }),
-    );
-    location.reload();
-    return false;
-  } //resetSettings
+  } //applySettings
 
   function resetPoll() {
     if (yesNoMode) {
@@ -1064,7 +1030,7 @@
     } //restart poll
 
     if (command == "!reset" && (context.username == USER.channel || context.username == "badoge")) {
-      resetSettings();
+      resetSettings("CHATVOTE");
       return;
     } //reset settings
 
@@ -1450,97 +1416,59 @@
     if (mainChart) {
       mainChart.destroy();
     }
-    if (CHATVOTE.chartType == "bar") {
-      mainChart = new Chart(ctx, {
-        type: "bar",
-        data: {
-          labels: ["Nothing here :)"],
-          datasets: [
-            {
-              label: "score",
-              data: [],
-              borderWidth: 2,
-            },
-          ],
-        },
-        options: {
-          indexAxis: "y",
-          maintainAspectRatio: false,
-          scales: {
-            x: {
-              ticks: {
-                textStrokeColor: "rgba(0,0,0,1)",
-                textStrokeWidth: 2,
-                color: "white",
-              },
-              beginAtZero: true,
-            },
-            y: {
-              ticks: {
-                textStrokeColor: "rgba(0,0,0,1)",
-                textStrokeWidth: 3,
-                color: "white",
-                mirror: true,
-                font: function (context) {
-                  let count = vote_results.length;
-                  let donk = (context.chart.height + context.chart.width) / 2;
-                  let size = Math.round(donk / 18) - count * 2;
-                  return {
-                    size: size,
-                  };
-                },
-                z: 1,
-              },
-              beginAtZero: true,
-            },
+    mainChart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: ["Nothing here :)"],
+        datasets: [
+          {
+            label: "score",
+            data: [],
+            borderWidth: 2,
           },
-          plugins: {
-            tooltip: {
-              enabled: false,
+        ],
+      },
+      options: {
+        indexAxis: "y",
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            ticks: {
+              textStrokeColor: "rgba(0,0,0,1)",
+              textStrokeWidth: 2,
+              color: "white",
             },
-            legend: {
-              display: false,
+            beginAtZero: true,
+          },
+          y: {
+            ticks: {
+              textStrokeColor: "rgba(0,0,0,1)",
+              textStrokeWidth: 3,
+              color: "white",
+              mirror: true,
+              font: function (context) {
+                let count = vote_results.length;
+                let donk = (context.chart.height + context.chart.width) / 2;
+                let size = Math.round(donk / 18) - count * 2;
+                return {
+                  size: size,
+                };
+              },
+              z: 1,
             },
+            beginAtZero: true,
           },
         },
-      });
-    } else if (CHATVOTE.chartType == "pie") {
-      mainChart = new Chart(ctx, {
-        type: "pie",
-        data: {
-          labels: ["Nothing here :)"],
-          datasets: [
-            {
-              label: "score",
-              data: [],
-              borderWidth: 2,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: true,
-              position: "right",
-              onClick: null,
-              labels: {
-                color: "white",
-                font: function (context) {
-                  let count = vote_results.length;
-                  let donk = (context.chart.height + context.chart.width) / 2;
-                  let size = Math.round(donk / 32) - count * 2;
-                  return {
-                    size: size,
-                  };
-                },
-              },
-            },
+        plugins: {
+          tooltip: {
+            enabled: false,
+          },
+          legend: {
+            display: false,
           },
         },
-      });
-    }
+      },
+    });
   } //loadChart
 
   function updateChart() {
@@ -2314,7 +2242,17 @@
     </div>
 
     <div class="navbar-nav">
-      <Login messageHandler={handleMessage} timeoutHandler={handleTimeout} />
+      <span
+        id="loginButtonSpan"
+        data-bs-container="body"
+        data-bs-placement="bottom"
+        data-bs-trigger="manual"
+        data-bs-toggle="popover"
+        data-bs-title="Not signed in"
+        data-bs-content="You need sign in before doing that"
+      >
+        <Login messageHandler={handleMessage} timeoutHandler={handleTimeout} />
+      </span>
     </div>
 
     <div class="navbar-nav">
@@ -2457,16 +2395,6 @@
             </div>
             <div class="row p-2">
               <div class="col">
-                <div class="btn-group" role="group" aria-label="chart type toggles">
-                  <input class="btn-check" type="radio" name="charttype" id="barChart" autocomplete="off" checked />
-                  <label class="btn btn-outline-info" for="barChart" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Bar chart">
-                    <IcBaselineStackedBarChart style="transform: rotateZ(90deg)" />
-                  </label>
-                  <input class="btn-check" type="radio" name="charttype" id="pieChart" autocomplete="off" />
-                  <label class="btn btn-outline-info" for="pieChart" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Pie chart">
-                    <IcBaselinePieChart />
-                  </label>
-                </div>
                 <input type="checkbox" class="btn-check" id="sortChart" autocomplete="off" />
                 <label class="btn btn-outline-success" for="sortChart" id="sortChartLabel" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Sort chart">
                   <IcBaselineSort />

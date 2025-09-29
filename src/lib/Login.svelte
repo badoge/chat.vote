@@ -1,6 +1,6 @@
 <script>
   import { onMount } from "svelte";
-  import { donkStorage } from "$lib/donkStorage.svelte";
+  import { donkStorage, resetSettings } from "$lib/donkStorage.svelte";
   import { checkToken, get7TVPFP, getTwitchPFP, getUserID } from "./functions";
   import MdiTwitch from "~icons/mdi/twitch";
   import IcBaselineLogout from "~icons/ic/baseline-logout";
@@ -25,13 +25,11 @@
 
   let bootstrap;
   let loginExpiredModal;
-  let loginButtonPopover;
 
   onMount(async () => {
     bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
 
     loginExpiredModal = new bootstrap.Modal(document.getElementById("loginExpiredModal"));
-    loginButtonPopover = new bootstrap.Popover(document.getElementById("loginButton"));
 
     //listen to storage events from the login windows
     window.onstorage = () => {
@@ -160,19 +158,8 @@
     loginStatus = "logged_out";
     localStorage.setItem("loginStatus", "logged_out");
     localStorage.setItem("USER_TEMP", JSON.stringify({}));
-    //resetSettings(true);
+    resetSettings("USER");
   } //logout
-
-  function checkLogin() {
-    if (!USER.channel) {
-      loginButtonPopover.show();
-      setTimeout(function () {
-        loginButtonPopover.hide();
-      }, 4000);
-      return false;
-    }
-    return true;
-  } //checkLogin
 </script>
 
 <div class="modal fade" id="loginExpiredModal" tabindex="-1" aria-hidden="true">
@@ -208,18 +195,7 @@
 
 {#if loginStatus == "logged_out"}
   <div class="btn-group">
-    <button
-      type="button"
-      class="btn btn-twitch"
-      id="loginButton"
-      onclick={login}
-      data-bs-container="body"
-      data-bs-placement="bottom"
-      data-bs-trigger="manual"
-      data-bs-toggle="popover"
-      data-bs-title="Not signed in"
-      data-bs-content="You need sign in before doing that"><MdiTwitch />Sign in with Twitch</button
-    >
+    <button type="button" class="btn btn-twitch" onclick={login}><MdiTwitch />Sign in with Twitch</button>
     <button type="button" class="btn btn-twitch dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
       <span class="visually-hidden">Toggle Dropdown</span>
     </button>

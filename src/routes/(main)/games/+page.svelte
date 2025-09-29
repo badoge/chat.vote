@@ -11,8 +11,8 @@
       grid: document.getElementById("grid"),
     };
 
-    enableTooltips();
-    enablePopovers();
+    enableTooltips(bootstrap);
+    enablePopovers(bootstrap);
   });
 
   let USER = {

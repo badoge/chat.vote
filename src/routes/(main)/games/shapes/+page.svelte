@@ -1,4 +1,6 @@
 <script>
+  import { enablePopovers, enableTooltips } from "$lib/functions";
+
   let voters = [];
 
   import { onMount } from "svelte";
@@ -44,8 +46,8 @@
       },
     }; //SHAPES
 
-    enableTooltips();
-    enablePopovers();
+    enableTooltips(bootstrap);
+    enablePopovers(bootstrap);
 
     initGraph();
 

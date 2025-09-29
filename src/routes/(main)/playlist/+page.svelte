@@ -58,7 +58,18 @@
   import IcBaselineTiktok from "~icons/ic/baseline-tiktok";
   import HomepageLink from "$lib/HomepageLink.svelte";
 
-  import { convertTwitchVODDuration, enableTooltips, escapeString, formatViewCount, replacer, secondsToTimeString, showToast, timeStringToSeconds, timeToSeconds } from "$lib/functions";
+  import {
+    convertTwitchVODDuration,
+    enablePopovers,
+    enableTooltips,
+    escapeString,
+    formatViewCount,
+    replacer,
+    secondsToTimeString,
+    showToast,
+    timeStringToSeconds,
+    timeToSeconds,
+  } from "$lib/functions";
   import { animate } from "animejs";
   import { onMount } from "svelte";
   import localforage from "localforage";
@@ -201,12 +212,13 @@
     settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
     copyLinkButton = new bootstrap.Popover(elements.copyLinkButton);
     togglePlaylistPopover = new bootstrap.Popover(elements.togglePlaylist);
+    loginButtonPopover = new bootstrap.Popover(document.getElementById("loginButtonSpan"));
 
     elements.banlistModal.addEventListener("show.bs.modal", (event) => {
       loadBanLists();
     });
 
-    enablePopovers();
+    enablePopovers(bootstrap);
 
     let resetSettingsPopover = new bootstrap.Popover("#resetSettingsPopover", {
       trigger: "focus",
@@ -256,11 +268,12 @@
       });
     }
 
-    enableTooltips();
+    enableTooltips(bootstrap);
     enableTwitchEmbed();
     videoEmbedEventListeners();
     tiktokEmbedEventListeners();
   }); //onMount
+  let loginButtonPopover;
 
   let currentTime = 0;
   let settingsOffcanvas;
@@ -282,6 +295,17 @@
   let bannedChannels = new Map();
   let firstTimeChatters = [];
   let skippers = [];
+
+  function checkLogin() {
+    if (!USER.channel) {
+      loginButtonPopover.show();
+      setTimeout(function () {
+        loginButtonPopover.hide();
+      }, 4000);
+      return false;
+    }
+    return true;
+  } //checkLogin
 
   async function refreshData() {
     PLAYLIST.autoplay = elements.autoplay.checked;
@@ -1457,7 +1481,7 @@
         </div>
       </div>`,
     );
-    enableTooltips(); //enable the streamable channel ban tooltip
+    enableTooltips(bootstrap); //enable the streamable channel ban tooltip
   } //addToPlaylist
 
   function addToHistory(request, localStorageLoad = false) {
@@ -3950,7 +3974,17 @@
     </div>
 
     <div class="navbar-nav">
-      <Login messageHandler={handleMessage} messageDeletedHandler={handleMessageDeleted} />
+      <span
+        id="loginButtonSpan"
+        data-bs-container="body"
+        data-bs-placement="bottom"
+        data-bs-trigger="manual"
+        data-bs-toggle="popover"
+        data-bs-title="Not signed in"
+        data-bs-content="You need sign in before doing that"
+      >
+        <Login messageHandler={handleMessage} messageDeletedHandler={handleMessageDeleted} />
+      </span>
     </div>
 
     <div class="navbar-nav">

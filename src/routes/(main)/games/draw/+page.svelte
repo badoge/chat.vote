@@ -72,8 +72,8 @@
 
     settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
 
-    enableTooltips();
-    enablePopovers();
+    enableTooltips(bootstrap);
+    enablePopovers(bootstrap);
 
     DRAW.canvas = new fabric.Canvas("canvas", {
       isDrawingMode: true,
