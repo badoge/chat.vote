@@ -135,17 +135,28 @@ export class DonkStorage {
     this.value = value;
 
     if (browser) {
-      const item = localStorage.getItem(key);
+      const item = localStorage.getItem(this.key);
       if (item) {
         this.value = JSON.parse(item);
       } else {
-        this.value = defaultSettings[key];
+        this.value = defaultSettings[this.key];
       }
     }
 
     $effect(() => {
       localStorage.setItem(this.key, JSON.stringify(this.value));
     });
+  }
+
+  refresh() {
+    if (browser) {
+      const item = localStorage.getItem(this.key);
+      if (item) {
+        this.value = JSON.parse(item);
+      } else {
+        this.value = defaultSettings[this.key];
+      }
+    }
   }
 }
 

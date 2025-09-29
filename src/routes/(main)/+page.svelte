@@ -3,7 +3,25 @@
   import ThemeSwitcher from "$lib/ThemeSwitcher.svelte";
   import Login from "$lib/Login.svelte";
 
-  import { enablePopovers, enableTooltips, escapeString, getStreamerColor, getUserID, sendData } from "$lib/functions";
+  import {
+    addBadges,
+    changeSiteLinkTarget,
+    enablePopovers,
+    enableTooltips,
+    escapeString,
+    getChannel7TVEmotes,
+    getChannelBTTVEmotes,
+    getChannelFFZEmotes,
+    getGlobal7TVEmotes,
+    getGlobalBTTVEmotes,
+    getGlobalFFZEmotes,
+    getStreamerColor,
+    linkifyElementID,
+    replaceEmotes,
+    sendData,
+    showToast,
+    unescapeString,
+  } from "$lib/functions";
   import { onMount } from "svelte";
   import IcBaselineRefresh from "~icons/ic/baseline-refresh";
   import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
@@ -39,23 +57,43 @@
   import { createGrid, themeQuartz, ModuleRegistry, AllCommunityModule } from "ag-grid-community";
   import { donkStorage, resetSettings } from "$lib/donkStorage.svelte";
 
+  /**
+   * @type {{ pollOption: any; settingsOffcanvas: any; enableVoting: any; enableSuggestions: any; randomOptionModal: any; timeOverModal: any; yesnoTimeOverModal: any; tieModal: any; randomYesnoModal: any; enableVotingDropdown: any; enableSuggestionsDropdown: any; tableTabButton: any; chartTabButton: any; yesnoTabButton: any; overlayTabButton: any; questionLabel: any; hideQuestion: any; voteWithNumbers: any; multiChoiceExample: any; voteWithText: any; sortChart: any; suggestionLimit: any; suggestionPrefix: any; suggestionsCommand: any; confettiLevel: any; linkPreviewThumbnailsEnabled: any; showChat: any; multiChoice: any; subMode: any; subOnlyAlert: any; restartYesno: any; pickRandom: any; hideScore: any; allowChange: any; suggestionLimitUser: any; timerValueMinutes: any; chartCanvas: any; refreshWarningEnabled: any; sortChartLabel: any; overlayLink: any; connectOverlayButton: any; voteHint: any; totalVotes: any; remove: any; randomOptionWinner: any; removeRandomWinner: any; tieModalText: any; coin: any; bttvGlobalEmotes: any; ffzGlobalEmotes: any; seventvGlobalEmotes: any; bttvChannelEmotes: any; ffzChannelEmotes: any; seventvChannelEmotes: any; yeaPic: any; nayPic: any; yeaCount: any; nayCount: any; yesnoTotalVotes: any; optionList: any; numberStats: any; json_selected: any; voters_selected: any; txt_selected: any; averageNumber: any; medianNumber: any; hideScoreIcon: any; chat: any; countdown: any; unpauseTimer: any; pauseTimer: any; stopTimer: any; yesnoTimeOverWinner: any; timeOverWinner: any; enableVotingText: any; enableSuggestionsText: any; generateOverlayButton: any; restartPoll?: HTMLElement | null; addOption?: HTMLElement | null; options?: HTMLElement | null; chatiframe?: HTMLElement | null; yesnoDiv?: HTMLElement | null; }}
+   */
   let elements;
   let bootstrap;
+  /**
+   * @type {import("ag-grid-community").GridApi<{ Command: string; Option: string; By: number; Score: number; Delete: number; }>}
+   */
+  let table;
 
-  let USER = donkStorage("USER", null).value;
-  let CHATVOTE = donkStorage("CHATVOTE", null).value;
+  let USER = donkStorage("USER", null);
+
+  let CHATVOTE = donkStorage("CHATVOTE", null);
 
   onMount(async () => {
     ModuleRegistry.registerModules([AllCommunityModule]);
 
-    const gridOptions = {
+    let gridOptions = {
       overlayNoRowsTemplate: `<div><h3>Nothing here <img src="/pics/donk.png" alt="donk" style="height:28px; width:28px;"></h3><br><small>Add options using the text field above</small></div>`,
       columnDefs: [
         { field: "Command", flex: 1 },
         { field: "Option", flex: 5, editable: true },
         { field: "By", flex: 2 },
         { field: "Score", flex: 1 },
-        { field: "Delete", flex: 1 },
+        {
+          field: "Delete",
+          flex: 1,
+          cellRenderer: (params) => {
+            const button = document.createElement("button");
+            button.innerText = "Delete";
+            button.classList = "btn btn-danger";
+            button.addEventListener("click", () => {
+              table.applyTransaction({ remove: [params.node.data] });
+            });
+            return button;
+          },
+        },
       ],
       suppressMovableColumns: true,
       theme: themeQuartz.withParams(
@@ -66,13 +104,9 @@
         },
         "bs-dark",
       ),
-      rowData: [
-        { Command: "Tesla", Option: "Model Y", By: 64950, Score: 64950, Delete: 64950 },
-        { Command: "Ford", Option: "F-Series", By: 33850, Score: 64950, Delete: 64950 },
-        { Command: "Toyota", Option: "Corolla", By: 29600, Score: 64950, Delete: 64950 },
-      ],
+      rowData: [],
     };
-    createGrid(document.querySelector("#table"), gridOptions);
+    table = createGrid(document.querySelector("#table"), gridOptions);
 
     bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
     elements = {
@@ -266,11 +300,11 @@
 
     elements.hideQuestion.addEventListener("click", function () {
       if (elements.hideQuestion.innerHTML == "arrow_drop_up") {
-        CHATVOTE.questionHidden = true;
+        CHATVOTE.value.questionHidden = true;
         elements.hideQuestion.innerHTML = "arrow_drop_down";
         elements.questionLabel.style.display = "none";
       } else {
-        CHATVOTE.questionHidden = false;
+        CHATVOTE.value.questionHidden = false;
         elements.hideQuestion.innerHTML = "arrow_drop_up";
         elements.questionLabel.style.display = "block";
       }
@@ -286,7 +320,7 @@
     elements.voteWithNumbers.onchange = async function () {
       if (this.checked) {
         elements.multiChoiceExample.innerText = `Example: "1 2 3"`;
-        CHATVOTE.votingMode = "numbers";
+        CHATVOTE.value.votingMode = "numbers";
       }
       saveSettings();
       await restartPoll();
@@ -295,7 +329,7 @@
     elements.voteWithText.onchange = async function () {
       if (this.checked) {
         elements.multiChoiceExample.innerText = `Example: "option1 option2 option3"`;
-        CHATVOTE.votingMode = "text";
+        CHATVOTE.value.votingMode = "text";
       }
       saveSettings();
       await restartPoll();
@@ -311,7 +345,7 @@
 
     elements.suggestionLimit.onchange = function () {
       let newValue = parseInt(this.value, 10);
-      if (newValue > CHATVOTE.suggestionLimit || newValue == 0) {
+      if (newValue > CHATVOTE.value.suggestionLimit || newValue == 0) {
         suggestionLimitReached = false;
       }
       saveSettings();
@@ -323,7 +357,7 @@
     };
 
     elements.confettiLevel.onchange = function () {
-      CHATVOTE.confettiLevel = parseInt(this.value, 10);
+      CHATVOTE.value.confettiLevel = parseInt(this.value, 10);
       saveSettings();
     };
 
@@ -333,7 +367,7 @@
       const tooltipList = [...tooltipTriggerList].map(function (tooltipTriggerEl) {
         tooltipTriggerEl.setAttribute("data-bs-title", spinner);
         tooltipTriggerEl.addEventListener("show.bs.tooltip", function () {
-          getLinkInfo(tooltipTriggerEl, CHATVOTE.linkPreviewThumbnailsEnabled);
+          getLinkInfo(tooltipTriggerEl, CHATVOTE.value.linkPreviewThumbnailsEnabled);
         });
         return new bootstrap.Tooltip(tooltipTriggerEl, {
           animation: false,
@@ -345,7 +379,7 @@
     };
 
     elements.showChat.onchange = function () {
-      CHATVOTE.showChat = this.checked;
+      CHATVOTE.value.showChat = this.checked;
       if (this.checked) {
         showChat();
       } else {
@@ -371,8 +405,8 @@
     loadChart();
 
     elements.pollOption.addEventListener("focus", async function () {
-      if (!streamerColor && USER.userID) {
-        streamerColor = await getStreamerColor(USER.userID);
+      if (!streamerColor && USER.value.userID) {
+        streamerColor = await getStreamerColor(USER.value.userID);
       }
     });
 
@@ -395,11 +429,11 @@
     });
 
     window.onbeforeunload = function () {
-      // sendData("chat.vote", USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube", {
+      // sendData("chat.vote", USER.value.channel, USER.value.platform == "twitch" ? `twitch - ${USER.value.twitchLogin}` : "youtube", {
       //   table: table.column(2).data().toArray(),
       //   scores: table.column(4).data().toArray(),
       // });
-      if (CHATVOTE.refreshWarningEnabled && (vote_results.length > 0 || vote_results_yesno.yea > 0 || vote_results_yesno.nay > 0)) {
+      if (CHATVOTE.value.refreshWarningEnabled && (vote_results.length > 0 || vote_results_yesno.yea > 0 || vote_results_yesno.nay > 0)) {
         return "Close/refresh warning enabled. You can turn it off in the settings.";
       }
       return null;
@@ -422,7 +456,6 @@
   let voting_enabled = false;
   let numberOfSuggestions = 0;
   let suggestionLimitReached = false;
-  let table;
   let yesNoMode = false;
   let scoreHidden = false;
   let allNumbers = false;
@@ -439,7 +472,7 @@
   let streamerColor = "";
 
   function checkLogin() {
-    if (!USER.channel) {
+    if (!USER.value.channel) {
       loginButtonPopover.show();
       setTimeout(function () {
         loginButtonPopover.hide();
@@ -450,28 +483,28 @@
   } //checkLogin
 
   async function refreshData() {
-    CHATVOTE.suggestion_prefix = elements.suggestionPrefix.value.replace(/\s+/g, "").toLowerCase();
+    CHATVOTE.value.suggestion_prefix = elements.suggestionPrefix.value.replace(/\s+/g, "").toLowerCase();
 
-    CHATVOTE.votingMode = elements.voteWithText.checked ? "text" : "numbers";
-    CHATVOTE.sortChart = elements.sortChart.checked;
+    CHATVOTE.value.votingMode = elements.voteWithText.checked ? "text" : "numbers";
+    CHATVOTE.value.sortChart = elements.sortChart.checked;
 
-    if (!CHATVOTE.suggestion_prefix) {
-      CHATVOTE.suggestion_prefix = "!suggest";
+    if (!CHATVOTE.value.suggestion_prefix) {
+      CHATVOTE.value.suggestion_prefix = "!suggest";
       elements.suggestionPrefix.value = "!suggest";
     }
 
-    CHATVOTE.showChat = elements.showChat.checked;
-    CHATVOTE.multiChoice = elements.multiChoice.checked;
-    CHATVOTE.allowChange = elements.allowChange.checked;
-    CHATVOTE.subMode = elements.subMode.checked;
-    CHATVOTE.confettiLevel = parseInt(elements.confettiLevel.value, 10);
-    CHATVOTE.suggestionLimitUser = parseInt(elements.suggestionLimitUser.value, 10);
-    CHATVOTE.suggestionLimit = parseInt(elements.suggestionLimit.value, 10);
-    CHATVOTE.timerValueMinutes = parseFloat(elements.timerValueMinutes.value);
+    CHATVOTE.value.showChat = elements.showChat.checked;
+    CHATVOTE.value.multiChoice = elements.multiChoice.checked;
+    CHATVOTE.value.allowChange = elements.allowChange.checked;
+    CHATVOTE.value.subMode = elements.subMode.checked;
+    CHATVOTE.value.confettiLevel = parseInt(elements.confettiLevel.value, 10);
+    CHATVOTE.value.suggestionLimitUser = parseInt(elements.suggestionLimitUser.value, 10);
+    CHATVOTE.value.suggestionLimit = parseInt(elements.suggestionLimit.value, 10);
+    CHATVOTE.value.timerValueMinutes = parseFloat(elements.timerValueMinutes.value);
     ctx = elements.chartCanvas.getContext("2d");
-    CHATVOTE.refreshWarningEnabled = elements.refreshWarningEnabled.checked;
-    CHATVOTE.linkPreviewThumbnailsEnabled = elements.linkPreviewThumbnailsEnabled.checked;
-    elements.suggestionsCommand.innerHTML = CHATVOTE.suggestion_prefix;
+    CHATVOTE.value.refreshWarningEnabled = elements.refreshWarningEnabled.checked;
+    CHATVOTE.value.linkPreviewThumbnailsEnabled = elements.linkPreviewThumbnailsEnabled.checked;
+    elements.suggestionsCommand.innerHTML = CHATVOTE.value.suggestion_prefix;
   } //refreshdata
 
   function saveSettings() {
@@ -479,27 +512,27 @@
   } //saveSettings
 
   function applySettings() {
-    if (CHATVOTE.votingMode !== "numbers" && CHATVOTE.votingMode !== "text") {
-      CHATVOTE.votingMode = "numbers";
+    if (CHATVOTE.value.votingMode !== "numbers" && CHATVOTE.value.votingMode !== "text") {
+      CHATVOTE.value.votingMode = "numbers";
     }
-    elements.voteWithNumbers.checked = CHATVOTE.votingMode === "numbers";
-    elements.voteWithText.checked = CHATVOTE.votingMode === "text";
+    elements.voteWithNumbers.checked = CHATVOTE.value.votingMode === "numbers";
+    elements.voteWithText.checked = CHATVOTE.value.votingMode === "text";
 
-    elements.sortChart.checked = CHATVOTE.sortChart ?? false;
-    elements.suggestionPrefix.value = CHATVOTE.suggestion_prefix || "!suggest";
-    elements.suggestionLimitUser.value = parseInt(CHATVOTE.suggestionLimitUser, 10) ?? 1;
-    elements.suggestionLimit.value = parseInt(CHATVOTE.suggestionLimit, 10) || 0;
-    elements.timerValueMinutes.value = parseFloat(CHATVOTE.timerValueMinutes) || 0;
+    elements.sortChart.checked = CHATVOTE.value.sortChart ?? false;
+    elements.suggestionPrefix.value = CHATVOTE.value.suggestion_prefix || "!suggest";
+    elements.suggestionLimitUser.value = parseInt(CHATVOTE.value.suggestionLimitUser, 10) ?? 1;
+    elements.suggestionLimit.value = parseInt(CHATVOTE.value.suggestionLimit, 10) || 0;
+    elements.timerValueMinutes.value = parseFloat(CHATVOTE.value.timerValueMinutes) || 0;
 
-    elements.showChat.checked = CHATVOTE.showChat ?? false;
-    elements.multiChoice.checked = CHATVOTE.multiChoice ?? false;
-    elements.allowChange.checked = CHATVOTE.allowChange ?? false;
-    elements.subMode.checked = CHATVOTE.subMode ?? false;
-    elements.confettiLevel.value = CHATVOTE.confettiLevel || 0;
-    elements.refreshWarningEnabled.checked = CHATVOTE.refreshWarningEnabled ?? false;
-    elements.linkPreviewThumbnailsEnabled.checked = CHATVOTE.linkPreviewThumbnailsEnabled ?? false;
+    elements.showChat.checked = CHATVOTE.value.showChat ?? false;
+    elements.multiChoice.checked = CHATVOTE.value.multiChoice ?? false;
+    elements.allowChange.checked = CHATVOTE.value.allowChange ?? false;
+    elements.subMode.checked = CHATVOTE.value.subMode ?? false;
+    elements.confettiLevel.value = CHATVOTE.value.confettiLevel || 0;
+    elements.refreshWarningEnabled.checked = CHATVOTE.value.refreshWarningEnabled ?? false;
+    elements.linkPreviewThumbnailsEnabled.checked = CHATVOTE.value.linkPreviewThumbnailsEnabled ?? false;
 
-    if (CHATVOTE.questionHidden) {
+    if (CHATVOTE.value.questionHidden) {
       elements.hideQuestion.innerHTML = "arrow_drop_down";
       elements.questionLabel.style.display = "none";
     } else {
@@ -507,19 +540,19 @@
       elements.questionLabel.style.display = "block";
     }
 
-    if (CHATVOTE.votingMode === "numbers") {
+    if (CHATVOTE.value.votingMode === "numbers") {
       elements.multiChoiceExample.innerText = `Example: "1 2 3"`;
     } else {
       elements.multiChoiceExample.innerText = `Example: "option1 option2 option3"`;
     }
 
-    if (CHATVOTE.subMode) {
+    if (CHATVOTE.value.subMode) {
       elements.subOnlyAlert.style.display = "";
     } else {
       elements.subOnlyAlert.style.display = "none";
     }
 
-    if (CHATVOTE.showChat) {
+    if (CHATVOTE.value.showChat) {
       showChat();
     }
 
@@ -554,7 +587,8 @@
     elements.voteHint.innerHTML = "";
     elements.totalVotes.innerHTML = "0";
     mainChart.destroy();
-    table.clear().draw();
+    //rowData = [];
+
     loadChart();
     disableVoteButton();
     disableSuggestButton();
@@ -582,10 +616,10 @@
       showToast(`This feature is unavailable while <img src="/pics/yeanay.webp" alt="yea nay" style="height:1.5em;" />Mode is on`, "primary", 5000);
       return;
     }
-    sendData("chat.vote", USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube", {
-      table: table.column(2).data().toArray(),
-      scores: table.column(4).data().toArray(),
-    });
+    // sendData("chat.vote", USER.value.channel, USER.value.platform == "twitch" ? `twitch - ${USER.value.twitchLogin}` : "youtube", {
+    //   table: table.column(2).data().toArray(),
+    //   scores: table.column(4).data().toArray(),
+    // });
     let optionsToKeep = Math.min(parseInt(elements.remove.value, 10), vote_results.length);
     voters = [];
     voters_options = [];
@@ -595,7 +629,7 @@
     vote_results_copy.sort(function (a, b) {
       return a.score > b.score ? -1 : a.score == b.score ? 0 : 1;
     });
-    table.clear().draw();
+    clearTable();
     vote_results = [];
     for (let k = 0; k < optionsToKeep; k++) {
       pushVoteResults(vote_results_copy[k].id, vote_results_copy[k].option, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
@@ -621,7 +655,7 @@
     vote_changed = [];
     mainChart.destroy();
     let vote_results_copy = structuredClone(vote_results);
-    table.clear().draw();
+    clearTable();
     vote_results = [];
     for (let k = 0; k < length; k++) {
       pushVoteResults(vote_results_copy[k].id, vote_results_copy[k].option, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
@@ -651,10 +685,10 @@
       showToast(`This feature is unavailable while <img src="/pics/yeanay.webp" alt="yea nay" style="height:1.5em;" />Mode is on`, "primary", 5000);
       return;
     }
-    sendData("chat.vote", USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube", {
-      table: table.column(2).data().toArray(),
-      scores: table.column(4).data().toArray(),
-    });
+    // sendData("chat.vote", USER.value.channel, USER.value.platform == "twitch" ? `twitch - ${USER.value.twitchLogin}` : "youtube", {
+    //   table: table.column(2).data().toArray(),
+    //   scores: table.column(4).data().toArray(),
+    // });
     let vote_results_copy = structuredClone(vote_results);
     vote_results_copy.sort(function (a, b) {
       return a.score < b.score ? -1 : a.score == b.score ? 0 : 1;
@@ -664,7 +698,7 @@
     vote_changed = [];
     mainChart.destroy();
     let oldlength = vote_results.length;
-    table.clear().draw();
+    clearTable();
     vote_results = [];
     //oldlength - 1 to skip the option with the most votes
     for (let k = 0; k < oldlength - 1; k++) {
@@ -690,27 +724,27 @@
     let random = Math.floor(Math.random() * vote_results.length);
     let title = elements.questionLabel.innerHTML;
     elements.randomOptionWinner.innerHTML = `<h2>${title}</h2><h3>${vote_results[random].option_emotes}</h3>`;
-    if (vote_results[random].by != USER.channel) {
+    if (vote_results[random].by != USER.value.channel) {
       elements.randomOptionWinner.innerHTML += `
     <h4>
     Submitted by: <button class="btn btn-link" style="color:${vote_results[random].context.color || "#FFFFFF"};" onclick=window.open("https://www.twitch.tv/popout/${
-      USER.channel
+      USER.value.channel
     }/viewercard/${vote_results[random].by}?popout=","_blank","width=340,height=800")>
     ${addBadges(vote_results[random].context.badges, vote_results[random].context["user-id"], vote_results[random].context["first-msg"])}${vote_results[random].by}
     </button>
     </h4>`;
     }
-    linkifyElementID("randomOptionWinner", CHATVOTE.linkPreviewThumbnailsEnabled);
-    if (CHATVOTE.confettiLevel > 0) {
-      showConfetti(CHATVOTE.confettiLevel);
+    linkifyElementID("randomOptionWinner", CHATVOTE.value.linkPreviewThumbnailsEnabled);
+    if (CHATVOTE.value.confettiLevel > 0) {
+      showConfetti(CHATVOTE.value.confettiLevel);
     }
   } //pickRandomOption
 
   function removeRandomWinner() {
-    sendData("chat.vote", USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube", {
-      table: table.column(2).data().toArray(),
-      scores: table.column(4).data().toArray(),
-    });
+    // sendData("chat.vote", USER.value.channel, USER.value.platform == "twitch" ? `twitch - ${USER.value.twitchLogin}` : "youtube", {
+    //   table: table.column(2).data().toArray(),
+    //   scores: table.column(4).data().toArray(),
+    // });
     let vote_results_copy = structuredClone(vote_results);
     //remove the random winner
     vote_results_copy = vote_results_copy.filter((o) => o.id !== randomTiedOptionWinner.id);
@@ -719,7 +753,7 @@
     voters_options = [];
     vote_changed = [];
     mainChart.destroy();
-    table.clear().draw();
+    clearTable();
     vote_results = [];
     for (let k = 0; k < vote_results_copy.length; k++) {
       pushVoteResults(vote_results_copy[k].id, vote_results_copy[k].option, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
@@ -759,17 +793,17 @@
   <h2>${elements.questionLabel.innerHTML}</h2>
   <h3>Random tied option: "${tied[random].option_emotes}"</h3>`;
 
-    if (tied[random].by != USER.channel) {
+    if (tied[random].by != USER.value.channel) {
       elements.tieModalText.innerHTML += `
     <h4>Submitted by: 
-    <button class="btn btn-link" style="color:${tied[random].context.color || "#FFFFFF"};" onclick=window.open("https://www.twitch.tv/popout/${USER.channel}/viewercard/${
+    <button class="btn btn-link" style="color:${tied[random].context.color || "#FFFFFF"};" onclick=window.open("https://www.twitch.tv/popout/${USER.value.channel}/viewercard/${
       tied[random].by
     }?popout=","_blank","width=340,height=800")>
     ${addBadges(tied[random].context.badges, tied[random].context["user-id"], tied[random].context["first-msg"])}${tied[random].by}
     </button>
     </h4>`;
     }
-    linkifyElementID("tieModalText", CHATVOTE.linkPreviewThumbnailsEnabled);
+    linkifyElementID("tieModalText", CHATVOTE.value.linkPreviewThumbnailsEnabled);
   } //pickRandomTiedOption
 
   function pickRandomYesNo() {
@@ -783,8 +817,8 @@
     let input = msg.split(" ").filter(Boolean);
     let command = input[0].toLowerCase();
 
-    if (CHATVOTE.votingMode == "numbers" && voting_enabled && !yesNoMode) {
-      if (CHATVOTE.subMode && !context.subscriber) {
+    if (CHATVOTE.value.votingMode == "numbers" && voting_enabled && !yesNoMode) {
+      if (CHATVOTE.value.subMode && !context.subscriber) {
         return;
       }
       if (input[0].toLowerCase() == "!vote") {
@@ -798,7 +832,7 @@
       }
 
       if (voters.includes(context.username)) {
-        if (!CHATVOTE.allowChange || vote_changed.includes(context.username)) {
+        if (!CHATVOTE.value.allowChange || vote_changed.includes(context.username)) {
           return;
         }
         //remove old vote
@@ -814,7 +848,7 @@
         updateChart();
       }
 
-      if (CHATVOTE.multiChoice && input[1]) {
+      if (CHATVOTE.value.multiChoice && input[1]) {
         let vote_input = [];
         let voted = false;
         let votes = [];
@@ -851,8 +885,8 @@
       }
     } //vote with numbers
 
-    if (CHATVOTE.votingMode == "text" && voting_enabled && !yesNoMode) {
-      if (CHATVOTE.subMode && !context.subscriber) {
+    if (CHATVOTE.value.votingMode == "text" && voting_enabled && !yesNoMode) {
+      if (CHATVOTE.value.subMode && !context.subscriber) {
         return;
       }
       if (input[0].toLowerCase() == "!vote") {
@@ -862,7 +896,7 @@
         }
       }
       if (voters.includes(context.username)) {
-        if (!CHATVOTE.allowChange || vote_changed.includes(context.username)) {
+        if (!CHATVOTE.value.allowChange || vote_changed.includes(context.username)) {
           return;
         }
         //remove old vote
@@ -877,7 +911,7 @@
         vote_changed.push(context.username);
         updateChart();
       }
-      if (CHATVOTE.multiChoice && input[1]) {
+      if (CHATVOTE.value.multiChoice && input[1]) {
         let vote_input = [];
         let voted = false;
         let votes = [];
@@ -913,7 +947,7 @@
     } //vote with text
 
     if (yesNoMode && voting_enabled && (command == "voteyea" || command == "votenay" || command == "yes" || command == "no")) {
-      if (CHATVOTE.subMode && !context.subscriber) {
+      if (CHATVOTE.value.subMode && !context.subscriber) {
         return;
       }
       if (voters_yesno.includes(context.username)) {
@@ -933,8 +967,8 @@
       return;
     } //yesNoMode
 
-    if (command == CHATVOTE.suggestion_prefix && suggestions_enabled) {
-      if (CHATVOTE.subMode && !context.subscriber) {
+    if (command == CHATVOTE.value.suggestion_prefix && suggestions_enabled) {
+      if (CHATVOTE.value.subMode && !context.subscriber) {
         return;
       }
       let suggestion = input.slice(1).join(" ");
@@ -942,7 +976,7 @@
       let suggestion_unchanged = escapeString(suggestion);
 
       let suggestion_clean = suggestion_unchanged.toLowerCase().replace(/\W/g, "");
-      if (CHATVOTE.votingMode == "text") {
+      if (CHATVOTE.value.votingMode == "text") {
         suggestion_clean = suggestion_clean.replace(/[^a-zA-Z0-9]+/g, "-");
       }
       if (!suggestion_clean) {
@@ -968,7 +1002,7 @@
 
       suggestion_emotes = replaceEmotes(suggestion_emotes, thirdPartyEmotes);
 
-      if (CHATVOTE.suggestionLimitUser > 0 && vote_results.reduce((acc, cur) => (cur.by === context.username ? ++acc : acc), 0) >= CHATVOTE.suggestionLimitUser) {
+      if (CHATVOTE.value.suggestionLimitUser > 0 && vote_results.reduce((acc, cur) => (cur.by === context.username ? ++acc : acc), 0) >= CHATVOTE.value.suggestionLimitUser) {
         return;
       }
 
@@ -982,9 +1016,9 @@
         return;
       }
 
-      if (CHATVOTE.suggestionLimit > 0) {
+      if (CHATVOTE.value.suggestionLimit > 0) {
         numberOfSuggestions++;
-        if (numberOfSuggestions >= CHATVOTE.suggestionLimit) {
+        if (numberOfSuggestions >= CHATVOTE.value.suggestionLimit) {
           suggestionLimitReached = true;
         }
       }
@@ -995,7 +1029,7 @@
       return;
     } //suggest
 
-    if (command == CHATVOTE.suggestion_prefix && !suggestions_enabled && (Date.now() - currentTime) / 1000 > 10) {
+    if (command == CHATVOTE.value.suggestion_prefix && !suggestions_enabled && (Date.now() - currentTime) / 1000 > 10) {
       currentTime = Date.now();
       suggestPopover.show();
       setTimeout(function () {
@@ -1005,14 +1039,14 @@
     } //suggestions disabled
 
     if (command == "!confetti") {
-      if (context.username == USER.channel || context.username == "badoge") {
+      if (context.username == USER.value.channel || context.username == "badoge") {
         showConfetti(input[1]);
         return;
       }
       return;
     } //confetti
 
-    if (command == "!rig" && context.username == USER.channel) {
+    if (command == "!rig" && context.username == USER.value.channel) {
       let option = parseInt(input[1], 10);
       let extra = parseInt(input[2], 10);
       if (!isNaN(option) && !isNaN(extra)) {
@@ -1024,12 +1058,12 @@
       return;
     } //rig
 
-    if (command == "!restart" && context.username == USER.channel) {
+    if (command == "!restart" && context.username == USER.value.channel) {
       restartPoll();
       return;
     } //restart poll
 
-    if (command == "!reset" && (context.username == USER.channel || context.username == "badoge")) {
+    if (command == "!reset" && (context.username == USER.value.channel || context.username == "badoge")) {
       resetSettings("CHATVOTE");
       return;
     } //reset settings
@@ -1038,10 +1072,10 @@
       if (input[0].toLowerCase() == "!vote") {
         input = input.slice(1);
       }
-      if (CHATVOTE.votingMode == "numbers" && isNaN(parseInt(input[0], 10))) {
+      if (CHATVOTE.value.votingMode == "numbers" && isNaN(parseInt(input[0], 10))) {
         return;
       }
-      if (CHATVOTE.votingMode == "text") {
+      if (CHATVOTE.value.votingMode == "text") {
         let pos = vote_results.findIndex((e) => e.option_clean === command);
         if (pos == -1) {
           return;
@@ -1065,20 +1099,20 @@
     if (voting_enabled) {
       return;
     }
-    for (let i = vote_results.length - 1; i >= 0; i--) {
-      if (vote_results[i].by === username && (Date.now() - vote_results[i].time) / 1000 < 5) {
-        table
-          .rows(function (idx, data, node) {
-            return data[0] == vote_results[i].id && node.children[2].firstChild.dataset.username == username;
-          })
-          .remove()
-          .draw();
-        vote_results.splice(i, 1);
-        updateChart();
-        showToast(`Removed ${username}'s suggestions because they got timed out`, "warning", 2000);
-        numberOfSuggestions--;
-      }
-    }
+    // for (let i = vote_results.length - 1; i >= 0; i--) {
+    //   if (vote_results[i].by === username && (Date.now() - vote_results[i].time) / 1000 < 5) {
+    //     table
+    //       .rows(function (idx, data, node) {
+    //         return data[0] == vote_results[i].id && node.children[2].firstChild.dataset.username == username;
+    //       })
+    //       .remove()
+    //       .draw();
+    //     vote_results.splice(i, 1);
+    //     updateChart();
+    //     showToast(`Removed ${username}'s suggestions because they got timed out`, "warning", 2000);
+    //     numberOfSuggestions--;
+    //   }
+    // }
   } //handleTimeout
 
   async function getEmotes() {
@@ -1090,10 +1124,10 @@
       elements.ffzGlobalEmotes.innerText = ffz.length;
       elements.seventvGlobalEmotes.innerText = seventv.length;
       thirdPartyEmotes = [...thirdPartyEmotes, ...bttv, ...ffz, ...seventv];
-      if (USER.userID) {
-        let bttvChannel = await getChannelBTTVEmotes(USER.userID);
-        let ffzChannel = await getChannelFFZEmotes(USER.userID);
-        let seventvChannel = await getChannel7TVEmotes(USER.userID);
+      if (USER.value.userID) {
+        let bttvChannel = await getChannelBTTVEmotes(USER.value.userID);
+        let ffzChannel = await getChannelFFZEmotes(USER.value.userID);
+        let seventvChannel = await getChannel7TVEmotes(USER.value.userID);
         thirdPartyEmotes = [...thirdPartyEmotes, ...bttvChannel, ...ffzChannel, ...seventvChannel];
         elements.bttvChannelEmotes.innerText = bttvChannel.length;
         elements.ffzChannelEmotes.innerText = ffzChannel.length;
@@ -1181,8 +1215,8 @@
     let extraoption_clean = extraoption.toLowerCase().replace(/\W/g, "");
     if (!vote_results.some((e) => e.option_clean === extraoption_clean) && extraoption_clean) {
       oid++;
-      pushTable(oid, replaceEmotes(extraoption, thirdPartyEmotes), USER.channel, 0, null);
-      pushVoteResults(oid, extraoption.replace(/<div.*?<\/div>/, "↖ Switch to Table view to see image :)"), replaceEmotes(extraoption, thirdPartyEmotes), USER.channel, 0, null);
+      pushTable(oid, replaceEmotes(extraoption, thirdPartyEmotes), USER.value.channel, 0, null);
+      pushVoteResults(oid, extraoption.replace(/<div.*?<\/div>/, "↖ Switch to Table view to see image :)"), replaceEmotes(extraoption, thirdPartyEmotes), USER.value.channel, 0, null);
       updateChart();
       elements.pollOption.value = "";
     } else {
@@ -1222,8 +1256,8 @@
 
       if (!vote_results.some((e) => e.option_clean === option_clean) && option_clean) {
         oid++;
-        pushTable(oid, replaceEmotes(f2[i], thirdPartyEmotes), USER.channel, 0, null);
-        pushVoteResults(oid, f2[i], replaceEmotes(f2[i], thirdPartyEmotes), USER.channel, 0, null);
+        pushTable(oid, replaceEmotes(f2[i], thirdPartyEmotes), USER.value.channel, 0, null);
+        pushVoteResults(oid, f2[i], replaceEmotes(f2[i], thirdPartyEmotes), USER.value.channel, 0, null);
         updateChart();
       } else {
         showToast("Some of the entered options were duplicate/invalid", "warning", 5000);
@@ -1231,19 +1265,25 @@
     }
   } //addOptionBulk
 
-  function pushTable(id, suggestion, by, score, context) {
+  function clearTable() {
+    const allData = [];
+    table.forEachNode((node) => allData.push(node.data));
+    table.applyTransaction({ remove: allData });
+  }
+
+  function addRow(id, suggestion, by, score, context) {
     let command = id;
-    if (CHATVOTE.votingMode == "text") {
+    if (CHATVOTE.value.votingMode == "text") {
       suggestion = suggestion.replace(/[^a-zA-Z0-9]+/g, "-");
       command = suggestion;
     }
 
-    if (!context && by == USER.channel) {
+    if (!context && by == USER.value.channel) {
       context = {
         badges: "streamer",
-        "user-id": USER.userID,
+        "user-id": USER.value.userID,
         "first-msg": false,
-        "display-name": USER.channel,
+        "display-name": USER.value.channel,
         color: streamerColor,
       };
     }
@@ -1256,26 +1296,29 @@
       color = context.color || "#FFFFFF";
       username = context["display-name"].toLowerCase() == by.toLowerCase() ? context["display-name"] : `${context["display-name"]} (${by})`;
     }
+
     table.row
       .add([
-        id,
         command,
         suggestion,
-        `<p class="cursorPointer" data-username="${by}" style="color:${color};" onclick='window.open("https://www.twitch.tv/popout/${USER.channel}/viewercard/${by}?popout=","_blank","width=340,height=800")'>${badgesHTML}${username}</p>`,
+        `<p class="cursorPointer" data-username="${by}" style="color:${color};" onclick='window.open("https://www.twitch.tv/popout/${USER.value.channel}/viewercard/${by}?popout=","_blank","width=340,height=800")'>${badgesHTML}${username}</p>`,
         score,
         `<button type="button" class="remove-option-button btn btn-danger"><i class="material-icons notranslate">delete_forever</i></button>`,
       ])
       .draw(false);
-    linkifyElementID("options", CHATVOTE.linkPreviewThumbnailsEnabled);
+
+    table.applyTransaction({ add: [{ Command: "Tesla", Option: "Model Y", By: 64950, Score: 64950, Delete: 64950 }] });
+
+    linkifyElementID("options", CHATVOTE.value.linkPreviewThumbnailsEnabled);
     changeSiteLinkTarget("_blank");
-  } //pushTable
+  }
 
   let startingHue = Math.random() * 360;
   function pushVoteResults(id, option, option_emotes, by, score, context) {
     let color = `hsla(${(startingHue += Math.random() * 60 + 20)}, 100%, 50%, 0.8)`;
     let label = `${id} • "${unescapeString(option)}"`;
     let option_clean = option.toLowerCase().replace(/\W/g, "");
-    if (CHATVOTE.votingMode == "text") {
+    if (CHATVOTE.value.votingMode == "text") {
       option = option.replace(/[^a-zA-Z0-9]+/g, "-");
       label = `"${option}"`;
       option_clean = option.toLowerCase().replace(/[^a-zA-Z0-9]+/g, "-");
@@ -1300,12 +1343,12 @@
     elements.voteHint.innerHTML = `Type ${vote_results
       .map((e) => e.id)
       .join("/")
-      .substring(0, 8)}${vote_results.length > 3 ? "..." : ""} in chat to vote. ${CHATVOTE.multiChoice ? "Multiple choices allowed (separate by a space)" : ""}`;
-    if (CHATVOTE.votingMode == "text") {
+      .substring(0, 8)}${vote_results.length > 3 ? "..." : ""} in chat to vote. ${CHATVOTE.value.multiChoice ? "Multiple choices allowed (separate by a space)" : ""}`;
+    if (CHATVOTE.value.votingMode == "text") {
       elements.voteHint.innerHTML = `Type ${vote_results
         .map((e) => e.option)
         .join("/")
-        .substring(0, 20)}${vote_results.length > 3 ? "..." : ""} in chat to vote. ${CHATVOTE.multiChoice ? "Multiple choices allowed (separate by a space)" : ""}`;
+        .substring(0, 20)}${vote_results.length > 3 ? "..." : ""} in chat to vote. ${CHATVOTE.value.multiChoice ? "Multiple choices allowed (separate by a space)" : ""}`;
     }
   } //updateHint
 
@@ -1341,7 +1384,7 @@
         let el = document.createElement("a");
         el.setAttribute("href", url);
         let filename = !title ? "chatvote list of voters" : title + "-chatvote list of voters";
-        el.setAttribute("download", `${new Date().toISOString()}-${filename}-${USER.channel}.json`);
+        el.setAttribute("download", `${new Date().toISOString()}-${filename}-${USER.value.channel}.json`);
         document.body.appendChild(el);
         el.click();
         setTimeout(function () {
@@ -1353,7 +1396,7 @@
         let el = document.createElement("a");
         el.setAttribute("href", url);
         let filename = !title ? "chatvote poll options" : title + "-chatvote poll options";
-        el.setAttribute("download", `${new Date().toISOString()}-${filename}-${USER.channel}.json`);
+        el.setAttribute("download", `${new Date().toISOString()}-${filename}-${USER.value.channel}.json`);
         document.body.appendChild(el);
         el.click();
         setTimeout(function () {
@@ -1375,7 +1418,7 @@
         let el = document.createElement("a");
         el.setAttribute("href", url);
         let filename = !title ? "chatvote list of voters" : title + "-chatvote list of voters";
-        el.setAttribute("download", `${new Date().toISOString()}-${filename}-${USER.channel}.txt`);
+        el.setAttribute("download", `${new Date().toISOString()}-${filename}-${USER.value.channel}.txt`);
         document.body.appendChild(el);
         el.click();
         setTimeout(function () {
@@ -1399,7 +1442,7 @@
         let el = document.createElement("a");
         el.setAttribute("href", url);
         let filename = !title ? "chatvote poll options" : title + "-chatvote poll options";
-        el.setAttribute("download", `${new Date().toISOString()}-${filename}-${USER.channel}.txt`);
+        el.setAttribute("download", `${new Date().toISOString()}-${filename}-${USER.value.channel}.txt`);
         document.body.appendChild(el);
         el.click();
         setTimeout(function () {
@@ -1479,7 +1522,7 @@
     let total = 0;
 
     //sort the data if the button checkbox is checked in the chart tab and score is not hidden
-    if (CHATVOTE.sortChart && !scoreHidden) {
+    if (CHATVOTE.value.sortChart && !scoreHidden) {
       vote_results_copy.sort(function (a, b) {
         return a.score > b.score ? -1 : a.score == b.score ? 0 : 1;
       });
@@ -1502,7 +1545,7 @@
         data[i] = vote_results_copy[i].score;
       }
       colors[i] = vote_results_copy[i].color;
-      table.cell({ row: i, column: 4 }).data(vote_results_copy[i].score);
+      //table.cell({ row: i, column: 4 }).data(vote_results_copy[i].score);
     }
 
     mainChart.data.labels = labels;
@@ -1549,7 +1592,7 @@
 
   //     for (let i = vote_results.length - 1; i >= 0; i--) {
   //       if (vote_results[i].id === cellid[0]) {
-  //         if (vote_results[i].by != USER.channel) {
+  //         if (vote_results[i].by != USER.value.channel) {
   //           numberOfSuggestions--;
   //         }
   //         vote_results.splice(i, 1);
@@ -1576,7 +1619,7 @@
     if (yesNoMode) {
       updateYesNo();
     } else {
-      table.column(4).visible(!scoreHidden);
+      //table.column(4).visible(!scoreHidden);
       updateChart();
     }
   } //hideScore
@@ -1590,7 +1633,7 @@
     id="chatiframe" 
     frameborder="0" 
     scrolling="yes" 
-    src="https://www.twitch.tv/embed/${USER.channel}/chat?darkpopout&parent=chat.vote" 
+    src="https://www.twitch.tv/embed/${USER.value.channel}/chat?darkpopout&parent=beta.chat.vote" 
     >
     </iframe>`;
     }
@@ -1652,19 +1695,19 @@
         elements.timeOverWinner.innerHTML = `
     <h2>${elements.questionLabel.innerHTML}</h2>
     <h3>"${vote_results_copy[0].option_emotes}" has won with ${vote_results_copy[0].score} ${vote_results_copy[0].score == 1 ? "vote" : "votes"}!</h3>`;
-        if (vote_results_copy[0].by != USER.channel) {
+        if (vote_results_copy[0].by != USER.value.channel) {
           elements.timeOverWinner.innerHTML += `<h4>
         Submitted by: <button class="btn btn-link" style="color:${vote_results_copy[0].context.color || "#FFFFFF"};" onclick=window.open("https://www.twitch.tv/popout/${
-          USER.channel
+          USER.value.channel
         }/viewercard/${vote_results_copy[0].by}?popout=","_blank","width=340,height=800")>
         ${addBadges(vote_results_copy[0].context.badges, vote_results_copy[0].context["user-id"], vote_results_copy[0].context["first-msg"])}${vote_results_copy[0].by}
         </button></h4>`;
         }
-        linkifyElementID("timeOverWinner", CHATVOTE.linkPreviewThumbnailsEnabled);
+        linkifyElementID("timeOverWinner", CHATVOTE.value.linkPreviewThumbnailsEnabled);
         timeOverModal.show();
       }
-      if (CHATVOTE.confettiLevel > 0) {
-        showConfetti(CHATVOTE.confettiLevel);
+      if (CHATVOTE.value.confettiLevel > 0) {
+        showConfetti(CHATVOTE.value.confettiLevel);
       }
     });
 
@@ -2251,7 +2294,7 @@
         data-bs-title="Not signed in"
         data-bs-content="You need sign in before doing that"
       >
-        <Login messageHandler={handleMessage} timeoutHandler={handleTimeout} />
+        <Login messageHandler={handleMessage} timeoutHandler={handleTimeout} loginEvent={() => USER.refresh()} />
       </span>
     </div>
 
@@ -2661,7 +2704,7 @@
                   data-bs-placement="top"
                   data-bs-trigger="focus"
                   data-bs-title="Are you sure?"
-                  data-bs-content="All poll options will be deleted<br><button type='button' class='btn btn-danger float-end my-3' onclick='resetPoll()'><i class='material-icons notranslate'>delete_forever</i>Delete all</button>"
+                  data-bs-content="All poll options will be deleted<br><button type='button' class='btn btn-danger float-end my-3' onclick='resetPoll'><i class='material-icons notranslate'>delete_forever</i>Delete all</button>"
                   style="padding-top: 14px"
                 >
                   <IcBaselineDeleteForever />

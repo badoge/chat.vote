@@ -8,9 +8,9 @@
 
   import tmi from "tmi.js";
 
-  let { messageHandler = null, timeoutHandler = null, messageDeletedHandler = null } = $props();
+  let { messageHandler = null, timeoutHandler = null, messageDeletedHandler = null, loginEvent = null } = $props();
 
-  let USER = donkStorage("USER", null).value;
+  let USER = donkStorage("USER", null);
 
   //logged_out - default state with the login button visible, stays like this if USER local storage is not found
   //login_prompted - gets set when the login button is clicked, login button turns into a loading spinner
@@ -38,11 +38,11 @@
 
         if (localStorage.getItem("loginStatus") == "logged_in") {
           let USER_TEMP = JSON.parse(localStorage.getItem("USER_TEMP") || "{}");
-          USER.channel = USER_TEMP.channel;
-          USER.twitchLogin = USER_TEMP.twitchLogin;
-          USER.access_token = USER_TEMP.access_token;
-          USER.userID = USER_TEMP.userID;
-          USER.platform = USER_TEMP.platform;
+          USER.value.channel = USER_TEMP.channel;
+          USER.value.twitchLogin = USER_TEMP.twitchLogin;
+          USER.value.access_token = USER_TEMP.access_token;
+          USER.value.userID = USER_TEMP.userID;
+          USER.value.platform = USER_TEMP.platform;
           localStorage.setItem("USER_TEMP", JSON.stringify({}));
           connectIRC();
           loadPFP();
@@ -52,14 +52,14 @@
 
     //check if the token is still valid if user logged in using twitch
     //if token is not valid set channel to "" to avoid connecting to chat and show the error modal
-    if (USER.twitchLogin && !(await checkToken(USER.access_token))) {
-      USER.channel = "";
+    if (USER.value.twitchLogin && !(await checkToken(USER.value.access_token))) {
+      USER.value.channel = "";
       loginExpiredModal.show();
       return;
     }
 
     //user has a valid token or is using manual login so connect to chat
-    if (USER.channel) {
+    if (USER.value.channel) {
       loginStatus = "logged_in";
       connectIRC();
       loadPFP();
@@ -78,7 +78,7 @@
         secure: true,
         reconnect: true,
       },
-      channels: [USER.channel],
+      channels: [USER.value.channel],
     };
     const client = new tmi.Client(options);
 
@@ -97,7 +97,10 @@
     client.on("connected", async (address, port) => {
       console.log(`Connected to ${address}:${port}`);
       chatStatus = { emoji: "🟢", title: "Chat connected" };
-      //sendUsername(`chat.vote`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
+      //sendUsername(`chat.vote`, USER.value.channel, USER.value.platform == "twitch" ? `twitch - ${USER.value.twitchLogin}` : "youtube");
+      if (loginEvent) {
+        loginEvent();
+      }
     }); //connected
 
     client.on("disconnected", (reason) => {
@@ -120,11 +123,11 @@
     localStorage.setItem("loginStatus", "logged_in");
     localStorage.setItem("USER_TEMP", JSON.stringify({}));
 
-    USER.channel = channel;
-    USER.twitchLogin = false;
-    USER.access_token = "";
-    USER.userID = await getUserID(channel);
-    USER.platform = "twitch";
+    USER.value.channel = channel;
+    USER.value.twitchLogin = false;
+    USER.value.access_token = "";
+    USER.value.userID = await getUserID(channel);
+    USER.value.platform = "twitch";
     localStorage.setItem("USER_TEMP", JSON.stringify({}));
     connectIRC();
     loadPFP();
@@ -140,9 +143,9 @@
   } //manualConnect
 
   async function loadPFP() {
-    pfpURL = await get7TVPFP(USER.userID);
-    if (pfpURL == "/pics/donk.png" && USER.access_token) {
-      pfpURL = await getTwitchPFP(USER.channel, USER.access_token);
+    pfpURL = await get7TVPFP(USER.value.userID);
+    if (pfpURL == "/pics/donk.png" && USER.value.access_token) {
+      pfpURL = await getTwitchPFP(USER.value.channel, USER.value.access_token);
     }
   } //loadPFP
 
@@ -234,7 +237,7 @@
       {/if}
     </span>
 
-    <span class="input-group-text border-secondary">{USER.channel || "Loading..."}</span>
+    <span class="input-group-text border-secondary">{USER.value.channel || "Loading..."}</span>
 
     <span class="input-group-text border-secondary p-0 cursor-pointer" title={chatStatus.title}>{chatStatus.emoji}</span>
 

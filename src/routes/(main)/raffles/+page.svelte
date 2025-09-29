@@ -42,7 +42,8 @@
   import { donkStorage } from "$lib/donkStorage.svelte";
   import HomepageLink from "$lib/HomepageLink.svelte";
 
-  let USER = donkStorage("USER", null).value;
+  let USER = donkStorage("USER", null);
+
   let RAFFLES = donkStorage("RAFFLES", null).value;
 
   let elements;
@@ -226,7 +227,7 @@
       const tooltipList = [...tooltipTriggerList].map(function (tooltipTriggerEl) {
         tooltipTriggerEl.setAttribute("data-bs-title", spinner);
         tooltipTriggerEl.addEventListener("show.bs.tooltip", function () {
-          getLinkInfo(tooltipTriggerEl, RAFFLES.linkPreviewThumbnailsEnabled);
+          getLinkInfo(tooltipTriggerEl, RAFFLES.value.linkPreviewThumbnailsEnabled);
         });
         return new bootstrap.Tooltip(tooltipTriggerEl, {
           animation: false,
@@ -254,7 +255,7 @@
     }, 3000);
 
     window.onbeforeunload = function () {
-      if (RAFFLES.refreshWarningEnabled && raffle_users.length > 0) {
+      if (RAFFLES.value.refreshWarningEnabled && raffle_users.length > 0) {
         return "Close/refresh warning enabled. You can turn it off in the settings";
       }
       return null;
@@ -278,7 +279,7 @@
   let firstTimeChatters = [];
 
   function checkLogin() {
-    if (!USER.channel) {
+    if (!USER.value.channel) {
       loginButtonPopover.show();
       setTimeout(function () {
         loginButtonPopover.hide();
@@ -289,50 +290,50 @@
   } //checkLogin
 
   async function refreshData() {
-    RAFFLES.raffleCommand = elements.raffleCommand.value.replace(/\s+/g, "").toLowerCase() ?? "!join";
-    elements.raffleCommand.value = RAFFLES.raffleCommand;
-    if (!RAFFLES.raffleCommand) {
-      RAFFLES.raffleCommand = "!join";
+    RAFFLES.value.raffleCommand = elements.raffleCommand.value.replace(/\s+/g, "").toLowerCase() ?? "!join";
+    elements.raffleCommand.value = RAFFLES.value.raffleCommand;
+    if (!RAFFLES.value.raffleCommand) {
+      RAFFLES.value.raffleCommand = "!join";
       elements.raffleCommand.value = "!join";
     }
 
-    RAFFLES.removeWinner = elements.removeWinner.checked ?? true;
-    RAFFLES.allowPlebs = elements.allowPlebs.checked ?? true;
-    RAFFLES.allowFollowers = elements.allowFollowers.checked ?? true;
-    RAFFLES.allowSubs = elements.allowSubs.checked ?? true;
-    RAFFLES.allowTier1 = elements.allowTier1.checked ?? true;
-    RAFFLES.allowTier2 = elements.allowTier2.checked ?? true;
-    RAFFLES.allowTier3 = elements.allowTier3.checked ?? true;
-    RAFFLES.allowMods = elements.allowMods.checked ?? true;
-    RAFFLES.allowVips = elements.allowVips.checked ?? true;
-    RAFFLES.allowFirstTimeChatters = elements.allowFirstTimeChatters.checked ?? true;
-    RAFFLES.plebBonus = parseInt(elements.plebBonus.value, 10) || 0;
-    RAFFLES.followerBonus = parseInt(elements.followerBonus.value, 10) || 0;
-    RAFFLES.subBonus = parseInt(elements.subBonus.value, 10) || 0;
-    RAFFLES.tier1Bonus = parseInt(elements.tier1Bonus.value, 10) || 0;
-    RAFFLES.tier2Bonus = parseInt(elements.tier2Bonus.value, 10) || 0;
-    RAFFLES.tier3Bonus = parseInt(elements.tier3Bonus.value, 10) || 0;
-    RAFFLES.modBonus = parseInt(elements.modBonus.value, 10) || 0;
-    RAFFLES.vipBonus = parseInt(elements.vipBonus.value, 10) || 0;
-    RAFFLES.firstTimeChatterBonus = parseInt(elements.firstTimeChatterBonus.value, 10) || 0;
-    RAFFLES.followAge = parseInt(elements.followAge.value, 10) || 0;
-    RAFFLES.followAgeUnit = elements.followAgeUnit.value || "min";
-    RAFFLES.subAge = parseInt(elements.subAge.value, 10) || 0;
-    RAFFLES.tier1SubAge = parseInt(elements.tier1SubAge.value, 10) || 0;
-    RAFFLES.tier2SubAge = parseInt(elements.tier2SubAge.value, 10) || 0;
-    RAFFLES.tier3SubAge = parseInt(elements.tier3SubAge.value, 10) || 0;
-    RAFFLES.splitTiers = elements.splitTiers.checked ?? false;
-    RAFFLES.animateDrawing = elements.animateDrawing.checked ?? true;
-    RAFFLES.useTwitchPFP = elements.useTwitchPFP.checked ?? false;
-    RAFFLES.autoRerollEnabled = elements.autoRerollEnabled.checked ?? false;
-    RAFFLES.rerollTimerValueMinutes = parseFloat(elements.rerollTimerValueMinutes.value) ?? 0;
-    RAFFLES.extraTimerEnabled = elements.extraTimerEnabled.checked ?? false;
-    RAFFLES.announceWinner = elements.announceWinner.checked ?? false;
-    RAFFLES.confirmJoin = elements.confirmJoin.checked ?? false;
-    RAFFLES.linkPreviewThumbnailsEnabled = elements.linkPreviewThumbnailsEnabled.checked ?? false;
-    RAFFLES.refreshWarningEnabled = elements.refreshWarningEnabled.checked ?? false;
-    elements.raffleCommandButton.innerHTML = RAFFLES.raffleCommand || "!join";
-    elements.raffleCommandText.innerHTML = RAFFLES.raffleCommand || "!join";
+    RAFFLES.value.removeWinner = elements.removeWinner.checked ?? true;
+    RAFFLES.value.allowPlebs = elements.allowPlebs.checked ?? true;
+    RAFFLES.value.allowFollowers = elements.allowFollowers.checked ?? true;
+    RAFFLES.value.allowSubs = elements.allowSubs.checked ?? true;
+    RAFFLES.value.allowTier1 = elements.allowTier1.checked ?? true;
+    RAFFLES.value.allowTier2 = elements.allowTier2.checked ?? true;
+    RAFFLES.value.allowTier3 = elements.allowTier3.checked ?? true;
+    RAFFLES.value.allowMods = elements.allowMods.checked ?? true;
+    RAFFLES.value.allowVips = elements.allowVips.checked ?? true;
+    RAFFLES.value.allowFirstTimeChatters = elements.allowFirstTimeChatters.checked ?? true;
+    RAFFLES.value.plebBonus = parseInt(elements.plebBonus.value, 10) || 0;
+    RAFFLES.value.followerBonus = parseInt(elements.followerBonus.value, 10) || 0;
+    RAFFLES.value.subBonus = parseInt(elements.subBonus.value, 10) || 0;
+    RAFFLES.value.tier1Bonus = parseInt(elements.tier1Bonus.value, 10) || 0;
+    RAFFLES.value.tier2Bonus = parseInt(elements.tier2Bonus.value, 10) || 0;
+    RAFFLES.value.tier3Bonus = parseInt(elements.tier3Bonus.value, 10) || 0;
+    RAFFLES.value.modBonus = parseInt(elements.modBonus.value, 10) || 0;
+    RAFFLES.value.vipBonus = parseInt(elements.vipBonus.value, 10) || 0;
+    RAFFLES.value.firstTimeChatterBonus = parseInt(elements.firstTimeChatterBonus.value, 10) || 0;
+    RAFFLES.value.followAge = parseInt(elements.followAge.value, 10) || 0;
+    RAFFLES.value.followAgeUnit = elements.followAgeUnit.value || "min";
+    RAFFLES.value.subAge = parseInt(elements.subAge.value, 10) || 0;
+    RAFFLES.value.tier1SubAge = parseInt(elements.tier1SubAge.value, 10) || 0;
+    RAFFLES.value.tier2SubAge = parseInt(elements.tier2SubAge.value, 10) || 0;
+    RAFFLES.value.tier3SubAge = parseInt(elements.tier3SubAge.value, 10) || 0;
+    RAFFLES.value.splitTiers = elements.splitTiers.checked ?? false;
+    RAFFLES.value.animateDrawing = elements.animateDrawing.checked ?? true;
+    RAFFLES.value.useTwitchPFP = elements.useTwitchPFP.checked ?? false;
+    RAFFLES.value.autoRerollEnabled = elements.autoRerollEnabled.checked ?? false;
+    RAFFLES.value.rerollTimerValueMinutes = parseFloat(elements.rerollTimerValueMinutes.value) ?? 0;
+    RAFFLES.value.extraTimerEnabled = elements.extraTimerEnabled.checked ?? false;
+    RAFFLES.value.announceWinner = elements.announceWinner.checked ?? false;
+    RAFFLES.value.confirmJoin = elements.confirmJoin.checked ?? false;
+    RAFFLES.value.linkPreviewThumbnailsEnabled = elements.linkPreviewThumbnailsEnabled.checked ?? false;
+    RAFFLES.value.refreshWarningEnabled = elements.refreshWarningEnabled.checked ?? false;
+    elements.raffleCommandButton.innerHTML = RAFFLES.value.raffleCommand || "!join";
+    elements.raffleCommandText.innerHTML = RAFFLES.value.raffleCommand || "!join";
   } //refreshdata
 
   function saveSettings() {
@@ -347,50 +348,50 @@
       console.log("localStorage raffle settings not found");
     } else {
       RAFFLES = JSON.parse(localStorage.getItem("RAFFLES"));
-      elements.raffleCommand.value = RAFFLES.raffleCommand || "!join";
-      elements.raffleCommandButton.innerHTML = RAFFLES.raffleCommand || "!join";
-      elements.raffleCommandText.innerHTML = RAFFLES.raffleCommand || "!join";
-      elements.removeWinner.checked = RAFFLES.removeWinner ?? true;
-      elements.allowPlebs.checked = RAFFLES.allowPlebs ?? true;
-      elements.allowFollowers.checked = RAFFLES.allowFollowers ?? true;
-      elements.allowSubs.checked = RAFFLES.allowSubs ?? true;
-      elements.allowTier1.checked = RAFFLES.allowTier1 ?? true;
-      elements.allowTier2.checked = RAFFLES.allowTier2 ?? true;
-      elements.allowTier3.checked = RAFFLES.allowTier3 ?? true;
-      elements.allowMods.checked = RAFFLES.allowMods ?? true;
-      elements.allowVips.checked = RAFFLES.allowVips ?? true;
-      elements.allowFirstTimeChatters.checked = RAFFLES.allowFirstTimeChatters ?? true;
-      elements.plebBonus.value = parseInt(RAFFLES.plebBonus, 10) || 0;
-      elements.followerBonus.value = parseInt(RAFFLES.followerBonus, 10) || 0;
-      elements.subBonus.value = parseInt(RAFFLES.subBonus, 10) || 0;
-      elements.tier1Bonus.value = parseInt(RAFFLES.tier1Bonus, 10) || 0;
-      elements.tier2Bonus.value = parseInt(RAFFLES.tier2Bonus, 10) || 0;
-      elements.tier3Bonus.value = parseInt(RAFFLES.tier3Bonus, 10) || 0;
-      elements.modBonus.value = parseInt(RAFFLES.modBonus, 10) || 0;
-      elements.vipBonus.value = parseInt(RAFFLES.vipBonus, 10) || 0;
-      elements.firstTimeChatterBonus.value = parseInt(RAFFLES.firstTimeChatterBonus, 10) || 0;
-      elements.followAge.value = parseInt(RAFFLES.followAge, 10) || 0;
-      elements.followAgeUnit.value = RAFFLES.followAgeUnit || "min";
-      elements.subAge.value = parseInt(RAFFLES.subAge, 10) || 0;
-      elements.tier1SubAge.value = parseInt(RAFFLES.tier1SubAge, 10) || 0;
-      elements.tier2SubAge.value = parseInt(RAFFLES.tier2SubAge, 10) || 0;
-      elements.tier3SubAge.value = parseInt(RAFFLES.tier3SubAge, 10) || 0;
-      elements.splitTiers.checked = RAFFLES.splitTiers ?? false;
-      elements.animateDrawing.checked = RAFFLES.animateDrawing ?? true;
-      elements.useTwitchPFP.checked = RAFFLES.useTwitchPFP ?? false;
-      elements.autoRerollEnabled.checked = RAFFLES.autoRerollEnabled ?? false;
+      elements.raffleCommand.value = RAFFLES.value.raffleCommand || "!join";
+      elements.raffleCommandButton.innerHTML = RAFFLES.value.raffleCommand || "!join";
+      elements.raffleCommandText.innerHTML = RAFFLES.value.raffleCommand || "!join";
+      elements.removeWinner.checked = RAFFLES.value.removeWinner ?? true;
+      elements.allowPlebs.checked = RAFFLES.value.allowPlebs ?? true;
+      elements.allowFollowers.checked = RAFFLES.value.allowFollowers ?? true;
+      elements.allowSubs.checked = RAFFLES.value.allowSubs ?? true;
+      elements.allowTier1.checked = RAFFLES.value.allowTier1 ?? true;
+      elements.allowTier2.checked = RAFFLES.value.allowTier2 ?? true;
+      elements.allowTier3.checked = RAFFLES.value.allowTier3 ?? true;
+      elements.allowMods.checked = RAFFLES.value.allowMods ?? true;
+      elements.allowVips.checked = RAFFLES.value.allowVips ?? true;
+      elements.allowFirstTimeChatters.checked = RAFFLES.value.allowFirstTimeChatters ?? true;
+      elements.plebBonus.value = parseInt(RAFFLES.value.plebBonus, 10) || 0;
+      elements.followerBonus.value = parseInt(RAFFLES.value.followerBonus, 10) || 0;
+      elements.subBonus.value = parseInt(RAFFLES.value.subBonus, 10) || 0;
+      elements.tier1Bonus.value = parseInt(RAFFLES.value.tier1Bonus, 10) || 0;
+      elements.tier2Bonus.value = parseInt(RAFFLES.value.tier2Bonus, 10) || 0;
+      elements.tier3Bonus.value = parseInt(RAFFLES.value.tier3Bonus, 10) || 0;
+      elements.modBonus.value = parseInt(RAFFLES.value.modBonus, 10) || 0;
+      elements.vipBonus.value = parseInt(RAFFLES.value.vipBonus, 10) || 0;
+      elements.firstTimeChatterBonus.value = parseInt(RAFFLES.value.firstTimeChatterBonus, 10) || 0;
+      elements.followAge.value = parseInt(RAFFLES.value.followAge, 10) || 0;
+      elements.followAgeUnit.value = RAFFLES.value.followAgeUnit || "min";
+      elements.subAge.value = parseInt(RAFFLES.value.subAge, 10) || 0;
+      elements.tier1SubAge.value = parseInt(RAFFLES.value.tier1SubAge, 10) || 0;
+      elements.tier2SubAge.value = parseInt(RAFFLES.value.tier2SubAge, 10) || 0;
+      elements.tier3SubAge.value = parseInt(RAFFLES.value.tier3SubAge, 10) || 0;
+      elements.splitTiers.checked = RAFFLES.value.splitTiers ?? false;
+      elements.animateDrawing.checked = RAFFLES.value.animateDrawing ?? true;
+      elements.useTwitchPFP.checked = RAFFLES.value.useTwitchPFP ?? false;
+      elements.autoRerollEnabled.checked = RAFFLES.value.autoRerollEnabled ?? false;
       elements.rerollTimerValueMinutes.disabled = !elements.autoRerollEnabled.checked;
-      elements.rerollTimerValueMinutes.value = parseFloat(RAFFLES.rerollTimerValueMinutes) || 0;
-      elements.extraTimerEnabled.checked = RAFFLES.extraTimerEnabled ?? false;
-      elements.announceWinner.checked = RAFFLES.announceWinner ?? false;
-      elements.confirmJoin.checked = RAFFLES.confirmJoin ?? false;
-      elements.linkPreviewThumbnailsEnabled.checked = RAFFLES.linkPreviewThumbnailsEnabled ?? false;
-      elements.refreshWarningEnabled.checked = RAFFLES.refreshWarningEnabled ?? false;
+      elements.rerollTimerValueMinutes.value = parseFloat(RAFFLES.value.rerollTimerValueMinutes) || 0;
+      elements.extraTimerEnabled.checked = RAFFLES.value.extraTimerEnabled ?? false;
+      elements.announceWinner.checked = RAFFLES.value.announceWinner ?? false;
+      elements.confirmJoin.checked = RAFFLES.value.confirmJoin ?? false;
+      elements.linkPreviewThumbnailsEnabled.checked = RAFFLES.value.linkPreviewThumbnailsEnabled ?? false;
+      elements.refreshWarningEnabled.checked = RAFFLES.value.refreshWarningEnabled ?? false;
 
-      if (RAFFLES.extraTimerEnabled) {
+      if (RAFFLES.value.extraTimerEnabled) {
         showExtraTimer();
       }
-      splitTiers(RAFFLES.splitTiers);
+      splitTiers(RAFFLES.value.splitTiers);
       updateWhoCanJoin();
     }
   } //load_localStorage
@@ -464,7 +465,7 @@
 
   async function handleMessage(target, context, msg, self) {
     if (context.username == currentRaffleWinner) {
-      if (RAFFLES.autoRerollEnabled && timer_raffle.isRunning()) {
+      if (RAFFLES.value.autoRerollEnabled && timer_raffle.isRunning()) {
         document.getElementById("countdown_raffle").remove();
         timer_raffle.reset();
         timer_raffle.stop();
@@ -479,49 +480,49 @@
     let input = msg.split(" ").filter(Boolean);
     let command = input[0].toLowerCase();
 
-    if (command == RAFFLES.raffleCommand && raffle_open) {
+    if (command == RAFFLES.value.raffleCommand && raffle_open) {
       //check if user already joined
       if (raffle_users.some((e) => e.username === context.username)) {
         return;
       }
 
       //check if multiple wins are not allowed and if user already won
-      if (RAFFLES.removeWinner && raffleWinners.includes(context.username)) {
+      if (RAFFLES.value.removeWinner && raffleWinners.includes(context.username)) {
         return;
       }
 
       ////check if user is allowed to join
       //check if sub tiers are split
-      if (RAFFLES.splitTiers) {
+      if (RAFFLES.value.splitTiers) {
         //if sub tiers are split check each tier separately
-        if (!RAFFLES.allowTier1 && context?.badges?.subscriber?.length <= 3) {
+        if (!RAFFLES.value.allowTier1 && context?.badges?.subscriber?.length <= 3) {
           return;
         }
-        if (!RAFFLES.allowTier2 && context?.badges?.subscriber?.length > 3 && context?.badges?.subscriber.startsWith("2")) {
+        if (!RAFFLES.value.allowTier2 && context?.badges?.subscriber?.length > 3 && context?.badges?.subscriber.startsWith("2")) {
           return;
         }
-        if (!RAFFLES.allowTier3 && context?.badges?.subscriber?.length > 3 && context?.badges?.subscriber.startsWith("3")) {
+        if (!RAFFLES.value.allowTier3 && context?.badges?.subscriber?.length > 3 && context?.badges?.subscriber.startsWith("3")) {
           return;
         }
       } else {
-        if (!RAFFLES.allowSubs && context.subscriber) {
+        if (!RAFFLES.value.allowSubs && context.subscriber) {
           return;
         }
       }
       //check if plebs are allowed to join
-      if (!RAFFLES.allowPlebs && !context.subscriber) {
+      if (!RAFFLES.value.allowPlebs && !context.subscriber) {
         return;
       }
       //check if mods are allowed to join
-      if (!RAFFLES.allowMods && context.mod) {
+      if (!RAFFLES.value.allowMods && context.mod) {
         return;
       }
       //check if vips are allowed to join
-      if (!RAFFLES.allowVips && context.vip) {
+      if (!RAFFLES.value.allowVips && context.vip) {
         return;
       }
       //check if first time chatters are allowed to join
-      if (!RAFFLES.allowFirstTimeChatters && firstTimeChatters.includes(context.username)) {
+      if (!RAFFLES.value.allowFirstTimeChatters && firstTimeChatters.includes(context.username)) {
         return;
       }
 
@@ -540,44 +541,44 @@
 
       ////add bonus tickets
       //check if sub tiers are split
-      if (RAFFLES.splitTiers) {
+      if (RAFFLES.value.splitTiers) {
         //if sub tiers are split add bonus for each tier separately
-        if (RAFFLES.tier1Bonus > 0 && context?.badges?.subscriber?.length <= 3) {
-          user.tickets += RAFFLES.tier1Bonus;
+        if (RAFFLES.value.tier1Bonus > 0 && context?.badges?.subscriber?.length <= 3) {
+          user.tickets += RAFFLES.value.tier1Bonus;
         }
-        if (RAFFLES.tier2Bonus > 0 && context?.badges?.subscriber?.length > 3 && context?.badges?.subscriber.startsWith("2")) {
-          user.tickets += RAFFLES.tier2Bonus;
+        if (RAFFLES.value.tier2Bonus > 0 && context?.badges?.subscriber?.length > 3 && context?.badges?.subscriber.startsWith("2")) {
+          user.tickets += RAFFLES.value.tier2Bonus;
         }
-        if (RAFFLES.tier3Bonus > 0 && context?.badges?.subscriber?.length > 3 && context?.badges?.subscriber.startsWith("3")) {
-          user.tickets += RAFFLES.tier3Bonus;
+        if (RAFFLES.value.tier3Bonus > 0 && context?.badges?.subscriber?.length > 3 && context?.badges?.subscriber.startsWith("3")) {
+          user.tickets += RAFFLES.value.tier3Bonus;
         }
       } else {
-        if (RAFFLES.subBonus > 0 && context.subscriber) {
-          user.tickets += RAFFLES.subBonus;
+        if (RAFFLES.value.subBonus > 0 && context.subscriber) {
+          user.tickets += RAFFLES.value.subBonus;
         }
       }
       //add pleb bonus
-      if (RAFFLES.plebBonus > 0 && !context.subscriber) {
-        user.tickets += RAFFLES.plebBonus;
+      if (RAFFLES.value.plebBonus > 0 && !context.subscriber) {
+        user.tickets += RAFFLES.value.plebBonus;
       }
       //add mod bonus
-      if (RAFFLES.modBonus > 0 && context.mod) {
-        user.tickets += RAFFLES.modBonus;
+      if (RAFFLES.value.modBonus > 0 && context.mod) {
+        user.tickets += RAFFLES.value.modBonus;
       }
       //add vip bonus
-      if (RAFFLES.vipBonus > 0 && context.vip) {
-        user.tickets += RAFFLES.vipBonus;
+      if (RAFFLES.value.vipBonus > 0 && context.vip) {
+        user.tickets += RAFFLES.value.vipBonus;
       }
       //add first time chatter bonus
-      if (RAFFLES.firstTimeChatterBonus > 0 && firstTimeChatters.includes(context.username)) {
-        user.tickets += RAFFLES.firstTimeChatterBonus;
+      if (RAFFLES.value.firstTimeChatterBonus > 0 && firstTimeChatters.includes(context.username)) {
+        user.tickets += RAFFLES.value.firstTimeChatterBonus;
       }
 
       //add the user object to the raffle which also adds the user to the raffle_users array
       addUserToRaffle(user);
     } //raffle
 
-    if (command == RAFFLES.raffleCommand && !raffle_open && (Date.now() - currentTime) / 1000 > 10) {
+    if (command == RAFFLES.value.raffleCommand && !raffle_open && (Date.now() - currentTime) / 1000 > 10) {
       currentTime = Date.now();
       rafflePopover.show();
       setTimeout(function () {
@@ -586,7 +587,7 @@
       return;
     } //raffle disabled
 
-    if (command == "!reset" && (context.username == USER.channel || context.username == "badoge")) {
+    if (command == "!reset" && (context.username == USER.value.channel || context.username == "badoge")) {
       resetSettings();
       return;
     } //reset settings
@@ -624,7 +625,7 @@
       showToast("No one has joined the raffle", "warning", 2500);
       return;
     }
-    if (RAFFLES.animateDrawing) {
+    if (RAFFLES.value.animateDrawing) {
       drawRaffleWinnerFancy();
     } else {
       let user_tickets = [];
@@ -636,18 +637,18 @@
       currentRaffleWinner = user_tickets[Math.floor(Math.random() * user_tickets.length)];
       raffleWinners.push(currentRaffleWinner);
       let winner = raffle_users.find((e) => e.username == currentRaffleWinner);
-      if (RAFFLES.autoRerollEnabled) {
+      if (RAFFLES.value.autoRerollEnabled) {
         startRaffleTimer();
       }
       let p = document.createElement("p");
       p.classList.add("h2");
-      p.innerHTML = `Winner #${raffleWinners.length}: <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USER.channel}/viewercard/${currentRaffleWinner}?popout=","_blank","width=340,height=800")>${currentRaffleWinner}</a>`;
+      p.innerHTML = `Winner #${raffleWinners.length}: <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USER.value.channel}/viewercard/${currentRaffleWinner}?popout=","_blank","width=340,height=800")>${currentRaffleWinner}</a>`;
       elements.raffleOutput.append(p);
-      if (RAFFLES.announceWinner && USER.twitchLogin) {
+      if (RAFFLES.value.announceWinner && USER.value.twitchLogin) {
         let chance = Math.ceil((raffle_users.find((users) => users.username === currentRaffleWinner).tickets / user_tickets.length) * 100);
         botSay(`PogChamp @${currentRaffleWinner} won the raffle with a ${chance}% chance to win :) 🎊`);
       }
-      if (RAFFLES.removeWinner) {
+      if (RAFFLES.value.removeWinner) {
         removeFromRaffle(currentRaffleWinner);
       }
       raffleWinnerChat(
@@ -668,7 +669,7 @@
       this.left = 0;
       this.div = document.createElement("div");
       this.div.classList.add("slot-element");
-      if (!RAFFLES.useTwitchPFP) {
+      if (!RAFFLES.value.useTwitchPFP) {
         this.div.innerHTML = `<span style="color:${this.color};"> ${this.username} </span>
         <div style="height: 310px; width: 300px; border-bottom: 10px solid transparent; background: radial-gradient(circle, rgba(255,255,255,1) 0%, ${this.color} 100%);">
           <img style="background: ${this.color}; height: 300px; width: 300px;" src="${this.pfp}" alt="${this.username}" title="${this.username}" />
@@ -742,14 +743,14 @@
       raffleWinners.push(winnerSlot.username);
       currentRaffleWinner = winnerSlot.username;
       let winner = raffle_users.find((e) => e.username == currentRaffleWinner);
-      if (RAFFLES.autoRerollEnabled) {
+      if (RAFFLES.value.autoRerollEnabled) {
         startRaffleTimer();
       }
       let p = document.createElement("p");
       p.classList.add("h2");
-      p.innerHTML = `Winner #${raffleWinners.length}: <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USER.channel}/viewercard/${winnerSlot.username}?popout=","_blank","width=340,height=800")>${winnerSlot.username}</a>`;
+      p.innerHTML = `Winner #${raffleWinners.length}: <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USER.value.channel}/viewercard/${winnerSlot.username}?popout=","_blank","width=340,height=800")>${winnerSlot.username}</a>`;
       elements.raffleOutput.append(p);
-      if (RAFFLES.announceWinner && USER.twitchLogin) {
+      if (RAFFLES.value.announceWinner && USER.value.twitchLogin) {
         let chance = Math.ceil(
           (raffle_users.find((users) => users.username === currentRaffleWinner).tickets /
             raffle_users.reduce(function (sum, obj) {
@@ -759,7 +760,7 @@
         );
         botSay(`PogChamp @${currentRaffleWinner} won the raffle with a ${chance}% chance to win :) 🎊`);
       }
-      if (RAFFLES.removeWinner) {
+      if (RAFFLES.value.removeWinner) {
         removeFromRaffle(winnerSlot.username);
       }
       raffleWinnerChat(
@@ -828,7 +829,7 @@
       }
     }
     user_tickets = user_tickets.shuffle().slice(0, 100);
-    if (!RAFFLES.useTwitchPFP) {
+    if (!RAFFLES.value.useTwitchPFP) {
       for (let index = 0, j = user_tickets.length; index < j; index++) {
         user_tickets[index].pfp = "/pics/raffledonk.png";
       }
@@ -979,7 +980,7 @@
       joinMessage ? `<span class="text-body-secondary"> ${msg_s}</span>` : msg_s
     }`;
     elements.raffleOutput.append(p);
-    linkifyElementID("raffleOutput", RAFFLES.linkPreviewThumbnailsEnabled);
+    linkifyElementID("raffleOutput", RAFFLES.value.linkPreviewThumbnailsEnabled);
   } //raffleWinnerChat
 
   /**
@@ -1000,10 +1001,10 @@
       elements.ffzGlobalEmotes.innerText = ffz.length;
       elements.seventvGlobalEmotes.innerText = seventv.length;
       thirdPartyEmotes = [...thirdPartyEmotes, ...bttv, ...ffz, ...seventv];
-      if (USER.userID) {
-        let bttvChannel = await getChannelBTTVEmotes(USER.userID);
-        let ffzChannel = await getChannelFFZEmotes(USER.userID);
-        let seventvChannel = await getChannel7TVEmotes(USER.userID);
+      if (USER.value.userID) {
+        let bttvChannel = await getChannelBTTVEmotes(USER.value.userID);
+        let ffzChannel = await getChannelFFZEmotes(USER.value.userID);
+        let seventvChannel = await getChannel7TVEmotes(USER.value.userID);
         thirdPartyEmotes = [...thirdPartyEmotes, ...bttvChannel, ...ffzChannel, ...seventvChannel];
         elements.bttvChannelEmotes.innerText = bttvChannel.length;
         elements.ffzChannelEmotes.innerText = ffzChannel.length;
@@ -1017,9 +1018,9 @@
    */
   async function botSay(msg, joinMsg = false) {
     let body = JSON.stringify({
-      channel: USER.channel,
+      channel: USER.value.channel,
       msg: joinMsg ? `@${msg.join(", @")} joined the raffle PogChamp` : msg,
-      access_token: USER.access_token,
+      access_token: USER.value.access_token,
     });
     let requestOptions = {
       method: "POST",
@@ -1052,11 +1053,11 @@
       timer_raffle.reset();
       timer_raffle.stop();
     }
-    RAFFLES.rerollTimerValueMinutes = parseFloat(elements.rerollTimerValueMinutes.value) * 60;
-    if (isNaN(RAFFLES.rerollTimerValueMinutes)) {
+    RAFFLES.value.rerollTimerValueMinutes = parseFloat(elements.rerollTimerValueMinutes.value) * 60;
+    if (isNaN(RAFFLES.value.rerollTimerValueMinutes)) {
       return;
     }
-    if (RAFFLES.rerollTimerValueMinutes == 0) {
+    if (RAFFLES.value.rerollTimerValueMinutes == 0) {
       return;
     }
     elements.raffleOutput.innerHTML += `<div class="card border-danger" id="countdown_raffle" style="text-align: center; margin: 10px; display: none;">
@@ -1080,7 +1081,7 @@
       countdown: true,
       precision: "secondTenths",
       startValues: {
-        seconds: RAFFLES.rerollTimerValueMinutes,
+        seconds: RAFFLES.value.rerollTimerValueMinutes,
       },
     });
   } //startRaffleTimer
@@ -1091,15 +1092,15 @@
     }
 
     if (
-      !RAFFLES.allowPlebs &&
-      !RAFFLES.allowSubs &&
-      !RAFFLES.allowTier1 &&
-      !RAFFLES.allowTier2 &&
-      !RAFFLES.allowTier2 &&
-      !RAFFLES.allowTier3 &&
-      !RAFFLES.allowMods &&
-      !RAFFLES.allowVips &&
-      !RAFFLES.allowFirstTimeChatters
+      !RAFFLES.value.allowPlebs &&
+      !RAFFLES.value.allowSubs &&
+      !RAFFLES.value.allowTier1 &&
+      !RAFFLES.value.allowTier2 &&
+      !RAFFLES.value.allowTier2 &&
+      !RAFFLES.value.allowTier3 &&
+      !RAFFLES.value.allowMods &&
+      !RAFFLES.value.allowVips &&
+      !RAFFLES.value.allowFirstTimeChatters
     ) {
       showToast("No one will be able to join the raffle", "danger", 3000);
       settingsOffcanvas.show();
@@ -1252,22 +1253,24 @@
 
   function updateWhoCanJoin() {
     let roles = {
-      "Non subscribers": { allowed: RAFFLES.allowPlebs, tickets: 1 + RAFFLES.plebBonus },
-      "Tier 1 subscribers": { allowed: RAFFLES.allowTier1, tickets: 1 + RAFFLES.tier1Bonus },
-      "Tier 2 subscribers": { allowed: RAFFLES.allowTier2, tickets: 1 + RAFFLES.tier2Bonus },
-      "Tier 3 subscribers": { allowed: RAFFLES.allowTier3, tickets: 1 + RAFFLES.tier3Bonus },
-      Subscribers: { allowed: RAFFLES.allowSubs, tickets: 1 + RAFFLES.subBonus },
-      Mods: { allowed: RAFFLES.allowMods, tickets: 1 + RAFFLES.modBonus },
-      VIPs: { allowed: RAFFLES.allowVips, tickets: 1 + RAFFLES.vipBonus },
-      "First time chatters": { allowed: RAFFLES.allowFirstTimeChatters, tickets: 1 + RAFFLES.firstTimeChatterBonus },
+      "Non subscribers": { allowed: RAFFLES.value.allowPlebs, tickets: 1 + RAFFLES.value.plebBonus },
+      "Tier 1 subscribers": { allowed: RAFFLES.value.allowTier1, tickets: 1 + RAFFLES.value.tier1Bonus },
+      "Tier 2 subscribers": { allowed: RAFFLES.value.allowTier2, tickets: 1 + RAFFLES.value.tier2Bonus },
+      "Tier 3 subscribers": { allowed: RAFFLES.value.allowTier3, tickets: 1 + RAFFLES.value.tier3Bonus },
+      Subscribers: { allowed: RAFFLES.value.allowSubs, tickets: 1 + RAFFLES.value.subBonus },
+      Mods: { allowed: RAFFLES.value.allowMods, tickets: 1 + RAFFLES.value.modBonus },
+      VIPs: { allowed: RAFFLES.value.allowVips, tickets: 1 + RAFFLES.value.vipBonus },
+      "First time chatters": { allowed: RAFFLES.value.allowFirstTimeChatters, tickets: 1 + RAFFLES.value.firstTimeChatterBonus },
     };
 
-    document.querySelector("#plebBadge > div").classList = RAFFLES.allowPlebs ? "role-allowed" : "role-not-allowed";
+    document.querySelector("#plebBadge > div").classList = RAFFLES.value.allowPlebs ? "role-allowed" : "role-not-allowed";
     document.querySelector("#subBadge > div").classList =
-      (!RAFFLES.splitTiers && RAFFLES.allowSubs) || (RAFFLES.splitTiers && (RAFFLES.allowTier1 || RAFFLES.allowTier2 || RAFFLES.allowTier3)) ? "role-allowed" : "role-not-allowed";
-    document.querySelector("#modBadge > div").classList = RAFFLES.allowMods ? "role-allowed" : "role-not-allowed";
-    document.querySelector("#vipBadge > div").classList = RAFFLES.allowVips ? "role-allowed" : "role-not-allowed";
-    document.querySelector("#firstmsgBadge > div").classList = RAFFLES.allowFirstTimeChatters ? "role-allowed" : "role-not-allowed";
+      (!RAFFLES.value.splitTiers && RAFFLES.value.allowSubs) || (RAFFLES.value.splitTiers && (RAFFLES.value.allowTier1 || RAFFLES.value.allowTier2 || RAFFLES.value.allowTier3))
+        ? "role-allowed"
+        : "role-not-allowed";
+    document.querySelector("#modBadge > div").classList = RAFFLES.value.allowMods ? "role-allowed" : "role-not-allowed";
+    document.querySelector("#vipBadge > div").classList = RAFFLES.value.allowVips ? "role-allowed" : "role-not-allowed";
+    document.querySelector("#firstmsgBadge > div").classList = RAFFLES.value.allowFirstTimeChatters ? "role-allowed" : "role-not-allowed";
 
     let allowed = [];
     let tickets = [];
@@ -1275,11 +1278,11 @@
     let numberOfRoles;
     for (let [key, value] of Object.entries(roles)) {
       if (value.allowed) {
-        if (RAFFLES.splitTiers && key == "Subscribers") {
+        if (RAFFLES.value.splitTiers && key == "Subscribers") {
           numberOfRoles = 7;
           continue;
         }
-        if (!RAFFLES.splitTiers && (key == "Tier 1 subscribers" || key == "Tier 3 subscribers" || key == "Tier 2 subscribers")) {
+        if (!RAFFLES.value.splitTiers && (key == "Tier 1 subscribers" || key == "Tier 3 subscribers" || key == "Tier 2 subscribers")) {
           numberOfRoles = 5;
           continue;
         }
@@ -1360,7 +1363,7 @@
         data-bs-title="Not signed in"
         data-bs-content="You need sign in before doing that"
       >
-        <Login messageHandler={handleMessage} timeoutHandler={handleTimeout} />
+        <Login messageHandler={handleMessage} timeoutHandler={handleTimeout} loginEvent={() => USER.refresh()} />
       </span>
     </div>
 

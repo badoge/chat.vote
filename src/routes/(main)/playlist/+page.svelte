@@ -78,8 +78,8 @@
   let elements;
   let bootstrap;
 
-  let USER = donkStorage("USER", null).value;
-  let PLAYLIST = donkStorage("PLAYLIST", null).value;
+  let USER = donkStorage("USER", null);
+  let PLAYLIST = donkStorage("PLAYLIST", null);
 
   onMount(async () => {
     bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
@@ -254,8 +254,8 @@
     });
 
     elements.link.addEventListener("focus", async function () {
-      if (!streamerColor && USER.userID) {
-        streamerColor = await getStreamerColor(USER.userID);
+      if (!streamerColor && USER.value.userID) {
+        streamerColor = await getStreamerColor(USER.value.userID);
       }
     });
 
@@ -297,7 +297,7 @@
   let skippers = [];
 
   function checkLogin() {
-    if (!USER.channel) {
+    if (!USER.value.channel) {
       loginButtonPopover.show();
       setTimeout(function () {
         loginButtonPopover.hide();
@@ -308,124 +308,124 @@
   } //checkLogin
 
   async function refreshData() {
-    PLAYLIST.autoplay = elements.autoplay.checked;
-    PLAYLIST.allowSpotifySongs = elements.allowSpotifySongs.checked;
-    PLAYLIST.allowStreamable = elements.allowStreamable.checked;
-    PLAYLIST.allowTwitchClips = elements.allowTwitchClips.checked;
-    PLAYLIST.allowTwitchStreams = elements.allowTwitchStreams.checked;
-    PLAYLIST.allowTwitchVODs = elements.allowTwitchVODs.checked;
-    PLAYLIST.allowTiktokVideos = elements.allowTiktokVideos.checked;
-    PLAYLIST.allowYTStreams = elements.allowYTStreams.checked;
-    PLAYLIST.allowYTShorts = elements.allowYTShorts.checked;
-    PLAYLIST.allowYTVideos = elements.allowYTVideos.checked;
-    PLAYLIST.allowVimeoVideos = elements.allowVimeoVideos.checked;
-    PLAYLIST.maxDuration = parseInt(elements.maxDuration.value, 10) || "";
-    PLAYLIST.maxDurationUnit = elements.maxDurationUnit.value || "m";
-    PLAYLIST.maxLength = parseInt(elements.maxLength.value, 10) || "";
-    PLAYLIST.maxSize = parseInt(elements.maxSize.value, 10) || "";
-    PLAYLIST.minViewCount = parseInt(elements.minViewCount.value, 10) || "";
-    PLAYLIST.minUploadAge = parseInt(elements.minUploadAge.value, 10) || "";
-    PLAYLIST.minUploadAgeUnit = elements.minUploadAgeUnit.value || "h";
-    PLAYLIST.maxUploadAge = parseInt(elements.maxUploadAge.value, 10) || "";
-    PLAYLIST.maxUploadAgeUnit = elements.maxUploadAgeUnit.value || "h";
-    PLAYLIST.uniqueOnly = elements.uniqueOnly.checked;
-    PLAYLIST.allowPlebs = elements.allowPlebs.checked;
-    PLAYLIST.allowSubs = elements.allowSubs.checked;
-    PLAYLIST.allowMods = elements.allowMods.checked;
-    PLAYLIST.allowVips = elements.allowVips.checked;
-    PLAYLIST.allowFirstTimeChatters = elements.allowFirstTimeChatters.checked;
-    PLAYLIST.plebLimit = parseInt(elements.plebLimit.value, 10) || "";
-    PLAYLIST.subLimit = parseInt(elements.subLimit.value, 10) || "";
-    PLAYLIST.modLimit = parseInt(elements.modLimit.value, 10) || "";
-    PLAYLIST.vipLimit = parseInt(elements.vipLimit.value, 10) || "";
-    PLAYLIST.firstTimeChatterLimit = parseInt(elements.firstTimeChatterLimit.value, 10) || "";
-    PLAYLIST.noCommand = elements.noCommand.checked;
-    PLAYLIST.requestCommand = elements.requestCommand.value.replace(/\s+/g, "").toLowerCase() || "!request";
-    PLAYLIST.requestCommandAlias = elements.requestCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!r";
-    PLAYLIST.allowVoteSkip = elements.allowVoteSkip.checked;
-    PLAYLIST.voteskipCommand = elements.voteskipCommand.value.replace(/\s+/g, "").toLowerCase() || "!voteskip";
-    PLAYLIST.voteskipCommandAlias = elements.voteskipCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!vs";
-    PLAYLIST.voteskipCount = parseInt(elements.voteskipCount.value, 10) || 100;
-    PLAYLIST.enableBot = elements.enableBot.checked;
-    PLAYLIST.botCooldown = parseInt(elements.botCooldown.value, 10) || 1;
-    PLAYLIST.songCommand = elements.songCommand.value.replace(/\s+/g, "").toLowerCase() || "!song";
-    PLAYLIST.songCommandAlias = elements.songCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!video";
-    PLAYLIST.playlistCommand = elements.playlistCommand.value.replace(/\s+/g, "").toLowerCase() || "!playlist";
-    PLAYLIST.playlistCommandAlias = elements.playlistCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!pl";
-    PLAYLIST.approvalQueue = elements.approvalQueue.checked;
-    PLAYLIST.openCommand = elements.openCommand.value.replace(/\s+/g, "").toLowerCase() || "!open";
-    PLAYLIST.closeCommand = elements.closeCommand.value.replace(/\s+/g, "").toLowerCase() || "!close";
-    PLAYLIST.playCommand = elements.playCommand.value.replace(/\s+/g, "").toLowerCase() || "!play";
-    PLAYLIST.pauseCommand = elements.pauseCommand.value.replace(/\s+/g, "").toLowerCase() || "!pause";
-    PLAYLIST.autoplayCommand = elements.autoplayCommand.value.replace(/\s+/g, "").toLowerCase() || "!autoplay";
-    PLAYLIST.skipCommand = elements.skipCommand.value.replace(/\s+/g, "").toLowerCase() || "!skip";
-    PLAYLIST.rewindCommand = elements.rewindCommand.value.replace(/\s+/g, "").toLowerCase() || "!rewind";
-    PLAYLIST.deleteCommand = elements.deleteCommand.value.replace(/\s+/g, "").toLowerCase() || "!delete";
-    PLAYLIST.modCommands = elements.modCommands.checked;
-    PLAYLIST.enableFavorites = elements.enableFavorites.checked;
+    PLAYLIST.value.autoplay = elements.autoplay.checked;
+    PLAYLIST.value.allowSpotifySongs = elements.allowSpotifySongs.checked;
+    PLAYLIST.value.allowStreamable = elements.allowStreamable.checked;
+    PLAYLIST.value.allowTwitchClips = elements.allowTwitchClips.checked;
+    PLAYLIST.value.allowTwitchStreams = elements.allowTwitchStreams.checked;
+    PLAYLIST.value.allowTwitchVODs = elements.allowTwitchVODs.checked;
+    PLAYLIST.value.allowTiktokVideos = elements.allowTiktokVideos.checked;
+    PLAYLIST.value.allowYTStreams = elements.allowYTStreams.checked;
+    PLAYLIST.value.allowYTShorts = elements.allowYTShorts.checked;
+    PLAYLIST.value.allowYTVideos = elements.allowYTVideos.checked;
+    PLAYLIST.value.allowVimeoVideos = elements.allowVimeoVideos.checked;
+    PLAYLIST.value.maxDuration = parseInt(elements.maxDuration.value, 10) || "";
+    PLAYLIST.value.maxDurationUnit = elements.maxDurationUnit.value || "m";
+    PLAYLIST.value.maxLength = parseInt(elements.maxLength.value, 10) || "";
+    PLAYLIST.value.maxSize = parseInt(elements.maxSize.value, 10) || "";
+    PLAYLIST.value.minViewCount = parseInt(elements.minViewCount.value, 10) || "";
+    PLAYLIST.value.minUploadAge = parseInt(elements.minUploadAge.value, 10) || "";
+    PLAYLIST.value.minUploadAgeUnit = elements.minUploadAgeUnit.value || "h";
+    PLAYLIST.value.maxUploadAge = parseInt(elements.maxUploadAge.value, 10) || "";
+    PLAYLIST.value.maxUploadAgeUnit = elements.maxUploadAgeUnit.value || "h";
+    PLAYLIST.value.uniqueOnly = elements.uniqueOnly.checked;
+    PLAYLIST.value.allowPlebs = elements.allowPlebs.checked;
+    PLAYLIST.value.allowSubs = elements.allowSubs.checked;
+    PLAYLIST.value.allowMods = elements.allowMods.checked;
+    PLAYLIST.value.allowVips = elements.allowVips.checked;
+    PLAYLIST.value.allowFirstTimeChatters = elements.allowFirstTimeChatters.checked;
+    PLAYLIST.value.plebLimit = parseInt(elements.plebLimit.value, 10) || "";
+    PLAYLIST.value.subLimit = parseInt(elements.subLimit.value, 10) || "";
+    PLAYLIST.value.modLimit = parseInt(elements.modLimit.value, 10) || "";
+    PLAYLIST.value.vipLimit = parseInt(elements.vipLimit.value, 10) || "";
+    PLAYLIST.value.firstTimeChatterLimit = parseInt(elements.firstTimeChatterLimit.value, 10) || "";
+    PLAYLIST.value.noCommand = elements.noCommand.checked;
+    PLAYLIST.value.requestCommand = elements.requestCommand.value.replace(/\s+/g, "").toLowerCase() || "!request";
+    PLAYLIST.value.requestCommandAlias = elements.requestCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!r";
+    PLAYLIST.value.allowVoteSkip = elements.allowVoteSkip.checked;
+    PLAYLIST.value.voteskipCommand = elements.voteskipCommand.value.replace(/\s+/g, "").toLowerCase() || "!voteskip";
+    PLAYLIST.value.voteskipCommandAlias = elements.voteskipCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!vs";
+    PLAYLIST.value.voteskipCount = parseInt(elements.voteskipCount.value, 10) || 100;
+    PLAYLIST.value.enableBot = elements.enableBot.checked;
+    PLAYLIST.value.botCooldown = parseInt(elements.botCooldown.value, 10) || 1;
+    PLAYLIST.value.songCommand = elements.songCommand.value.replace(/\s+/g, "").toLowerCase() || "!song";
+    PLAYLIST.value.songCommandAlias = elements.songCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!video";
+    PLAYLIST.value.playlistCommand = elements.playlistCommand.value.replace(/\s+/g, "").toLowerCase() || "!playlist";
+    PLAYLIST.value.playlistCommandAlias = elements.playlistCommandAlias.value.replace(/\s+/g, "").toLowerCase() || "!pl";
+    PLAYLIST.value.approvalQueue = elements.approvalQueue.checked;
+    PLAYLIST.value.openCommand = elements.openCommand.value.replace(/\s+/g, "").toLowerCase() || "!open";
+    PLAYLIST.value.closeCommand = elements.closeCommand.value.replace(/\s+/g, "").toLowerCase() || "!close";
+    PLAYLIST.value.playCommand = elements.playCommand.value.replace(/\s+/g, "").toLowerCase() || "!play";
+    PLAYLIST.value.pauseCommand = elements.pauseCommand.value.replace(/\s+/g, "").toLowerCase() || "!pause";
+    PLAYLIST.value.autoplayCommand = elements.autoplayCommand.value.replace(/\s+/g, "").toLowerCase() || "!autoplay";
+    PLAYLIST.value.skipCommand = elements.skipCommand.value.replace(/\s+/g, "").toLowerCase() || "!skip";
+    PLAYLIST.value.rewindCommand = elements.rewindCommand.value.replace(/\s+/g, "").toLowerCase() || "!rewind";
+    PLAYLIST.value.deleteCommand = elements.deleteCommand.value.replace(/\s+/g, "").toLowerCase() || "!delete";
+    PLAYLIST.value.modCommands = elements.modCommands.checked;
+    PLAYLIST.value.enableFavorites = elements.enableFavorites.checked;
 
-    elements.voteskipCommand.disabled = !PLAYLIST.allowVoteSkip;
-    elements.voteskipCommandAlias.disabled = !PLAYLIST.allowVoteSkip;
-    elements.voteskipCount.disabled = !PLAYLIST.allowVoteSkip;
-    elements.botCooldown.disabled = !PLAYLIST.enableBot;
-    elements.songCommand.disabled = !PLAYLIST.enableBot;
-    elements.songCommandAlias.disabled = !PLAYLIST.enableBot;
-    elements.playlistCommand.disabled = !PLAYLIST.enableBot;
-    elements.playlistCommandAlias.disabled = !PLAYLIST.enableBot;
+    elements.voteskipCommand.disabled = !PLAYLIST.value.allowVoteSkip;
+    elements.voteskipCommandAlias.disabled = !PLAYLIST.value.allowVoteSkip;
+    elements.voteskipCount.disabled = !PLAYLIST.value.allowVoteSkip;
+    elements.botCooldown.disabled = !PLAYLIST.value.enableBot;
+    elements.songCommand.disabled = !PLAYLIST.value.enableBot;
+    elements.songCommandAlias.disabled = !PLAYLIST.value.enableBot;
+    elements.playlistCommand.disabled = !PLAYLIST.value.enableBot;
+    elements.playlistCommandAlias.disabled = !PLAYLIST.value.enableBot;
 
-    elements.approvalTabButton.style.display = PLAYLIST.approvalQueue ? "" : "none";
+    elements.approvalTabButton.style.display = PLAYLIST.value.approvalQueue ? "" : "none";
 
-    elements.voteSkipHint.innerHTML = `<strong>${PLAYLIST.voteskipCommand}</strong> or <strong>${PLAYLIST.voteskipCommandAlias}</strong>`;
+    elements.voteSkipHint.innerHTML = `<strong>${PLAYLIST.value.voteskipCommand}</strong> or <strong>${PLAYLIST.value.voteskipCommandAlias}</strong>`;
 
-    if (PLAYLIST.noCommand) {
+    if (PLAYLIST.value.noCommand) {
       elements.commandHint.innerHTML = `Add songs or videos to the playlist by posting a link in chat`;
       elements.commandHint2.innerHTML = `Request something by posting a link in chat`;
     } else {
       elements.commandHint.innerHTML = `Add songs or videos to the playlist using 
-    <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">${PLAYLIST.requestCommand} [link]</kbd> or 
-    <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">${PLAYLIST.requestCommandAlias} [link]</kbd>`;
+    <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">${PLAYLIST.value.requestCommand} [link]</kbd> or 
+    <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">${PLAYLIST.value.requestCommandAlias} [link]</kbd>`;
       elements.commandHint2.innerHTML = `Request something using<br />
-    <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">${PLAYLIST.requestCommand} [link]</kbd> or 
-    <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">${PLAYLIST.requestCommandAlias} [link]</kbd>`;
+    <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">${PLAYLIST.value.requestCommand} [link]</kbd> or 
+    <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">${PLAYLIST.value.requestCommandAlias} [link]</kbd>`;
     }
 
-    let min = numberAndUnitToSeconds(PLAYLIST.minUploadAge, PLAYLIST.minUploadAgeUnit) * 1000;
-    let max = numberAndUnitToSeconds(PLAYLIST.maxUploadAge, PLAYLIST.maxUploadAgeUnit) * 1000;
+    let min = numberAndUnitToSeconds(PLAYLIST.value.minUploadAge, PLAYLIST.value.minUploadAgeUnit) * 1000;
+    let max = numberAndUnitToSeconds(PLAYLIST.value.maxUploadAge, PLAYLIST.value.maxUploadAgeUnit) * 1000;
     let now = Date.now();
 
     if (min > 0 && max > 0 && min == max) {
-      PLAYLIST.minUploadAge = "";
-      PLAYLIST.maxUploadAge = "";
+      PLAYLIST.value.minUploadAge = "";
+      PLAYLIST.value.maxUploadAge = "";
       elements.minUploadAge.value = "";
       elements.maxUploadAge.value = "";
       showToast("Limits can't be the same", "warning", 3000);
     }
 
     if (min > 0 && max > 0 && min > max) {
-      PLAYLIST.minUploadAge = "";
-      PLAYLIST.maxUploadAge = "";
+      PLAYLIST.value.minUploadAge = "";
+      PLAYLIST.value.maxUploadAge = "";
       elements.minUploadAge.value = "";
       elements.maxUploadAge.value = "";
       showToast("Older than limit must be less than the Newer than limit", "warning", 5000);
     }
 
-    if (PLAYLIST.minUploadAge && PLAYLIST.maxUploadAge) {
+    if (PLAYLIST.value.minUploadAge && PLAYLIST.value.maxUploadAge) {
       elements.uploadAgeDesc.innerHTML = `Content must be uploaded between ${new Date(now - max).toLocaleString("en-GB")} and ${new Date(now - min).toLocaleString("en-GB")}`;
     }
 
-    if (PLAYLIST.minUploadAge && !PLAYLIST.maxUploadAge) {
+    if (PLAYLIST.value.minUploadAge && !PLAYLIST.value.maxUploadAge) {
       elements.uploadAgeDesc.innerHTML = `Content must be uploaded before ${new Date(now - min).toLocaleString("en-GB")}`;
     }
 
-    if (!PLAYLIST.minUploadAge && PLAYLIST.maxUploadAge) {
+    if (!PLAYLIST.value.minUploadAge && PLAYLIST.value.maxUploadAge) {
       elements.uploadAgeDesc.innerHTML = `Content must be uploaded after ${new Date(now - max).toLocaleString("en-GB")}`;
     }
 
-    if (!PLAYLIST.minUploadAge && !PLAYLIST.maxUploadAge) {
+    if (!PLAYLIST.value.minUploadAge && !PLAYLIST.value.maxUploadAge) {
       elements.uploadAgeDesc.innerHTML = `No age limits set`;
     }
 
-    if (PLAYLIST.enableFavorites) {
+    if (PLAYLIST.value.enableFavorites) {
       elements.favoriteButtonDiv.style.display = "";
     } else {
       elements.favoriteButtonDiv.style.display = "none";
@@ -453,85 +453,85 @@
     } else {
       PLAYLIST = JSON.parse(localStorage.getItem("PLAYLIST"));
 
-      elements.autoplay.checked = PLAYLIST.autoplay ?? true;
-      elements.allowSpotifySongs.checked = PLAYLIST.allowSpotifySongs ?? true;
-      elements.allowStreamable.checked = PLAYLIST.allowStreamable ?? true;
-      elements.allowTwitchClips.checked = PLAYLIST.allowTwitchClips ?? true;
-      elements.allowTwitchStreams.checked = PLAYLIST.allowTwitchStreams ?? true;
-      elements.allowTwitchVODs.checked = PLAYLIST.allowTwitchVODs ?? true;
-      elements.allowTiktokVideos.checked = PLAYLIST.allowTiktokVideos ?? true;
-      elements.allowYTStreams.checked = PLAYLIST.allowYTStreams ?? true;
-      elements.allowYTShorts.checked = PLAYLIST.allowYTShorts ?? true;
-      elements.allowYTVideos.checked = PLAYLIST.allowYTVideos ?? true;
-      elements.allowVimeoVideos.checked = PLAYLIST.allowVimeoVideos ?? true;
-      elements.maxDuration.value = PLAYLIST.maxDuration || "";
-      elements.maxDurationUnit.value = PLAYLIST.maxDurationUnit || "m";
-      elements.maxLength.value = PLAYLIST.maxLength || "";
-      elements.maxSize.value = PLAYLIST.maxSize || "";
-      elements.minViewCount.value = PLAYLIST.minViewCount || "";
-      elements.minUploadAge.value = PLAYLIST.minUploadAge || "";
-      elements.minUploadAgeUnit.value = PLAYLIST.minUploadAgeUnit || "h";
-      elements.maxUploadAge.value = PLAYLIST.maxUploadAge || "";
-      elements.maxUploadAgeUnit.value = PLAYLIST.maxUploadAgeUnit || "h";
-      elements.uniqueOnly.checked = PLAYLIST.uniqueOnly ?? false;
-      elements.allowPlebs.checked = PLAYLIST.allowPlebs ?? true;
-      elements.allowSubs.checked = PLAYLIST.allowSubs ?? true;
-      elements.allowMods.checked = PLAYLIST.allowMods ?? true;
-      elements.allowVips.checked = PLAYLIST.allowVips ?? true;
-      elements.allowFirstTimeChatters.checked = PLAYLIST.allowFirstTimeChatters ?? true;
-      elements.plebLimit.value = PLAYLIST.plebLimit || "";
-      elements.subLimit.value = PLAYLIST.subLimit || "";
-      elements.modLimit.value = PLAYLIST.modLimit || "";
-      elements.vipLimit.value = PLAYLIST.vipLimit || "";
-      elements.firstTimeChatterLimit.value = PLAYLIST.firstTimeChatterLimit || "";
-      elements.noCommand.checked = PLAYLIST.noCommand ?? false;
-      elements.requestCommand.value = PLAYLIST.requestCommand || "!request";
-      elements.requestCommandAlias.value = PLAYLIST.requestCommandAlias || "!r";
-      elements.allowVoteSkip.checked = PLAYLIST.allowVoteSkip ?? false;
-      elements.voteskipCommand.value = PLAYLIST.voteskipCommand || "!voteskip";
-      elements.voteskipCommandAlias.value = PLAYLIST.voteskipCommandAlias || "!vs";
-      elements.voteskipCount.value = PLAYLIST.voteskipCount || 100;
-      elements.enableBot.checked = PLAYLIST.enableBot ?? false;
-      elements.botCooldown.value = PLAYLIST.botCooldown || 1;
-      elements.songCommand.value = PLAYLIST.songCommand || "!song";
-      elements.songCommandAlias.value = PLAYLIST.songCommandAlias || "!video";
-      elements.playlistCommand.value = PLAYLIST.playlistCommand || "!playlist";
-      elements.playlistCommandAlias.value = PLAYLIST.playlistCommandAlias || "!pl";
-      elements.approvalQueue.checked = PLAYLIST.approvalQueue ?? false;
-      elements.openCommand.value = PLAYLIST.openCommand || "!open";
-      elements.closeCommand.value = PLAYLIST.closeCommand || "!close";
-      elements.playCommand.value = PLAYLIST.playCommand || "!play";
-      elements.pauseCommand.value = PLAYLIST.pauseCommand || "!pause";
-      elements.autoplayCommand.value = PLAYLIST.autoplayCommand || "!autoplay";
-      elements.skipCommand.value = PLAYLIST.skipCommand || "!skip";
-      elements.rewindCommand.value = PLAYLIST.rewindCommand || "!rewind";
-      elements.deleteCommand.value = PLAYLIST.deleteCommand || "!delete";
-      elements.modCommands.checked = PLAYLIST.modCommands ?? true;
-      elements.enableFavorites.checked = PLAYLIST.enableFavorites ?? false;
+      elements.autoplay.checked = PLAYLIST.value.autoplay ?? true;
+      elements.allowSpotifySongs.checked = PLAYLIST.value.allowSpotifySongs ?? true;
+      elements.allowStreamable.checked = PLAYLIST.value.allowStreamable ?? true;
+      elements.allowTwitchClips.checked = PLAYLIST.value.allowTwitchClips ?? true;
+      elements.allowTwitchStreams.checked = PLAYLIST.value.allowTwitchStreams ?? true;
+      elements.allowTwitchVODs.checked = PLAYLIST.value.allowTwitchVODs ?? true;
+      elements.allowTiktokVideos.checked = PLAYLIST.value.allowTiktokVideos ?? true;
+      elements.allowYTStreams.checked = PLAYLIST.value.allowYTStreams ?? true;
+      elements.allowYTShorts.checked = PLAYLIST.value.allowYTShorts ?? true;
+      elements.allowYTVideos.checked = PLAYLIST.value.allowYTVideos ?? true;
+      elements.allowVimeoVideos.checked = PLAYLIST.value.allowVimeoVideos ?? true;
+      elements.maxDuration.value = PLAYLIST.value.maxDuration || "";
+      elements.maxDurationUnit.value = PLAYLIST.value.maxDurationUnit || "m";
+      elements.maxLength.value = PLAYLIST.value.maxLength || "";
+      elements.maxSize.value = PLAYLIST.value.maxSize || "";
+      elements.minViewCount.value = PLAYLIST.value.minViewCount || "";
+      elements.minUploadAge.value = PLAYLIST.value.minUploadAge || "";
+      elements.minUploadAgeUnit.value = PLAYLIST.value.minUploadAgeUnit || "h";
+      elements.maxUploadAge.value = PLAYLIST.value.maxUploadAge || "";
+      elements.maxUploadAgeUnit.value = PLAYLIST.value.maxUploadAgeUnit || "h";
+      elements.uniqueOnly.checked = PLAYLIST.value.uniqueOnly ?? false;
+      elements.allowPlebs.checked = PLAYLIST.value.allowPlebs ?? true;
+      elements.allowSubs.checked = PLAYLIST.value.allowSubs ?? true;
+      elements.allowMods.checked = PLAYLIST.value.allowMods ?? true;
+      elements.allowVips.checked = PLAYLIST.value.allowVips ?? true;
+      elements.allowFirstTimeChatters.checked = PLAYLIST.value.allowFirstTimeChatters ?? true;
+      elements.plebLimit.value = PLAYLIST.value.plebLimit || "";
+      elements.subLimit.value = PLAYLIST.value.subLimit || "";
+      elements.modLimit.value = PLAYLIST.value.modLimit || "";
+      elements.vipLimit.value = PLAYLIST.value.vipLimit || "";
+      elements.firstTimeChatterLimit.value = PLAYLIST.value.firstTimeChatterLimit || "";
+      elements.noCommand.checked = PLAYLIST.value.noCommand ?? false;
+      elements.requestCommand.value = PLAYLIST.value.requestCommand || "!request";
+      elements.requestCommandAlias.value = PLAYLIST.value.requestCommandAlias || "!r";
+      elements.allowVoteSkip.checked = PLAYLIST.value.allowVoteSkip ?? false;
+      elements.voteskipCommand.value = PLAYLIST.value.voteskipCommand || "!voteskip";
+      elements.voteskipCommandAlias.value = PLAYLIST.value.voteskipCommandAlias || "!vs";
+      elements.voteskipCount.value = PLAYLIST.value.voteskipCount || 100;
+      elements.enableBot.checked = PLAYLIST.value.enableBot ?? false;
+      elements.botCooldown.value = PLAYLIST.value.botCooldown || 1;
+      elements.songCommand.value = PLAYLIST.value.songCommand || "!song";
+      elements.songCommandAlias.value = PLAYLIST.value.songCommandAlias || "!video";
+      elements.playlistCommand.value = PLAYLIST.value.playlistCommand || "!playlist";
+      elements.playlistCommandAlias.value = PLAYLIST.value.playlistCommandAlias || "!pl";
+      elements.approvalQueue.checked = PLAYLIST.value.approvalQueue ?? false;
+      elements.openCommand.value = PLAYLIST.value.openCommand || "!open";
+      elements.closeCommand.value = PLAYLIST.value.closeCommand || "!close";
+      elements.playCommand.value = PLAYLIST.value.playCommand || "!play";
+      elements.pauseCommand.value = PLAYLIST.value.pauseCommand || "!pause";
+      elements.autoplayCommand.value = PLAYLIST.value.autoplayCommand || "!autoplay";
+      elements.skipCommand.value = PLAYLIST.value.skipCommand || "!skip";
+      elements.rewindCommand.value = PLAYLIST.value.rewindCommand || "!rewind";
+      elements.deleteCommand.value = PLAYLIST.value.deleteCommand || "!delete";
+      elements.modCommands.checked = PLAYLIST.value.modCommands ?? true;
+      elements.enableFavorites.checked = PLAYLIST.value.enableFavorites ?? false;
 
-      elements.voteskipCommand.disabled = !PLAYLIST.allowVoteSkip;
-      elements.voteskipCommandAlias.disabled = !PLAYLIST.allowVoteSkip;
-      elements.voteskipCount.disabled = !PLAYLIST.allowVoteSkip;
-      elements.botCooldown.disabled = !PLAYLIST.enableBot;
-      elements.songCommand.disabled = !PLAYLIST.enableBot;
-      elements.songCommandAlias.disabled = !PLAYLIST.enableBot;
-      elements.playlistCommand.disabled = !PLAYLIST.enableBot;
-      elements.playlistCommandAlias.disabled = !PLAYLIST.enableBot;
+      elements.voteskipCommand.disabled = !PLAYLIST.value.allowVoteSkip;
+      elements.voteskipCommandAlias.disabled = !PLAYLIST.value.allowVoteSkip;
+      elements.voteskipCount.disabled = !PLAYLIST.value.allowVoteSkip;
+      elements.botCooldown.disabled = !PLAYLIST.value.enableBot;
+      elements.songCommand.disabled = !PLAYLIST.value.enableBot;
+      elements.songCommandAlias.disabled = !PLAYLIST.value.enableBot;
+      elements.playlistCommand.disabled = !PLAYLIST.value.enableBot;
+      elements.playlistCommandAlias.disabled = !PLAYLIST.value.enableBot;
 
-      elements.approvalTabButton.style.display = PLAYLIST.approvalQueue ? "" : "none";
+      elements.approvalTabButton.style.display = PLAYLIST.value.approvalQueue ? "" : "none";
 
-      elements.voteSkipHint.innerHTML = `<strong>${PLAYLIST.voteskipCommand}</strong> or <strong>${PLAYLIST.voteskipCommandAlias}</strong>`;
+      elements.voteSkipHint.innerHTML = `<strong>${PLAYLIST.value.voteskipCommand}</strong> or <strong>${PLAYLIST.value.voteskipCommandAlias}</strong>`;
 
-      if (PLAYLIST.noCommand) {
+      if (PLAYLIST.value.noCommand) {
         elements.commandHint.innerHTML = `Add songs or videos to the playlist by posting a link in chat`;
         elements.commandHint2.innerHTML = `Request something by posting a link in chat`;
       } else {
         elements.commandHint.innerHTML = `Add songs or videos to the playlist using 
-      <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">${PLAYLIST.requestCommand}</kbd> or 
-      <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">${PLAYLIST.requestCommandAlias}</kbd>`;
+      <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">${PLAYLIST.value.requestCommand}</kbd> or 
+      <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">${PLAYLIST.value.requestCommandAlias}</kbd>`;
         elements.commandHint2.innerHTML = `Request something using 
-      <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">${PLAYLIST.requestCommand} [link]</kbd> or 
-      <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">${PLAYLIST.requestCommandAlias} [link]</kbd>`;
+      <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand()">${PLAYLIST.value.requestCommand} [link]</kbd> or 
+      <kbd class="notranslate text-success cursor-pointer" onclick="editRequestCommand(true)">${PLAYLIST.value.requestCommandAlias} [link]</kbd>`;
       }
 
       updateWhoCanRequest();
@@ -739,7 +739,7 @@
     }
     let input = msg.split(" ").filter(Boolean);
 
-    if (PLAYLIST.noCommand && playlist_open) {
+    if (PLAYLIST.value.noCommand && playlist_open) {
       if (bannedUsers.get(context["user-id"])) {
         botReply(`🚫 You are banned`, context.id, false);
         return;
@@ -769,8 +769,8 @@
 
     let command = input[0].toLowerCase();
     switch (command) {
-      case PLAYLIST.requestCommand:
-      case PLAYLIST.requestCommandAlias:
+      case PLAYLIST.value.requestCommand:
+      case PLAYLIST.value.requestCommandAlias:
         if (!input[1]) {
           return;
         }
@@ -813,15 +813,15 @@
         addRequest(context, link, context.id, search);
         break;
 
-      case PLAYLIST.voteskipCommand:
-      case PLAYLIST.voteskipCommandAlias:
+      case PLAYLIST.value.voteskipCommand:
+      case PLAYLIST.value.voteskipCommandAlias:
         if (bannedUsers.get(context["user-id"])) {
           return;
         }
         voteSkip(context["user-id"]);
         break;
-      case PLAYLIST.songCommand:
-      case PLAYLIST.songCommandAlias:
+      case PLAYLIST.value.songCommand:
+      case PLAYLIST.value.songCommandAlias:
         if (currentItem) {
           if (bannedUsers.get(context["user-id"])) {
             botReply(`🚫 You are banned`, context.id, false);
@@ -837,47 +837,47 @@
           );
         }
         break;
-      case PLAYLIST.playlistCommand:
-      case PLAYLIST.playlistCommandAlias:
-        if (USER.access_token) {
+      case PLAYLIST.value.playlistCommand:
+      case PLAYLIST.value.playlistCommandAlias:
+        if (USER.value.access_token) {
           if (bannedUsers.get(context["user-id"])) {
             botReply(`🚫 You are banned`, context.id, false);
             return;
           }
 
-          botReply(`You can view the playlist here: https://playlist.chat.vote/${USER.channel}`, context.id, true);
+          botReply(`You can view the playlist here: https://playlist.chat.vote/${USER.value.channel}`, context.id, true);
         }
         break;
       default:
         break;
     } //normal commands
 
-    if ((Date.now() - botCooldown) / 1000 > PLAYLIST.botCooldown && (context.username == USER.channel || (PLAYLIST.modCommands && context.mod))) {
+    if ((Date.now() - botCooldown) / 1000 > PLAYLIST.value.botCooldown && (context.username == USER.value.channel || (PLAYLIST.value.modCommands && context.mod))) {
       botCooldown = Date.now();
 
       switch (command) {
-        case PLAYLIST.openCommand:
+        case PLAYLIST.value.openCommand:
           openPlaylist(context.id);
           break;
-        case PLAYLIST.closeCommand:
+        case PLAYLIST.value.closeCommand:
           closePlaylist(context.id);
           break;
-        case PLAYLIST.playCommand:
+        case PLAYLIST.value.playCommand:
           playPlaylist(context.id);
           break;
-        case PLAYLIST.pauseCommand:
+        case PLAYLIST.value.pauseCommand:
           pausePlaylist(context.id);
           break;
-        case PLAYLIST.autoplayCommand:
+        case PLAYLIST.value.autoplayCommand:
           toggleAutoplay(context.id);
           break;
-        case PLAYLIST.skipCommand:
+        case PLAYLIST.value.skipCommand:
           nextItem(context.id);
           break;
-        case PLAYLIST.rewindCommand:
+        case PLAYLIST.value.rewindCommand:
           previousItem(context.id);
           break;
-        case PLAYLIST.deleteCommand:
+        case PLAYLIST.value.deleteCommand:
           deleteItem(input[1], context.id);
           break;
         default:
@@ -926,35 +926,35 @@
    */
   function checkRequestLimit(userIndex) {
     let limit = 0;
-    if (!users[userIndex].sub && PLAYLIST.allowPlebs) {
-      if (PLAYLIST.plebLimit === "") {
+    if (!users[userIndex].sub && PLAYLIST.value.allowPlebs) {
+      if (PLAYLIST.value.plebLimit === "") {
         return -1;
       }
-      limit = Math.max(limit, PLAYLIST.plebLimit);
+      limit = Math.max(limit, PLAYLIST.value.plebLimit);
     }
-    if (users[userIndex].sub && PLAYLIST.allowSubs) {
-      if (PLAYLIST.subLimit === "") {
+    if (users[userIndex].sub && PLAYLIST.value.allowSubs) {
+      if (PLAYLIST.value.subLimit === "") {
         return -1;
       }
-      limit = Math.max(limit, PLAYLIST.subLimit);
+      limit = Math.max(limit, PLAYLIST.value.subLimit);
     }
-    if (users[userIndex].mod && PLAYLIST.allowMods) {
-      if (PLAYLIST.modLimit === "") {
+    if (users[userIndex].mod && PLAYLIST.value.allowMods) {
+      if (PLAYLIST.value.modLimit === "") {
         return -1;
       }
-      limit = Math.max(limit, PLAYLIST.modLimit);
+      limit = Math.max(limit, PLAYLIST.value.modLimit);
     }
-    if (users[userIndex].vip && PLAYLIST.allowVips) {
-      if (PLAYLIST.vipLimit === "") {
+    if (users[userIndex].vip && PLAYLIST.value.allowVips) {
+      if (PLAYLIST.value.vipLimit === "") {
         return -1;
       }
-      limit = Math.max(limit, PLAYLIST.vipLimit);
+      limit = Math.max(limit, PLAYLIST.value.vipLimit);
     }
-    if (users[userIndex].firstTimeChatter && PLAYLIST.allowFirstTimeChatters) {
-      if (PLAYLIST.firstTimeChatterLimit === "") {
+    if (users[userIndex].firstTimeChatter && PLAYLIST.value.allowFirstTimeChatters) {
+      if (PLAYLIST.value.firstTimeChatterLimit === "") {
         return -1;
       }
-      limit = Math.max(limit, PLAYLIST.firstTimeChatterLimit);
+      limit = Math.max(limit, PLAYLIST.value.firstTimeChatterLimit);
     }
     return limit;
   } //checkRequestLimit
@@ -1038,7 +1038,7 @@
         msgid: msgid,
         type: link.type,
         platform: link.platform,
-        approved: PLAYLIST.approvalQueue ? false : true,
+        approved: PLAYLIST.value.approvalQueue ? false : true,
         title: "",
         channel: "",
         uri: "",
@@ -1523,7 +1523,7 @@
               ${request.by[0].badges}
               <a 
               class="link-body-emphasis link-underline-opacity-0"
-              href="https://www.twitch.tv/popout/${USER.channel}/viewercard/${request.by[0].username}"
+              href="https://www.twitch.tv/popout/${USER.value.channel}/viewercard/${request.by[0].username}"
               target="_blank"
               rel="noopener noreferrer">
               <span style="color: ${request.by[0].color}">${request.by[0].username}</span>
@@ -1578,7 +1578,7 @@
     ${request.by[0].badges}
     <a 
     class="link-body-emphasis link-underline-opacity-0"
-    href="https://www.twitch.tv/popout/${USER.channel}/viewercard/${request.by[0].username}"
+    href="https://www.twitch.tv/popout/${USER.value.channel}/viewercard/${request.by[0].username}"
     target="_blank"
     rel="noopener noreferrer">
     <span style="color: ${request.by[0].color}">${request.by[0].username}</span>
@@ -1586,7 +1586,7 @@
      ${request.by.length > 1 ? `and ${request.by.length - 1} other ${request.by.length - 1 == 1 ? "user" : "users"}` : ""}`;
       document.getElementById(`id${request.name}_by`).title = `Requested by @${request.by.map((u) => u.username).join(" & ")}`;
 
-      if (!playlist_playing && PLAYLIST.autoplay && !localStorageLoad) {
+      if (!playlist_playing && PLAYLIST.value.autoplay && !localStorageLoad) {
         nextItem();
       }
 
@@ -1742,7 +1742,7 @@
           if (request.duration == 0) {
             request.duration = -1;
           }
-          if (!PLAYLIST.allowYTStreams) {
+          if (!PLAYLIST.value.allowYTStreams) {
             deleteRequest(request.name);
             botReply("🚫 YouTube streams are not allowed", msgid, false);
             return;
@@ -1844,46 +1844,50 @@
     } //banned channels check
 
     if (
-      PLAYLIST.maxDuration !== "" &&
+      PLAYLIST.value.maxDuration !== "" &&
       request.duration !== -1 &&
       request.duration !== null &&
-      total_duration + request.duration - request.timestamp > numberAndUnitToSeconds(PLAYLIST.maxDuration, PLAYLIST.maxDurationUnit)
+      total_duration + request.duration - request.timestamp > numberAndUnitToSeconds(PLAYLIST.value.maxDuration, PLAYLIST.value.maxDurationUnit)
     ) {
       if (playlist_open) {
         togglePlaylist();
       }
       deleteRequest(request.name);
-      botReply(`⛔ The playlist's duration limit was reached (${PLAYLIST.maxDuration}${PLAYLIST.maxDurationUnit})`, msgid, false);
+      botReply(`⛔ The playlist's duration limit was reached (${PLAYLIST.value.maxDuration}${PLAYLIST.value.maxDurationUnit})`, msgid, false);
       return;
     } //total duration limit check
 
-    if (PLAYLIST.maxLength !== "" && request.duration !== -1 && request.duration !== null && request.duration - request.timestamp > PLAYLIST.maxLength * 60) {
+    if (PLAYLIST.value.maxLength !== "" && request.duration !== -1 && request.duration !== null && request.duration - request.timestamp > PLAYLIST.value.maxLength * 60) {
       deleteRequest(request.name);
-      botReply(`⛔ Your request is too long (${PLAYLIST.maxLength}m max)`, msgid, false);
+      botReply(`⛔ Your request is too long (${PLAYLIST.value.maxLength}m max)`, msgid, false);
       return;
     } //request length check
 
-    if (PLAYLIST.maxSize !== "" && requests.size > PLAYLIST.maxSize) {
+    if (PLAYLIST.value.maxSize !== "" && requests.size > PLAYLIST.value.maxSize) {
       if (playlist_open) {
         togglePlaylist();
       }
       deleteRequest(request.name);
-      botReply(`⛔ The playlist's size limit was reached (${PLAYLIST.maxSize})`, msgid, false);
+      botReply(`⛔ The playlist's size limit was reached (${PLAYLIST.value.maxSize})`, msgid, false);
       return;
     } //playlist size check
 
-    if (PLAYLIST.minViewCount !== "" && request.views !== null && request.views < PLAYLIST.minViewCount) {
+    if (PLAYLIST.value.minViewCount !== "" && request.views !== null && request.views < PLAYLIST.value.minViewCount) {
       deleteRequest(request.name);
-      botReply(`⛔ Your request does not meet the minimum view count (${PLAYLIST.minViewCount.toLocaleString()})`, msgid, false);
+      botReply(`⛔ Your request does not meet the minimum view count (${PLAYLIST.value.minViewCount.toLocaleString()})`, msgid, false);
       return;
     } //view count check
 
-    if (PLAYLIST.minUploadAge !== "" && request.age !== null && request.age > Date.now() - numberAndUnitToSeconds(PLAYLIST.minUploadAge, PLAYLIST.minUploadAgeUnit) * 1000) {
+    if (
+      PLAYLIST.value.minUploadAge !== "" &&
+      request.age !== null &&
+      request.age > Date.now() - numberAndUnitToSeconds(PLAYLIST.value.minUploadAge, PLAYLIST.value.minUploadAgeUnit) * 1000
+    ) {
       deleteRequest(request.name);
-      let min = numberAndUnitToSeconds(PLAYLIST.minUploadAge, PLAYLIST.minUploadAgeUnit) * 1000;
-      let max = numberAndUnitToSeconds(PLAYLIST.maxUploadAge, PLAYLIST.maxUploadAgeUnit) * 1000;
+      let min = numberAndUnitToSeconds(PLAYLIST.value.minUploadAge, PLAYLIST.value.minUploadAgeUnit) * 1000;
+      let max = numberAndUnitToSeconds(PLAYLIST.value.maxUploadAge, PLAYLIST.value.maxUploadAgeUnit) * 1000;
       let now = Date.now();
-      if (PLAYLIST.maxUploadAge !== "") {
+      if (PLAYLIST.value.maxUploadAge !== "") {
         botReply(`⛔ Your request is too new (must be uploaded between ${new Date(now - max).toLocaleString("en-GB")} and ${new Date(now - min).toLocaleString("en-GB")})`, msgid, false);
       } else {
         botReply(`⛔ Your request is too new (must be uploaded before ${new Date(now - min).toLocaleString("en-GB")})`, msgid, false);
@@ -1891,12 +1895,16 @@
       return;
     } //min upload age check
 
-    if (PLAYLIST.maxUploadAge !== "" && request.age !== null && request.age < Date.now() - numberAndUnitToSeconds(PLAYLIST.maxUploadAge, PLAYLIST.maxUploadAgeUnit) * 1000) {
+    if (
+      PLAYLIST.value.maxUploadAge !== "" &&
+      request.age !== null &&
+      request.age < Date.now() - numberAndUnitToSeconds(PLAYLIST.value.maxUploadAge, PLAYLIST.value.maxUploadAgeUnit) * 1000
+    ) {
       deleteRequest(request.name);
-      let min = numberAndUnitToSeconds(PLAYLIST.minUploadAge, PLAYLIST.minUploadAgeUnit) * 1000;
-      let max = numberAndUnitToSeconds(PLAYLIST.maxUploadAge, PLAYLIST.maxUploadAgeUnit) * 1000;
+      let min = numberAndUnitToSeconds(PLAYLIST.value.minUploadAge, PLAYLIST.value.minUploadAgeUnit) * 1000;
+      let max = numberAndUnitToSeconds(PLAYLIST.value.maxUploadAge, PLAYLIST.value.maxUploadAgeUnit) * 1000;
       let now = Date.now();
-      if (PLAYLIST.minUploadAge !== "") {
+      if (PLAYLIST.value.minUploadAge !== "") {
         botReply(`⛔ Your request is too old (must be uploaded between ${new Date(now - max).toLocaleString("en-GB")} and ${new Date(now - min).toLocaleString("en-GB")})`, msgid, false);
       } else {
         botReply(`⛔ Your request is too old (must be uploaded after ${new Date(now - max).toLocaleString("en-GB")})`, msgid, false);
@@ -1904,7 +1912,7 @@
       return;
     } //max upload age check
 
-    if (PLAYLIST.uniqueOnly && history.some((e) => e.name === request.name)) {
+    if (PLAYLIST.value.uniqueOnly && history.some((e) => e.name === request.name)) {
       deleteRequest(request.name);
       botReply(`⛔ Your request is not unique`, msgid, false);
       return;
@@ -2125,31 +2133,31 @@
   } //updateClipMP4
 
   function linkTypeAllowed(type) {
-    if (type == "twitch clip" && !PLAYLIST.allowTwitchClips) {
+    if (type == "twitch clip" && !PLAYLIST.value.allowTwitchClips) {
       return false;
     }
-    if (type == "twitch vod" && !PLAYLIST.allowTwitchVODs) {
+    if (type == "twitch vod" && !PLAYLIST.value.allowTwitchVODs) {
       return false;
     }
-    if (type == "twitch stream" && !PLAYLIST.allowTwitchStreams) {
+    if (type == "twitch stream" && !PLAYLIST.value.allowTwitchStreams) {
       return false;
     }
-    if (type == "spotify" && !PLAYLIST.allowSpotifySongs) {
+    if (type == "spotify" && !PLAYLIST.value.allowSpotifySongs) {
       return false;
     }
-    if (type == "streamable" && !PLAYLIST.allowStreamable) {
+    if (type == "streamable" && !PLAYLIST.value.allowStreamable) {
       return false;
     }
-    if (type == "tiktok video" && !PLAYLIST.allowTiktokVideos) {
+    if (type == "tiktok video" && !PLAYLIST.value.allowTiktokVideos) {
       return false;
     }
-    if (type == "youtube" && !PLAYLIST.allowYTStreams && !PLAYLIST.allowYTVideos) {
+    if (type == "youtube" && !PLAYLIST.value.allowYTStreams && !PLAYLIST.value.allowYTVideos) {
       return false;
     }
-    if (type == "youtube short" && !PLAYLIST.allowYTShorts) {
+    if (type == "youtube short" && !PLAYLIST.value.allowYTShorts) {
       return false;
     }
-    if (type == "vimeo" && !PLAYLIST.allowVimeoVideos) {
+    if (type == "vimeo" && !PLAYLIST.value.allowVimeoVideos) {
       return false;
     }
     return true;
@@ -2215,9 +2223,9 @@
     addRequest(
       {
         id: "toast",
-        "user-id": USER.userID,
-        username: USER.channel,
-        displayName: USER.channel,
+        "user-id": USER.value.userID,
+        username: USER.value.channel,
+        displayName: USER.value.channel,
         mod: true,
         sub: true,
         vip: true,
@@ -2392,7 +2400,7 @@
   ${currentItem.by[0].badges}
   <a 
     class="link-body-emphasis link-underline-opacity-0"
-    href="https://www.twitch.tv/popout/${USER.channel}/viewercard/${currentItem.by[0].username}"
+    href="https://www.twitch.tv/popout/${USER.value.channel}/viewercard/${currentItem.by[0].username}"
     target="_blank"
     rel="noopener noreferrer">
       <span style="color: ${currentItem.by[0].color}">${currentItem.by[0].username}</span>
@@ -2653,7 +2661,7 @@
 
   let voteskipTimeout;
   function voteSkip(userid) {
-    if (!playlist_playing || !PLAYLIST.allowVoteSkip) {
+    if (!playlist_playing || !PLAYLIST.value.allowVoteSkip) {
       return;
     }
 
@@ -2683,7 +2691,7 @@
     }
 
     skippers.push(userid);
-    let remaining = PLAYLIST.voteskipCount - skippers.length;
+    let remaining = PLAYLIST.value.voteskipCount - skippers.length;
     elements.voteSkipVotes.innerHTML = `${remaining} ${remaining == 1 ? "vote" : "votes"}  needed to skip`;
 
     if (remaining <= 0) {
@@ -2710,20 +2718,20 @@
       return;
     }
 
-    if (!USER.access_token || !PLAYLIST.enableBot || !id) {
+    if (!USER.value.access_token || !PLAYLIST.value.enableBot || !id) {
       return;
     }
 
-    if ((Date.now() - botCooldown) / 1000 < PLAYLIST.botCooldown && followCooldown) {
+    if ((Date.now() - botCooldown) / 1000 < PLAYLIST.value.botCooldown && followCooldown) {
       return;
     }
     botCooldown = Date.now();
 
     let body = JSON.stringify({
-      channel: USER.channel,
+      channel: USER.value.channel,
       id: id,
       msg: msg,
-      access_token: USER.access_token,
+      access_token: USER.value.access_token,
     });
     let requestOptions = {
       method: "POST",
@@ -2752,7 +2760,7 @@
   let updateCooldown;
   async function updateSite() {
     clearTimeout(updateCooldown);
-    if (USER.access_token) {
+    if (USER.value.access_token) {
       updateCooldown = setTimeout(() => {
         updateSiteSend();
       }, 3000);
@@ -2767,9 +2775,9 @@
     }
 
     let body = JSON.stringify({
-      userid: USER.userID,
-      username: USER.channel,
-      access_token: USER.access_token,
+      userid: USER.value.userID,
+      username: USER.value.channel,
+      access_token: USER.value.access_token,
       time: new Date(),
       settings: PLAYLIST,
       playlist: requestsArray,
@@ -2793,7 +2801,7 @@
   } //updateSiteSend
 
   function copyLink() {
-    navigator.clipboard.writeText(`https://playlist.chat.vote/${USER.channel || ""}`);
+    navigator.clipboard.writeText(`https://playlist.chat.vote/${USER.value.channel || ""}`);
     copyLinkButton.show();
     setTimeout(() => {
       copyLinkButton.hide();
@@ -2810,11 +2818,11 @@
 
   function updateWhoCanRequest() {
     let roles = {
-      "Non subscribers": { allowed: PLAYLIST.allowPlebs, limit: PLAYLIST.plebLimit },
-      Subscribers: { allowed: PLAYLIST.allowSubs, limit: PLAYLIST.subLimit },
-      Mods: { allowed: PLAYLIST.allowMods, limit: PLAYLIST.modLimit },
-      VIPs: { allowed: PLAYLIST.allowVips, limit: PLAYLIST.vipLimit },
-      "First time chatters": { allowed: PLAYLIST.allowFirstTimeChatters, limit: PLAYLIST.firstTimeChatterLimit },
+      "Non subscribers": { allowed: PLAYLIST.value.allowPlebs, limit: PLAYLIST.value.plebLimit },
+      Subscribers: { allowed: PLAYLIST.value.allowSubs, limit: PLAYLIST.value.subLimit },
+      Mods: { allowed: PLAYLIST.value.allowMods, limit: PLAYLIST.value.modLimit },
+      VIPs: { allowed: PLAYLIST.value.allowVips, limit: PLAYLIST.value.vipLimit },
+      "First time chatters": { allowed: PLAYLIST.value.allowFirstTimeChatters, limit: PLAYLIST.value.firstTimeChatterLimit },
     };
 
     let allowed = [];
@@ -3116,7 +3124,7 @@
 
   function youtubePlayerOnStateChange(event) {
     console.log(event);
-    if (event.data == YT.PlayerState.ENDED && PLAYLIST.autoplay) {
+    if (event.data == YT.PlayerState.ENDED && PLAYLIST.value.autoplay) {
       nextItem();
     }
   } //youtubePlayerOnStateChange
@@ -3136,7 +3144,7 @@
   //   const callback = (EmbedController) => {
   //     spotifyPlayer = EmbedController;
   //     EmbedController.addListener("playback_update", (event) => {
-  //       if (event.data.position == event.data.duration && event.data.duration > 0 && PLAYLIST.autoplay) {
+  //       if (event.data.position == event.data.duration && event.data.duration > 0 && PLAYLIST.value.autoplay) {
   //         nextItem();
   //       }
   //     });
@@ -3148,7 +3156,7 @@
     const callback = (EmbedController) => {
       spotifyPlayer = EmbedController;
       EmbedController.addListener("playback_update", (event) => {
-        if (event.data.position == event.data.duration && event.data.duration > 0 && PLAYLIST.autoplay) {
+        if (event.data.position == event.data.duration && event.data.duration > 0 && PLAYLIST.value.autoplay) {
           nextItem();
         }
       });
@@ -3181,7 +3189,7 @@
     twitchPlayer.addEventListener(Twitch.Player.PLAYING, twitchPlayerPlaying);
 
     function twitchPlayerEnded(event) {
-      if (PLAYLIST.autoplay) {
+      if (PLAYLIST.value.autoplay) {
         nextItem();
       }
     }
@@ -3196,7 +3204,7 @@
 
   function videoEmbedEventListeners() {
     elements.videoEmbed.addEventListener("ended", (event) => {
-      if (PLAYLIST.autoplay) {
+      if (PLAYLIST.value.autoplay) {
         nextItem();
       }
     });
@@ -3227,7 +3235,7 @@
     if (!vimeoPlayer) {
       vimeoPlayer = new Vimeo.Player(elements.vimeoEmbed, { id: id, responsive: true, speed: true, autoplay: true, start_time: timestamp });
       vimeoPlayer.on("ended", (event) => {
-        if (PLAYLIST.autoplay) {
+        if (PLAYLIST.value.autoplay) {
           nextItem();
         }
       });
@@ -3983,7 +3991,7 @@
         data-bs-title="Not signed in"
         data-bs-content="You need sign in before doing that"
       >
-        <Login messageHandler={handleMessage} messageDeletedHandler={handleMessageDeleted} />
+        <Login messageHandler={handleMessage} messageDeletedHandler={handleMessageDeleted} loginEvent={() => USER.refresh()} />
       </span>
     </div>
 

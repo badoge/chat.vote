@@ -40,7 +40,7 @@
   let elements;
   let bootstrap;
 
-  let USER = donkStorage("USER", null).value;
+  let USER = donkStorage("USER", null);
 
   onMount(async () => {
     bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
@@ -480,7 +480,7 @@
   };
 
   function checkLogin() {
-    if (!USER.channel) {
+    if (!USER.value.channel) {
       loginButtonPopover.show();
       setTimeout(function () {
         loginButtonPopover.hide();
@@ -2062,7 +2062,7 @@
    */
   function streamerVote(position) {
     vote_results[position]++;
-    voters.push(USER.userID);
+    voters.push(USER.value.userID);
     updateScores();
     for (let element of document.getElementsByClassName("streamer-vote")) {
       element.style.visibility = "hidden";
@@ -3124,9 +3124,9 @@
       return;
     }
     let body = JSON.stringify({
-      userid: USER.userID,
-      username: USER.channel,
-      access_token: USER.access_token,
+      userid: USER.value.userID,
+      username: USER.value.channel,
+      access_token: USER.value.access_token,
       bracket: BRACKETS.brackets[bracketIndex],
     });
     let requestOptions = {
@@ -4335,7 +4335,7 @@
         data-bs-title="Not signed in"
         data-bs-content="You need sign in before doing that"
       >
-        <Login messageHandler={handleMessage} />
+        <Login messageHandler={handleMessage} loginEvent={() => USER.refresh()} />
       </span>
     </div>
 
