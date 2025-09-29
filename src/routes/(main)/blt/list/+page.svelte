@@ -3,7 +3,7 @@
   let elements;
   let bootstrap;
   onMount(async () => {
-    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
     elements = {
       blacklistModal: document.getElementById("blacklistModal"),
       reason: document.getElementById("reason"),
@@ -189,14 +189,11 @@
 
 <svelte:head>
   <title>chat.vote Brackets - Community brackets</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <meta name="description" content="chat.vote Brackets - Community brackets" />
   <meta name="keywords" content="chatvote, chat.vote" />
   <meta property="og:title" content="chat.vote Brackets - Community brackets" />
-  <meta property="og:type" content="website" />
   <meta property="og:url" content="https://chat.vote/blt/list" />
   <meta property="og:image" content="/pics/ogimage.png" />
-  <meta property="og:locale" content="en_US" />
   <meta property="og:description" content="chat.vote Brackets - Community brackets" /></svelte:head
 >
 

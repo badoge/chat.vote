@@ -13,7 +13,7 @@
   let aboutModal;
 
   onMount(async () => {
-    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
     elements = {
       //modals
       aboutModal: document.getElementById("aboutModal"),

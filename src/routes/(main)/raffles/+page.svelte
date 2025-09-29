@@ -25,7 +25,6 @@
     enablePopovers,
     enableTooltips,
     escapeString,
-    get7TVPFP,
     getChannel7TVEmotes,
     getChannelBTTVEmotes,
     getChannelFFZEmotes,
@@ -33,28 +32,22 @@
     getGlobalBTTVEmotes,
     getGlobalFFZEmotes,
     getLinkInfo,
-    getTwitchPFP,
-    getUserID,
     linkifyElementID,
-    loadBadges,
     replaceEmotes,
-    sendUsername,
     showToast,
   } from "$lib/functions";
-  import { onMount, onDestroy } from "svelte";
+  import { onMount } from "svelte";
 
-  onDestroy(() => {
-    if (RAFFLES.refreshWarningEnabled && raffle_users.length > 0) {
-      return "Close/refresh warning enabled. You can turn it off in the settings";
-    }
-    return null;
-  });
+  import { donkStorage } from "$lib/donkStorage.svelte";
+
+  let USER = donkStorage("USER", null).value;
+  let RAFFLES = donkStorage("RAFFLES", null).value;
 
   let elements;
-
   let bootstrap;
+
   onMount(async () => {
-    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
     elements = {
       //modals
       fancyRaffleModal: document.getElementById("fancyRaffleModal"),
@@ -174,11 +167,6 @@
       }
     });
 
-    elements.channelName.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        connect();
-      }
-    });
     elements.raffleCommand.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         saveSettings();
@@ -261,9 +249,15 @@
         elements.raffleTitle.classList.remove("active");
       }, 200);
     }, 3000);
-  });
 
-  let client;
+    window.onbeforeunload = function () {
+      if (RAFFLES.refreshWarningEnabled && raffle_users.length > 0) {
+        return "Close/refresh warning enabled. You can turn it off in the settings";
+      }
+      return null;
+    }; //onbeforeunload
+  }); //onMount
+
   let raffle_users = [];
   let raffle_tickets = [];
   let raffle_open;
@@ -279,61 +273,7 @@
   let thirdPartyEmotes = [];
   let firstTimeChatters = [];
 
-  let USER = {
-    channel: "",
-    twitchLogin: false,
-    access_token: "",
-    userID: "",
-    platform: "",
-  };
-
-  let RAFFLES = {
-    raffleCommand: "!join",
-    removeWinner: true,
-    allowPlebs: true,
-    allowFollowers: true,
-    allowSubs: true,
-    allowTier1: true,
-    allowTier2: true,
-    allowTier3: true,
-    allowMods: true,
-    allowVips: true,
-    allowFirstTimeChatters: true,
-    plebBonus: 0,
-    followerBonus: 0,
-    subBonus: 0,
-    tier1Bonus: 0,
-    tier2Bonus: 0,
-    tier3Bonus: 0,
-    modBonus: 0,
-    vipBonus: 0,
-    firstTimeChatterBonus: 0,
-    followAge: 0,
-    followAgeUnit: "min",
-    subAge: 0,
-    tier1SubAge: 0,
-    tier2SubAge: 0,
-    tier3SubAge: 0,
-    splitTiers: false,
-    animateDrawing: true,
-    useTwitchPFP: false,
-    autoRerollEnabled: false,
-    rerollTimerValueMinutes: 0,
-    extraTimerEnabled: false,
-    announceWinner: false,
-    confirmJoin: false,
-    linkPreviewThumbnailsEnabled: false,
-    refreshWarningEnabled: false,
-  };
-
   async function refreshData() {
-    if (!USER.twitchLogin) {
-      USER.channel = escapeString(elements.channelName.value.replace(/\s+/g, "").toLowerCase());
-      USER.platform = "twitch";
-    }
-    if (!USER.userID && USER.channel) {
-      USER.userID = await getUserID(USER.channel);
-    }
     RAFFLES.raffleCommand = elements.raffleCommand.value.replace(/\s+/g, "").toLowerCase() ?? "!join";
     elements.raffleCommand.value = RAFFLES.raffleCommand;
     if (!RAFFLES.raffleCommand) {
@@ -382,20 +322,12 @@
 
   function saveSettings() {
     refreshData();
-    localStorage.setItem("USER", JSON.stringify(USER));
     localStorage.setItem("RAFFLES", JSON.stringify(RAFFLES));
 
     updateWhoCanJoin();
   } //saveSettings
 
   function load_localStorage() {
-    if (!localStorage.getItem("USER")) {
-      console.log("localStorage user info not found");
-    } else {
-      USER = JSON.parse(localStorage.getItem("USER"));
-      elements.channelName.value = USER.channel || "";
-    }
-
     if (!localStorage.getItem("RAFFLES")) {
       console.log("localStorage raffle settings not found");
     } else {
@@ -450,16 +382,7 @@
 
   function resetSettings(logout = false) {
     if (logout) {
-      localStorage?.setItem(
-        "USER",
-        JSON.stringify({
-          channel: "",
-          twitchLogin: false,
-          access_token: "",
-          userID: "",
-          platform: "",
-        }),
-      );
+      logout();
     }
 
     localStorage?.setItem(
@@ -1361,7 +1284,7 @@
 
   let joinedUsers = [];
   setInterval(() => {
-    if (RAFFLES.confirmJoin && joinedUsers.length > 0) {
+    if (RAFFLES?.confirmJoin && joinedUsers.length > 0) {
       botSay(joinedUsers, true);
       joinedUsers = [];
     }
@@ -1370,17 +1293,14 @@
 
 <svelte:head>
   <title>chat.vote Raffles</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <meta name="description" content="chat.vote Raffles" />
   <meta name="keywords" content="twitch, chat, raffles, raffle, giveaway, giveaways, chatvote, chat.vote" />
   <meta property="og:title" content="chat.vote Raffles" />
   <meta property="og:site_name" content="chat.vote Raffles" />
-  <meta property="og:type" content="website" />
   <meta property="og:url" content="https://chat.vote/raffles/" />
   <meta property="og:image" content="https://screenshot.donk.workers.dev/?url=https://chat.vote/raffles" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:description" content="chat.vote Raffles" /></svelte:head
->
+  <meta property="og:description" content="chat.vote Raffles" />
+</svelte:head>
 
 <div class="modal fade" data-bs-backdrop="static" id="fancyRaffleModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog widemodal modal-dialog-centered">
@@ -1418,7 +1338,7 @@
     </div>
 
     <div class="navbar-nav">
-      <Login />
+      <Login messageHandler={handleMessage} timeoutHandler={handleTimeout} />
     </div>
 
     <div class="navbar-nav">
@@ -2007,12 +1927,6 @@
 
   .resizable img {
     height: 100%;
-  }
-
-  .custom-popover {
-    --bs-popover-border-color: var(--bs-warning);
-    --bs-popover-header-bg: var(--bs-warning);
-    --bs-popover-header-color: var(--bs-white);
   }
 
   .tooltip.show {

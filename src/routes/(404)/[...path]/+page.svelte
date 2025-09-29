@@ -35,15 +35,12 @@
 
 <svelte:head>
   <title>chat.vote/404</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <meta name="description" content="Create twitch chat polls and vote through chat commands easily and quickly using chat.vote" />
   <meta name="keywords" content="twitch, chat, poll, chatvote, chat.vote" />
   <meta property="og:title" content="chat.vote/404" />
   <meta property="og:site_name" content="chat.vote/404" />
-  <meta property="og:type" content="website" />
   <meta property="og:url" content="https://chat.vote/404" />
   <meta property="og:image" content="https://chat.vote/pics/ogimage.png" />
-  <meta property="og:locale" content="en_US" />
   <meta property="og:description" content="Create twitch chat polls and vote through chat commands easily and quickly using chat.vote" />
 </svelte:head>
 

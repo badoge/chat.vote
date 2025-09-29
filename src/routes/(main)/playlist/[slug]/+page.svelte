@@ -4,7 +4,7 @@
 
   let bootstrap;
   onMount(async () => {
-    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
     enableTooltips();
   });
 

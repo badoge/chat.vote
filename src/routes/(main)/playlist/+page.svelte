@@ -61,10 +61,16 @@
   import { animate } from "animejs";
   import { onMount } from "svelte";
   import localforage from "localforage";
+  import { donkStorage } from "$lib/donkStorage.svelte";
+
   let elements;
   let bootstrap;
+
+  let USER = donkStorage("USER", null).value;
+  let PLAYLIST = donkStorage("PLAYLIST", null).value;
+
   onMount(async () => {
-    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
 
     elements = {
       //modals
@@ -253,9 +259,8 @@
     enableTwitchEmbed();
     videoEmbedEventListeners();
     tiktokEmbedEventListeners();
-  });
+  }); //onMount
 
-  let client;
   let currentTime = 0;
   let settingsOffcanvas;
   let dankUpdateModal, banlistModal;
@@ -277,81 +282,7 @@
   let firstTimeChatters = [];
   let skippers = [];
 
-  let USER = {
-    channel: "",
-    twitchLogin: false,
-    access_token: "",
-    userID: "",
-    platform: "",
-  };
-
-  let PLAYLIST = {
-    autoplay: true,
-    allowSpotifySongs: true,
-    allowStreamable: true,
-    allowTwitchClips: true,
-    allowTwitchStreams: true,
-    allowTwitchVODs: true,
-    allowTiktokVideos: true,
-    allowYTStreams: true,
-    allowYTShorts: true,
-    allowYTVideos: true,
-    allowVimeoVideos: true,
-    maxDuration: "",
-    maxDurationUnit: "m",
-    maxLength: "",
-    maxSize: "",
-    minViewCount: "",
-    minUploadAge: "",
-    minUploadAgeUnit: "h",
-    maxUploadAge: "",
-    maxUploadAgeUnit: "h",
-    uniqueOnly: false,
-    allowPlebs: true,
-    allowSubs: true,
-    allowMods: true,
-    allowVips: true,
-    allowFirstTimeChatters: true,
-    plebLimit: "",
-    subLimit: "",
-    modLimit: "",
-    vipLimit: "",
-    firstTimeChatterLimit: "",
-    noCommand: false,
-    requestCommand: "!request",
-    requestCommandAlias: "!r",
-    allowVoteSkip: false,
-    voteskipCommand: "!voteskip",
-    voteskipCommandAlias: "!vs",
-    voteskipCount: 100,
-    enableBot: false,
-    botCooldown: 1,
-    songCommand: "!song",
-    songCommandAlias: "!video",
-    playlistCommand: "!playlist",
-    playlistCommandAlias: "!pl",
-    approvalQueue: false,
-    openCommand: "!open",
-    closeCommand: "!close",
-    playCommand: "!play",
-    pauseCommand: "!pause",
-    autoplayCommand: "!autoplay",
-    skipCommand: "!skip",
-    rewindCommand: "!rewind",
-    deleteCommand: "!delete",
-    modCommands: true,
-    enableFavorites: false,
-  };
-
   async function refreshData() {
-    if (!USER.twitchLogin) {
-      USER.channel = escapeString(elements.channelName.value.replace(/\s+/g, "").toLowerCase());
-      USER.platform = "twitch";
-    }
-    if (!USER.userID && USER.channel) {
-      USER.userID = await getUserID(USER.channel);
-    }
-
     PLAYLIST.autoplay = elements.autoplay.checked;
     PLAYLIST.allowSpotifySongs = elements.allowSpotifySongs.checked;
     PLAYLIST.allowStreamable = elements.allowStreamable.checked;
@@ -481,7 +412,6 @@
 
   function saveSettings() {
     refreshData();
-    localStorage.setItem("USER", JSON.stringify(USER));
     localStorage.setItem("PLAYLIST", JSON.stringify(PLAYLIST));
     localforage.setItem("PLAYLIST_REQUESTS", JSON.stringify(requests, replacer));
     localforage.setItem("PLAYLIST_HISTORY", JSON.stringify(history));
@@ -493,13 +423,6 @@
   } //saveSettings
 
   async function load_localStorage() {
-    if (!localStorage.getItem("USER")) {
-      console.log("localStorage user info not found");
-    } else {
-      USER = JSON.parse(localStorage.getItem("USER"));
-      elements.channelName.value = USER.channel;
-    }
-
     if (!localStorage.getItem("PLAYLIST")) {
       console.log("localStorage settings not found");
     } else {
@@ -713,16 +636,7 @@
 
   function resetSettings(logout = false) {
     if (logout) {
-      localStorage.setItem(
-        "USER",
-        JSON.stringify({
-          channel: "",
-          twitchLogin: false,
-          access_token: "",
-          userID: "",
-          platform: "",
-        }),
-      );
+      logout();
       localforage.setItem("PLAYLIST_REQUESTS", JSON.stringify(new Map(), replacer));
       localforage.setItem("PLAYLIST_HISTORY", JSON.stringify([]));
       localforage.setItem("PLAYLIST_FAVORITES", JSON.stringify([]));
@@ -3304,17 +3218,14 @@
 
 <svelte:head>
   <title>chat.vote Playlist</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <meta name="description" content="chat.vote Playlist" />
   <meta name="keywords" content="twitch, chat, poll, chatvote, chat.vote" />
   <meta property="og:title" content="chat.vote Playlist" />
   <meta property="og:site_name" content="chat.vote Playlist" />
-  <meta property="og:type" content="website" />
   <meta property="og:url" content="https://chat.vote/playlist/" />
   <meta property="og:image" content="https://screenshot.donk.workers.dev/?url=https://chat.vote/playlist" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:description" content="chat.vote Playlist" /></svelte:head
->
+  <meta property="og:description" content="chat.vote Playlist" />
+</svelte:head>
 
 <div class="modal fade" id="dankUpdateModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -4040,7 +3951,7 @@
     </div>
 
     <div class="navbar-nav">
-      <Login />
+      <Login messageHandler={handleMessage} messageDeletedHandler={handleMessageDeleted} />
     </div>
 
     <div class="navbar-nav">
@@ -4339,12 +4250,6 @@
 
   #commandHint {
     height: 57px;
-  }
-
-  .custom-popover {
-    --bs-popover-border-color: var(--bs-warning);
-    --bs-popover-header-bg: var(--bs-warning);
-    --bs-popover-header-color: var(--bs-white);
   }
 
   .request-limit {

@@ -4,7 +4,7 @@
   import Login from "$lib/Login.svelte";
 
   import { enablePopovers, enableTooltips, escapeString, getUserID, sendData } from "$lib/functions";
-  import { onMount, onDestroy } from "svelte";
+  import { onMount } from "svelte";
   import IcBaselineRefresh from "~icons/ic/baseline-refresh";
   import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
   import IcBaselineVisibility from "~icons/ic/baseline-visibility";
@@ -33,10 +33,17 @@
   import IcBaselineStop from "~icons/ic/baseline-stop";
   import IcBaselinePause from "~icons/ic/baseline-pause";
   import IcBaselinePlayArrow from "~icons/ic/baseline-play-arrow";
+  import MdiTwitch from "~icons/mdi/twitch";
+
   import Chart from "chart.js/auto";
+  import { createGrid, themeQuartz, ModuleRegistry, AllCommunityModule } from "ag-grid-community";
+  import { donkStorage } from "$lib/donkStorage.svelte";
+
   let elements;
   let bootstrap;
-  import { createGrid, themeQuartz, ModuleRegistry, AllCommunityModule } from "ag-grid-community";
+
+  let USER = donkStorage("USER", null).value;
+  let CHATVOTE = donkStorage("CHATVOTE", null).value;
 
   onMount(async () => {
     ModuleRegistry.registerModules([AllCommunityModule]);
@@ -67,7 +74,7 @@
     };
     createGrid(document.querySelector("#table"), gridOptions);
 
-    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
     elements = {
       //modals
       randomOptionModal: document.getElementById("randomOptionModal"),
@@ -273,11 +280,6 @@
         addOption();
       }
     });
-    elements.channelName.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        connect();
-      }
-    });
 
     elements.voteWithNumbers.onchange = async function () {
       if (this.checked) {
@@ -401,26 +403,18 @@
       hideScore();
     });
 
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
+    window.onbeforeunload = function () {
+      // sendData("chat.vote", USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube", {
+      //   table: table.column(2).data().toArray(),
+      //   scores: table.column(4).data().toArray(),
+      // });
+      if (CHATVOTE.refreshWarningEnabled && (vote_results.length > 0 || vote_results_yesno.yea > 0 || vote_results_yesno.nay > 0)) {
+        return "Close/refresh warning enabled. You can turn it off in the settings.";
+      }
+      return null;
+    }; //onbeforeunload
+  }); //onMount
 
-    if (urlParams.get("overlay") === "true") {
-      document.getElementById("overlaytabli").style.display = "";
-    }
-  });
-
-  onDestroy(() => {
-    // sendData("chat.vote", USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube", {
-    //   table: table.column(2).data().toArray(),
-    //   scores: table.column(4).data().toArray(),
-    // });
-    if (CHATVOTE.refreshWarningEnabled && (vote_results.length > 0 || vote_results_yesno.yea > 0 || vote_results_yesno.nay > 0)) {
-      return "Close/refresh warning enabled. You can turn it off in the settings.";
-    }
-    return null;
-  });
-
-  let client;
   let voters = [];
   let voters_options = [];
   let vote_results = [];
@@ -449,41 +443,9 @@
 
   let thirdPartyEmotes = [];
 
-  let USER = {
-    channel: "",
-    twitchLogin: false,
-    access_token: "",
-    userID: "",
-    platform: "",
-  };
   let streamerColor = "";
 
-  let CHATVOTE = {
-    chartType: "bar",
-    sortChart: false,
-    showChat: false,
-    multiChoice: false,
-    allowChange: false,
-    subMode: false,
-    questionHidden: false,
-    suggestion_prefix: "!suggest",
-    votingMode: "numbers",
-    confettiLevel: 0,
-    suggestionLimitUser: 1,
-    suggestionLimit: 0,
-    timerValueMinutes: 0,
-    refreshWarningEnabled: false,
-    linkPreviewThumbnailsEnabled: false,
-  };
-
   async function refreshData() {
-    if (!USER.twitchLogin) {
-      USER.channel = escapeString(elements.channelName.value.replace(/\s+/g, "").toLowerCase());
-      USER.platform = "twitch";
-    }
-    if (!USER.userID && USER.channel) {
-      USER.userID = await getUserID(USER.channel);
-    }
     CHATVOTE.suggestion_prefix = elements.suggestionPrefix.value.replace(/\s+/g, "").toLowerCase();
 
     CHATVOTE.votingMode = elements.voteWithText.checked ? "text" : "numbers";
@@ -511,22 +473,12 @@
 
   function saveSettings() {
     refreshData();
-    localStorage.setItem("USER", JSON.stringify(USER));
-    localStorage.setItem("CHATVOTE", JSON.stringify(CHATVOTE));
   } //saveSettings
 
   function load_localStorage() {
-    if (!localStorage.getItem("USER")) {
-      console.log("localStorage user info not found");
-    } else {
-      USER = JSON.parse(localStorage.getItem("USER"));
-      elements.channelName.value = USER.channel;
-    }
-
-    if (!localStorage.getItem("CHATVOTE")) {
+    if (!CHATVOTE) {
       console.log("localStorage settings not found");
     } else {
-      CHATVOTE = JSON.parse(localStorage.getItem("CHATVOTE"));
       if (CHATVOTE.votingMode !== "numbers" && CHATVOTE.votingMode !== "text") {
         CHATVOTE.votingMode = "numbers";
       }
@@ -591,16 +543,7 @@
 
   function resetSettings(logout = false) {
     if (logout) {
-      localStorage.setItem(
-        "USER",
-        JSON.stringify({
-          channel: "",
-          twitchLogin: false,
-          access_token: "",
-          userID: "",
-          platform: "",
-        }),
-      );
+      logout();
     }
     localStorage.setItem(
       "CHATVOTE",
@@ -2250,7 +2193,7 @@
         <div class="form-check form-switch mb-3">
           <input type="checkbox" class="form-check-input" id="showChat" aria-describedby="showChatDesc" />
           <label class="form-check-label" id="showChatDesc" for="showChat">
-            <img style="height: 1.2em; filter: invert(0.6)" id="twitchLogo2" alt="twitch" src="/pics/twitch.png" /> Show chat
+            <MdiTwitch /> Show chat
           </label>
           <br /><small class="text-body-secondary">Shows your Twitch chat on the right side</small>
         </div>
@@ -2372,7 +2315,7 @@
     </div>
 
     <div class="navbar-nav">
-      <Login />
+      <Login messageHandler={handleMessage} timeoutHandler={handleTimeout} />
     </div>
 
     <div class="navbar-nav">
@@ -2424,7 +2367,7 @@
       <div class="alert alert-info alert-dismissible mb-2 mt-2" id="subOnlyAlert" role="alert" style="display: none">
         <IcBaselineAttachMoney /> Subscribers only poll. Click on the subscribe button, you might have a free prime sub
         <img src="/pics/smile.png" alt="bot" style="height: 1.5em" />
-        <button type="button" class="btn btn-twitch">
+        <button type="button" class="btn btn-info">
           <svg width="1.5em" height="1.5em" style="fill: white" version="1.1" viewBox="0 0 20 20" x="20px" y="20px">
             <path fill-rule="evenodd" clip-rule="evenodd" d="M18 5v8a2 2 0 0 1-2 2H4a2.002 2.002 0 0 1-2-2V5l4 3 4-4 4 4 4-3z"></path>
           </svg>
@@ -3017,12 +2960,6 @@
   #timerValueMinutes > button {
     background-color: #a73a19;
     border-color: #b8431f;
-  }
-
-  .custom-popover {
-    --bs-popover-border-color: var(--bs-warning);
-    --bs-popover-header-bg: var(--bs-warning);
-    --bs-popover-header-color: var(--bs-white);
   }
 
   .accordion-button,

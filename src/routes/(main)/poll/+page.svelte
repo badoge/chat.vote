@@ -19,7 +19,7 @@
   let elements;
   let bootstrap;
   onMount(async () => {
-    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
     elements = {
       //modals
       pollModal: document.getElementById("pollModal"),
@@ -687,15 +687,12 @@
 
 <svelte:head>
   <title>chat.vote Polls</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <meta name="description" content="Create shareable polls easily and quickly using chat.vote/poll" />
   <meta name="keywords" content="poll, polls, chatvote, chat.vote" />
   <meta property="og:title" content="chat.vote Polls" />
   <meta property="og:site_name" content="chat.vote Polls" />
-  <meta property="og:type" content="website" />
   <meta property="og:url" content="https://chat.vote/poll/" />
   <meta property="og:image" content="https://screenshot.donk.workers.dev/?url=https://chat.vote/poll" />
-  <meta property="og:locale" content="en_US" />
   <meta property="og:description" content="Create shareable polls easily and quickly using chat.vote/poll" />
 
   <script src="https://www.google.com/recaptcha/api.js?render=6LdzxrwdAAAAADyHX2t8ZS4U5QxTNLVWNrGOeNp0"></script>

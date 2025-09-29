@@ -1,3 +1,12 @@
+<script>
+  import { onMount } from "svelte";
+  let darkTheme = $state(true);
+  onMount(async () => {
+    darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
+    //switchTheme(darkTheme);
+  });
+</script>
+
 <div id="theme-label-container">
   <label id="theme-label">
     <input id="darkTheme" type="checkbox" checked />

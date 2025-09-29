@@ -34,10 +34,15 @@
   import { addBadges, changeSiteLinkTarget, enablePopovers, enableTooltips, escapeString, getUserID, ISO8601ToSeconds, showToast } from "$lib/functions";
   import localforage from "localforage";
 
+  import { donkStorage } from "$lib/donkStorage.svelte";
+
   let elements;
   let bootstrap;
+
+  let USER = donkStorage("USER", null).value;
+
   onMount(async () => {
-    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
     elements = {
       //modals
 
@@ -297,12 +302,6 @@
       }
     });
 
-    elements.channelName.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        connect();
-      }
-    });
-
     elements.generateBracketType.onchange = function () {
       for (let element of document.getElementsByClassName("generate-type")) {
         element.style.display = "none";
@@ -445,7 +444,7 @@
       importCode(code);
       history.replaceState(undefined, undefined, "#");
     }
-  });
+  }); //onMount
 
   const icons = {
     text: `<i class="material-icons notranslate">description</i>`,
@@ -457,7 +456,6 @@
   };
   const spotifyURLRegex = /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:(album|track|playlist|episode)\/|\?uri=spotify:track:)((\w|-){22})/;
 
-  let client;
   let tierlistEditorModal, previewModal, generateChatModal, generateModal, communityModal, startModal, startTriviaModal, publishedModal, importModal;
   let votePopover, votePopoverTierlist;
   let currentBracket = {};
@@ -469,14 +467,6 @@
 
   let vote_results = { left: 0, right: 0 };
 
-  let USER = {
-    channel: "",
-    twitchLogin: false,
-    access_token: "",
-    userID: "",
-    platform: "",
-  };
-
   let BRACKETS = {
     brackets: [],
   };
@@ -486,16 +476,7 @@
   };
 
   function resetSettings() {
-    localStorage.setItem(
-      "USER",
-      JSON.stringify({
-        channel: "",
-        twitchLogin: false,
-        access_token: "",
-        userID: "",
-        platform: "",
-      }),
-    );
+    logout();
     localforage.setItem("BRACKETS_TIERLISTS", JSON.stringify([]));
     localforage.setItem("TRIVIA", JSON.stringify([]));
 
@@ -503,31 +484,15 @@
     return false;
   } //resetSettings
 
-  async function refreshData() {
-    if (!USER.twitchLogin) {
-      USER.channel = escapeString(elements.channelName.value.replace(/\s+/g, "").toLowerCase());
-      USER.platform = "twitch";
-    }
-    if (!USER.userID && USER.channel) {
-      USER.userID = await getUserID(USER.channel);
-    }
-  } //refreshdata
+  async function refreshData() {} //refreshdata
 
   function saveSettings() {
     refreshData();
-    localStorage.setItem("USER", JSON.stringify(USER));
     localforage.setItem("BRACKETS_TIERLISTS", JSON.stringify(BRACKETS));
     localforage.setItem("TRIVIA", JSON.stringify(TRIVIA));
   } //saveSettings
 
   async function load_localStorage() {
-    if (!localStorage.getItem("USER")) {
-      console.log("localStorage user info not found");
-    } else {
-      USER = JSON.parse(localStorage.getItem("USER"));
-      elements.channelName.value = USER.channel;
-    }
-
     localforage.config({
       driver: localforage.INDEXEDDB,
       name: "chat.vote/blt",
@@ -3744,15 +3709,12 @@
 
 <svelte:head>
   <title>chat.vote Brackets, (tier)Lists & Trivia</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <meta name="description" content="Brackets, (tier)Lists & Trivia" />
   <meta name="keywords" content="brackets, tierlists, trivia, chatvote, chat.vote" />
   <meta property="og:title" content="chat.vote Brackets, (tier)Lists & Trivia" />
   <meta property="og:site_name" content="chat.vote Brackets, (tier)Lists & Trivia" />
-  <meta property="og:type" content="website" />
   <meta property="og:url" content="https://chat.vote/blt" />
   <meta property="og:image" content="https://screenshot.donk.workers.dev/?url=https://chat.vote/blt" />
-  <meta property="og:locale" content="en_US" />
   <meta property="og:description" content="Brackets, (tier)Lists & Trivia" /></svelte:head
 >
 
@@ -4351,7 +4313,7 @@
     </div>
 
     <div class="navbar-nav">
-      <Login />
+      <Login messageHandler={handleMessage} />
     </div>
 
     <div class="navbar-nav">
@@ -4865,12 +4827,6 @@
 
   .resizable img {
     height: 100%;
-  }
-
-  .custom-popover {
-    --bs-popover-border-color: var(--bs-warning);
-    --bs-popover-header-bg: var(--bs-warning);
-    --bs-popover-header-color: var(--bs-white);
   }
 
   .deletebtn {

@@ -10,7 +10,7 @@
 
   let bootstrap;
   onMount(async () => {
-    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
     elements = {
       //modals
       grid: document.getElementById("grid"),
@@ -56,12 +56,6 @@
 
     enableTooltips();
     enablePopovers();
-
-    elements.channelName.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        connect();
-      }
-    });
 
     elements.twitchGlobal.onchange = function () {
       EMOTEBENCHMARK.twitchGlobal = this.checked;
@@ -423,15 +417,12 @@
 
 <svelte:head>
   <title>chat.vote Games - Emote benchmark</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <meta name="description" content="A test of reaction speed and emote knowledge. Type the appearing emotes in chat as fast as you can." />
   <meta name="keywords" content="chatvote, chat.vote, interactive, games, Twitch, chat" />
   <meta property="og:title" content="chat.vote Games - Emote benchmark" />
   <meta property="og:site_name" content="chat.vote Games - Emote benchmark" />
-  <meta property="og:type" content="website" />
   <meta property="og:url" content="https://chat.vote/games/emotes/" />
   <meta property="og:image" content="https://screenshot.donk.workers.dev/?url=https://chat.vote/games/emotes" />
-  <meta property="og:locale" content="en_US" />
   <meta property="og:description" content="A test of reaction speed and emote knowledge. Type the appearing emotes in chat as fast as you can." />
 </svelte:head>
 
@@ -645,12 +636,6 @@
 
   .resizable img {
     height: 100%;
-  }
-
-  .custom-popover {
-    --bs-popover-border-color: var(--bs-warning);
-    --bs-popover-header-bg: var(--bs-warning);
-    --bs-popover-header-color: var(--bs-white);
   }
 
   .tooltip.show {

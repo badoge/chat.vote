@@ -6,7 +6,7 @@
   let SHAPES;
   let bootstrap;
   onMount(async () => {
-    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
     elements = {
       //modals
       grid: document.getElementById("grid"),
@@ -46,12 +46,6 @@
 
     enableTooltips();
     enablePopovers();
-
-    elements.channelName.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        connect();
-      }
-    });
 
     initGraph();
 
@@ -472,15 +466,12 @@
 
 <svelte:head>
   <title>chat.vote Games - 🟥⏹️🔴🔴⭕⏹️</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <meta name="description" content="A very weird logic puzzle. Finish the row of shapes, which has been formed using a pre-determined hidden rule." />
   <meta name="keywords" content="chatvote, chat.vote, interactive, games, Twitch, chat" />
   <meta property="og:title" content="chat.vote Games - 🟥⏹️🔴🔴⭕⏹️" />
   <meta property="og:site_name" content="chat.vote Games - 🟥⏹️🔴🔴⭕⏹️" />
-  <meta property="og:type" content="website" />
   <meta property="og:url" content="https://chat.vote/games/shapes/" />
   <meta property="og:image" content="https://screenshot.donk.workers.dev/?url=https://chat.vote/games/shapes" />
-  <meta property="og:locale" content="en_US" />
   <meta property="og:description" content="A very weird logic puzzle. Finish the row of shapes, which has been formed using a pre-determined hidden rule." />
 </svelte:head>
 
@@ -599,12 +590,6 @@
 
   .resizable img {
     height: 100%;
-  }
-
-  .custom-popover {
-    --bs-popover-border-color: var(--bs-warning);
-    --bs-popover-header-bg: var(--bs-warning);
-    --bs-popover-header-color: var(--bs-white);
   }
 
   .tooltip.show {

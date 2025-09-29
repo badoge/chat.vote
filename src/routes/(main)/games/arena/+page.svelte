@@ -4,7 +4,7 @@
   let html;
   let bootstrap;
   onMount(async () => {
-    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
     html = {
       killfeed: document.querySelector("#killfeed"),
       autoFullscreenInput: document.querySelector("input#bAutoFullscreen"),
@@ -187,12 +187,6 @@
 
     enableTooltips();
     enablePopovers();
-
-    elements.channelName.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        connect();
-      }
-    });
   });
 
   let USER = {
@@ -541,15 +535,12 @@
 
 <svelte:head>
   <title>chat.vote Games - Arena</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <meta name="description" content="Fight your chatters in a 'battle royale' arena, where only one can win!" />
   <meta name="keywords" content="chatvote, chat.vote, interactive, games, Twitch, chat" />
   <meta property="og:title" content="chat.vote Games - Arena" />
   <meta property="og:site_name" content="chat.vote Games - Arena" />
-  <meta property="og:type" content="website" />
   <meta property="og:url" content="https://chat.vote/games/arena" />
   <meta property="og:image" content="https://screenshot.donk.workers.dev/?url=https://chat.vote/games/arena" />
-  <meta property="og:locale" content="en_US" />
   <meta property="og:description" content="Fight your chatters in a 'battle royale' arena, where only one can win!" />
 
   <script src="/donk-arena-classes.min.js"></script>
@@ -761,12 +752,6 @@
 
   .resizable img {
     height: 100%;
-  }
-
-  .custom-popover {
-    --bs-popover-border-color: var(--bs-warning);
-    --bs-popover-header-bg: var(--bs-warning);
-    --bs-popover-header-color: var(--bs-white);
   }
 
   .tooltip.show {

@@ -4,7 +4,7 @@
   let NIM;
   let bootstrap;
   onMount(async () => {
-    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.min.js");
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
     elements = {
       //modals
       grid: document.getElementById("grid"),
@@ -47,12 +47,6 @@
 
     enableTooltips();
     enablePopovers();
-
-    elements.channelName.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        connect();
-      }
-    });
 
     initGraph();
     elements.overlay.innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
@@ -348,15 +342,12 @@
 
 <svelte:head>
   <title>chat.vote Games - Nim</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <meta name="description" content="Classic. Remove popsicles until there's one left. Whoever takes the last one - loses!" />
   <meta name="keywords" content="chatvote, chat.vote, interactive, games, Twitch, chat" />
   <meta property="og:title" content="chat.vote Games - Nim" />
   <meta property="og:site_name" content="chat.vote Games - Nim" />
-  <meta property="og:type" content="website" />
   <meta property="og:url" content="https://chat.vote/games/nim/" />
   <meta property="og:image" content="https://screenshot.donk.workers.dev/?url=https://chat.vote/games/nim" />
-  <meta property="og:locale" content="en_US" />
   <meta property="og:description" content="Classic. Remove popsicles until there's one left. Whoever takes the last one - loses!" />
 </svelte:head>
 
@@ -495,12 +486,6 @@
 
   .resizable img {
     height: 100%;
-  }
-
-  .custom-popover {
-    --bs-popover-border-color: var(--bs-warning);
-    --bs-popover-header-bg: var(--bs-warning);
-    --bs-popover-header-color: var(--bs-white);
   }
 
   .tooltip.show {

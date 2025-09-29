@@ -1,8 +1,6 @@
-const CLIENT_ID = "qn0wimnszbqlwfnszdz3wwfz430eqr";
-const CLIENT_ID_YT = "975425654977-2ckljuapg94eukqrnm1rgqup5npo95m9.apps.googleusercontent.com";
-const API_KEY_YT = "AIzaSyAMCaIslOwxlmotLsNN4NB2ia949h4GLP0";
-
 const spinner = `<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`;
+
+import { CLIENT_ID } from "$lib/consts";
 
 let channelBadges = { subscriber: [], bits: [] };
 let globalBadges = {};
@@ -758,6 +756,32 @@ export function numberAndUnitToSeconds(number, unit) {
 } //numberAndUnitToSeconds
 
 /**
+ * @description checks if the twitch access token is valid
+ * @param {string} access_token
+ * @returns {Promise<boolean>}
+ */
+export async function checkToken(access_token) {
+  let requestOptions = {
+    headers: { Authorization: `OAuth ${access_token}` },
+  };
+  try {
+    let response = await fetch("https://id.twitch.tv/oauth2/validate", requestOptions);
+    if (!response.ok) {
+      return false;
+    }
+    let result = await response.json();
+    if (result.expires_in < 600) {
+      return false;
+    } else {
+      return true;
+    }
+  } catch (error) {
+    console.log("checkToken error", error);
+    return false;
+  }
+} //checkToken
+
+/**
  * @description convert the release date and release date precision from the spotify api to a timestamp
  * @param {string} releaseDate
  * @param {string} releaseDatePrecision
@@ -780,27 +804,6 @@ export function spotifyReleaseDateToTimestamp(releaseDate, releaseDatePrecision)
   }
   return new Date(date).getTime();
 } //spotifyReleaseDateToTimestamp
-
-export async function checkToken(access_token) {
-  let requestOptions = {
-    headers: { Authorization: `OAuth ${access_token}` },
-  };
-  try {
-    let response = await fetch("https://id.twitch.tv/oauth2/validate", requestOptions);
-    if (!response.ok) {
-      return false;
-    }
-    let result = await response.json();
-    if (result.expires_in < 600) {
-      return false;
-    } else {
-      return true;
-    }
-  } catch (error) {
-    console.log("checkToken error", error);
-    return false;
-  }
-} //checkToken
 
 export function spamTest(type, count, delay = 100, votes = null) {
   if (!type && !count) {

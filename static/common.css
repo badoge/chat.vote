@@ -46,28 +46,6 @@ select:disabled {
   cursor: not-allowed;
 }
 
-.twitch-icon {
-  display: inline-block;
-  width: 22px;
-  height: 26px;
-  background-image: url(/pics/twitch.png);
-  margin: 0 5px -8px 0;
-}
-
-.btn-twitch {
-  color: #ffffff;
-  background-color: #9933ff !important;
-  border-color: #8744aa !important;
-}
-
-.btn-twitch:active,
-.btn-twitch:focus,
-.btn-twitch:hover {
-  color: #ffffff;
-  background-color: #8038de !important;
-  border-color: #7f40a1 !important;
-}
-
 .youtube-icon {
   display: inline-block;
   width: 37px;
@@ -102,4 +80,3 @@ select:disabled {
 #vtsLink:hover .vts-icon {
   filter: none;
 }
-

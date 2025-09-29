@@ -1,82 +1,74 @@
 <script>
-  function login() {
-    elements.topRight.innerHTML = `<div class="btn-group" role="group" aria-label="log in button group">
-    <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></button>
-    <div class="btn-group" role="group">
-        <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-      </button>
-        <ul class="dropdown-menu dropdown-menu-lg-end" aria-label="Log out">
-            <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
-        </ul>
-    </div>
-</div>`;
-    window.open("/prompt.html", "loginWindow", "toolbar=0,status=0,scrollbars=0,width=500px,height=800px");
-    return false;
-  } //login
+  import { onMount } from "svelte";
+  import { donkStorage } from "$lib/donkStorage.svelte";
+  import { checkToken, get7TVPFP, getTwitchPFP } from "./functions";
+  import MdiTwitch from "~icons/mdi/twitch";
+  import IcBaselineLogout from "~icons/ic/baseline-logout";
+  import { CLIENT_ID } from "$lib/consts";
 
-  function logout() {
-    elements.topRight.innerHTML = ` <div class="btn-group" role="group" aria-label="login options">
-  <a
-    role="button"
-    id="loginButton"
-    onclick="login()"
-    class="btn btn-twitch"
-    tabindex="0"
-    data-bs-container="body"
-    data-bs-custom-class="custom-popover"
-    data-bs-placement="bottom"
-    data-bs-trigger="manual"
-    data-bs-toggle="popover"
-    data-bs-title="Not signed in"
-    data-bs-content="You need sign in first before adding options or enabling voting/suggestions"
-    ><span class="twitch-icon"></span>Sign in with Twitch</a
-  >
-  <div class="btn-group" role="group">
-    <button
-      id="btnGroupDropLogin"
-      type="button"
-      class="btn btn-twitch dropdown-toggle"
-      data-bs-toggle="dropdown"
-      data-bs-auto-close="outside"
-      aria-label="other login option, connect manually"
-      aria-expanded="false"
-    ></button>
-    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="btnGroupDropLogin">
-      <div class="p-3" style="width: 300px">
-        <label for="channelName" class="form-label">Connect to chat directly</label>
-        <div class="input-group mb-3">
-          <span class="input-group-text" id="directLoginChannel">twitch.tv/</span>
-          <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
-        </div>
-        <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
-        <button type="button" onclick="connect()" class="btn btn-primary float-end">Connect</button>
-      </div>
-    </div>
-  </div>
-</div>`;
-    resetSettings(true);
-  } //logout
+  import tmi from "tmi.js";
 
-  function connect() {
-    elements.status.innerHTML = `
-    <h4>
-      <span class="badge bg-warning">Connecting... 
-        <div class="spinner-border" style="width:18px;height:18px;" role="status"><span class="visually-hidden">Loading...</span></div>
-      </span>
-    </h4>`;
-    elements.topRight.innerHTML = `
-    <div class="btn-group" role="group" aria-label="log in button group">
-      <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></button>
-      <div class="btn-group" role="group">
-        <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
-        <ul class="dropdown-menu dropdown-menu-lg-end" aria-label="Log out">
-          <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
-        </ul>
-      </div>
-    </div>`;
-    refreshData();
-    getEmotes();
-    loadBadges(USER.channel);
+  let { messageHandler = null, timeoutHandler = null, messageDeletedHandler = null } = $props();
+
+  let USER = donkStorage("USER", null).value;
+
+  //logged_out - default state with the login button visible, stays like this if USER local storage is not found
+  //login_prompted - gets set when the login button is clicked, login button turns into a loading spinner
+  //logged_in - user completed login prompt or USER local storage loaded, login button turns into a pfp + username
+  let loginStatus = $state("logged_out");
+
+  let chatStatus = $state({ emoji: "🔴", title: "Chat disconnected" });
+
+  let pfpURL = $state("");
+
+  let bootstrap;
+  let loginExpiredModal;
+  let loginButtonPopover;
+
+  onMount(async () => {
+    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
+
+    loginExpiredModal = new bootstrap.Modal(document.getElementById("loginExpiredModal"));
+    loginButtonPopover = new bootstrap.Popover(document.getElementById("loginButton"));
+
+    //listen to storage events from the login windows
+    window.onstorage = () => {
+      if (localStorage.getItem("loginStatus") !== loginStatus) {
+        loginStatus = localStorage.getItem("loginStatus") || "logged_out";
+
+        if (localStorage.getItem("loginStatus") == "logged_in") {
+          let USER_TEMP = JSON.parse(localStorage.getItem("USER_TEMP") || "{}");
+          USER.channel = USER_TEMP.channel;
+          USER.twitchLogin = USER_TEMP.twitchLogin;
+          USER.access_token = USER_TEMP.access_token;
+          USER.userID = USER_TEMP.userID;
+          USER.platform = USER_TEMP.platform;
+          localStorage.setItem("USER_TEMP", JSON.stringify({}));
+          connectIRC();
+          loadPFP();
+        }
+      }
+    };
+
+    //check if the token is still valid if user logged in using twitch
+    //if token is not valid set channel to "" to avoid connecting to chat and show the error modal
+    if (USER.twitchLogin && !(await checkToken(USER.access_token))) {
+      USER.channel = "";
+      loginExpiredModal.show();
+      return;
+    }
+
+    //user has a valid token or is using manual login so connect to chat
+    if (USER.channel) {
+      loginStatus = "logged_in";
+      connectIRC();
+      loadPFP();
+    }
+  }); //onMount
+
+  function connectIRC() {
+    chatStatus = { emoji: "🟡", title: "Chat connecting" };
+
     let options = {
       options: {
         clientId: CLIENT_ID,
@@ -88,126 +80,69 @@
       },
       channels: [USER.channel],
     };
-    client = new tmi.client(options);
+    const client = new tmi.Client(options);
 
-    client.on("message", handleMessage);
+    if (messageHandler) {
+      client.on("message", messageHandler);
+    }
 
-    client.on("timeout", handleTimeout);
+    if (timeoutHandler) {
+      client.on("timeout", timeoutHandler);
+    }
 
-    client.on("messagedeleted", handleMessageDeleted);
+    if (messageDeletedHandler) {
+      client.on("messagedeleted", messageDeletedHandler);
+    }
 
     client.on("connected", async (address, port) => {
       console.log(`Connected to ${address}:${port}`);
-      elements.status.innerHTML = `<h4><span class="badge bg-success">Connected :)</span></h4>`;
-      saveSettings();
-      sendUsername(`chat.vote`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
-      loadPFP();
+      chatStatus = { emoji: "🟢", title: "Chat connected" };
+      //sendUsername(`chat.vote`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
     }); //connected
 
     client.on("disconnected", (reason) => {
-      elements.status.innerHTML = `<h4><span class="badge bg-danger">Disconnected: ${reason}</span></h4>`;
+      chatStatus = { emoji: "⚠", title: `Chat disconnected: ${reason}` };
     }); //disconnected
 
     client.on("notice", (channel, msgid, message) => {
-      elements.status.innerHTML = `<h4><span class="badge bg-danger">Disconnected: ${message}</span></h4>`;
+      chatStatus = { emoji: "⚠", title: `Chat disconnected: ${message}` };
     }); //notice
 
     client.connect().catch(console.error);
-  } //connect
+  } //connectIRC
 
   async function loadPFP() {
-    if (!USER.channel) {
-      elements.topRight.innerHTML = ` <div class="btn-group" role="group" aria-label="login options">
-      <a
-        role="button"
-        id="loginButton"
-        onclick="login()"
-        class="btn btn-twitch"
-        tabindex="0"
-        data-bs-container="body"
-        data-bs-custom-class="custom-popover"
-        data-bs-placement="bottom"
-        data-bs-trigger="manual"
-        data-bs-toggle="popover"
-        data-bs-title="Not signed in"
-        data-bs-content="You need sign in first"
-        ><span class="twitch-icon"></span>Sign in with Twitch</a
-      >
-      <div class="btn-group" role="group">
-        <button
-          id="btnGroupDropLogin"
-          type="button"
-          class="btn btn-twitch dropdown-toggle"
-          data-bs-toggle="dropdown"
-          data-bs-auto-close="outside"
-          aria-label="other login option, connect manually"
-          aria-expanded="false"
-        ></button>
-        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="btnGroupDropLogin">
-          <div class="p-3" style="width: 300px">
-            <label for="channelName" class="form-label">Connect to chat directly</label>
-            <div class="input-group mb-3">
-              <span class="input-group-text" id="directLoginChannel">twitch.tv/</span>
-              <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
-            </div>
-            <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
-            <button type="button" onclick="connect()" class="btn btn-primary float-end">Connect</button>
-          </div>
-        </div>
-      </div>
-    </div>`;
-      return;
+    pfpURL = await get7TVPFP(USER.userID);
+    if (pfpURL == "/pics/donk.png" && USER.access_token) {
+      pfpURL = await getTwitchPFP(USER.channel, USER.access_token);
     }
-    let profilepicurl = await get7TVPFP(USER.userID);
-    if (profilepicurl == "/pics/donk.png" && USER.access_token) {
-      profilepicurl = await getTwitchPFP(USER.channel, USER.access_token);
-    }
-    elements.topRight.innerHTML = `
-    <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
-    <button type="button" id="btnGroupDrop2" class="btn btn-${darkTheme ? "dark" : "secondary"}"><img src="${profilepicurl}" alt="profile pic" style="height:2em;"></button>
-    <div class="btn-group" role="group">
-    <button id="btnGroupDrop1" type="button" class="btn btn-${darkTheme ? "dark" : "secondary"} dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-    ${USER.channel}
-    </button>
-    <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="btnGroupDrop1">
-    <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
-    </ul>
-    </div>
-    </div>`;
   } //loadPFP
+
+  function login() {
+    loginStatus = "login_prompted";
+    localStorage.setItem("loginStatus", "login_prompted");
+    localStorage.setItem("USER_TEMP", JSON.stringify({}));
+    window.open("/prompt", "loginWindow", "toolbar=0,status=0,scrollbars=0,width=500px,height=800px");
+    return false;
+  } //login
+
+  function logout() {
+    loginStatus = "logged_out";
+    localStorage.setItem("loginStatus", "logged_out");
+    localStorage.setItem("USER_TEMP", JSON.stringify({}));
+    //resetSettings(true);
+  } //logout
 
   function checkLogin() {
     if (!USER.channel) {
-      loginButton.show();
+      loginButtonPopover.show();
       setTimeout(function () {
-        loginButton.hide();
+        loginButtonPopover.hide();
       }, 4000);
       return false;
     }
     return true;
   } //checkLogin
-
-  async function loadAndConnect() {
-    load_localStorage();
-    refreshData();
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-      get: (searchParams, prop) => searchParams.get(prop),
-    });
-    if (params.channel && !USER.channel && !USER.twitchLogin && !USER.access_token && !USER.userID) {
-      let input = params.channel.replace(/\s+/g, "").toLowerCase();
-      elements.channelName.value = input;
-      USER.channel = input;
-      window.history.replaceState({}, document.title, "/");
-    }
-    if (USER.twitchLogin && !(await checkToken(USER.access_token))) {
-      USER.channel = "";
-      loginExpiredModal.show();
-      return;
-    }
-    if (USER.channel) {
-      connect();
-    }
-  } //loadAndConnect
 </script>
 
 <div class="modal fade" id="loginExpiredModal" tabindex="-1" aria-hidden="true">
@@ -220,7 +155,7 @@
       <div class="modal-body">
         <div class="row justify-content-center">
           Renew login:<br />
-          <button type="button" data-bs-dismiss="modal" onclick={login} class="btn btn-twitch"><span class="twitch-icon"></span>Sign in with Twitch</button>
+          <button type="button" data-bs-dismiss="modal" onclick={login} class="btn btn-twitch"><MdiTwitch />Sign in with Twitch</button>
           <br /><small class="text-body-secondary">Logins expire after 2 months.<br />Or after you change your password.</small>
         </div>
       </div>
@@ -241,49 +176,97 @@
   </div>
 </div>
 
-<div class="mx-auto d-inline-flex">
-  <div id="status" style="margin-top: 5px">
-    <h4><span class="badge bg-danger">Not connected :(</span></h4>
-  </div>
-</div>
-<div class="btn-group" role="group" aria-label="login options">
-  <!-- svelte-ignore a11y_click_events_have_key_events -->
-  <a
-    role="button"
-    id="loginButton"
-    onclick={login}
-    class="btn btn-twitch"
-    tabindex="0"
-    data-bs-container="body"
-    data-bs-custom-class="custom-popover"
-    data-bs-placement="bottom"
-    data-bs-trigger="manual"
-    data-bs-toggle="popover"
-    data-bs-title="Not signed in"
-    data-bs-content="You need sign in first before adding options or enabling voting/suggestions"
-  >
-    <span class="twitch-icon"></span>Sign in with Twitch
-  </a>
-  <div class="btn-group" role="group">
+{#if loginStatus == "logged_out"}
+  <div class="btn-group">
     <button
-      id="btnGroupDropLogin"
       type="button"
-      class="btn btn-twitch dropdown-toggle"
-      data-bs-toggle="dropdown"
-      data-bs-auto-close="outside"
-      aria-label="other login option, connect manually"
-      aria-expanded="false"
-    ></button>
-    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="btnGroupDropLogin">
-      <div class="p-3" style="width: 300px">
+      class="btn btn-twitch"
+      id="loginButton"
+      onclick={login}
+      data-bs-container="body"
+      data-bs-placement="bottom"
+      data-bs-trigger="manual"
+      data-bs-toggle="popover"
+      data-bs-title="Not signed in"
+      data-bs-content="You need sign in before doing that"><MdiTwitch />Sign in with Twitch</button
+    >
+    <button type="button" class="btn btn-twitch dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+      <span class="visually-hidden">Toggle Dropdown</span>
+    </button>
+    <div class="dropdown-menu dropdown-menu-end">
+      <div class="p-4" style="width: 300px">
         <label for="channelName" class="form-label">Connect to chat directly</label>
-        <div class="input-group mb-3">
+        <div class="input-group">
           <span class="input-group-text" id="directLoginChannel">twitch.tv/</span>
-          <input type="text" class="form-control" id="channelName" aria-describedby="directLoginChannel" />
+          <input type="text" class="form-control" id="channelName" placeholder="Username" value={USER?.channel || ""} aria-describedby="directLoginChannel" />
         </div>
-        <small class="text-body-secondary">Some features will not be available if you connect directly</small><br />
-        <button type="button" onclick={connect} class="btn btn-primary float-end">Connect</button>
+        <small class="text-body-secondary">Some features will be unavailable if you connect directly</small>
+        <br />
+        <button type="button" onclick={connect} class="btn btn-primary float-end mb-3">Connect</button>
       </div>
     </div>
   </div>
-</div>
+{:else if loginStatus == "login_prompted"}
+  <div class="btn-group" role="group" aria-label="log in button group">
+    <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status" style="width: 1.5em; height: 1.5em"><span class="visually-hidden">Loading...</span></div></button>
+    <div class="btn-group" role="group">
+      <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Log out button dropdown"> </button>
+      <ul class="dropdown-menu dropdown-menu-lg-end" aria-label="Log out">
+        <li><button class="dropdown-item" type="button" onclick={logout}><IcBaselineLogout />Log out</button></li>
+      </ul>
+    </div>
+  </div>
+{:else if loginStatus == "logged_in"}
+  <div class="input-group">
+    <span class="input-group-text pfp-container">
+      {#if pfpURL}
+        <img src={pfpURL} alt="profile pic" class="rounded-start pfp" />
+      {:else}
+        <div class="placeholder-glow" style="width: 100%; height: 100%">
+          <span class="placeholder rounded-start" style="width: 100%; height: 100%"></span>
+        </div>
+      {/if}
+    </span>
+
+    <span class="input-group-text border-secondary">{USER.channel || "Loading..."}</span>
+
+    <span class="input-group-text border-secondary p-0 cursor-pointer" title={chatStatus.title}>{chatStatus.emoji}</span>
+
+    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Log out button dropdown"></button>
+    <ul class="dropdown-menu dropdown-menu-end">
+      <li><button class="dropdown-item" type="button" onclick={logout}><IcBaselineLogout />Log out</button></li>
+    </ul>
+  </div>
+{/if}
+
+<style>
+  .pfp-container {
+    padding: 0;
+    height: 45.3px;
+    width: 45.3px;
+  }
+  .pfp {
+    object-fit: contain;
+    max-width: 100%;
+    max-height: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .btn-twitch {
+    color: #ffffff;
+    background-color: #9933ff !important;
+    border-color: #8744aa !important;
+  }
+
+  .btn-twitch:focus,
+  .btn-twitch:hover {
+    background-color: #8038de !important;
+    border-color: #7f40a1 !important;
+  }
+
+  .btn-twitch:active {
+    background-color: #6b2cbd !important;
+    border-color: #6a308a !important;
+  }
+</style>
