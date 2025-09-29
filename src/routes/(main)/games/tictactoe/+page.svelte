@@ -295,7 +295,7 @@
       document.getElementById("tttoverlay").innerHTML = "";
     }
     TTT.isComputerPlaying = false;
-    document.getElementById("gameboard").classList = "cursorpointer";
+    document.getElementById("gameboard").classList = "cursor-pointer";
     document.getElementById("totalvotesttt").innerHTML = `Total votes: 0`;
   } //playTurn
 
@@ -370,7 +370,7 @@
       <div class="row">
         <div class="col-xl-7">
           <div class="wrapper">
-            <main id="gameboard" class="cursorpointer">
+            <main id="gameboard" class="cursor-pointer">
               <div class="rows">
                 <div class="square square-00" data-index="0"><span class="text-body-secondary">1</span></div>
                 <div class="square square-01" data-index="1"><span class="text-body-secondary">2</span></div>
@@ -491,10 +491,6 @@
     text-align: center;
     font-size: 100px;
     font-weight: bold;
-  }
-
-  .cursorpointer {
-    cursor: pointer;
   }
 
   .cursordefault {

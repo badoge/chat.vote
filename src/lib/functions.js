@@ -1,6 +1,9 @@
 const spinner = `<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`;
 
 import { CLIENT_ID } from "$lib/consts";
+import DOMPurify from "dompurify";
+import linkifyElement from "linkify-element";
+import "linkify-plugin-mention";
 
 let channelBadges = { subscriber: [], bits: [] };
 let globalBadges = {};
@@ -175,9 +178,9 @@ export async function getEmoji() {
 
 export async function getTwitchUserId(username) {
   try {
-    if (username == USER.channel && USER.userID) {
-      return USER.userID;
-    }
+    // if (username == USER.channel && USER.userID) {
+    //   return USER.userID;
+    // }
 
     let response = await fetch(`https://helper.donk.workers.dev/twitch/users?login=${username}`);
     let result = await response.json();
@@ -623,7 +626,7 @@ export function switchGame(game) {
   }
 } //switchGame
 
-export async function getLinkInfo(element, allowThumbnails) {
+export async function getLinkInfo(element, allowThumbnails, bootstrap) {
   if (element.getAttribute("data-bs-title") == spinner) {
     let url = element.getAttribute("href");
     if (!url) {
@@ -670,7 +673,11 @@ export async function checkImage(url) {
   }
 } //checkImage
 
-export function linkifyElementID(id, allowThumbnails) {
+/**
+ * @param {string} id
+ * @param {any} allowThumbnails
+ */
+export function linkifyElementID(id, allowThumbnails, bootstrap) {
   linkifyElement(
     document.getElementById(id),
     {
@@ -696,7 +703,7 @@ export function linkifyElementID(id, allowThumbnails) {
   const tooltipList = [...tooltipTriggerList].map(function (tooltipTriggerEl) {
     if (tooltipTriggerEl.getAttribute("data-bs-title") == spinner) {
       tooltipTriggerEl.addEventListener("show.bs.tooltip", function () {
-        getLinkInfo(tooltipTriggerEl, allowThumbnails);
+        getLinkInfo(tooltipTriggerEl, allowThumbnails, bootstrap);
       });
     }
     const elements = document.getElementsByClassName("tooltip show");

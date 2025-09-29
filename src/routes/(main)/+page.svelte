@@ -18,6 +18,7 @@
     getStreamerColor,
     linkifyElementID,
     replaceEmotes,
+    roundToTwo,
     sendData,
     showToast,
     unescapeString,
@@ -79,7 +80,13 @@
       columnDefs: [
         { field: "Command", flex: 1 },
         { field: "Option", flex: 5, editable: true },
-        { field: "By", flex: 2 },
+        {
+          field: "By",
+          flex: 2,
+          cellRenderer: (params) => {
+            return params.value;
+          },
+        },
         { field: "Score", flex: 1 },
         {
           field: "Delete",
@@ -367,7 +374,7 @@
       const tooltipList = [...tooltipTriggerList].map(function (tooltipTriggerEl) {
         tooltipTriggerEl.setAttribute("data-bs-title", spinner);
         tooltipTriggerEl.addEventListener("show.bs.tooltip", function () {
-          getLinkInfo(tooltipTriggerEl, CHATVOTE.value.linkPreviewThumbnailsEnabled);
+          getLinkInfo(tooltipTriggerEl, CHATVOTE.value.linkPreviewThumbnailsEnabled, bootstrap);
         });
         return new bootstrap.Tooltip(tooltipTriggerEl, {
           animation: false,
@@ -633,7 +640,7 @@
     vote_results = [];
     for (let k = 0; k < optionsToKeep; k++) {
       pushVoteResults(vote_results_copy[k].id, vote_results_copy[k].option, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
-      pushTable(vote_results_copy[k].id, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
+      addRow(vote_results_copy[k].id, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
     }
     loadChart();
     updateChart();
@@ -659,7 +666,7 @@
     vote_results = [];
     for (let k = 0; k < length; k++) {
       pushVoteResults(vote_results_copy[k].id, vote_results_copy[k].option, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
-      pushTable(vote_results_copy[k].id, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
+      addRow(vote_results_copy[k].id, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
     }
     loadChart();
     updateChart();
@@ -703,7 +710,7 @@
     //oldlength - 1 to skip the option with the most votes
     for (let k = 0; k < oldlength - 1; k++) {
       pushVoteResults(vote_results_copy[k].id, vote_results_copy[k].option, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
-      pushTable(vote_results_copy[k].id, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
+      addRow(vote_results_copy[k].id, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
     }
     loadChart();
     updateChart();
@@ -734,7 +741,7 @@
     </button>
     </h4>`;
     }
-    linkifyElementID("randomOptionWinner", CHATVOTE.value.linkPreviewThumbnailsEnabled);
+    linkifyElementID("randomOptionWinner", CHATVOTE.value.linkPreviewThumbnailsEnabled, bootstrap);
     if (CHATVOTE.value.confettiLevel > 0) {
       showConfetti(CHATVOTE.value.confettiLevel);
     }
@@ -757,7 +764,7 @@
     vote_results = [];
     for (let k = 0; k < vote_results_copy.length; k++) {
       pushVoteResults(vote_results_copy[k].id, vote_results_copy[k].option, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
-      pushTable(vote_results_copy[k].id, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
+      addRow(vote_results_copy[k].id, vote_results_copy[k].option_emotes, vote_results_copy[k].by, 0, vote_results_copy[k].context);
     }
     loadChart();
     updateChart();
@@ -803,7 +810,7 @@
     </button>
     </h4>`;
     }
-    linkifyElementID("tieModalText", CHATVOTE.value.linkPreviewThumbnailsEnabled);
+    linkifyElementID("tieModalText", CHATVOTE.value.linkPreviewThumbnailsEnabled, bootstrap);
   } //pickRandomTiedOption
 
   function pickRandomYesNo() {
@@ -1023,7 +1030,7 @@
         }
       }
       oid++;
-      pushTable(oid, suggestion_emotes, context.username, 0, context);
+      addRow(oid, suggestion_emotes, context.username, 0, context);
       pushVoteResults(oid, suggestion_unchanged, suggestion_emotes, context.username, 0, context);
       updateChart();
       return;
@@ -1215,7 +1222,7 @@
     let extraoption_clean = extraoption.toLowerCase().replace(/\W/g, "");
     if (!vote_results.some((e) => e.option_clean === extraoption_clean) && extraoption_clean) {
       oid++;
-      pushTable(oid, replaceEmotes(extraoption, thirdPartyEmotes), USER.value.channel, 0, null);
+      addRow(oid, replaceEmotes(extraoption, thirdPartyEmotes), USER.value.channel, 0, null);
       pushVoteResults(oid, extraoption.replace(/<div.*?<\/div>/, "↖ Switch to Table view to see image :)"), replaceEmotes(extraoption, thirdPartyEmotes), USER.value.channel, 0, null);
       updateChart();
       elements.pollOption.value = "";
@@ -1256,7 +1263,7 @@
 
       if (!vote_results.some((e) => e.option_clean === option_clean) && option_clean) {
         oid++;
-        pushTable(oid, replaceEmotes(f2[i], thirdPartyEmotes), USER.value.channel, 0, null);
+        addRow(oid, replaceEmotes(f2[i], thirdPartyEmotes), USER.value.channel, 0, null);
         pushVoteResults(oid, f2[i], replaceEmotes(f2[i], thirdPartyEmotes), USER.value.channel, 0, null);
         updateChart();
       } else {
@@ -1297,19 +1304,18 @@
       username = context["display-name"].toLowerCase() == by.toLowerCase() ? context["display-name"] : `${context["display-name"]} (${by})`;
     }
 
-    table.row
-      .add([
-        command,
-        suggestion,
-        `<p class="cursorPointer" data-username="${by}" style="color:${color};" onclick='window.open("https://www.twitch.tv/popout/${USER.value.channel}/viewercard/${by}?popout=","_blank","width=340,height=800")'>${badgesHTML}${username}</p>`,
-        score,
-        `<button type="button" class="remove-option-button btn btn-danger"><i class="material-icons notranslate">delete_forever</i></button>`,
-      ])
-      .draw(false);
+    table.applyTransaction({
+      add: [
+        {
+          Command: command,
+          Option: suggestion,
+          By: `<p class="cursor-pointer" data-username="${by}" style="color:${color};" onclick='window.open("https://www.twitch.tv/popout/${USER.value.channel}/viewercard/${by}?popout=","_blank","width=340,height=800")'>${badgesHTML}${username}</p>`,
+          Score: score,
+        },
+      ],
+    });
 
-    table.applyTransaction({ add: [{ Command: "Tesla", Option: "Model Y", By: 64950, Score: 64950, Delete: 64950 }] });
-
-    linkifyElementID("options", CHATVOTE.value.linkPreviewThumbnailsEnabled);
+    linkifyElementID("table", CHATVOTE.value.linkPreviewThumbnailsEnabled, bootstrap);
     changeSiteLinkTarget("_blank");
   }
 
@@ -1703,7 +1709,7 @@
         ${addBadges(vote_results_copy[0].context.badges, vote_results_copy[0].context["user-id"], vote_results_copy[0].context["first-msg"])}${vote_results_copy[0].by}
         </button></h4>`;
         }
-        linkifyElementID("timeOverWinner", CHATVOTE.value.linkPreviewThumbnailsEnabled);
+        linkifyElementID("timeOverWinner", CHATVOTE.value.linkPreviewThumbnailsEnabled, bootstrap);
         timeOverModal.show();
       }
       if (CHATVOTE.value.confettiLevel > 0) {
@@ -2765,8 +2771,7 @@
   }
 
   .card-header,
-  #hideQuestion:hover,
-  .cursorPointer {
+  #hideQuestion:hover {
     cursor: pointer;
   }
 

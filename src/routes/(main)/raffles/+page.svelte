@@ -642,7 +642,7 @@
       }
       let p = document.createElement("p");
       p.classList.add("h2");
-      p.innerHTML = `Winner #${raffleWinners.length}: <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USER.value.channel}/viewercard/${currentRaffleWinner}?popout=","_blank","width=340,height=800")>${currentRaffleWinner}</a>`;
+      p.innerHTML = `Winner #${raffleWinners.length}: <a class="link-success cursor-pointer" onclick=window.open("https://www.twitch.tv/popout/${USER.value.channel}/viewercard/${currentRaffleWinner}?popout=","_blank","width=340,height=800")>${currentRaffleWinner}</a>`;
       elements.raffleOutput.append(p);
       if (RAFFLES.value.announceWinner && USER.value.twitchLogin) {
         let chance = Math.ceil((raffle_users.find((users) => users.username === currentRaffleWinner).tickets / user_tickets.length) * 100);
@@ -748,7 +748,7 @@
       }
       let p = document.createElement("p");
       p.classList.add("h2");
-      p.innerHTML = `Winner #${raffleWinners.length}: <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USER.value.channel}/viewercard/${winnerSlot.username}?popout=","_blank","width=340,height=800")>${winnerSlot.username}</a>`;
+      p.innerHTML = `Winner #${raffleWinners.length}: <a class="link-success cursor-pointer" onclick=window.open("https://www.twitch.tv/popout/${USER.value.channel}/viewercard/${winnerSlot.username}?popout=","_blank","width=340,height=800")>${winnerSlot.username}</a>`;
       elements.raffleOutput.append(p);
       if (RAFFLES.value.announceWinner && USER.value.twitchLogin) {
         let chance = Math.ceil(
@@ -1864,8 +1864,7 @@
 </div>
 
 <style>
-  .card-header,
-  .cursorPointer {
+  .card-header {
     cursor: pointer;
   }
 

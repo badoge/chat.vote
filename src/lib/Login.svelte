@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { donkStorage, resetSettings } from "$lib/donkStorage.svelte";
-  import { checkToken, get7TVPFP, getTwitchPFP, getUserID } from "./functions";
+  import { checkToken, get7TVPFP, getTwitchPFP, getUserID, loadBadges } from "./functions";
   import MdiTwitch from "~icons/mdi/twitch";
   import IcBaselineLogout from "~icons/ic/baseline-logout";
   import { CLIENT_ID } from "$lib/consts";
@@ -68,6 +68,10 @@
 
   function connectIRC() {
     chatStatus = { emoji: "🟡", title: "Chat connecting" };
+    loadBadges(USER.value.channel);
+    if (loginEvent) {
+      loginEvent();
+    }
 
     let options = {
       options: {
@@ -98,9 +102,6 @@
       console.log(`Connected to ${address}:${port}`);
       chatStatus = { emoji: "🟢", title: "Chat connected" };
       //sendUsername(`chat.vote`, USER.value.channel, USER.value.platform == "twitch" ? `twitch - ${USER.value.twitchLogin}` : "youtube");
-      if (loginEvent) {
-        loginEvent();
-      }
     }); //connected
 
     client.on("disconnected", (reason) => {
@@ -187,7 +188,7 @@
           data-bs-placement="top"
           data-bs-title="Will reset everything so you can login again."
           data-bs-dismiss="modal"
-          onclick={() => resetSettings(true)}
+          onclick={() => resetSettings("USER")}
         >
           Reset
         </button>
