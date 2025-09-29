@@ -34,6 +34,7 @@
   import IcBaselinePause from "~icons/ic/baseline-pause";
   import IcBaselinePlayArrow from "~icons/ic/baseline-play-arrow";
   import MdiTwitch from "~icons/mdi/twitch";
+  import HomepageLink from "$lib/HomepageLink.svelte";
 
   import Chart from "chart.js/auto";
   import { createGrid, themeQuartz, ModuleRegistry, AllCommunityModule } from "ag-grid-community";
@@ -2303,9 +2304,7 @@
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLinks" aria-controls="navbarLinks" aria-expanded="false" aria-label="Toggle site links">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <a class="navbar-brand notranslate site-link" href="/home" target="_self" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Home page">
-      <img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" />
-    </a>
+    <HomepageLink />
     <a class="navbar-brand notranslate site-link" href="/" target="_self"> chat.vote </a>
 
     <div class="collapse navbar-collapse" id="navbarLinks">

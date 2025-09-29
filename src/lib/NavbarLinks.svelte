@@ -1,6 +1,7 @@
 <script>
   import { page } from "$app/state";
   import "bootstrap/dist/css/bootstrap.min.css";
+  import { onMount } from "svelte";
 
   import IcBaselineVideogameAsset from "~icons/ic/baseline-videogame-asset";
   import IcBaselineQueueMusic from "~icons/ic/baseline-queue-music";
@@ -10,11 +11,23 @@
   import IcRoundHowToVote from "~icons/ic/round-how-to-vote";
 
   const route = $derived(page.route.id);
+
+  onMount(async () => {
+    let bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
+
+    let mainTooltip = new bootstrap.Tooltip(document.getElementById("mainPageLink"));
+    let pollTooltip = new bootstrap.Tooltip(document.getElementById("pollPageLink"));
+    let gamesTooltip = new bootstrap.Tooltip(document.getElementById("gamesPageLink"));
+    let rafflesTooltip = new bootstrap.Tooltip(document.getElementById("rafflesPageLink"));
+    let bltTooltip = new bootstrap.Tooltip(document.getElementById("bltPageLink"));
+    let playlistTooltip = new bootstrap.Tooltip(document.getElementById("playlistPageLink"));
+  });
 </script>
 
 <li class="nav-item">
   <a
     class="nav-link site-link {route === '/(main)' ? 'active' : ''}"
+    id="mainPageLink"
     data-bs-toggle="tooltip"
     data-bs-delay="200"
     data-bs-placement="bottom"
@@ -29,6 +42,7 @@
 <li class="nav-item">
   <a
     class="nav-link site-link {route === '/(main)/poll' ? 'active' : ''}"
+    id="pollPageLink"
     data-bs-toggle="tooltip"
     data-bs-delay="200"
     data-bs-placement="bottom"
@@ -43,6 +57,7 @@
 <li class="nav-item">
   <a
     class="nav-link site-link {route?.startsWith('/(main)/games') ? 'active' : ''}"
+    id="gamesPageLink"
     data-bs-toggle="tooltip"
     data-bs-delay="200"
     data-bs-placement="bottom"
@@ -57,6 +72,7 @@
 <li class="nav-item">
   <a
     class="nav-link site-link {route === '/(main)/raffles' ? 'active' : ''}"
+    id="rafflesPageLink"
     data-bs-toggle="tooltip"
     data-bs-delay="200"
     data-bs-placement="bottom"
@@ -71,6 +87,7 @@
 <li class="nav-item">
   <a
     class="nav-link site-link {route === '/(main)/blt' ? 'active' : ''}"
+    id="bltPageLink"
     data-bs-toggle="tooltip"
     data-bs-delay="200"
     data-bs-placement="bottom"
@@ -85,6 +102,7 @@
 <li class="nav-item">
   <a
     class="nav-link site-link {route === '/(main)/playlist' ? 'active' : ''}"
+    id="playlistPageLink"
     data-bs-toggle="tooltip"
     data-bs-delay="200"
     data-bs-placement="bottom"

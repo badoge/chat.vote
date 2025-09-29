@@ -1,6 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import MdiTwitch from "~icons/mdi/twitch";
+  import { CLIENT_ID } from "$lib/consts";
 
   onMount(() => {
     localStorage.setItem("loginStatus", "login_prompted");
@@ -11,6 +12,11 @@
       localStorage.setItem("USER_TEMP", JSON.stringify({}));
     }; //onbeforeunload
   });
+
+  let redirect_uri = "http://localhost:5173/super_long_url_to_hide_access_token__if_you_see_this_on_stream_then_the_streamer_you_are_watching_is_very_stupid";
+  //let redirect_uri="https://beta.chat.vote/super_long_url_to_hide_access_token__if_you_see_this_on_stream_then_the_streamer_you_are_watching_is_very_stupid"
+
+  let scopes = "";
 </script>
 
 <svelte:head>
@@ -26,10 +32,7 @@
         Don't show this on stream
       </div>
       <br />
-      <a
-        class="btn btn-twitch"
-        href="https://id.twitch.tv/oauth2/authorize?client_id=qn0wimnszbqlwfnszdz3wwfz430eqr&redirect_uri=https://beta.chat.vote/super_long_url_to_hide_access_token__if_you_see_this_on_stream_then_the_streamer_you_are_watching_is_very_stupid&response_type=token"
-      >
+      <a class="btn btn-twitch" href="https://id.twitch.tv/oauth2/authorize?client_id={CLIENT_ID}&redirect_uri={redirect_uri}&response_type=token{scopes}">
         <MdiTwitch /> Sign in with Twitch
       </a>
       <br />

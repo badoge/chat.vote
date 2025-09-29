@@ -56,6 +56,7 @@
   import MdiSpotify from "~icons/mdi/spotify";
   import MdiVimeo from "~icons/mdi/vimeo";
   import IcBaselineTiktok from "~icons/ic/baseline-tiktok";
+  import HomepageLink from "$lib/HomepageLink.svelte";
 
   import { convertTwitchVODDuration, enableTooltips, escapeString, formatViewCount, replacer, secondsToTimeString, showToast, timeStringToSeconds, timeToSeconds } from "$lib/functions";
   import { animate } from "animejs";
@@ -3939,9 +3940,7 @@
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLinks" aria-controls="navbarLinks" aria-expanded="false" aria-label="Toggle site links">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <a class="navbar-brand notranslate site-link" href="/home" target="_self" data-bs-toggle="tooltip" data-bs-delay="200" data-bs-placement="bottom" data-bs-title="Home page">
-      <img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" />
-    </a>
+    <HomepageLink />
     <a class="navbar-brand notranslate site-link" href="/playlist" target="_self"> chat.vote Playlist</a>
 
     <div class="collapse navbar-collapse" id="navbarLinks">
