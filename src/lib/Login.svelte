@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { donkStorage } from "$lib/donkStorage.svelte";
-  import { checkToken, get7TVPFP, getTwitchPFP } from "./functions";
+  import { checkToken, get7TVPFP, getTwitchPFP, getUserID } from "./functions";
   import MdiTwitch from "~icons/mdi/twitch";
   import IcBaselineLogout from "~icons/ic/baseline-logout";
   import { CLIENT_ID } from "$lib/consts";
@@ -20,6 +20,8 @@
   let chatStatus = $state({ emoji: "🔴", title: "Chat disconnected" });
 
   let pfpURL = $state("");
+
+  let channelInput = $state("");
 
   let bootstrap;
   let loginExpiredModal;
@@ -111,6 +113,34 @@
     client.connect().catch(console.error);
   } //connectIRC
 
+  async function manualConnect() {
+    let channel = channelInput.replace(/\s+/g, "").toLowerCase();
+    if (!channel) {
+      return;
+    }
+    loginStatus = "logged_in";
+    localStorage.setItem("loginStatus", "logged_in");
+    localStorage.setItem("USER_TEMP", JSON.stringify({}));
+
+    USER.channel = channel;
+    USER.twitchLogin = false;
+    USER.access_token = "";
+    USER.userID = await getUserID(channel);
+    USER.platform = "twitch";
+    localStorage.setItem("USER_TEMP", JSON.stringify({}));
+    connectIRC();
+    loadPFP();
+  } //manualConnect
+
+  /**
+   * @param {{ key: string; }} event
+   */
+  function handleKeydown(event) {
+    if (event.key === "Enter") {
+      manualConnect();
+    }
+  } //manualConnect
+
   async function loadPFP() {
     pfpURL = await get7TVPFP(USER.userID);
     if (pfpURL == "/pics/donk.png" && USER.access_token) {
@@ -198,11 +228,11 @@
         <label for="channelName" class="form-label">Connect to chat directly</label>
         <div class="input-group">
           <span class="input-group-text" id="directLoginChannel">twitch.tv/</span>
-          <input type="text" class="form-control" id="channelName" placeholder="Username" value={USER?.channel || ""} aria-describedby="directLoginChannel" />
+          <input type="text" class="form-control" id="channelName" placeholder="Username" bind:value={channelInput} onkeydown={handleKeydown} aria-describedby="directLoginChannel" />
         </div>
         <small class="text-body-secondary">Some features will be unavailable if you connect directly</small>
         <br />
-        <button type="button" onclick={connect} class="btn btn-primary float-end mb-3">Connect</button>
+        <button type="button" onclick={manualConnect} class="btn btn-primary float-end mb-3">Connect</button>
       </div>
     </div>
   </div>

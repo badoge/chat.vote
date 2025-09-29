@@ -318,6 +318,11 @@ export function showToast(msg, type, timeout) {
   }, timeout);
 } //showToast
 
+/**
+ * @param {any} username
+ * @description gets the twitch user id from a twitch login name - returns empty string if user is not found
+ * @returns {Promise<string>} twitch user id
+ */
 export async function getUserID(username) {
   try {
     let response = await fetch(`https://helper.donk.workers.dev/twitch/users?login=${username}`);
