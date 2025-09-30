@@ -2,7 +2,7 @@
   import NavbarLinks from "$lib/NavbarLinks.svelte";
   import ThemeSwitcher from "$lib/ThemeSwitcher.svelte";
   import Login from "$lib/Login.svelte";
-  import { changeSiteLinkTarget, enablePopovers, enableTooltips, escapeString, showToast } from "$lib/functions";
+  import { changeSiteLinkTarget, enablePopovers, enableTooltips, escapeString } from "$lib/functions";
   import { onMount } from "svelte";
   import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
   import IcBaselineVisibility from "~icons/ic/baseline-visibility";
@@ -16,6 +16,7 @@
   import IcBaselineHowToVote from "~icons/ic/baseline-how-to-vote";
   import IcBaselineCreate from "~icons/ic/baseline-create";
   import HomepageLink from "$lib/HomepageLink.svelte";
+  import { showToast } from "../+layout.svelte";
 
   let elements;
   let bootstrap;
@@ -360,7 +361,7 @@
 
   async function createPoll() {
     if (checkEmpty()) {
-      showToast("No poll options added", "warning", 3000);
+      showToast(bootstrap, "No poll options added", "warning", 3000);
       return;
     }
 
@@ -369,7 +370,7 @@
     }
 
     if (checkSize()) {
-      showToast("Too many poll options", "danger", 3000);
+      showToast(bootstrap, "Too many poll options", "danger", 3000);
       return;
     }
 
@@ -427,7 +428,7 @@
     }
 
     if (pollOptionsArray.length < 2) {
-      showToast("You can't create a poll with less than 2 options", "warning", 3000);
+      showToast(bootstrap, "You can't create a poll with less than 2 options", "warning", 3000);
       return;
     }
 
@@ -665,7 +666,7 @@
       if (optionCards.length > 2) {
         optionCards[index].remove();
       } else {
-        showToast("You can't have less than 2 options", "danger", 3000);
+        showToast(bootstrap, "You can't have less than 2 options", "danger", 3000);
       }
     }
   } //deleteInput

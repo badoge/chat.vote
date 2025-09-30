@@ -20,7 +20,6 @@
     replaceEmotes,
     roundToTwo,
     sendData,
-    showToast,
     unescapeString,
   } from "$lib/functions";
   import { onMount } from "svelte";
@@ -57,6 +56,7 @@
   import Chart from "chart.js/auto";
   import { createGrid, themeQuartz, ModuleRegistry, AllCommunityModule } from "ag-grid-community";
   import { donkStorage, resetSettings } from "$lib/donkStorage.svelte";
+  import { showToast } from "./+layout.svelte";
 
   /**
    * @type {{ pollOption: any; settingsOffcanvas: any; enableVoting: any; enableSuggestions: any; randomOptionModal: any; timeOverModal: any; yesnoTimeOverModal: any; tieModal: any; randomYesnoModal: any; enableVotingDropdown: any; enableSuggestionsDropdown: any; tableTabButton: any; chartTabButton: any; yesnoTabButton: any; overlayTabButton: any; questionLabel: any; hideQuestion: any; voteWithNumbers: any; multiChoiceExample: any; voteWithText: any; sortChart: any; suggestionLimit: any; suggestionPrefix: any; suggestionsCommand: any; confettiLevel: any; linkPreviewThumbnailsEnabled: any; showChat: any; multiChoice: any; subMode: any; subOnlyAlert: any; restartYesno: any; pickRandom: any; hideScore: any; allowChange: any; suggestionLimitUser: any; timerValueMinutes: any; chartCanvas: any; refreshWarningEnabled: any; sortChartLabel: any; overlayLink: any; connectOverlayButton: any; voteHint: any; totalVotes: any; remove: any; randomOptionWinner: any; removeRandomWinner: any; tieModalText: any; coin: any; bttvGlobalEmotes: any; ffzGlobalEmotes: any; seventvGlobalEmotes: any; bttvChannelEmotes: any; ffzChannelEmotes: any; seventvChannelEmotes: any; yeaPic: any; nayPic: any; yeaCount: any; nayCount: any; yesnoTotalVotes: any; optionList: any; numberStats: any; json_selected: any; voters_selected: any; txt_selected: any; averageNumber: any; medianNumber: any; hideScoreIcon: any; chat: any; countdown: any; unpauseTimer: any; pauseTimer: any; stopTimer: any; yesnoTimeOverWinner: any; timeOverWinner: any; enableVotingText: any; enableSuggestionsText: any; generateOverlayButton: any; restartPoll?: HTMLElement | null; addOption?: HTMLElement | null; options?: HTMLElement | null; chatiframe?: HTMLElement | null; yesnoDiv?: HTMLElement | null; }}
@@ -579,7 +579,7 @@
   function resetPoll() {
     if (yesNoMode) {
       restartPoll();
-      showToast("YEA/NAY mode options can't be removed", "warning", 2000);
+      showToast(bootstrap, "YEA/NAY mode options can't be removed", "warning", 2000);
       return;
     }
 
@@ -620,7 +620,7 @@
       return;
     }
     if (yesNoMode) {
-      showToast(`This feature is unavailable while <img src="/pics/yeanay.webp" alt="yea nay" style="height:1.5em;" />Mode is on`, "primary", 5000);
+      showToast(bootstrap, `This feature is unavailable while <img src="/pics/yeanay.webp" alt="yea nay" style="height:1.5em;" />Mode is on`, "primary", 5000);
       return;
     }
     // sendData("chat.vote", USER.value.channel, USER.value.platform == "twitch" ? `twitch - ${USER.value.twitchLogin}` : "youtube", {
@@ -689,7 +689,7 @@
       return;
     }
     if (yesNoMode) {
-      showToast(`This feature is unavailable while <img src="/pics/yeanay.webp" alt="yea nay" style="height:1.5em;" />Mode is on`, "primary", 5000);
+      showToast(bootstrap, `This feature is unavailable while <img src="/pics/yeanay.webp" alt="yea nay" style="height:1.5em;" />Mode is on`, "primary", 5000);
       return;
     }
     // sendData("chat.vote", USER.value.channel, USER.value.platform == "twitch" ? `twitch - ${USER.value.twitchLogin}` : "youtube", {
@@ -1014,7 +1014,7 @@
       }
 
       if (suggestionLimitReached) {
-        showToast("Viewer suggestion limit reached", "warning", 5000);
+        showToast(bootstrap, "Viewer suggestion limit reached", "warning", 5000);
         disableSuggestButton();
         return;
       }
@@ -1116,7 +1116,7 @@
     //       .draw();
     //     vote_results.splice(i, 1);
     //     updateChart();
-    //     showToast(`Removed ${username}'s suggestions because they got timed out`, "warning", 2000);
+    //     showToast(bootstrap,`Removed ${username}'s suggestions because they got timed out`, "warning", 2000);
     //     numberOfSuggestions--;
     //   }
     // }
@@ -1194,7 +1194,7 @@
       return true;
     }
     if (!vote_results[0]) {
-      showToast("Poll is empty", "warning", 2000);
+      showToast(bootstrap, "Poll is empty", "warning", 2000);
       return false;
     }
 
@@ -1227,7 +1227,7 @@
       updateChart();
       elements.pollOption.value = "";
     } else {
-      showToast("Duplicate/invalid input", "warning", 5000);
+      showToast(bootstrap, "Duplicate/invalid input", "warning", 5000);
       elements.pollOption.value = "";
     }
   } //addOption
@@ -1238,7 +1238,7 @@
     }
 
     if (yesNoMode) {
-      showToast(`This feature is unavailable while <img src="/pics/yeanay.webp" alt="yeanay" style="height:1.5em;" />Mode is on`, "primary", 5000);
+      showToast(bootstrap, `This feature is unavailable while <img src="/pics/yeanay.webp" alt="yeanay" style="height:1.5em;" />Mode is on`, "primary", 5000);
       return;
     }
     let og = elements.optionList.value.split(/\r?\n/);
@@ -1267,7 +1267,7 @@
         pushVoteResults(oid, f2[i], replaceEmotes(f2[i], thirdPartyEmotes), USER.value.channel, 0, null);
         updateChart();
       } else {
-        showToast("Some of the entered options were duplicate/invalid", "warning", 5000);
+        showToast(bootstrap, "Some of the entered options were duplicate/invalid", "warning", 5000);
       }
     }
   } //addOptionBulk
@@ -1376,7 +1376,7 @@
 
   function download() {
     if (yesNoMode) {
-      showToast("Export Data does not support Yea/Nay mode for now :(", "danger", 2000);
+      showToast(bootstrap, "Export Data does not support Yea/Nay mode for now :(", "danger", 2000);
       return;
     }
     if (!checkLogin() || !checkEmpty()) {
@@ -1611,7 +1611,7 @@
 
   //     if (cellid[4] > 0) {
   //       restartPoll();
-  //       showToast(`Poll restarted`, "warning", 3000);
+  //       showToast(bootstrap,`Poll restarted`, "warning", 3000);
   //     }
 
   //     updateChart();
@@ -1853,7 +1853,7 @@
       let response = await fetch(`https://overlay.chat.vote/generate`, requestOptions);
       let result = await response.json();
       console.log(result);
-      showToast(result.message, "info", 3000);
+      showToast(bootstrap, result.message, "info", 3000);
       overlayID = result.data.id;
       elements.overlayLink.value = `https://chat.vote/overlay#${result.data.id}`;
       localStorage.setItem("OVERLAY", result.data.id);
@@ -1867,14 +1867,14 @@
   async function copyOverlayLink() {
     let link = elements.overlayLink.value;
     if (!link) {
-      showToast("Generate an overlay link first", "warning", 2000);
+      showToast(bootstrap, "Generate an overlay link first", "warning", 2000);
       return;
     }
     try {
       await navigator.clipboard.writeText(link);
-      showToast("Link copied :)", "success", 1000);
+      showToast(bootstrap, "Link copied :)", "success", 1000);
     } catch (error) {
-      showToast("Could not copy link :(", "danger", 1000);
+      showToast(bootstrap, "Could not copy link :(", "danger", 1000);
     }
   } //copyOverlayLink
 
@@ -1923,7 +1923,7 @@
 
         dataChannel.onopen = (event) => {
           console.log("datachannel open");
-          showToast("Overlay connected", "success", 1000);
+          showToast(bootstrap, "Overlay connected", "success", 1000);
           elements.connectOverlayButton.innerHTML = `<i class="material-icons notranslate">done</i>Overlay connected`;
           elements.connectOverlayButton.disabled = true;
           document.getElementById("overlayX").disabled = false;

@@ -58,22 +58,12 @@
   import IcBaselineTiktok from "~icons/ic/baseline-tiktok";
   import HomepageLink from "$lib/HomepageLink.svelte";
 
-  import {
-    convertTwitchVODDuration,
-    enablePopovers,
-    enableTooltips,
-    escapeString,
-    formatViewCount,
-    replacer,
-    secondsToTimeString,
-    showToast,
-    timeStringToSeconds,
-    timeToSeconds,
-  } from "$lib/functions";
+  import { convertTwitchVODDuration, enablePopovers, enableTooltips, escapeString, formatViewCount, replacer, secondsToTimeString, timeStringToSeconds, timeToSeconds } from "$lib/functions";
   import { animate } from "animejs";
   import { onMount } from "svelte";
   import localforage from "localforage";
   import { donkStorage } from "$lib/donkStorage.svelte";
+  import { showToast } from "../+layout.svelte";
 
   let elements;
   let bootstrap;
@@ -398,7 +388,7 @@
       PLAYLIST.value.maxUploadAge = "";
       elements.minUploadAge.value = "";
       elements.maxUploadAge.value = "";
-      showToast("Limits can't be the same", "warning", 3000);
+      showToast(bootstrap, "Limits can't be the same", "warning", 3000);
     }
 
     if (min > 0 && max > 0 && min > max) {
@@ -406,7 +396,7 @@
       PLAYLIST.value.maxUploadAge = "";
       elements.minUploadAge.value = "";
       elements.maxUploadAge.value = "";
-      showToast("Older than limit must be less than the Newer than limit", "warning", 5000);
+      showToast(bootstrap, "Older than limit must be less than the Newer than limit", "warning", 5000);
     }
 
     if (PLAYLIST.value.minUploadAge && PLAYLIST.value.maxUploadAge) {
@@ -1094,7 +1084,7 @@
     }
 
     if (!request) {
-      showToast("Could not ban user", "danger", 2000);
+      showToast(bootstrap, "Could not ban user", "danger", 2000);
       return;
     }
 
@@ -1103,9 +1093,9 @@
       //check if user is already banned before adding them to the list
       if (!bannedUsers.get(request.by[index].id)) {
         bannedUsers.set(request.by[index].id, request.by[index].username);
-        showToast(`${request.by[index].username} is now banned`, "success", 2000);
+        showToast(bootstrap, `${request.by[index].username} is now banned`, "success", 2000);
       } else {
-        showToast(`${request.by[index].username} is already banned`, "warning", 2000);
+        showToast(bootstrap, `${request.by[index].username} is already banned`, "warning", 2000);
       }
     }
 
@@ -1141,16 +1131,16 @@
       request = requests.get(requestName);
     }
     if (!request) {
-      showToast("Could not ban video/song", "danger", 2000);
+      showToast(bootstrap, "Could not ban video/song", "danger", 2000);
       return;
     }
 
     //check if item is already banned before adding it to the list
     if (!bannedItems.get(requestName)) {
       bannedItems.set(requestName, request);
-      showToast(`${request.platform == "spotify" ? "Song" : "Video"} is now banned`, "success", 2000);
+      showToast(bootstrap, `${request.platform == "spotify" ? "Song" : "Video"} is now banned`, "success", 2000);
     } else {
-      showToast(`${request.platform == "spotify" ? "Song" : "Video"} is already banned`, "warning", 2000);
+      showToast(bootstrap, `${request.platform == "spotify" ? "Song" : "Video"} is already banned`, "warning", 2000);
     }
 
     if (bannedFromHistory) {
@@ -1169,7 +1159,7 @@
       if (i > -1) {
         //check if request has a channel listed
         if (!history[i].channelid) {
-          showToast("Item has no channel/artist", "danger", 2000);
+          showToast(bootstrap, "Item has no channel/artist", "danger", 2000);
           return;
         }
         channelid = history[i].channelid;
@@ -1177,25 +1167,25 @@
         if (!bannedChannels.get(`${history[i].platform}:${history[i].channelid}`)) {
           bannedChannels.set(`${history[i].platform}:${history[i].channelid}`, history[i]);
         } else {
-          showToast(`${history[i].channel} is already banned`, "warning", 2000);
+          showToast(bootstrap, `${history[i].channel} is already banned`, "warning", 2000);
           return;
         }
       } else {
-        showToast("Could not ban channel/artist", "danger", 2000);
+        showToast(bootstrap, "Could not ban channel/artist", "danger", 2000);
         return;
       }
-      showToast(`${history[i].channel} is now banned`, "success", 2000);
+      showToast(bootstrap, `${history[i].channel} is now banned`, "success", 2000);
       saveSettings();
       loadBanLists();
     } else {
       let request = requests.get(requestName);
       if (!request) {
-        showToast("Could not ban channel/artist", "danger", 2000);
+        showToast(bootstrap, "Could not ban channel/artist", "danger", 2000);
         return;
       }
       //check if request has a channel listed
       if (!request.channelid) {
-        showToast("Item has no channel/artist", "danger", 2000);
+        showToast(bootstrap, "Item has no channel/artist", "danger", 2000);
         return;
       }
       channelid = request.channelid;
@@ -1203,10 +1193,10 @@
       if (!bannedChannels.get(`${request.platform}:${request.channelid}`)) {
         bannedChannels.set(`${request.platform}:${request.channelid}`, request);
       } else {
-        showToast(`${request.channel} is already banned`, "warning", 2000);
+        showToast(bootstrap, `${request.channel} is already banned`, "warning", 2000);
         return;
       }
-      showToast(`${request.channel} is now banned`, "success", 2000);
+      showToast(bootstrap, `${request.channel} is now banned`, "success", 2000);
       deleteRequest(requestName, false);
     }
 
@@ -1221,7 +1211,7 @@
   function unbanUser(userid) {
     //check if user is actually banned
     if (!bannedUsers.get(userid)) {
-      showToast("That user is not banned", "warning", 2000);
+      showToast(bootstrap, "That user is not banned", "warning", 2000);
       return;
     }
     bannedUsers.delete(userid);
@@ -1232,7 +1222,7 @@
   function unbanItem(item) {
     //check if item is actually banned
     if (!bannedItems.get(item)) {
-      showToast("That video/song is not banned", "warning", 2000);
+      showToast(bootstrap, "That video/song is not banned", "warning", 2000);
       return;
     }
     bannedItems.delete(item);
@@ -1243,7 +1233,7 @@
   function unbanChannel(channel) {
     //check if channel is actually banned
     if (!bannedChannels.get(channel)) {
-      showToast("That channel/artist is not banned", "warning", 2000);
+      showToast(bootstrap, "That channel/artist is not banned", "warning", 2000);
       return;
     }
     bannedChannels.delete(channel);
@@ -2208,12 +2198,12 @@
 
     let link = await parseLink(request);
     if (!link) {
-      showToast("Could not parse your request", "warning", 3000);
+      showToast(bootstrap, "Could not parse your request", "warning", 3000);
       elements.link.value = "";
       return;
     }
     if (!linkTypeAllowed(link.type)) {
-      showToast(`${link.type} links are not enabled`, "warning", 3000);
+      showToast(bootstrap, `${link.type} links are not enabled`, "warning", 3000);
       elements.link.value = "";
       return;
     }
@@ -2446,7 +2436,7 @@
 
   function favorite() {
     if (!currentItem?.name) {
-      showToast("Nothing is playing right now", "danger", 3000);
+      showToast(bootstrap, "Nothing is playing right now", "danger", 3000);
       return;
     }
     if (favorites.includes(currentItem.name)) {
@@ -2479,12 +2469,12 @@
 
   function downloadFavorites(format) {
     if (history.length == 0) {
-      showToast("Favorite downloading disabled because history was cleared", "danger", 3000);
+      showToast(bootstrap, "Favorite downloading disabled because history was cleared", "danger", 3000);
       return;
     }
 
     if (history.length == 0 || favorites.length == 0) {
-      showToast("There is nothing to download", "danger", 3000);
+      showToast(bootstrap, "There is nothing to download", "danger", 3000);
       return;
     }
 
@@ -2509,7 +2499,7 @@
       }
 
       if (cleanFavorites.length !== favorites.length) {
-        showToast("Some favorites are missing from the history", "warning", 3000);
+        showToast(bootstrap, "Some favorites are missing from the history", "warning", 3000);
       }
 
       const blob = new Blob([JSON.stringify(cleanFavorites)], { type: "text/json" });
@@ -2545,7 +2535,7 @@
       }
 
       if (cleanFavorites.length !== favorites.length) {
-        showToast("Some favorites are missing from the history", "warning", 3000);
+        showToast(bootstrap, "Some favorites are missing from the history", "warning", 3000);
       }
 
       const keys = Object.keys(cleanFavorites[0]);
@@ -2564,13 +2554,13 @@
       link.dispatchEvent(event);
       link.remove();
     } else {
-      showToast("Something went wrong :(", "danger", 2000);
+      showToast(bootstrap, "Something went wrong :(", "danger", 2000);
     }
   } //downloadFavorites
 
   function downloadHistory(format) {
     if (history.length == 0) {
-      showToast("There is nothing to download", "danger", 3000);
+      showToast(bootstrap, "There is nothing to download", "danger", 3000);
       return;
     }
 
@@ -2635,7 +2625,7 @@
       link.dispatchEvent(event);
       link.remove();
     } else {
-      showToast("Something went wrong :(", "danger", 2000);
+      showToast(bootstrap, "Something went wrong :(", "danger", 2000);
     }
   } //downloadHistory
 
@@ -2714,7 +2704,7 @@
   let botCooldown = Date.now();
   async function botReply(msg, id, followCooldown) {
     if (id == "toast") {
-      showToast(msg, "info", 2000);
+      showToast(bootstrap, msg, "info", 2000);
       return;
     }
 
@@ -2747,7 +2737,7 @@
         elements.enableBot.checked = false;
         saveSettings();
         let text = await response.text();
-        showToast(`Bot unable to send messages "${text}"... Disabling bot setting`, "danger", 4000);
+        showToast(bootstrap, `Bot unable to send messages "${text}"... Disabling bot setting`, "danger", 4000);
         console.log(`botReply response: 418 ${text}`);
         return;
       }
@@ -2882,7 +2872,7 @@
     }
 
     if (warn) {
-      showToast("Commands must be unique", "warning", 2000);
+      showToast(bootstrap, "Commands must be unique", "warning", 2000);
     }
   } //checkCommands
 

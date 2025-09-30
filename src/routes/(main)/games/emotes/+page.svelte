@@ -1,5 +1,7 @@
 <script>
   import { enablePopovers, enableTooltips } from "$lib/functions";
+  import { showToast } from "../../+layout.svelte";
+
   import { onMount } from "svelte";
   import { animate } from "animejs";
   import IcBaselineDone from "~icons/ic/baseline-done";
@@ -272,7 +274,7 @@
       clearInterval(EMOTEBENCHMARK.interval);
       EMOTEBENCHMARK.interval = null;
       EMOTEBENCHMARK.turn = 0;
-      showToast("Not enough emotes remaining.", "warning", 5000);
+      showToast(bootstrap, "Not enough emotes remaining.", "warning", 5000);
       settingsOffcanvas.show();
       elements.start.disabled = false;
       return;

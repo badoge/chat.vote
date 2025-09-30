@@ -1,5 +1,7 @@
 <script>
-  import { enableTooltips, showToast } from "$lib/functions.js";
+  import { enableTooltips } from "$lib/functions.js";
+  import { showToast } from "../../+layout.svelte";
+
   import { onMount } from "svelte";
 
   let bootstrap;
@@ -16,7 +18,7 @@
    */
   function copyCommand(command) {
     navigator.clipboard.writeText(command);
-    showToast("Command copied :)", "info", 1000);
+    showToast(bootstrap, "Command copied :)", "info", 1000);
   } //copyLink
 
   /**

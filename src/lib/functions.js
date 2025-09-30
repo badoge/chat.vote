@@ -297,30 +297,6 @@ export async function getChannel7TVEmotes(userID, largeEmotes = false) {
   }
 } //getChannel7TVEmotes
 
-export function showToast(msg, type, timeout) {
-  let id = Date.now();
-  let toast = `<div id="${id}" class="toast align-items-center text-bg-${type} border-0" role="alert" data-bs-autohide="false" aria-live="assertive" aria-atomic="true">
-      <div class="d-flex">
-      <div class="toast-body" style="font-size:1.2em">${msg}</div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-      </div>`;
-  elements.toastContainer.innerHTML += toast;
-  let toastElList = [].slice.call(document.querySelectorAll(".toast"));
-  let toastList = toastElList.map(function (toastEl) {
-    return new bootstrap.Toast(toastEl, {
-      animation: false,
-      autohide: false,
-    });
-  });
-  toastList[toastList.length - 1].show();
-  //dismiss this way bcz built in dismiss wont work if there are multiple toasts FeelsDankMan
-  setTimeout(function () {
-    toastList[toastList.length - 1].hide();
-    document.getElementById(id).remove();
-  }, timeout);
-} //showToast
-
 /**
  * @param {any} username
  * @description gets the twitch user id from a twitch login name - returns empty string if user is not found

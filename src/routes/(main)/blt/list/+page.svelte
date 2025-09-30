@@ -1,5 +1,7 @@
 <script>
   import { onMount } from "svelte";
+  import { showToast } from "../../+layout.svelte";
+
   let elements;
   let bootstrap;
   onMount(async () => {
@@ -63,7 +65,7 @@
       elements.optionsModalBody.innerHTML = html;
       optionsModal.show();
     } else {
-      showToast("bracket not found", "danger", 3000);
+      showToast(bootstrap, "bracket not found", "danger", 3000);
     }
   } //showOptions
 
@@ -83,11 +85,11 @@
     try {
       let response = await fetch(`https://blt.donk.workers.dev/blacklist`, requestOptions);
       let result = await response.json();
-      showToast(result.message, "info", 3000);
+      showToast(bootstrap, result.message, "info", 3000);
       blacklistModal.hide();
       loadList();
     } catch (error) {
-      showToast("Could not blacklist bracket", "danger", 3000);
+      showToast(bootstrap, "Could not blacklist bracket", "danger", 3000);
       console.log("blacklistSubmit error", error);
     }
   } //blacklistSubmit
@@ -107,10 +109,10 @@
     try {
       let response = await fetch(`https://blt.donk.workers.dev/unblacklist`, requestOptions);
       let result = await response.json();
-      showToast(result.message, "info", 3000);
+      showToast(bootstrap, result.message, "info", 3000);
       loadList();
     } catch (error) {
-      showToast("Could not unblacklist bracket", "danger", 3000);
+      showToast(bootstrap, "Could not unblacklist bracket", "danger", 3000);
       console.log("unblacklist error", error);
     }
   } //unblacklist
@@ -181,7 +183,7 @@
       elements.list.innerHTML = list;
       elements.blacklisted.innerHTML = blacklisted;
     } catch (error) {
-      showToast("Could not load list", "danger", 3000);
+      showToast(bootstrap, "Could not load list", "danger", 3000);
       console.log(error);
     }
   } //loadList

@@ -1,6 +1,8 @@
 <script>
   import { enablePopovers, enableTooltips } from "$lib/functions";
   import { onMount } from "svelte";
+  import { showToast } from "../../+layout.svelte";
+
   import IcBaselineRefresh from "~icons/ic/baseline-refresh";
   import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
   import IcBaselineVisibility from "~icons/ic/baseline-visibility";
@@ -157,7 +159,7 @@
                 if (ableToMoveCount < 1)
                   setTimeout(() => {
                     //wrap into arrow func to render new DOM
-                    showToast("Hunters have no valid moves! Skipping turn.", "warning", 3000);
+                    showToast(bootstrap, "Hunters have no valid moves! Skipping turn.", "warning", 3000);
                     DONKHUNT.functions.turn(1);
                   }, 50);
                 break;
@@ -251,7 +253,7 @@
                 }
               } else {
                 console.warn("Bot: Hunters cannot move!");
-                showToast("Hunters have no valid moves - they skip their turn.", "warning", 3000);
+                showToast(bootstrap, "Hunters have no valid moves - they skip their turn.", "warning", 3000);
               }
               break;
             case "target":
@@ -345,7 +347,7 @@
               if (movableCount < 1) {
                 setTimeout(() => {
                   //wrap into arrow func to render new DOM
-                  showToast("Hunters have no valid moves! Skipping turn.", "warning", 3000);
+                  showToast(bootstrap, "Hunters have no valid moves! Skipping turn.", "warning", 3000);
                   DONKHUNT.functions.turn(1);
                 }, 50);
               }

@@ -35,9 +35,9 @@
     getLinkInfo,
     linkifyElementID,
     replaceEmotes,
-    showToast,
   } from "$lib/functions";
   import { onMount } from "svelte";
+  import { showToast } from "../+layout.svelte";
 
   import { donkStorage } from "$lib/donkStorage.svelte";
   import HomepageLink from "$lib/HomepageLink.svelte";
@@ -622,7 +622,7 @@
 
   async function drawRaffleWinner() {
     if (raffle_users.length < 1) {
-      showToast("No one has joined the raffle", "warning", 2500);
+      showToast(bootstrap, "No one has joined the raffle", "warning", 2500);
       return;
     }
     if (RAFFLES.value.animateDrawing) {
@@ -1037,7 +1037,7 @@
         elements.confirmJoin.checked = false;
         saveSettings();
         let text = await response.text();
-        showToast(`Bot unable to send messages "${text}"... Disabling bot settings`, "danger", 4000);
+        showToast(bootstrap, `Bot unable to send messages "${text}"... Disabling bot settings`, "danger", 4000);
         console.log(`botSay response: 418 ${text}`);
         return;
       }
@@ -1102,7 +1102,7 @@
       !RAFFLES.value.allowVips &&
       !RAFFLES.value.allowFirstTimeChatters
     ) {
-      showToast("No one will be able to join the raffle", "danger", 3000);
+      showToast(bootstrap, "No one will be able to join the raffle", "danger", 3000);
       settingsOffcanvas.show();
       elements.whoCanJoinCard.scrollIntoView();
       let flashBorder = setInterval(() => {

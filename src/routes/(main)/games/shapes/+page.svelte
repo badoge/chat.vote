@@ -1,5 +1,6 @@
 <script>
   import { enablePopovers, enableTooltips } from "$lib/functions";
+  import { showToast } from "../../+layout.svelte";
 
   let voters = [];
 
@@ -233,7 +234,7 @@
         updateGraph();
         SHAPES.shapesGame.lives -= 1;
         SHAPES.shapesGame.choices[selected].isKnownToBeIncorrect(true);
-        showToast("Incorrect choice!", "danger", 3000);
+        showToast(bootstrap, "Incorrect choice!", "danger", 3000);
 
         if (SHAPES.shapesGame.lives < 1) {
           endGame(false);

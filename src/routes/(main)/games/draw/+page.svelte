@@ -1,5 +1,6 @@
 <script>
   import IcBaselineSettings from "~icons/ic/baseline-settings";
+  import { showToast } from "../../+layout.svelte";
 
   import IcBaselineTimer from "~icons/ic/baseline-timer";
   import IcBaselineUndo from "~icons/ic/baseline-undo";
@@ -298,7 +299,7 @@
       selectedemotes = selectedemotes.filter((list) => list.name !== element);
     });
     if (selectedemotes.length < 2) {
-      showToast(`Not enough emotes selected`, "warning", 3000);
+      showToast(bootstrap, `Not enough emotes selected`, "warning", 3000);
       settingsOffcanvas.show();
       return;
     }
@@ -328,7 +329,7 @@
 
   function correct(user) {
     if (DRAW.correctUsers >= DRAW.points) {
-      showToast(`No more points left; starting new round`, "warning", 3000);
+      showToast(bootstrap, `No more points left; starting new round`, "warning", 3000);
       start();
       return;
     }
