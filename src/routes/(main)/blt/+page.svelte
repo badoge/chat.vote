@@ -32,7 +32,7 @@
   import IcBaselineChat from "~icons/ic/baseline-chat";
 
   import { addBadges, changeSiteLinkTarget, enablePopovers, enableTooltips, escapeString, getUserID, ISO8601ToSeconds } from "$lib/functions";
-  import { showToast } from "./+layout.svelte";
+  import { showToast } from "../+layout.svelte";
 
   import localforage from "localforage";
 
