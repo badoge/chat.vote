@@ -1,6 +1,6 @@
 <script>
   import { onMount } from "svelte";
-  import { showToast } from "../+layout.svelte";
+  import { showToast } from "../../+layout.svelte";
 
   let elements;
   let html;
