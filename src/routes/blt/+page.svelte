@@ -45,12 +45,10 @@
     elements = {
       //modals
 
-      tierlistEditorModal: document.getElementById("tierlistEditorModal"),
       tierlistEditor: document.getElementById("tierlistEditor"),
 
       previewModal: document.getElementById("previewModal"),
       previewModalBody: document.getElementById("previewModalBody"),
-      generateChatModal: document.getElementById("generateChatModal"),
       playlist: document.getElementById("playlist"),
       generateModal: document.getElementById("generateModal"),
       generateBracketType: document.getElementById("generateBracketType"),
@@ -62,7 +60,6 @@
       ytchannelSettings: document.getElementById("ytchannelSettings"),
       ytplaylistSettings: document.getElementById("ytplaylistSettings"),
 
-      publishedModal: document.getElementById("publishedModal"),
       bracketCode: document.getElementById("bracketCode"),
       bracketLink: document.getElementById("bracketLink"),
 
@@ -81,15 +78,11 @@
       ytplaylistLink: document.getElementById("ytplaylistLink"),
       ytplaylistPreview: document.getElementById("ytplaylistPreview"),
 
-      communityModal: document.getElementById("communityModal"),
       communityModalBody: document.getElementById("communityModalBody"),
       shareCode: document.getElementById("shareCode"),
-      importModal: document.getElementById("importModal"),
       importModalBody: document.getElementById("importModalBody"),
-      myBracketsModal: document.getElementById("myBracketsModal"),
       myBracketsModalBody: document.getElementById("myBracketsModalBody"),
 
-      startModal: document.getElementById("startModal"),
       formatSelect: document.getElementById("formatSelect"),
       optionLimit: document.getElementById("optionLimit"),
       bracketSettings: document.querySelectorAll(".bracketSettings"),
@@ -103,8 +96,6 @@
       disableAnimations: document.getElementById("disableAnimations"),
       disableAnimationsCopy: document.getElementById("disableAnimationsCopy"),
       spotifyWarning: document.getElementById("spotifyWarning"),
-
-      startTriviaModal: document.getElementById("startTriviaModal"),
 
       myBrackets: document.getElementById("myBrackets"),
       myTrivia: document.getElementById("myTrivia"),
@@ -265,27 +256,11 @@
     votePopover = new bootstrap.Popover(elements.enableVoting);
     votePopoverTierlist = new bootstrap.Popover(elements.enableVotingTierlist);
 
-    loginButtonPopover = new bootstrap.Popover(document.getElementById("loginButtonSpan"));
-
-    tierlistEditorModal = new bootstrap.Modal(elements.tierlistEditorModal);
-    previewModal = new bootstrap.Modal(elements.previewModal);
-    generateChatModal = new bootstrap.Modal(elements.generateChatModal);
-    generateModal = new bootstrap.Modal(elements.generateModal);
-    communityModal = new bootstrap.Modal(elements.communityModal);
-    startModal = new bootstrap.Modal(elements.startModal);
-    startTriviaModal = new bootstrap.Modal(elements.startTriviaModal);
-    publishedModal = new bootstrap.Modal(elements.publishedModal);
-    importModal = new bootstrap.Modal(elements.importModal);
-
-    elements.tierlistEditorModal.addEventListener("show.bs.modal", (event) => {
-      loadTierlistEditor();
-    });
-
-    elements.previewModal.addEventListener("hidden.bs.modal", (event) => {
+    elements.previewModal.addEventListener("close", (event) => {
       elements.previewModalBody.innerHTML = "";
     });
 
-    elements.generateModal.addEventListener("hidden.bs.modal", (event) => {
+    elements.generateModal.addEventListener("close", (event) => {
       previewedBracket = [];
       previewedBracketDescription = "";
       previewedBracketTitle = "";
@@ -403,7 +378,8 @@
       for (let element of document.getElementsByClassName("generate-preview")) {
         element.innerHTML = "";
       }
-      generateModal.show();
+      createBracketModal.close();
+      generateModal.showModal();
     });
 
     elements.addBracketOption.addEventListener("click", function () {
@@ -453,9 +429,7 @@
     streamable: `<i class="material-icons notranslate">play_arrow</i>`,
   };
   const spotifyURLRegex = /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:(album|track|playlist|episode)\/|\?uri=spotify:track:)((\w|-){22})/;
-  let loginButtonPopover;
 
-  let tierlistEditorModal, previewModal, generateChatModal, generateModal, communityModal, startModal, startTriviaModal, publishedModal, importModal;
   let votePopover, votePopoverTierlist;
   let currentBracket = {};
   let currentTierlist = {};
@@ -473,17 +447,6 @@
   let TRIVIA = {
     trivia: [],
   };
-
-  function checkLogin() {
-    if (!USER.value.channel) {
-      loginButtonPopover.show();
-      setTimeout(function () {
-        loginButtonPopover.hide();
-      }, 4000);
-      return false;
-    }
-    return true;
-  } //checkLogin
 
   function resetSettings() {
     logout();
@@ -890,7 +853,7 @@
     ${escapeString(option?.value) || `<span class="text-body-secondary">Empty option</span>`}
     </div>
     </div>`;
-      previewModal.show();
+      previewModal.showModal();
     } //text
 
     if (type.value == "image") {
@@ -906,7 +869,7 @@
     <img src="https://proxy.donk.workers.dev/?url=${encodeURI(option.value)}" alt="${name.value}" title="${name.value}" class="option-image">
     </div>
     </div>`;
-      previewModal.show();
+      previewModal.showModal();
     } //image
 
     if (link?.type == "youtube") {
@@ -927,7 +890,7 @@
     </iframe>
     </div>
     </div>`;
-      previewModal.show();
+      previewModal.showModal();
     } //youtube
 
     if (link?.type == "twitch") {
@@ -949,7 +912,7 @@
       </iframe>
       </div>
       </div>`;
-      previewModal.show();
+      previewModal.showModal();
     } //twitch
 
     if (link?.type == "spotify") {
@@ -968,7 +931,7 @@
       </iframe>
       </div>
       </div>`;
-      previewModal.show();
+      previewModal.showModal();
     } //spotify
 
     if (link?.type == "streamable") {
@@ -983,7 +946,7 @@
       <video src="${link.video}" controls autoplay height="480" width="100%"></video>
       </div>
       </div>`;
-      previewModal.show();
+      previewModal.showModal();
     } else {
       option.dataset.video = "";
     } //streamable
@@ -1020,7 +983,7 @@
     ${escapeString(question?.value) || `<span class="text-body-secondary">Empty question</span>`}
     </div>
     </div>`;
-      previewModal.show();
+      previewModal.showModal();
     } //text
 
     if (questionType.value == "image") {
@@ -1036,7 +999,7 @@
     <img src="https://proxy.donk.workers.dev/?url=${encodeURI(questionMedia.value)}" alt="${question.value}" title="${question.value}" class="option-image">
     </div>
     </div>`;
-      previewModal.show();
+      previewModal.showModal();
     } //image
 
     if (link?.type == "youtube") {
@@ -1052,7 +1015,7 @@
     </iframe>
     </div>
     </div>`;
-      previewModal.show();
+      previewModal.showModal();
     } //youtube
 
     if (link?.type == "twitch") {
@@ -1069,7 +1032,7 @@
       </iframe>
       </div>
       </div>`;
-      previewModal.show();
+      previewModal.showModal();
     } //twitch
 
     if (link?.type == "spotify") {
@@ -1083,7 +1046,7 @@
       </iframe>
       </div>
       </div>`;
-      previewModal.show();
+      previewModal.showModal();
     } //spotify
 
     if (link?.type == "streamable") {
@@ -1096,7 +1059,7 @@
       <video src="${link.video}" controls autoplay height="480" width="100%"></video>
       </div>
       </div>`;
-      previewModal.show();
+      previewModal.showModal();
     } else {
       question.dataset.video = "";
     } //streamable
@@ -1427,7 +1390,7 @@
     } else {
       elements.spotifyWarning.style.display = "none";
     }
-    startModal.show();
+    startModal.showModal();
   } //showStartModal
 
   function showStartTriviaModal(id) {
@@ -1440,7 +1403,7 @@
     } else {
       elements.spotifyWarning.style.display = "none";
     }
-    startTriviaModal.show();
+    startTriviaModal.showModal();
   } //showStartTriviaModal
 
   function startBracket() {
@@ -3096,7 +3059,7 @@
     }
 
     saveBracket();
-    generateModal.hide();
+    generateModal.close();
   } //generateBracket
 
   async function publishBracket(id, e) {
@@ -3135,7 +3098,7 @@
         BRACKETS.brackets[bracketIndex].published = true;
         elements.bracketCode.innerHTML = result.id;
         elements.bracketLink.innerHTML = `https://chat.vote/blt#${result.id}`;
-        publishedModal.show();
+        publishedModal.showModal();
         saveSettings();
         loadBrackets();
       }
@@ -3161,8 +3124,8 @@
       return;
     }
     elements.shareCode.value = "";
-    communityModal.hide();
-    importModal.show();
+    communityModal.close();
+    importModal.showModal();
     try {
       let response = await fetch(`https://blt.donk.workers.dev/id/${code}`);
       if (response.status !== 200) {
@@ -3217,7 +3180,7 @@
       );
     }
     saveBracket();
-    importModal.hide();
+    importModal.close();
   } //importPreviewed
 
   async function importApproved(id) {
@@ -3235,7 +3198,7 @@
       );
     }
     saveBracket();
-    communityModal.hide();
+    communityModal.close();
   } //importApproved
 
   let chatBracket = [];
@@ -3311,7 +3274,7 @@
         Playlist has ${count} videos ${diff ? ` (${diff} unsupported/broken ${diff == 1 ? "video" : "videos"} skipped)` : ""}
         ${html}`;
 
-        communityModal.hide();
+        communityModal.close();
 
         console.log(playlist);
       }
@@ -3333,7 +3296,7 @@
     }
 
     saveBracket();
-    generateChatModal.hide();
+    generateChatModal.close();
   } //generateChatBracket
 
   function zoomCard(id) {
@@ -3722,583 +3685,639 @@
   <meta property="og:description" content="Brackets, (tier)Lists & Trivia" /></svelte:head
 >
 
-<div class="modal fade" id="tierlistEditorModal" tabindex="-1" data-bs-backdrop="false" aria-hidden="true">
-  <div class="modal-dialog modal-lg float-end border border-warning rounded-3" style="margin-top: 100px; margin-right: 300px">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Tierlist editor</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <button type="button" class="btn btn-success mb-3" onclick={addTier("name", "command", "#de0b0b")}>Add tier</button>
+<dialog id="tierlistEditorModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Tierlist editor</h3>
+    <button type="button" class="btn btn-success mb-3" onclick={() => addTier("name", "command", "#de0b0b")}>Add tier</button>
 
-        <div id="tierlistEditor"></div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
-      </div>
+    <div id="tierlistEditor"></div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-secondary">OK</button>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
-<div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Preview</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body text-center" id="previewModalBody"></div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
+<dialog id="previewModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Preview</h3>
+    <div class="text-center" id="previewModalBody"></div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-secondary">Close</button>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
-<div class="modal fade" id="createBracketModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Create a new bracket</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="hstack gap-3 mb-5">
-          <button type="button" class="btn btn-info btn-lg" data-bs-dismiss="modal" id="importBracket">
-            <div class="hstack"><IcBaselineAutoAwesome /> Generate bracket</div>
-          </button>
-          Automatically generates a bracket from 3rd party sources
+<dialog id="createBracketModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Create a new bracket</h3>
+    <div class="hstack gap-3 mb-5">
+      <button type="button" class="btn btn-info btn-lg" id="importBracket">
+        <div class="hstack"><IcBaselineAutoAwesome /> Generate bracket</div>
+      </button>
+      Automatically generates a bracket from 3rd party sources
 
-          <IcBaselineHelp
-            class="cursor-pointer"
-            data-bs-toggle="tooltip"
-            data-bs-placement="top"
-            data-bs-title="Sources include: Spotify playlists, TierMaker.com tier list, Twitch clips & emotes, UwUFUFU.com brackets, YouTube channels & playlists"
-          />
-        </div>
+      <IcBaselineHelp
+        class="cursor-pointer"
+        data-bs-toggle="tooltip"
+        data-bs-placement="top"
+        data-bs-title="Sources include: Spotify playlists, TierMaker.com tier list, Twitch clips & emotes, UwUFUFU.com brackets, YouTube channels & playlists"
+      />
+    </div>
 
-        <div class="hstack gap-3 mb-5">
-          <button type="button" class="btn btn-success btn-lg" data-bs-dismiss="modal" onclick={createBracket}>
-            <div class="hstack"><IcBaselineCreate /> Create empty bracket</div>
-          </button>
-          Creates an empty bracket that you have to fill out manually
-        </div>
+    <div class="hstack gap-3 mb-5">
+      <button
+        type="button"
+        class="btn btn-success btn-lg"
+        onclick={() => {
+          createBracketModal.close();
+          createBracket();
+        }}
+      >
+        <div class="hstack"><IcBaselineCreate /> Create empty bracket</div>
+      </button>
+      Creates an empty bracket that you have to fill out manually
+    </div>
 
-        <div class="hstack gap-3 mb-5">
-          <button type="button" class="btn btn-secondary btn-lg" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#generateChatModal">
-            <div class="hstack"><IcBaselineChat /> Chat bracket</div>
-          </button>
-          Generates a bracket from chat's requests
+    <div class="hstack gap-3 mb-5">
+      <button type="submit" class="btn btn-secondary btn-lg" onclick={() => generateChatModal.showModal()}>
+        <div class="hstack"><IcBaselineChat /> Chat bracket</div>
+      </button>
+      Generates a bracket from chat's requests
 
-          <IcBaselineHelp
-            class="cursor-pointer"
-            data-bs-toggle="tooltip"
-            data-bs-placement="top"
-            data-bs-title="Viewers will be able to add YouTube videos, Twitch clips, Spotify songs, Streamable videos"
-          />
-        </div>
+      <IcBaselineHelp
+        class="cursor-pointer"
+        data-bs-toggle="tooltip"
+        data-bs-placement="top"
+        data-bs-title="Viewers will be able to add YouTube videos, Twitch clips, Spotify songs, Streamable videos"
+      />
+    </div>
 
-        <div class="hstack gap-3">
-          <button type="button" class="btn btn-primary btn-lg" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#communityModal">
-            <div class="hstack"><IcBaselineSearch /> Import bracket</div>
-          </button>
-          Download brackets created by other users
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
+    <div class="hstack gap-3">
+      <button
+        type="button"
+        class="btn btn-primary btn-lg"
+        onclick={() => {
+          createBracketModal.close();
+          communityModal.showModal();
+        }}
+      >
+        <div class="hstack"><IcBaselineSearch /> Import bracket</div>
+      </button>
+      Download brackets created by other users
+    </div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-secondary">Close</button>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
-<div class="modal fade" id="createTriviaModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Create a trivia</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="hstack gap-3 mb-5">
-          <button type="button" class="btn btn-info btn-lg" data-bs-dismiss="modal" id="importTrivia" disabled>
-            <div class="hstack"><IcBaselineAutoAwesome /> Generate trivia</div>
-          </button>
-          not working yet :) - Automatically generates trivia from 3rd party sources
-        </div>
+<dialog id="createTriviaModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Create a trivia</h3>
+    <div class="hstack gap-3 mb-5">
+      <button type="button" class="btn btn-info btn-lg" id="importTrivia" onclick={() => createTriviaModal.close()} disabled>
+        <div class="hstack"><IcBaselineAutoAwesome /> Generate trivia</div>
+      </button>
+      not working yet :) - Automatically generates trivia from 3rd party sources
+    </div>
 
-        <div class="hstack gap-3 mb-5">
-          <button type="button" class="btn btn-success btn-lg" data-bs-dismiss="modal" onclick={createTrivia}>
-            <div class="hstack"><IcBaselineCreate /> Create empty trivia</div>
-          </button>
-          Creates an empty trivia that you have to fill out manually
-        </div>
+    <div class="hstack gap-3 mb-5">
+      <button
+        type="button"
+        class="btn btn-success btn-lg"
+        onclick={() => {
+          createTriviaModal.close();
+          createTrivia();
+        }}
+      >
+        <div class="hstack"><IcBaselineCreate /> Create empty trivia</div>
+      </button>
+      Creates an empty trivia that you have to fill out manually
+    </div>
 
-        <div class="hstack gap-3">
-          <button type="button" class="btn btn-primary btn-lg" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#communityModal" disabled>
-            <div class="hstack"><IcBaselineSearch /> Import trivia</div>
-          </button>
-          not working yet :) - Download trivia created by other users
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
+    <div class="hstack gap-3">
+      <button
+        type="button"
+        class="btn btn-primary btn-lg"
+        onclick={() => {
+          createTriviaModal.close();
+          communityModal.showModal();
+        }}
+        disabled
+      >
+        <div class="hstack"><IcBaselineSearch /> Import trivia</div>
+      </button>
+      not working yet :) - Download trivia created by other users
+    </div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-secondary">Close</button>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
-<div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="generateChatModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Chat bracket</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <h4>How to use:</h4>
-        <ul>
-          <li>
-            Go to the <a href="/playlist" target="_blank">chat.vote <IcBaselineQueueMusic /> Playlist site</a>
-          </li>
-          <li>
-            Adjust settings (limits, platforms, etc)
-            <IcBaselineWarningAmber class="text-warning cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Brackets don't support Twitch streams and VODs" />
-          </li>
-          <li>Viewers send requests on the Playlist site</li>
-          <li>
-            <button type="button" class="btn btn-success" onclick={loadPlaylist}><IcBaselineFileDownload /> Load playlist</button>
-          </li>
-        </ul>
+<dialog id="generateChatModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Chat bracket</h3>
+    <h4>How to use:</h4>
+    <ul>
+      <li>
+        Go to the <a href="/playlist" target="_blank">chat.vote <IcBaselineQueueMusic /> Playlist site</a>
+      </li>
+      <li>
+        Adjust settings (limits, platforms, etc)
+        <IcBaselineWarningAmber class="text-warning cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Brackets don't support Twitch streams and VODs" />
+      </li>
+      <li>Viewers send requests on the Playlist site</li>
+      <li>
+        <button type="button" class="btn btn-success" onclick={loadPlaylist}><IcBaselineFileDownload /> Load playlist</button>
+      </li>
+    </ul>
 
-        <small class="text-warning">Current playing video won't be included, disable autoplay to not miss any video when generating the bracket</small>
+    <small class="text-warning">Current playing video won't be included, disable autoplay to not miss any video when generating the bracket</small>
 
-        <div id="playlist" class="generate-preview"></div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#createBracketModal">
+    <div id="playlist" class="generate-preview"></div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-secondary" onclick={() => createBracketModal.showModal()}>
           <IcBaselineArrowBack /> Back
         </button>
         <button type="button" class="btn btn-success" onclick={generateChatBracket}><IcBaselineAutoAwesome /> Generate</button>
-      </div>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
-<div class="modal fade" id="generateModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Generate bracket</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<dialog id="generateModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Generate bracket</h3>
+    <div class="input-group mb-3">
+      <label class="input-group-text" for="generateBracketType">Bracket type</label>
+      <select class="form-select generate-value" id="generateBracketType">
+        <option value="" selected>Choose...</option>
+        <option value="spotifyplaylist">Spotify playlist</option>
+        <option value="tiermaker">TierMaker.com tier list</option>
+        <option value="clips">Twitch clips</option>
+        <option value="emotes">Twitch emotes</option>
+        <option disabled value="uwufufu">UwUFUFU.com bracket - uwufufu shutdown at the start of 2025. An archived version might be coming soon here :)</option>
+        <option value="ytchannel">YouTube channel</option>
+        <option value="ytplaylist">YouTube playlist</option>
+      </select>
+    </div>
+
+    <div id="spotifyplaylistSettings" class="generate-type" style="display: none">
+      <p>Generate a bracket from a Spotify playlist</p>
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="spotifyPlaylistLinkLabel">Spotify playlist link</span>
+        <input
+          type="text"
+          class="form-control generate-value"
+          id="spotifyPlaylistLink"
+          placeholder="https://open.spotify.com/playlist/XXXXXXXXXXXXXXXXXXXXXX"
+          aria-label="Spotify Playlist link"
+          aria-describedby="spotifyPlaylistLinkLabel"
+        />
+        <button type="button" class="btn btn-outline-info" onclick={previewSpotifyPlaylist}><IcBaselineFileDownload /> Load</button>
       </div>
-      <div class="modal-body">
-        <div class="input-group mb-3">
-          <label class="input-group-text" for="generateBracketType">Bracket type</label>
-          <select class="form-select generate-value" id="generateBracketType">
-            <option value="" selected>Choose...</option>
-            <option value="spotifyplaylist">Spotify playlist</option>
-            <option value="tiermaker">TierMaker.com tier list</option>
-            <option value="clips">Twitch clips</option>
-            <option value="emotes">Twitch emotes</option>
-            <option disabled value="uwufufu">UwUFUFU.com bracket - uwufufu shutdown at the start of 2025. An archived version might be coming soon here :)</option>
-            <option value="ytchannel">YouTube channel</option>
-            <option value="ytplaylist">YouTube playlist</option>
-          </select>
-        </div>
+      <div id="spotifyPlaylistPreview" class="generate-preview"></div>
+    </div>
 
-        <div id="spotifyplaylistSettings" class="generate-type" style="display: none">
-          <p>Generate a bracket from a Spotify playlist</p>
-          <div class="input-group mb-3">
-            <span class="input-group-text" id="spotifyPlaylistLinkLabel">Spotify playlist link</span>
-            <input
-              type="text"
-              class="form-control generate-value"
-              id="spotifyPlaylistLink"
-              placeholder="https://open.spotify.com/playlist/XXXXXXXXXXXXXXXXXXXXXX"
-              aria-label="Spotify Playlist link"
-              aria-describedby="spotifyPlaylistLinkLabel"
-            />
-            <button type="button" class="btn btn-outline-info" onclick={previewSpotifyPlaylist}><IcBaselineFileDownload /> Load</button>
-          </div>
-          <div id="spotifyPlaylistPreview" class="generate-preview"></div>
-        </div>
-
-        <div id="tiermakerSettings" class="generate-type" style="display: none">
-          <p>Generate a bracket from a TierMaker.com tier list</p>
-          <div class="input-group mb-3">
-            <span class="input-group-text" id="tiermakerLinkLabel">TierMaker.com link</span>
-            <input
-              type="text"
-              class="form-control generate-value"
-              id="tiermakerLink"
-              placeholder="https://tiermaker.com/create/example-tierlist-XXXXX"
-              aria-label="TierMaker.com link"
-              aria-describedby="tiermakerLinkLabel"
-            />
-            <button type="button" class="btn btn-outline-info" onclick={previewTiermaker}><IcBaselineFileDownload /> Load</button>
-          </div>
-          <div id="tiermakerPreview" class="generate-preview"></div>
-        </div>
-
-        <div id="clipsSettings" class="generate-type" style="display: none">
-          <p>Generate a bracket using the top 100 clips from a Twitch channel</p>
-          <div class="input-group mb-3">
-            <span class="input-group-text" id="clipsChannelLabel">twitch.tv/</span>
-            <input type="text" class="form-control generate-value" id="clipsChannel" placeholder="username" aria-label="Twitch username" aria-describedby="clipsChannelLabel" />
-            <button type="button" class="btn btn-outline-info" onclick={previewClips}><IcBaselineFileDownload /> Load</button>
-          </div>
-          <div id="clipsPreview" class="generate-preview"></div>
-        </div>
-
-        <div id="emotesSettings" class="generate-type" style="display: none">
-          <p>Generate a bracket with a Twitch channel's emotes</p>
-          <div class="input-group mb-3">
-            <span class="input-group-text" id="emotesChannelLabel">twitch.tv/</span>
-            <input type="text" class="form-control generate-value" id="emotesChannel" placeholder="username" aria-label="Twitch username" aria-describedby="emotesChannelLabel" />
-            <button type="button" class="btn btn-outline-info" onclick={previewEmotes}><IcBaselineFileDownload /> Load</button>
-          </div>
-          <div id="emotesPreview" class="generate-preview"></div>
-        </div>
-
-        <div id="uwufufuSettings" class="generate-type" style="display: none">
-          <p>Generate a bracket from an UwUFUFU quiz</p>
-          <div class="input-group mb-3">
-            <span class="input-group-text" id="uwufufuLinkLabel">UwUFUFU.com link</span>
-            <input
-              type="text"
-              class="form-control generate-value"
-              id="uwufufuLink"
-              placeholder="https://uwufufu.com/quiz/worldcup/XXXXXXXXXXXXXXXXXXXXXXXX"
-              aria-label="uwufufu URL"
-              aria-describedby="uwufufuLinkLabel"
-            />
-            <button type="button" class="btn btn-outline-info" onclick={previewUwufufu}><IcBaselineFileDownload /> Load</button>
-          </div>
-          <div id="uwufufuPreview" class="generate-preview"></div>
-        </div>
-
-        <div id="ytchannelSettings" class="generate-type" style="display: none">
-          <p>Generate a bracket using the 50 most viewed videos from a YouTube channel</p>
-          <div class="input-group mb-3">
-            <span class="input-group-text" id="ytchannelLinkLabel">YouTube handle</span>
-            <input type="text" class="form-control generate-value" id="ytchannelLink" placeholder="@username" aria-label="YouTube channel URL" aria-describedby="ytchannelLinkLabel" />
-            <button type="button" class="btn btn-outline-info" onclick={previewYTChannel}><IcBaselineFileDownload /> Load</button>
-          </div>
-          <div id="ytchannelPreview" class="generate-preview"></div>
-        </div>
-
-        <div id="ytplaylistSettings" class="generate-type" style="display: none">
-          <p>Generate a bracket from a YouTube playlist</p>
-          <div class="input-group mb-3">
-            <span class="input-group-text" id="ytplaylistLinkLabel">YouTube playlist link</span>
-            <input
-              type="text"
-              class="form-control generate-value"
-              id="ytplaylistLink"
-              placeholder="https://www.youtube.com/playlist?list=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-              aria-label="YouTube playlist URL"
-              aria-describedby="ytplaylistLinkLabel"
-            />
-            <button type="button" class="btn btn-outline-info" onclick={previewYTPlaylist}><IcBaselineFileDownload /> Load</button>
-          </div>
-          <div id="ytplaylistPreview" class="generate-preview"></div>
-        </div>
+    <div id="tiermakerSettings" class="generate-type" style="display: none">
+      <p>Generate a bracket from a TierMaker.com tier list</p>
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="tiermakerLinkLabel">TierMaker.com link</span>
+        <input
+          type="text"
+          class="form-control generate-value"
+          id="tiermakerLink"
+          placeholder="https://tiermaker.com/create/example-tierlist-XXXXX"
+          aria-label="TierMaker.com link"
+          aria-describedby="tiermakerLinkLabel"
+        />
+        <button type="button" class="btn btn-outline-info" onclick={previewTiermaker}><IcBaselineFileDownload /> Load</button>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#createBracketModal">
+      <div id="tiermakerPreview" class="generate-preview"></div>
+    </div>
+
+    <div id="clipsSettings" class="generate-type" style="display: none">
+      <p>Generate a bracket using the top 100 clips from a Twitch channel</p>
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="clipsChannelLabel">twitch.tv/</span>
+        <input type="text" class="form-control generate-value" id="clipsChannel" placeholder="username" aria-label="Twitch username" aria-describedby="clipsChannelLabel" />
+        <button type="button" class="btn btn-outline-info" onclick={previewClips}><IcBaselineFileDownload /> Load</button>
+      </div>
+      <div id="clipsPreview" class="generate-preview"></div>
+    </div>
+
+    <div id="emotesSettings" class="generate-type" style="display: none">
+      <p>Generate a bracket with a Twitch channel's emotes</p>
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="emotesChannelLabel">twitch.tv/</span>
+        <input type="text" class="form-control generate-value" id="emotesChannel" placeholder="username" aria-label="Twitch username" aria-describedby="emotesChannelLabel" />
+        <button type="button" class="btn btn-outline-info" onclick={previewEmotes}><IcBaselineFileDownload /> Load</button>
+      </div>
+      <div id="emotesPreview" class="generate-preview"></div>
+    </div>
+
+    <div id="uwufufuSettings" class="generate-type" style="display: none">
+      <p>Generate a bracket from an UwUFUFU quiz</p>
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="uwufufuLinkLabel">UwUFUFU.com link</span>
+        <input
+          type="text"
+          class="form-control generate-value"
+          id="uwufufuLink"
+          placeholder="https://uwufufu.com/quiz/worldcup/XXXXXXXXXXXXXXXXXXXXXXXX"
+          aria-label="uwufufu URL"
+          aria-describedby="uwufufuLinkLabel"
+        />
+        <button type="button" class="btn btn-outline-info" onclick={previewUwufufu}><IcBaselineFileDownload /> Load</button>
+      </div>
+      <div id="uwufufuPreview" class="generate-preview"></div>
+    </div>
+
+    <div id="ytchannelSettings" class="generate-type" style="display: none">
+      <p>Generate a bracket using the 50 most viewed videos from a YouTube channel</p>
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="ytchannelLinkLabel">YouTube handle</span>
+        <input type="text" class="form-control generate-value" id="ytchannelLink" placeholder="@username" aria-label="YouTube channel URL" aria-describedby="ytchannelLinkLabel" />
+        <button type="button" class="btn btn-outline-info" onclick={previewYTChannel}><IcBaselineFileDownload /> Load</button>
+      </div>
+      <div id="ytchannelPreview" class="generate-preview"></div>
+    </div>
+
+    <div id="ytplaylistSettings" class="generate-type" style="display: none">
+      <p>Generate a bracket from a YouTube playlist</p>
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="ytplaylistLinkLabel">YouTube playlist link</span>
+        <input
+          type="text"
+          class="form-control generate-value"
+          id="ytplaylistLink"
+          placeholder="https://www.youtube.com/playlist?list=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+          aria-label="YouTube playlist URL"
+          aria-describedby="ytplaylistLinkLabel"
+        />
+        <button type="button" class="btn btn-outline-info" onclick={previewYTPlaylist}><IcBaselineFileDownload /> Load</button>
+      </div>
+      <div id="ytplaylistPreview" class="generate-preview"></div>
+    </div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-secondary" onclick={() => createBracketModal.showModal()}>
           <IcBaselineArrowBack /> Back
         </button>
         <button type="button" class="btn btn-success" onclick={generateBracket}><IcBaselineAutoAwesome /> Generate</button>
-      </div>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
-<div class="modal fade" id="communityModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Community brackets</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<dialog id="communityModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Community brackets</h3>
+    <div id="communityModalBody">
+      <label for="shareCode" class="form-label">Import bracket</label>
+      <div class="input-group">
+        <span class="input-group-text">Bracket code</span>
+        <input type="text" class="form-control" placeholder="XXXX" id="shareCode" />
+        <button class="btn btn-outline-success" type="button" onclick={importCode}><IcBaselineFileDownload />Import</button>
       </div>
-      <div class="modal-body" id="communityModalBody">
-        <label for="shareCode" class="form-label">Import bracket</label>
-        <div class="input-group">
-          <span class="input-group-text">Bracket code</span>
-          <input type="text" class="form-control" placeholder="XXXX" id="shareCode" />
-          <button class="btn btn-outline-success" type="button" onclick={importCode}><IcBaselineFileDownload />Import</button>
-        </div>
-        <!-- <hr />
-            <button type="button" class="btn btn-info" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#myBracketsModal">
-              <i class="material-icons notranslate">person</i> My published brackets
-            </button> -->
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#createBracketModal">
+      <!-- <hr />
+      <button
+        class="btn btn-info"
+        onclick={() => {
+          communityModal.close();
+          myBracketsModal.showModal();
+        }}
+      >
+        <i class="material-icons notranslate">person</i> My published brackets
+      </button> -->
+    </div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-secondary" onclick={() => createBracketModal.showModal()}>
           <IcBaselineArrowBack /> Back
         </button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
+        <button type="submit" class="btn btn-secondary">Close</button>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
-<div class="modal fade" id="importModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Import bracket</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" style="max-height: 80vh; overflow: auto" id="importModalBody"></div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#communityModal">
+<dialog id="importModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Import bracket</h3>
+    <div style="max-height: 80vh; overflow: auto" id="importModalBody"></div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-secondary" onclick={() => communityModal.showModal()}>
           <IcBaselineArrowBack /> Back
         </button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
+        <button type="submit" class="btn btn-secondary">Close</button>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
-<div class="modal fade" id="myBracketsModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">My bracket</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" style="max-height: 80vh; overflow: auto" id="myBracketsModalBody">not working yet :)</div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#communityModal">
+<dialog id="myBracketsModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">My bracket</h3>
+    <div style="max-height: 80vh; overflow: auto" id="myBracketsModalBody">not working yet :)</div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-secondary" onclick={() => communityModal.showModal()}>
           <IcBaselineArrowBack /> Back
         </button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
+        <button type="submit" class="btn btn-secondary">Close</button>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
-<div class="modal fade" id="publishedModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Bracket published</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        Share your bracket with other users using the code
-        <h2><kbd id="bracketCode"></kbd></h2>
-        <small class="text-body-secondary">To use the code click on <IcBaselineAddCircleOutline /> Create new bracket → <IcBaselineSearch /> Import bracket</small>
-        <hr />
-        You can also share the bracket using this link
-        <h3><kbd id="bracketLink"></kbd></h3>
-        <small class="text-body-secondary">Bracket will be automatically downloaded when a user opens the link</small>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
-      </div>
+<dialog id="publishedModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Bracket published</h3>
+    Share your bracket with other users using the code
+    <h2><kbd id="bracketCode"></kbd></h2>
+    <small class="text-body-secondary">To use the code click on <IcBaselineAddCircleOutline /> Create new bracket → <IcBaselineSearch /> Import bracket</small>
+    <hr />
+    You can also share the bracket using this link
+    <h3><kbd id="bracketLink"></kbd></h3>
+    <small class="text-body-secondary">Bracket will be automatically downloaded when a user opens the link</small>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-secondary">OK</button>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
-<div class="modal fade" id="startModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Start bracket/tier list</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="input-group mb-3">
-          <label class="input-group-text" for="formatSelect">Format</label>
-          <select class="form-select" id="formatSelect">
-            <option value="single" selected>Bracket</option>
-            <option value="tierlist">Tier list</option>
-          </select>
-        </div>
+<dialog id="startModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Start bracket/tier list</h3>
+    <div class="input-group mb-3">
+      <label class="input-group-text" for="formatSelect">Format</label>
+      <select class="form-select" id="formatSelect">
+        <option value="single" selected>Bracket</option>
+        <option value="tierlist">Tier list</option>
+      </select>
+    </div>
 
-        <label for="optionLimit">How many options to include?</label>
-        <div class="input-group">
-          <select class="form-select" id="optionLimit">
-            <option value="0" selected>All</option>
-            <option value="2">2</option>
-            <option value="4">4</option>
-            <option value="8">8</option>
-            <option value="16">16</option>
-            <option value="32">32</option>
-            <option value="64">64</option>
-            <option value="128">128</option>
-            <option value="256">256</option>
-            <option value="512">512</option>
-          </select>
-          <label class="input-group-text" for="optionLimit">options</label>
-        </div>
-        <small class="text-body-secondary mb-3">Will skip random options to reduce the bracket/tier list length</small>
+    <label for="optionLimit">How many options to include?</label>
+    <div class="input-group">
+      <select class="form-select" id="optionLimit">
+        <option value="0" selected>All</option>
+        <option value="2">2</option>
+        <option value="4">4</option>
+        <option value="8">8</option>
+        <option value="16">16</option>
+        <option value="32">32</option>
+        <option value="64">64</option>
+        <option value="128">128</option>
+        <option value="256">256</option>
+        <option value="512">512</option>
+      </select>
+      <label class="input-group-text" for="optionLimit">options</label>
+    </div>
+    <small class="text-body-secondary mb-3">Will skip random options to reduce the bracket/tier list length</small>
 
-        <div class="bracketSettings">
-          <div class="form-check form-switch mt-3">
-            <input class="form-check-input" type="checkbox" role="switch" id="changeCommand" />
-            <label class="form-check-label" for="changeCommand">Alternate voting command</label><br />
-            <small class="text-body-secondary"> Switches the voting command from 1/2 to a/b every other round to get around the Twitch 30s same message cooldown </small>
-          </div>
-        </div>
-
-        <div class="tierlistSettings" style="display: none">
-          <div class="form-check form-switch mt-3">
-            <input class="form-check-input" type="checkbox" role="switch" id="averageScore" />
-            <label class="form-check-label" for="changeCommand">Use average score</label><br />
-            <small class="text-body-secondary">
-              If this is unchecked then the item will be placed in the tier with the most votes. If this is checked and an item has 50 S votes and 10 F votes then it will be placed in the
-              average tier which is A
-            </small>
-          </div>
-        </div>
-
-        <div class="form-check form-switch mt-3">
-          <input class="form-check-input" type="checkbox" role="switch" id="keepVotingEnabled" />
-          <label class="form-check-label" for="keepVotingEnabled">Keep voting enabled after round ends</label><br />
-          <small class="text-body-secondary">
-            If this is off then voting will be automatically disabled after a round ends so viewers don't accidentally vote too soon if they have a long stream delay
-          </small>
-        </div>
-
-        <div class="form-check form-switch mt-3">
-          <input class="form-check-input" type="checkbox" role="switch" id="disableAnimations" />
-          <label class="form-check-label" for="disableAnimations">Disable animations</label>
-        </div>
-
-        <div id="spotifyWarning" class="mt-5" style="display: none">
-          <div class="alert alert-danger" role="alert">
-            <IcBaselineWarning /><IcBaselineVolumeUp /> Spotify embeds don't have a volume slider; make sure to lower your volume before starting
-          </div>
-          <div class="alert alert-warning mt-1" role="alert">
-            <IcBaselineLogin /> You must be logged in to Spotify on this browser to listen to the full songs; you will be given a 30s preview otherwise
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick={startBracket}>Start bracket</button>
+    <div class="bracketSettings">
+      <div class="form-check form-switch mt-3">
+        <input class="form-check-input" type="checkbox" role="switch" id="changeCommand" />
+        <label class="form-check-label" for="changeCommand">Alternate voting command</label><br />
+        <small class="text-body-secondary"> Switches the voting command from 1/2 to a/b every other round to get around the Twitch 30s same message cooldown </small>
       </div>
     </div>
-  </div>
-</div>
 
-<div class="modal fade" id="startTriviaModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Trivia Settings</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="form-floating">
-          <input type="number" class="form-control" id="triviaPoints" value="10" min="1" />
-          <label for="triviaPoints">Question points value</label>
-        </div>
-        <small class="text-body-secondary"> How many points each question is worth </small>
-
-        <div class="mt-3" id="questionTimerDiv" style="display: none">
-          <label for="questionTimer" class="form-label">Question timer: <span id="questionTimerValue">10s</span></label>
-          <input type="range" class="form-range" min="5" value="10" max="60" id="questionTimer" />
-        </div>
-
-        <div class="form-floating mt-3">
-          <select class="form-select" id="triviaScoring" aria-label="trivia scoring">
-            <option value="first" selected>First answer only</option>
-            <option value="decay">Points decay</option>
-            <option value="timer">Speed based reward/punishment</option>
-            <option value="everyone">Everyone</option>
-          </select>
-          <label for="triviaScoring">Scoring</label>
-        </div>
+    <div class="tierlistSettings" style="display: none">
+      <div class="form-check form-switch mt-3">
+        <input class="form-check-input" type="checkbox" role="switch" id="averageScore" />
+        <label class="form-check-label" for="changeCommand">Use average score</label><br />
         <small class="text-body-secondary">
-          <strong>First answer only:</strong> first viewer to answer correctly gets the full points<br />
-          <strong>Points decay:</strong> first viewer to answer correctly gets the full points, 2nd viewer gets 1 point less 3rd viewer gets 2 points less...<br />
-          <strong>Everyone:</strong> anyone that answers correctly will get the full points<br />
-          <strong>Speed based reward/punishment:</strong> point value decreases as the timer goes down, correct asnwers gain points while wrong answers lose points. Works better with high question
-          points values (1000+)
+          If this is unchecked then the item will be placed in the tier with the most votes. If this is checked and an item has 50 S votes and 10 F votes then it will be placed in the
+          average tier which is A
         </small>
-
-        <div class="form-check form-switch mt-3">
-          <input class="form-check-input" type="checkbox" role="switch" id="oneChance" />
-          <label class="form-check-label" for="oneChance">Take first message as the answer</label>
-        </div>
-        <small class="text-body-secondary">
-          The first message each viewer types will be considered as their answer and they won't be able to answer again till next round. Prevents viewers from spamming answers till they get
-          the corrent one
-        </small>
-
-        <div class="form-check form-switch mt-3">
-          <input class="form-check-input" type="checkbox" role="switch" id="showHint" checked />
-          <label class="form-check-label" for="showHint">Show hint</label>
-        </div>
-        <small class="text-body-secondary">
-          Shows a hint that reveals the number of characters <br />
-          (the answer → _ _ _ &nbsp; _ _ _ _ _ ) <br />
-          Does not apply for multiple choice questions
-        </small>
-
-        <div id="triviaSettingsWarning" class="alert alert-warning mt-3" role="alert" style="display: none">
-          Changing some settings while the trivia is running will take effect on the next question
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button id="dismissTriviaSettingsButton" type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="display: none">OK</button>
-        <button id="startTriviaButton" type="button" class="btn btn-success" data-bs-dismiss="modal" onclick={startTrivia}>Start Trivia</button>
       </div>
     </div>
-  </div>
-</div>
 
-<div class="modal fade" id="changeSettingsModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Settings</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="form-check form-switch mt-3">
+      <input class="form-check-input" type="checkbox" role="switch" id="keepVotingEnabled" />
+      <label class="form-check-label" for="keepVotingEnabled">Keep voting enabled after round ends</label><br />
+      <small class="text-body-secondary">
+        If this is off then voting will be automatically disabled after a round ends so viewers don't accidentally vote too soon if they have a long stream delay
+      </small>
+    </div>
+
+    <div class="form-check form-switch mt-3">
+      <input class="form-check-input" type="checkbox" role="switch" id="disableAnimations" />
+      <label class="form-check-label" for="disableAnimations">Disable animations</label>
+    </div>
+
+    <div id="spotifyWarning" class="mt-5" style="display: none">
+      <div class="alert alert-danger" role="alert">
+        <IcBaselineWarning /><IcBaselineVolumeUp /> Spotify embeds don't have a volume slider; make sure to lower your volume before starting
       </div>
-      <div class="modal-body">
-        <div class="bracketSettings">
-          <div class="form-check form-switch mt-3">
-            <input class="form-check-input" type="checkbox" role="switch" id="changeCommandCopy" />
-            <label class="form-check-label" for="changeCommandCopy">Alternate voting command</label><br />
-            <small class="text-body-secondary"> Switches the voting command from 1/2 to a/b every other round to get around the Twitch 30s same message cooldown </small>
-          </div>
-        </div>
-
-        <div class="tierlistSettings" style="display: none">
-          <div class="form-check form-switch mt-3">
-            <input class="form-check-input" type="checkbox" role="switch" id="averageScoreCopy" />
-            <label class="form-check-label" for="averageScoreCopy">Use average score</label><br />
-            <small class="text-body-secondary">
-              If this is unchecked then the item will be placed in the tier with the most votes. If this is checked and an item has 50 S votes and 10 F votes then it will be placed in the
-              average tier which is A
-            </small>
-          </div>
-        </div>
-
-        <div class="form-check form-switch mt-3">
-          <input class="form-check-input" type="checkbox" role="switch" id="keepVotingEnabledCopy" />
-          <label class="form-check-label" for="keepVotingEnabledCopy">Keep voting enabled after round ends</label><br />
-          <small class="text-body-secondary">
-            If this is off then voting will be automatically disabled after a round ends so viewers don't accidentally vote too soon if they have a long stream delay
-          </small>
-        </div>
-
-        <div class="form-check form-switch mt-3">
-          <input class="form-check-input" type="checkbox" role="switch" id="disableAnimationsCopy" />
-          <label class="form-check-label" for="disableAnimationsCopy">Disable animations</label>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
+      <div class="alert alert-warning mt-1" role="alert">
+        <IcBaselineLogin /> You must be logged in to Spotify on this browser to listen to the full songs; you will be given a 30s preview otherwise
       </div>
     </div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-success" onclick={startBracket}>Start bracket</button>
+      </form>
+    </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
+
+<dialog id="startTriviaModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Trivia Settings</h3>
+    <div class="form-floating">
+      <input type="number" class="form-control" id="triviaPoints" value="10" min="1" />
+      <label for="triviaPoints">Question points value</label>
+    </div>
+    <small class="text-body-secondary"> How many points each question is worth </small>
+
+    <div class="mt-3" id="questionTimerDiv" style="display: none">
+      <label for="questionTimer" class="form-label">Question timer: <span id="questionTimerValue">10s</span></label>
+      <input type="range" class="form-range" min="5" value="10" max="60" id="questionTimer" />
+    </div>
+
+    <div class="form-floating mt-3">
+      <select class="form-select" id="triviaScoring" aria-label="trivia scoring">
+        <option value="first" selected>First answer only</option>
+        <option value="decay">Points decay</option>
+        <option value="timer">Speed based reward/punishment</option>
+        <option value="everyone">Everyone</option>
+      </select>
+      <label for="triviaScoring">Scoring</label>
+    </div>
+    <small class="text-body-secondary">
+      <strong>First answer only:</strong> first viewer to answer correctly gets the full points<br />
+      <strong>Points decay:</strong> first viewer to answer correctly gets the full points, 2nd viewer gets 1 point less 3rd viewer gets 2 points less...<br />
+      <strong>Everyone:</strong> anyone that answers correctly will get the full points<br />
+      <strong>Speed based reward/punishment:</strong> point value decreases as the timer goes down, correct asnwers gain points while wrong answers lose points. Works better with high question
+      points values (1000+)
+    </small>
+
+    <div class="form-check form-switch mt-3">
+      <input class="form-check-input" type="checkbox" role="switch" id="oneChance" />
+      <label class="form-check-label" for="oneChance">Take first message as the answer</label>
+    </div>
+    <small class="text-body-secondary">
+      The first message each viewer types will be considered as their answer and they won't be able to answer again till next round. Prevents viewers from spamming answers till they get the
+      corrent one
+    </small>
+
+    <div class="form-check form-switch mt-3">
+      <input class="form-check-input" type="checkbox" role="switch" id="showHint" checked />
+      <label class="form-check-label" for="showHint">Show hint</label>
+    </div>
+    <small class="text-body-secondary">
+      Shows a hint that reveals the number of characters <br />
+      (the answer → _ _ _ &nbsp; _ _ _ _ _ ) <br />
+      Does not apply for multiple choice questions
+    </small>
+
+    <div id="triviaSettingsWarning" class="alert alert-warning mt-3" role="alert" style="display: none">
+      Changing some settings while the trivia is running will take effect on the next question
+    </div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button id="dismissTriviaSettingsButton" type="submit" class="btn btn-secondary" style="display: none">OK</button>
+        <button id="startTriviaButton" type="submit" class="btn btn-success" onclick={startTrivia}>Start Trivia</button>
+      </form>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
+
+<dialog id="changeSettingsModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Settings</h3>
+    <div class="bracketSettings">
+      <div class="form-check form-switch mt-3">
+        <input class="form-check-input" type="checkbox" role="switch" id="changeCommandCopy" />
+        <label class="form-check-label" for="changeCommandCopy">Alternate voting command</label><br />
+        <small class="text-body-secondary"> Switches the voting command from 1/2 to a/b every other round to get around the Twitch 30s same message cooldown </small>
+      </div>
+    </div>
+
+    <div class="tierlistSettings" style="display: none">
+      <div class="form-check form-switch mt-3">
+        <input class="form-check-input" type="checkbox" role="switch" id="averageScoreCopy" />
+        <label class="form-check-label" for="averageScoreCopy">Use average score</label><br />
+        <small class="text-body-secondary">
+          If this is unchecked then the item will be placed in the tier with the most votes. If this is checked and an item has 50 S votes and 10 F votes then it will be placed in the
+          average tier which is A
+        </small>
+      </div>
+    </div>
+
+    <div class="form-check form-switch mt-3">
+      <input class="form-check-input" type="checkbox" role="switch" id="keepVotingEnabledCopy" />
+      <label class="form-check-label" for="keepVotingEnabledCopy">Keep voting enabled after round ends</label><br />
+      <small class="text-body-secondary">
+        If this is off then voting will be automatically disabled after a round ends so viewers don't accidentally vote too soon if they have a long stream delay
+      </small>
+    </div>
+
+    <div class="form-check form-switch mt-3">
+      <input class="form-check-input" type="checkbox" role="switch" id="disableAnimationsCopy" />
+      <label class="form-check-label" for="disableAnimationsCopy">Disable animations</label>
+    </div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-secondary">OK</button>
+      </form>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
 <Navbar messageHandler={handleMessage} loginEvent={() => USER.refresh()} />
 
@@ -4411,7 +4430,7 @@
         </a>
       </span>
       <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Settings">
-        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#changeSettingsModal">
+        <button type="button" class="btn btn-secondary" onclick={() => changeSettingsModal.showModal()}>
           <IcBaselineSettings />
         </button>
       </span>
@@ -4504,7 +4523,7 @@
           <IcBaselineRefresh />
         </button>
 
-        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#changeSettingsModal">
+        <button type="button" class="btn btn-secondary" onclick={() => changeSettingsModal.showModal()}>
           <IcBaselineSettings />
         </button>
 
@@ -4651,7 +4670,7 @@
         </a>
       </span>
       <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Settings">
-        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#startTriviaModal">
+        <button type="button" class="btn btn-secondary" onclick={() => startTriviaModal.showModal()}>
           <IcBaselineSettings />
         </button>
       </span>
@@ -4665,7 +4684,7 @@
   <div class="row">
     <div class="col-md-1"></div>
     <div class="col-md-5" id="lists">
-      <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#createBracketModal">
+      <button type="button" class="btn btn-success btn-lg" onclick={() => createBracketModal.showModal()}>
         <IcBaselineAddCircleOutline /> Create new bracket/tierlist
       </button>
 
@@ -4674,7 +4693,7 @@
         <span class="text-body-secondary">Loading...</span>
       </div>
       <hr />
-      <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#createTriviaModal">
+      <button type="button" class="btn btn-success btn-lg" onclick={() => createTriviaModal.showModal()}>
         <IcBaselineAddCircleOutline /> Create new trivia
       </button>
 

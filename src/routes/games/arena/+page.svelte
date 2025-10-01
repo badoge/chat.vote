@@ -2,7 +2,6 @@
   import { onMount } from "svelte";
   import { showToast } from "../../+layout.svelte";
 
-  let elements;
   let html;
   onMount(async () => {
     html = {
@@ -22,11 +21,6 @@
       bulkAddBotBtn: document.querySelector("button#bAddBots"),
       addPassiveBotBtn: document.querySelector("button#bAddDummies"),
       cleanUpBtn: document.querySelector("button#bCleanUp"),
-    };
-    elements = {
-      //modals
-      grid: document.getElementById("grid"),
-      gameDiv: document.getElementById("gameDiv"),
     };
 
     // big red button which starts the game
@@ -545,34 +539,8 @@
   <script src="/donk-arena-better-ai.min.js"></script>
 </svelte:head>
 
-<div class="modal fade" id="howToPlayModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="howToPlayTitle">How to play - Arena</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="howToPlayBody">
-        <h4>Streamer controls:</h4>
-        <p>Move: arrows<br />Attack: <kbd>Space</kbd><br />Use ability: <kbd>Shift</kbd></p>
-        <h4>Chat:</h4>
-        Type<kbd>!join [class]</kbd> in chat to join<br />
-        <kbd>!join rogue</kbd> or <kbd>DonkRogue</kbd><br />
-        <kbd>!join hunter</kbd> or <kbd>DonkHunter</kbd><br />
-        <kbd>!join mage</kbd> or <kbd>DonkMage</kbd><br />
-        <kbd>!join paladin</kbd> or <kbd>DonkPaladin</kbd><br />
-        <kbd>!join priest</kbd> or <kbd>DonkPriest</kbd><br />
-        <kbd>!join shaman</kbd> or <kbd>DonkShaman</kbd>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="container-fluid">
-  <div class="container-fluid p-0" id="gameDiv">
+  <div class="container-fluid p-0">
     <div class="row" id="gameRow">
       <div id="arena">
         <div class="main-part">

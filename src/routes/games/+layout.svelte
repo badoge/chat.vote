@@ -1,68 +1,74 @@
 <script>
-  import { switchGame } from "$lib/functions";
-  import { onMount } from "svelte";
+  import { switchGame } from "$lib/games";
   import IcRoundOpenInNew from "~icons/ic/round-open-in-new";
   import Navbar from "$lib/Navbar.svelte";
+  import IcBaselineClose from "~icons/ic/baseline-close";
+  import HowToPlay from "$lib/HowToPlay.svelte";
 
   let { children } = $props();
-
-  let elements;
-
-  let aboutModal;
-
-  onMount(async () => {
-    elements = {
-      //modals
-      aboutModal: document.getElementById("aboutModal"),
-    };
-
-    aboutModal = new bootstrap.Modal(elements.aboutModal);
-  });
 </script>
 
-<div class="modal fade" id="aboutModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">About</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="card mb-3">
-          <div class="card-body">
-            <h5>Contact info:</h5>
-            <p>
-              Site by <a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/badoge">badoge</a> :) <br />If you find any issues or if you have suggestions or questions, you
-              can contact me: <br /><a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/popout/badoge/chat?popout=">in this chat</a> <br />or on
-              <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/FR8bgQdPUT">discord</a> <br />or by <a href="mailto:games@chat.vote">email</a>
-            </p>
-          </div>
-        </div>
-
-        <div class="card mb-3">
-          <div class="card-body">
-            <p>tictactoe based on <a target="_blank" rel="noopener noreferrer" href="https://github.com/michaelwhyte/tic_tac_toe">github.com/michaelwhyte/tic_tac_toe</a></p>
-            <p>connect4 based on <a target="_blank" rel="noopener noreferrer" href="https://github.com/mennovanslooten/connect4">github.com/mennovanslooten/connect4</a></p>
-            <p>not wordle based on <a target="_blank" rel="noopener noreferrer" href="https://www.nytimes.com/games/wordle/index.html">wordle</a></p>
-            <p>🟥⏹️🔴🔴⭕⏹️, Donk Hunt, Nim and Arena by <a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/g7eternal">g7eternal</a></p>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
+<dialog id="howToPlayModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">How to play - name</h3>
+    <HowToPlay />
+    <div class="modal-action">
+      <form method="dialog">
+        <button class="btn">Close</button>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
+
+<dialog id="aboutModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">About</h3>
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5>Contact info:</h5>
+        <p>
+          Site by <a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/badoge">badoge</a> :) <br />If you find any issues or if you have suggestions or questions, you can
+          contact me: <br /><a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/popout/badoge/chat?popout=">in this chat</a> <br />or on
+          <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/FR8bgQdPUT">discord</a> <br />or by <a href="mailto:games@chat.vote">email</a>
+        </p>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-body">
+        <p>tictactoe based on <a target="_blank" rel="noopener noreferrer" href="https://github.com/michaelwhyte/tic_tac_toe">github.com/michaelwhyte/tic_tac_toe</a></p>
+        <p>connect4 based on <a target="_blank" rel="noopener noreferrer" href="https://github.com/mennovanslooten/connect4">github.com/mennovanslooten/connect4</a></p>
+        <p>not wordle based on <a target="_blank" rel="noopener noreferrer" href="https://www.nytimes.com/games/wordle/index.html">wordle</a></p>
+        <p>🟥⏹️🔴🔴⭕⏹️, Donk Hunt, Nim and Arena by <a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/g7eternal">g7eternal</a></p>
+      </div>
+    </div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button class="btn">Close</button>
+      </form>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
 <Navbar />
 
 <div class="container-fluid">
-  <div id="grid" class="mt-3" style="display: none;">
+  <div id="grid" class="mt-3">
     <div class="row row-cols-1 row-cols-xl-4 row-cols-lg-3 row-cols-sm-3 g-4">
       <div class="col">
-        <div class="card h-100">
+        <div class="card h-20 w-40">
           <img src="/gamespics/draw.png" onclick={() => switchGame("draw")} class="card-img-top" alt="Draw" />
           <div class="card-body">
             <h5 class="card-title">Draw</h5>
@@ -71,7 +77,7 @@
         </div>
       </div>
       <div class="col">
-        <div class="card h-100">
+        <div class="card h-20 w-40">
           <img src="/gamespics/arena.png" onclick={() => switchGame("arena")} class="card-img-top" alt="Arena" />
           <div class="card-body">
             <h5 class="card-title">Arena</h5>
@@ -80,7 +86,7 @@
         </div>
       </div>
       <div class="col">
-        <div class="card h-100">
+        <div class="card h-20 w-40">
           <img src="/gamespics/eb.png" onclick={() => switchGame("eb")} class="card-img-top" alt="Emote benchmark" />
           <div class="card-body">
             <h5 class="card-title">Emote benchmark</h5>
@@ -89,7 +95,7 @@
         </div>
       </div>
       <div class="col">
-        <div class="card h-100">
+        <div class="card h-20 w-40">
           <img src="/gamespics/dh.png" onclick={() => switchGame("dh")} class="card-img-top" alt="Donk Hunt" />
           <div class="card-body">
             <h5 class="card-title">Donk Hunt</h5>
@@ -98,7 +104,7 @@
         </div>
       </div>
       <div class="col">
-        <div class="card h-100">
+        <div class="card h-20 w-40">
           <img src="/gamespics/shapes.png" onclick={() => switchGame("shapes")} class="card-img-top" alt="🟥⏹️🔴🔴⭕⏹️" />
           <div class="card-body">
             <h5 class="card-title">🟥⏹️🔴🔴⭕⏹️</h5>
@@ -107,7 +113,7 @@
         </div>
       </div>
       <div class="col">
-        <div class="card h-100">
+        <div class="card h-20 w-40">
           <img src="/gamespics/nim.png" onclick={() => switchGame("nim")} class="card-img-top" alt="Nim" />
           <div class="card-body">
             <h5 class="card-title">Nim</h5>
@@ -116,7 +122,7 @@
         </div>
       </div>
       <div class="col">
-        <div class="card h-100">
+        <div class="card h-20 w-40">
           <img src="/gamespics/nw.png" onclick={() => switchGame("nw")} class="card-img-top" alt="Not Wordle :)" />
           <div class="card-body">
             <h5 class="card-title">Not Wordle :)</h5>
@@ -125,7 +131,7 @@
         </div>
       </div>
       <div class="col">
-        <div class="card h-100">
+        <div class="card h-20 w-40">
           <img src="/gamespics/c4.png" onclick={() => switchGame("c4")} class="card-img-top" alt="Connect 4" />
           <div class="card-body">
             <h5 class="card-title">Connect 4</h5>
@@ -134,7 +140,7 @@
         </div>
       </div>
       <div class="col">
-        <div class="card h-100">
+        <div class="card h-20 w-40">
           <img src="/gamespics/ttt.png" onclick={() => switchGame("ttt")} class="card-img-top" alt="tic tac toe" />
           <div class="card-body">
             <h5 class="card-title">tic tac toe</h5>
@@ -143,7 +149,7 @@
         </div>
       </div>
       <div class="col">
-        <div class="card h-100">
+        <div class="card h-20 w-40">
           <img src="/gamespics/guessr.png" onclick={() => switchGame("guessr")} class="card-img-top" alt="guessr" />
           <div class="card-body">
             <h5 class="card-title"><IcRoundOpenInNew /> Guessr.tv</h5>
@@ -152,8 +158,8 @@
         </div>
       </div>
       <div class="col">
-        <div class="card h-100">
-          <img src="/pics/donk.png" style="width: 180px; height: 180px; align-self: center" onclick={() => switchGame("about")} class="card-img-top" alt="About" />
+        <div class="card h-20 w-40">
+          <img src="/pics/donk.png" style="width: 180px; height: 180px; align-self: center" onclick={() => aboutModal.showModal()} class="card-img-top" alt="About" />
           <div class="card-body">
             <h5 class="card-title">About</h5>
             <p class="card-text">About section</p>

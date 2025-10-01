@@ -4,10 +4,6 @@
   let NIM;
   onMount(async () => {
     elements = {
-      //modals
-      grid: document.getElementById("grid"),
-      gameDiv: document.getElementById("gameDiv"),
-
       //main
       popCondition: document.getElementById("popCondition"),
       popCountNumber: document.getElementById("popCountNumber"),
@@ -346,27 +342,8 @@
   <meta property="og:description" content="Classic. Remove popsicles until there's one left. Whoever takes the last one - loses!" />
 </svelte:head>
 
-<div class="modal fade" id="howToPlayModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="howToPlayTitle">How to play - nim</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="howToPlayBody">
-        <p>There are some popsicles lying around (20 by default). Players take turns to eat them.</p>
-        <p>A player can eat 1, 2, or 3 popsicles at once.</p>
-        <p>Whoever eats the LAST popsicle - wins or loses the game! (depending on your settings)</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="container-fluid">
-  <div class="container-fluid p-0" id="gameDiv">
+  <div class="container-fluid p-0">
     <div class="card m-3 bg-body-tertiary" id="nimgame">
       <div class="card-body" id="nimfield">
         <!-- div.field-row have dynamic contents! -->

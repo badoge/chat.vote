@@ -1,24 +1,3 @@
-<script>
-  import { switchGame } from "$lib/functions";
-  import { onMount } from "svelte";
-  let elements;
-
-  onMount(async () => {
-    elements = {
-      //modals
-      grid: document.getElementById("grid"),
-    };
-  });
-
-  let USER = {
-    channel: "",
-    twitchLogin: false,
-    access_token: "",
-    userID: "",
-    platform: "",
-  };
-</script>
-
 <svelte:head>
   <title>chat.vote Games</title>
   <meta name="description" content="A collection of interactive minigames that you can play with your Twitch chat" />

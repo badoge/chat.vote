@@ -1,13 +1,13 @@
 <script>
   import { onMount } from "svelte";
   import { showToast } from "../../+layout.svelte";
+  import IcBaselineClose from "~icons/ic/baseline-close";
+  import { escapeString } from "$lib/functions";
 
   let elements;
   onMount(async () => {
     elements = {
-      blacklistModal: document.getElementById("blacklistModal"),
       reason: document.getElementById("reason"),
-      optionsModal: document.getElementById("optionsModal"),
       optionsModalBody: document.getElementById("optionsModalBody"),
 
       main: document.getElementById("main"),
@@ -33,16 +33,12 @@
     }
 
     loadList();
-    blacklistModal = new bootstrap.Modal(elements.blacklistModal);
-    optionsModal = new bootstrap.Modal(elements.optionsModal);
   });
-
-  let blacklistModal, optionsModal;
 
   let blacklistID = "";
   function blacklist(id) {
     blacklistID = id;
-    blacklistModal.show();
+    blacklistModal.showModal();
   } //blacklist
 
   function showOptions(id) {
@@ -61,7 +57,7 @@
       }
       html += `</ul>`;
       elements.optionsModalBody.innerHTML = html;
-      optionsModal.show();
+      optionsModal.showModal();
     } else {
       showToast("bracket not found", "danger", 3000);
     }
@@ -84,7 +80,7 @@
       let response = await fetch(`https://blt.donk.workers.dev/blacklist`, requestOptions);
       let result = await response.json();
       showToast(result.message, "info", 3000);
-      blacklistModal.hide();
+      blacklistModal.close();
       loadList();
     } catch (error) {
       showToast("Could not blacklist bracket", "danger", 3000);
@@ -205,41 +201,45 @@
   </div>
 </nav>
 
-<div class="modal fade" tabindex="-1" id="blacklistModal">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Blacklist bracket</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="input-group">
-          <span class="input-group-text">Reason</span>
-          <input type="text" class="form-control" id="reason" aria-describedby="reject reason" />
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+<dialog id="blacklistModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Blacklist bracket</h3>
+    <div class="input-group">
+      <span class="input-group-text">Reason</span>
+      <input type="text" class="form-control" id="reason" aria-describedby="reject reason" />
+    </div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-secondary">Close</button>
         <button type="button" class="btn btn-danger" onclick={blacklistSubmit}>Blacklist</button>
-      </div>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
-<div class="modal fade" tabindex="-1" id="optionsModal">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Options</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="optionsModalBody"></div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
+<dialog id="optionsModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Random winner</h3>
+    <div id="optionsModalBody"></div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-secondary">Close</button>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
 <div class="container-fluid">
   <div class="row">

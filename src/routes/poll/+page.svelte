@@ -14,14 +14,11 @@
   import IcBaselineCreate from "~icons/ic/baseline-create";
   import { showToast } from "../+layout.svelte";
   import Navbar from "$lib/Navbar.svelte";
+  import IcBaselineClose from "~icons/ic/baseline-close";
 
   let elements;
   onMount(async () => {
     elements = {
-      //modals
-      pollModal: document.getElementById("pollModal"),
-      captchaModal: document.getElementById("captchaModal"),
-
       //pollModal
       errorDiv: document.getElementById("errorDiv"),
       pollLinkDiv: document.getElementById("pollLinkDiv"),
@@ -61,9 +58,6 @@
     load_localStorage();
     refreshData();
 
-    pollModal = new bootstrap.Modal(elements.pollModal);
-    captchaModal = new bootstrap.Modal(elements.captchaModal);
-
     elements.pollTitle.addEventListener("keydown", function (event) {
       if (event.key === "Tab") {
         event.preventDefault();
@@ -96,7 +90,6 @@
     elements.pollTitle.select();
   });
 
-  let pollModal, captchaModal;
   let security = "high";
   let token;
   let copyPopover;
@@ -425,12 +418,12 @@
     }
 
     resetPollModal();
-    pollModal.show();
+    pollModal.showModal();
 
     try {
       token = await grecaptcha.execute(ckey, { action: "submit" });
       if (!token) {
-        captchaModal.show();
+        captchaModal.showModal();
         return;
       }
       let requestOptions = {
@@ -692,81 +685,86 @@
   <script src="https://www.google.com/recaptcha/api.js?render=6LdzxrwdAAAAADyHX2t8ZS4U5QxTNLVWNrGOeNp0"></script>
 </svelte:head>
 
-<div class="modal fade" data-bs-backdrop="static" id="pollModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Poll info</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="text-danger" id="errorDiv"></div>
-        <h4>Poll link:</h4>
-        <div id="pollLinkDiv">
-          <p class="placeholder-glow">
-            <span class="placeholder placeholder-lg col-12 bg-warning"></span>
-          </p>
-        </div>
-        <h5>Poll info:</h5>
-        <h6>Title:</h6>
-        <div id="pollTitleDiv">
-          <p class="placeholder-glow">
-            <span class="placeholder col-12"></span>
-          </p>
-        </div>
-        <h6>Options:</h6>
-        <div id="pollOptionsDiv">
-          <p class="placeholder-glow">
-            <span class="placeholder col-12"></span>
-          </p>
-        </div>
-        <h6>Settings:</h6>
-        <div id="pollSettingsDiv">
-          <p class="placeholder-glow">
-            <span class="placeholder col-12"></span>
-          </p>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
+<dialog id="pollModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Poll info</h3>
+    <div class="text-danger" id="errorDiv"></div>
+    <h4>Poll link:</h4>
+    <div id="pollLinkDiv">
+      <p class="placeholder-glow">
+        <span class="placeholder placeholder-lg col-12 bg-warning"></span>
+      </p>
+    </div>
+    <h5>Poll info:</h5>
+    <h6>Title:</h6>
+    <div id="pollTitleDiv">
+      <p class="placeholder-glow">
+        <span class="placeholder col-12"></span>
+      </p>
+    </div>
+    <h6>Options:</h6>
+    <div id="pollOptionsDiv">
+      <p class="placeholder-glow">
+        <span class="placeholder col-12"></span>
+      </p>
+    </div>
+    <h6>Settings:</h6>
+    <div id="pollSettingsDiv">
+      <p class="placeholder-glow">
+        <span class="placeholder col-12"></span>
+      </p>
+    </div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-secondary">Close</button>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
-<div class="modal fade" id="captchaModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Failed to run reCAPTCHA</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        It seems that you are blocking reCAPTCHA, the server won't accept any request that is not verified by reCAPTCHA.<br />
-        Try disabling any extension that might be blocking it and refresh :)<br />
-      </div>
-      <div class="modal-footer"></div>
+<dialog id="captchaModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Failed to run reCAPTCHA</h3>
+    It seems that you are blocking reCAPTCHA, the server won't accept any request that is not verified by reCAPTCHA.<br />
+    Try disabling any extension that might be blocking it and refresh :)<br />
+    <div class="modal-action">
+      <form method="dialog">
+        <button class="btn">Close</button>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
-<div class="modal fade" id="bulkModal" tabindex="-1" aria-labelledby="bulkModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="bulkModalLabel">Add poll options in bulk</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <textarea class="form-control" placeholder="1 option per line" id="bulkOptions" style="white-space: pre-wrap" rows="9"></textarea>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-success" onclick={addOptionBulk} data-bs-dismiss="modal"><IcBaselineAdd />Add</button>
-      </div>
+<dialog id="bulkModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Add poll options in bulk</h3>
+    <textarea class="form-control" placeholder="1 option per line" id="bulkOptions" style="white-space: pre-wrap" rows="9"></textarea>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-secondary">Close</button>
+        <button type="submit" class="btn btn-success" onclick={addOptionBulk}><IcBaselineAdd />Add</button>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
 <Navbar />
 
@@ -841,7 +839,7 @@
                   <label class="form-check-label" for="results_creator"><IcBaselinePerson />Visible to me only</label>
                 </div>
                 <hr />
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bulkModal">Add multiple options</button>
+                <button type="button" class="btn btn-primary" onclick={() => bulkModal.showModal()}>Add multiple options</button>
               </div>
               <div class="col" style="display: none">
                 <h4>Duplicate detection level</h4>

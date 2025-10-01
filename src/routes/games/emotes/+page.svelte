@@ -11,10 +11,6 @@
 
   onMount(async () => {
     elements = {
-      //modals
-      grid: document.getElementById("grid"),
-      gameDiv: document.getElementById("gameDiv"),
-
       //main
       twitchGlobal: document.getElementById("twitchGlobal"),
       bttvGlobal: document.getElementById("bttvGlobal"),
@@ -417,29 +413,8 @@
   <meta property="og:description" content="A test of reaction speed and emote knowledge. Type the appearing emotes in chat as fast as you can." />
 </svelte:head>
 
-<div class="modal fade" id="howToPlayModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="howToPlayTitle">How to play - Emote benchmark</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="howToPlayBody">
-        <p>1. Streamer adjusts settings then clicks on "Start"</p>
-        <p>2. Emotes will be shown on screen and chat has to type them in order</p>
-        <p>3. Viewers that type them correctly move on to the next round</p>
-        <p>4. Game ends when 1 viewers is left</p>
-        <p>Streamer can also play by typing in chat</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="container-fluid">
-  <div class="container-fluid p-0" id="gameDiv">
+  <div class="container-fluid p-0">
     <div class="row">
       <div class="col-xl-2"></div>
       <div class="col-xl-8">

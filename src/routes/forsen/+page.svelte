@@ -13,10 +13,9 @@
       //modals
       restartRaffleModal: document.getElementById("restartRaffleModal"),
       restartTier3RaffleModal: document.getElementById("restartTier3RaffleModal"),
-      fancyRaffleModal: document.getElementById("fancyRaffleModal"),
       slot: document.getElementById("slot"),
       claw: document.getElementById("claw"),
-      gameWinner: document.getElementById("gameWinner"),
+      fancyRaffleWinner: document.getElementById("fancyRaffleWinner"),
       //navbar
       status: document.getElementById("status"),
       topRight: document.getElementById("topRight"),
@@ -35,7 +34,6 @@
 
     restartRaffleModal = new bootstrap.Modal(elements.restartRaffleModal);
     restartTier3RaffleModal = new bootstrap.Modal(elements.restartTier3RaffleModal);
-    fancyRaffleModal = new bootstrap.Modal(elements.fancyRaffleModal);
 
     tickSound = new Howl({
       src: ["/raffles/tick.mp3"],
@@ -63,7 +61,7 @@
   let raffle_open;
   let color = "";
   let currentTime = 0;
-  let restartRaffleModal, restartTier3RaffleModal, fancyRaffleModal;
+  let restartRaffleModal, restartTier3RaffleModal;
   let winner = "";
   let raffleWinners = [];
   let winnerTier3 = "";
@@ -434,7 +432,7 @@
     }
     if (winnerSlot) {
       const resultDiv = winnerSlot.cloneSelf();
-      elements.gameWinner.appendChild(resultDiv.div);
+      elements.fancyRaffleWinner.appendChild(resultDiv.div);
       app.spinStarted = false;
       raffleWinners.push(winnerSlot.username);
       winner = winnerSlot.username;
@@ -446,8 +444,8 @@
       p.innerHTML = `Winner #${raffleWinners.length}: <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USERNAME}/viewercard/${winnerSlot.username}?popout=","_blank","width=340,height=800")>${winnerSlot.username}</a>`;
       elements.raffleOutput.append(p);
       setTimeout(() => {
-        fancyRaffleModal.hide();
-        elements.gameWinner.innerHTML = "";
+        fancyRaffleModal.close();
+        elements.fancyRaffleWinner.innerHTML = "";
         elements.slot.innerHTML = `<div class="spinner-border" style="width: 10rem; height: 10rem; margin-left: auto; margin-right: auto; display:block;" role="status"><span class="visually-hidden">Loading...</span></div>`;
       }, 2000);
     } else {
@@ -466,7 +464,7 @@
     }
     if (winnerSlot) {
       const resultDiv = winnerSlot.cloneSelf();
-      elements.gameWinner.appendChild(resultDiv.div);
+      elements.fancyRaffleWinner.appendChild(resultDiv.div);
       app.spinStarted = false;
       raffleWinnersTier3.push(winnerSlot.username);
       winnerTier3 = winnerSlot.username;
@@ -478,8 +476,8 @@
       p.innerHTML = `Winner #${raffleWinnersTier3.length}: <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USERNAME}/viewercard/${winnerSlot.username}?popout=","_blank","width=340,height=800")>${winnerSlot.username}</a>`;
       elements.raffleOutputTier3.append(p);
       setTimeout(() => {
-        fancyRaffleModal.hide();
-        elements.gameWinner.innerHTML = "";
+        fancyRaffleModal.close();
+        elements.fancyRaffleWinner.innerHTML = "";
         elements.slot.innerHTML = `<div class="spinner-border" style="width: 10rem; height: 10rem; margin-left: auto; margin-right: auto; display:block;" role="status"><span class="visually-hidden">Loading...</span></div>`;
       }, 2000);
     } else {
@@ -547,7 +545,7 @@
   };
 
   async function drawRaffleWinnerFancy() {
-    fancyRaffleModal.show();
+    fancyRaffleModal.showModal();
     elements.claw.style.display = "none";
     let user_tickets = [];
     for (let index = 0, j = raffle_users.length; index < j; index++) {
@@ -601,7 +599,7 @@
       }
     }
     // restart the wheel
-    elements.gameWinner.innerHTML = "";
+    elements.fancyRaffleWinner.innerHTML = "";
     elements.slot.innerHTML = "";
     elements.claw.style.display = "block";
     app.slotOptions.shuffle().forEach((game, i) => {
@@ -626,7 +624,7 @@
   } //drawRaffleWinnerFancy
 
   async function drawRaffleWinnerFancyTier3() {
-    fancyRaffleModal.show();
+    fancyRaffleModal.showModal();
     elements.claw.style.display = "none";
     let user_tickets = [];
     for (let index = 0, j = raffle_users_tier3.length; index < j; index++) {
@@ -679,7 +677,7 @@
       }
     }
     // restart the wheel
-    elements.gameWinner.innerHTML = "";
+    elements.fancyRaffleWinner.innerHTML = "";
     elements.slot.innerHTML = "";
     elements.claw.style.display = "block";
     app.slotOptions.shuffle().forEach((game, i) => {
@@ -869,24 +867,20 @@
   </div>
 </div>
 
-<div class="modal fade" data-bs-backdrop="static" id="fancyRaffleModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog widemodal modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-body">
-        <section>
-          <div id="claw"></div>
-          <div class="half" id="slot">
-            <div class="spinner-border" style="width: 10rem; height: 10rem; position: relative; left: 45%" role="status"><span class="sr-only"></span></div>
-          </div>
-        </section>
-        <section class="result">
-          <div></div>
-          <div class="result-container" id="gameWinner"></div>
-        </section>
+<dialog id="fancyRaffleModal" class="modal">
+  <div class="modal-box w-[95vw] max-w-[95vw]">
+    <section>
+      <div id="claw"></div>
+      <div class="half" id="slot">
+        <div class="spinner-border" style="width: 10rem; height: 10rem; position: relative; left: 45%" role="status"><span class="sr-only"></span></div>
       </div>
-    </div>
+    </section>
+    <section class="result">
+      <div></div>
+      <div class="result-container" id="fancyRaffleWinner"></div>
+    </section>
   </div>
-</div>
+</dialog>
 
 <div class="container-fluid">
   <div class="row">

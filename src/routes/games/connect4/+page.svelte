@@ -1,7 +1,6 @@
 <script>
   import { onMount } from "svelte";
 
-  let elements;
   let CONNECT4;
 
   onMount(async () => {
@@ -18,12 +17,6 @@
         { label: "7", data: 0, c1: "#4336f4", c2: "#4426f5" },
       ],
     }; //CONNECT4
-    elements = {
-      //modals
-      grid: document.getElementById("grid"),
-      gameDiv: document.getElementById("gameDiv"),
-      board: document.getElementById("board"),
-    };
 
     resetGame();
     initGraph();
@@ -144,7 +137,7 @@
   } //updateGraph
 
   function start(ai_1_strength, ai_2_strength) {
-    elements.board.innerHTML = "";
+    document.getElementById("board").innerHTML = "";
     let game = new C4({
       ai_1_strength: ai_1_strength,
       ai_2_strength: ai_2_strength,
@@ -483,28 +476,8 @@
   <meta property="og:description" content="Players take turns to drop their pieces into the container, attempting to connect 4 of their pieces in a row." />
 </svelte:head>
 
-<div class="modal fade" id="howToPlayModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="howToPlayTitle">How to play - Connect4</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="howToPlayBody">
-        <p>1. Streamer makes a move</p>
-        <p>2. Chat picks a column by typing a number in chat</p>
-        <p>3. Streamer clicks on "Play chat's turn"</p>
-        <p>Repeat until someone wins :)</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="container-fluid">
-  <div class="container-fluid p-0" id="gameDiv">
+  <div class="container-fluid p-0">
     <div class="row" id="gameRow">
       <div class="col"></div>
       <div class="col-auto">

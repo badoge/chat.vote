@@ -46,7 +46,6 @@
   onMount(async () => {
     elements = {
       //modals
-      fancyRaffleModal: document.getElementById("fancyRaffleModal"),
       claw: document.getElementById("claw"),
       slot: document.getElementById("slot"),
       fancyRaffleWinner: document.getElementById("fancyRaffleWinner"),
@@ -133,12 +132,6 @@
       titleHint: document.getElementById("titleHint"),
     };
 
-    loginButtonPopover = new bootstrap.Popover(document.getElementById("loginButtonSpan"));
-
-    rafflePopover = new bootstrap.Popover(elements.enableRaffle);
-
-    fancyRaffleModal = new bootstrap.Modal(elements.fancyRaffleModal);
-
     elements.enableRaffle.addEventListener("click", function () {
       if (raffle_open) {
         disableRaffleButton();
@@ -198,22 +191,22 @@
       }
     };
 
-    elements.linkPreviewThumbnailsEnabled.onchange = function () {
-      saveSettings();
-      const tooltipTriggerList = document.querySelectorAll("a.linktooltip");
-      const tooltipList = [...tooltipTriggerList].map(function (tooltipTriggerEl) {
-        tooltipTriggerEl.setAttribute("data-bs-title", spinner);
-        tooltipTriggerEl.addEventListener("show.bs.tooltip", function () {
-          getLinkInfo(tooltipTriggerEl, RAFFLES.value.linkPreviewThumbnailsEnabled);
-        });
-        return new bootstrap.Tooltip(tooltipTriggerEl, {
-          animation: false,
-          html: true,
-          delay: { show: 200, hide: 0 },
-          trigger: "hover",
-        });
-      });
-    };
+    // elements.linkPreviewThumbnailsEnabled.onchange = function () {
+    //   saveSettings();
+    //   const tooltipTriggerList = document.querySelectorAll("a.linktooltip");
+    //   const tooltipList = [...tooltipTriggerList].map(function (tooltipTriggerEl) {
+    //     tooltipTriggerEl.setAttribute("data-bs-title", spinner);
+    //     tooltipTriggerEl.addEventListener("show.bs.tooltip", function () {
+    //       getLinkInfo(tooltipTriggerEl, RAFFLES.value.linkPreviewThumbnailsEnabled);
+    //     });
+    //     return new bootstrap.Tooltip(tooltipTriggerEl, {
+    //       animation: false,
+    //       html: true,
+    //       delay: { show: 200, hide: 0 },
+    //       trigger: "hover",
+    //     });
+    //   });
+    // };
 
     tickSound = new Howl({
       src: ["/tick.mp3"],
@@ -238,7 +231,6 @@
       return null;
     }; //onbeforeunload
   }); //onMount
-  let loginButtonPopover;
 
   let raffle_users = [];
   let raffle_tickets = [];
@@ -246,24 +238,11 @@
   let extraTimer;
   let timer_raffle;
   let currentTime = 0;
-  let rafflePopover;
-  let fancyRaffleModal;
   let currentRaffleWinner = "";
   let raffleWinners = [];
   let tickSound, revealSound;
   let thirdPartyEmotes = [];
   let firstTimeChatters = [];
-
-  function checkLogin() {
-    if (!USER.value.channel) {
-      loginButtonPopover.show();
-      setTimeout(function () {
-        loginButtonPopover.hide();
-      }, 4000);
-      return false;
-    }
-    return true;
-  } //checkLogin
 
   async function refreshData() {
     RAFFLES.value.raffleCommand = elements.raffleCommand.value.replace(/\s+/g, "").toLowerCase() ?? "!join";
@@ -556,10 +535,10 @@
 
     if (command == RAFFLES.value.raffleCommand && !raffle_open && (Date.now() - currentTime) / 1000 > 10) {
       currentTime = Date.now();
-      rafflePopover.show();
-      setTimeout(function () {
-        rafflePopover.hide();
-      }, 3000);
+      // rafflePopover.show();
+      // setTimeout(function () {
+      //   rafflePopover.hide();
+      // }, 3000);
       return;
     } //raffle disabled
 
@@ -745,7 +724,7 @@
         true,
       );
       setTimeout(() => {
-        fancyRaffleModal.hide();
+        fancyRaffleModal.close();
         elements.fancyRaffleWinner.innerHTML = "";
         elements.slot.innerHTML = `<div class="spinner-border" style="width: 10rem; height: 10rem; margin-left: auto; margin-right: auto; display:block;" role="status"><span class="visually-hidden">Loading...</span></div>`;
       }, 2000);
@@ -796,7 +775,7 @@
   };
 
   async function drawRaffleWinnerFancy() {
-    fancyRaffleModal.show();
+    fancyRaffleModal.showModal();
     elements.claw.style.display = "none";
     let user_tickets = [];
     for (let index = 0, j = raffle_users.length; index < j; index++) {
@@ -1296,24 +1275,20 @@
   <meta property="og:description" content="chat.vote Raffles" />
 </svelte:head>
 
-<div class="modal fade" data-bs-backdrop="static" id="fancyRaffleModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog widemodal modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-body">
-        <section>
-          <div id="claw"></div>
-          <div class="half" id="slot">
-            <div class="spinner-border" style="width: 10rem; height: 10rem; position: relative; left: 45%" role="status"><span class="sr-only"></span></div>
-          </div>
-        </section>
-        <section class="result">
-          <div></div>
-          <div class="result-container" id="fancyRaffleWinner"></div>
-        </section>
+<dialog id="fancyRaffleModal" class="modal">
+  <div class="modal-box w-[95vw] max-w-[95vw]">
+    <section>
+      <div id="claw"></div>
+      <div class="half" id="slot">
+        <div class="spinner-border" style="width: 10rem; height: 10rem; position: relative; left: 45%" role="status"><span class="sr-only"></span></div>
       </div>
-    </div>
+    </section>
+    <section class="result">
+      <div></div>
+      <div class="result-container" id="fancyRaffleWinner"></div>
+    </section>
   </div>
-</div>
+</dialog>
 
 <Navbar messageHandler={handleMessage} timeoutHandler={handleTimeout} loginEvent={() => USER.refresh()} />
 
@@ -1982,10 +1957,6 @@
     flex-flow: row nowrap;
     justify-content: flex-start;
     overflow: hidden;
-  }
-
-  .widemodal {
-    min-width: 95%;
   }
 
   .popover {

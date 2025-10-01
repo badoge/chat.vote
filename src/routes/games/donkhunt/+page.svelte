@@ -30,16 +30,9 @@
   import IcBaselineStop from "~icons/ic/baseline-stop";
   import IcBaselinePause from "~icons/ic/baseline-pause";
   import IcBaselinePlayArrow from "~icons/ic/baseline-play-arrow";
-  let elements;
   let DONKHUNT;
 
   onMount(async () => {
-    elements = {
-      //modals
-      grid: document.getElementById("grid"),
-      gameDiv: document.getElementById("gameDiv"),
-    };
-
     DONKHUNT = {
       consts: {
         ARROWS_MAP: {
@@ -688,30 +681,8 @@
   <meta property="og:description" content="Scary looking creatures are trying to trap their prey. Are you the hunter or the hunted one?" />
 </svelte:head>
 
-<div class="modal fade" id="howToPlayModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="howToPlayTitle">How to play - Donk hunt</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="howToPlayBody">
-        <p>Hunters are trying to surround and kill the Target</p>
-        <p>Hunters and Target will take turns to move around the field.</p>
-        <p>Hunters can only move forward (upward). Only one Hunter can move each turn.</p>
-        <p>Target can move in any direction (but not diagonally).</p>
-        <p>Hunters and Target can only move diagonally when moving to or from the Base (topmost cell).</p>
-        <p>Hunters win if Target has nowhere to go (is surrounded/blocked). Target wins if it finds a way to reach the flag.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="container-fluid">
-  <div class="container-fluid p-0" id="gameDiv">
+  <div class="container-fluid p-0">
     <div class="row" id="gameRow">
       <div class="col-6">
         <div id="dhplayground">

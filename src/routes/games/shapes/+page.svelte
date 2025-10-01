@@ -4,15 +4,8 @@
   let voters = [];
 
   import { onMount } from "svelte";
-  let elements;
   let SHAPES;
   onMount(async () => {
-    elements = {
-      //modals
-      grid: document.getElementById("grid"),
-      gameDiv: document.getElementById("gameDiv"),
-    };
-
     SHAPES = {
       field: document.getElementById("field"),
       figureList: Array.from(document.querySelectorAll("#field div.figure")),
@@ -472,28 +465,8 @@
   <meta property="og:description" content="A very weird logic puzzle. Finish the row of shapes, which has been formed using a pre-determined hidden rule." />
 </svelte:head>
 
-<div class="modal fade" id="howToPlayModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="howToPlayTitle">How to play - 🟥⏹️🔴🔴⭕⏹️</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="howToPlayBody">
-        <p>There is a list of geometric shapes. You will have to finish this list by adding more shapes.</p>
-        <p>The list is built according to a predefined hidden rule (e.g. "next shape cannot be the same color as the last one")</p>
-        <p>Use first shapes to figure out which rule is in order, then click on the shape which you think will fit.</p>
-        <p>This game does not have separate streamer and chat turns, you can play it together at the same time</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="container-fluid">
-  <div class="container-fluid p-0" id="gameDiv">
+  <div class="container-fluid p-0">
     <div class="row" id="gameRow">
       <div class="row" id="shapesrow">
         <div id="field" class="figure-container">

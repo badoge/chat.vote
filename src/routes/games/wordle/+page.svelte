@@ -4,14 +4,7 @@
 
   import IcBaselinePlusOne from "~icons/ic/baseline-plus-one";
   import IcBaselineSpellcheck from "~icons/ic/baseline-spellcheck";
-  let elements;
   onMount(async () => {
-    elements = {
-      //modals
-      grid: document.getElementById("grid"),
-      gameDiv: document.getElementById("gameDiv"),
-    };
-
     listeners();
     loadwords();
     drawKeyboard();
@@ -339,31 +332,8 @@
   <meta property="og:description" content="A twist of a well-known game: try to guess a word in several attempts. Your chat will choose the hidden word." />
 </svelte:head>
 
-<div class="modal fade" id="howToPlayModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="howToPlayTitle">How to play - Not wordle :)</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="howToPlayBody">
-        <p>1. Streamer adjusts settings</p>
-        <p>2. Chat starts submitting words by typing in chat</p>
-        <p>3. Streamer clicks on "Start" to randomly pick a submitted word</p>
-        <p>
-          4. Streamer starts guessing the word, should work just like the
-          <a target="_blank" rel="noopener noreferrer" href="https://www.nytimes.com/games/wordle/index.html">real site</a>
-        </p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="container-fluid">
-  <div class="container-fluid p-0" id="gameDiv">
+  <div class="container-fluid p-0">
     <div class="row" id="gameRow">
       <div class="col-xl-8">
         <div id="nwoutput">

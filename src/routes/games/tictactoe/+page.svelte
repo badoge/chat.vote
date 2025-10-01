@@ -1,14 +1,7 @@
 <script>
   import { onMount } from "svelte";
-  let elements;
   let TTT;
   onMount(async () => {
-    elements = {
-      //modals
-      grid: document.getElementById("grid"),
-      gameDiv: document.getElementById("gameDiv"),
-    };
-
     TTT = {
       chart: null,
       isComputerPlaying: false,
@@ -338,28 +331,8 @@
   <meta property="og:description" content="An ancient game of wits. Will you outsmart the hive mind - which is your chat?" />
 </svelte:head>
 
-<div class="modal fade" id="howToPlayModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="howToPlayTitle">How to play - tictactoe</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="howToPlayBody">
-        <p>1. Streamer makes a move</p>
-        <p>2. Chat picks a square by typing a number in chat</p>
-        <p>3. Streamer clicks on "Play chat's turn"</p>
-        <p>Repeat until someone wins :)</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="container-fluid">
-  <div class="container-fluid p-0" id="gameDiv">
+  <div class="container-fluid p-0">
     <div class="row" id="gameRow">
       <div class="row">
         <div class="col-xl-7">

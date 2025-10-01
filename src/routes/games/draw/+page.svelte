@@ -26,10 +26,6 @@
 
   onMount(async () => {
     elements = {
-      //modals
-      grid: document.getElementById("grid"),
-      gameDiv: document.getElementById("gameDiv"),
-
       //main
       drawemotecardbody: document.getElementById("drawemotecardbody"),
       drawoutput: document.getElementById("drawoutput"),
@@ -606,27 +602,8 @@
   <meta property="og:description" content="Streamer draws a random emote, chat has to guess the emote. Can you draw well enough?" />
 </svelte:head>
 
-<div class="modal fade" id="howToPlayModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="howToPlayTitle">How to play - Draw</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="howToPlayBody">
-        <p>1. Open the settings using the <IcBaselineSettings /> button on the right and pick the emotes that you want to draw and adjust other settings</p>
-        <p>2. <IcBaselinePlayArrow /> Start the game. A random emote will be shown bottom right that you have to draw</p>
-        <p>3. Viewers guess the emote by typing in chat</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="container-fluid">
-  <div class="container-fluid p-0" id="gameDiv">
+  <div class="container-fluid p-0">
     <div class="row">
       <div class="col">
         <div class="canvas-container" style="z-index: 1000; width: 850px; height: 850px; position: relative; user-select: none; background: #666666">

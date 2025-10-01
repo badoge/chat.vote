@@ -18,6 +18,7 @@
     unescapeString,
   } from "$lib/functions";
   import { onMount } from "svelte";
+  import IcBaselineClose from "~icons/ic/baseline-close";
   import IcBaselineRefresh from "~icons/ic/baseline-refresh";
   import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
   import IcBaselineVisibility from "~icons/ic/baseline-visibility";
@@ -108,17 +109,11 @@
 
     elements = {
       //modals
-      randomOptionModal: document.getElementById("randomOptionModal"),
       randomOptionWinner: document.getElementById("randomOptionWinner"),
-      timeOverModal: document.getElementById("timeOverModal"),
       timeOverWinner: document.getElementById("timeOverWinner"),
-      yesnoTimeOverModal: document.getElementById("yesnoTimeOverModal"),
       yesnoTimeOverWinner: document.getElementById("yesnoTimeOverWinner"),
-      restartYesno: document.getElementById("restartYesno"),
-      tieModal: document.getElementById("tieModal"),
       tieModalText: document.getElementById("tieModalText"),
       removeRandomWinner: document.getElementById("removeRandomWinner"),
-      randomYesnoModal: document.getElementById("randomYesnoModal"),
       coin: document.getElementById("coin"),
 
       //start voting button
@@ -213,18 +208,8 @@
 
     elements.pollOption.focus();
     elements.pollOption.select();
-    votePopover = new bootstrap.Popover(elements.enableVoting);
-    suggestPopover = new bootstrap.Popover(elements.enableSuggestions);
-
-    loginButtonPopover = new bootstrap.Popover(document.getElementById("loginButtonSpan"));
 
     sortChartTooltip = new bootstrap.Tooltip("#sortChartLabel");
-
-    randomOptionModal = new bootstrap.Modal(elements.randomOptionModal);
-    timeOverModal = new bootstrap.Modal(elements.timeOverModal);
-    yesnoTimeOverModal = new bootstrap.Modal(elements.yesnoTimeOverModal);
-    tieModal = new bootstrap.Modal(elements.tieModal);
-    randomYesnoModal = new bootstrap.Modal(elements.randomYesnoModal);
 
     enableVotingDropdown = new bootstrap.Dropdown(elements.enableVotingDropdown);
     enableSuggestionsDropdown = new bootstrap.Dropdown(elements.enableSuggestionsDropdown);
@@ -394,11 +379,6 @@
       }
     });
 
-    elements.restartYesno.addEventListener("click", function () {
-      yesnoTimeOverModal.hide();
-      restartYesNoMode();
-    });
-
     elements.pickRandom.addEventListener("click", function () {
       if (timer && timer.isRunning()) {
         stopTimer();
@@ -424,7 +404,6 @@
     }; //onbeforeunload
   }); //onMount
 
-  let loginButtonPopover;
   let sortChartTooltip;
   let voters = [];
   let voters_options = [];
@@ -445,25 +424,12 @@
   let allNumbers = false;
   let timer;
   let currentTime = 0;
-  let votePopover, suggestPopover;
-  let randomOptionModal, timeOverModal, yesnoTimeOverModal, tieModal, randomYesnoModal;
   let enableVotingDropdown, enableSuggestionsDropdown;
   let tableTab, chartTab, yesnoTab, overlayTab;
 
   let thirdPartyEmotes = [];
 
   let streamerColor = "";
-
-  function checkLogin() {
-    if (!USER.value.channel) {
-      loginButtonPopover.show();
-      setTimeout(function () {
-        loginButtonPopover.hide();
-      }, 4000);
-      return false;
-    }
-    return true;
-  } //checkLogin
 
   async function refreshData() {
     CHATVOTE.value.suggestion_prefix = elements.suggestionPrefix.value.replace(/\s+/g, "").toLowerCase();
@@ -698,12 +664,12 @@
       return;
     }
     if (yesNoMode) {
-      randomYesnoModal.show();
+      randomYesnoModal.showModal();
       pickRandomYesNo();
       return;
     }
     refreshData();
-    randomOptionModal.show();
+    randomOptionModal.showModal();
     let random = Math.floor(Math.random() * vote_results.length);
     let title = elements.questionLabel.innerHTML;
     elements.randomOptionWinner.innerHTML = `<h2>${title}</h2><h3>${vote_results[random].option_emotes}</h3>`;
@@ -750,8 +716,8 @@
   let randomTiedOptionWinner;
   function pickRandomTiedOption() {
     if (yesNoMode) {
-      tieModal.hide();
-      randomYesnoModal.show();
+      tieModal.close();
+      randomYesnoModal.showModal();
       pickRandomYesNo();
       return;
     }
@@ -1014,10 +980,10 @@
 
     if (command == CHATVOTE.value.suggestion_prefix && !suggestions_enabled && (Date.now() - currentTime) / 1000 > 10) {
       currentTime = Date.now();
-      suggestPopover.show();
-      setTimeout(function () {
-        suggestPopover.hide();
-      }, 2000);
+      // suggestPopover.show();
+      // setTimeout(function () {
+      //   suggestPopover.hide();
+      // }, 2000);
       return;
     } //suggestions disabled
 
@@ -1070,10 +1036,10 @@
         }
       }
       currentTime = Date.now();
-      votePopover.show();
-      setTimeout(function () {
-        votePopover.hide();
-      }, 2000);
+      // votePopover.show();
+      // setTimeout(function () {
+      //   votePopover.hide();
+      // }, 2000);
       return;
     } //voting disabled
   } //handleMessage
@@ -1654,7 +1620,7 @@
         if (vote_results_yesno.nay == vote_results_yesno.yea) {
           elements.tieModalText.innerHTML = "Winner and runner up are tied, unable to pick a winner";
           elements.removeRandomWinner.style.display = "none";
-          tieModal.show();
+          tieModal.showModal();
           return;
         }
         elements.yesnoTimeOverWinner.innerHTML = `
@@ -1662,7 +1628,7 @@
     <h3>${
       vote_results_yesno.nay > vote_results_yesno.yea ? `<img src="/pics/nay.webp" alt="nay" style="height: 100px" />` : `<img  src="/pics/yea.webp" alt="yea" style="height: 100px" />`
     } has won with ${Math.max(vote_results_yesno.yea, vote_results_yesno.nay)} ${Math.max(vote_results_yesno.yea, vote_results_yesno.nay) == 1 ? "vote" : "votes"}!</h3>`;
-        yesnoTimeOverModal.show();
+        yesnoTimeOverModal.showModal();
       } else {
         let vote_results_copy = structuredClone(vote_results);
         vote_results_copy.sort(function (a, b) {
@@ -1671,7 +1637,7 @@
         if (vote_results_copy[0].score == vote_results_copy[1].score) {
           elements.tieModalText.innerHTML = "Winner and runner up are tied, unable to pick a winner";
           elements.removeRandomWinner.style.display = "none";
-          tieModal.show();
+          tieModal.showModal();
           return;
         }
         elements.timeOverWinner.innerHTML = `
@@ -1686,7 +1652,7 @@
         </button></h4>`;
         }
         linkifyElementID("timeOverWinner", CHATVOTE.value.linkPreviewThumbnailsEnabled);
-        timeOverModal.show();
+        timeOverModal.showModal();
       }
       if (CHATVOTE.value.confettiLevel > 0) {
         showConfetti(CHATVOTE.value.confettiLevel);
@@ -1804,7 +1770,6 @@
   } //disableSuggestButton
 
   function changeSuggestionCommand() {
-    enableSuggestionsDropdown.hide();
     document.getElementById("settingsDrawer").checked = true;
     elements.suggestionPrefix.focus();
     elements.suggestionPrefix.select();
@@ -1948,133 +1913,141 @@
   } //moveY
 </script>
 
-<div class="modal fade" id="randomOptionModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Random winner</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p id="randomOptionWinner"></p>
-      </div>
-      <div class="modal-footer">
+<dialog id="randomOptionModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Random winner</h3>
+    <p id="randomOptionWinner"></p>
+    <div class="modal-action">
+      <form method="dialog">
         <button type="button" class="btn btn-secondary" onclick={pickRandomOption}><IcBaselineRefresh />reroll</button>
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
-      </div>
+        <button type="submit" class="btn btn-primary">OK</button>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
-<div class="modal fade" id="timeOverModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Time is up</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p id="timeOverWinner"></p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-info" data-bs-dismiss="modal" onclick={removeWinner}>Remove winner and restart</button>
-        <button type="button" class="btn btn-warning" data-bs-dismiss="modal" onclick={restartPoll}><IcBaselineRefresh />Restart</button>
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
-      </div>
+<dialog id="timeOverModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Time is up</h3>
+    <p id="timeOverWinner"></p>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-info" onclick={removeWinner}>Remove winner and restart</button>
+        <button type="submit" class="btn btn-warning" onclick={restartPoll}><IcBaselineRefresh />Restart</button>
+        <button type="submit" class="btn btn-primary">OK</button>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
-<div class="modal fade" id="yesnoTimeOverModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Time is up</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p id="yesnoTimeOverWinner"></p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" id="restartYesno" class="btn btn-warning">Restart</button>
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
-      </div>
+<dialog id="yesnoTimeOverModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Time is up</h3>
+    <p id="yesnoTimeOverWinner"></p>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-warning" onclick={restartYesNoMode}>Restart</button>
+        <button type="submit" class="btn btn-primary">OK</button>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
-<div class="modal fade" id="tieModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Can't pick a winner</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p id="tieModalText">Winner and runner up are tied, unable to pick a winner</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-info" id="removeRandomWinner" style="display: none" data-bs-dismiss="modal" onclick={removeRandomWinner}>Remove winner and restart</button>
+<dialog id="tieModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Can't pick a winner</h3>
+    <p id="tieModalText">Winner and runner up are tied, unable to pick a winner</p>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-info" onclick={removeRandomWinner} id="removeRandomWinner" style="display: none">Remove winner and restart</button>
         <button type="button" class="btn btn-primary" onclick={pickRandomTiedOption}><IcBaselineCasino />Pick a random option</button>
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick={enableVoteButton}><IcBaselineTimer />Keep voting</button>
-      </div>
+        <button type="submit" class="btn btn-success" onclick={enableVoteButton}><IcBaselineTimer />Keep voting</button>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
-<div class="modal fade" id="randomYesnoModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Random winner</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div id="coin" onclick={pickRandomYesNo}>
-          <div class="side-a"><img src="/pics/yea.webp" alt="yea" width="150" height="150" /></div>
-          <div class="side-b"><img src="/pics/nay.webp" alt="nay" width="150" height="150" /></div>
-        </div>
-      </div>
-
-      <div class="modal-footer">
+<dialog id="randomYesnoModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Random winner</h3>
+    <div id="coin" onclick={pickRandomYesNo}>
+      <div class="side-a"><img src="/pics/yea.webp" alt="yea" width="150" height="150" /></div>
+      <div class="side-b"><img src="/pics/nay.webp" alt="nay" width="150" height="150" /></div>
+    </div>
+    <div class="modal-action">
+      <form method="dialog">
         <button type="button" class="btn btn-secondary" onclick={pickRandomYesNo}><IcBaselineRefresh />reroll</button>
-      </div>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
-<div class="modal fade" id="bulkAddModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Add multiple options</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <textarea class="form-control" placeholder="1 option per line" id="optionList" style="white-space: pre-wrap" rows="9"></textarea>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick={addOptionBulk}><IcBaselineAdd /> Add</button>
-      </div>
+<dialog id="bulkAddModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Add multiple options</h3>
+    <textarea class="form-control" placeholder="1 option per line" id="optionList" style="white-space: pre-wrap" rows="9"></textarea>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-secondary">Cancel</button>
+        <button type="submit" class="btn btn-success" onclick={addOptionBulk}><IcBaselineAdd /> Add</button>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
-<div class="modal fade" id="overlayModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Overlay info</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">dank</div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
-      </div>
+<dialog id="overlayModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Overlay info</h3>
+    dank
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-secondary">OK</button>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
 <Navbar messageHandler={handleMessage} timeoutHandler={handleTimeout} loginEvent={() => USER.refresh()} />
 
@@ -2112,7 +2085,7 @@
               <span class="visually-hidden">Toggle Dropdown</span>
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#bulkAddModal">Add multiple options</a></li>
+              <li><a class="dropdown-item" href="#" data-bs-toggle="modal" onclick={() => bulkAddModal.showModal()}>Add multiple options</a></li>
             </ul>
           </div>
         </div>
@@ -2271,7 +2244,7 @@
                   <button class="btn btn-danger" type="button" id="generateOverlayButton" onclick={generateOverlay}>
                     <IcBaselineRestartAlt /> Generate new overlay link
                   </button>
-                  <button class="btn btn-info" type="button" data-bs-toggle="modal" data-bs-target="#overlayModal"><IcBaselineHelp /></button>
+                  <button class="btn btn-info" type="button" data-bs-toggle="modal" onclick={() => overlayModal.showModal()}><IcBaselineHelp /></button>
                 </div>
 
                 <label for="overlayX" class="form-label">x</label>

@@ -24,11 +24,18 @@
 
   let channelInput = $state("");
 
-  let loginExpiredModal;
+  // function checkLogin() {
+  //   if (!USER.value.channel) {
+  //     loginButtonPopover.show();
+  //     setTimeout(function () {
+  //       loginButtonPopover.hide();
+  //     }, 4000);
+  //     return false;
+  //   }
+  //   return true;
+  // } //checkLogin
 
   onMount(async () => {
-    loginExpiredModal = new bootstrap.Modal(document.getElementById("loginExpiredModal"));
-
     //listen to storage events from the login windows
     window.onstorage = () => {
       if (localStorage.getItem("loginStatus") !== loginStatus) {
@@ -52,7 +59,7 @@
     //if token is not valid set channel to "" to avoid connecting to chat and show the error modal
     if (USER.value.twitchLogin && !(await checkToken(USER.value.access_token))) {
       USER.value.channel = "";
-      loginExpiredModal.show();
+      loginExpiredModal.showModal();
       return;
     }
 
@@ -164,21 +171,18 @@
   } //logout
 </script>
 
-<div class="modal fade" id="loginExpiredModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Login expired</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="row justify-content-center">
-          Renew login:<br />
-          <button type="button" data-bs-dismiss="modal" onclick={login} class="btn btn-twitch"><MdiTwitch />Sign in with Twitch</button>
-          <br /><small class="text-body-secondary">Logins expire after 2 months.<br />Or after you change your password.</small>
-        </div>
-      </div>
-      <div class="modal-footer">
+<dialog id="loginExpiredModal" class="modal">
+  <div class="modal-box">
+    <h3 class="text-lg font-bold">Login expired</h3>
+
+    <div class="row justify-content-center">
+      Renew login:<br />
+      <button type="button" data-bs-dismiss="modal" onclick={login} class="btn btn-twitch"><MdiTwitch />Sign in with Twitch</button>
+      <br /><small class="text-body-secondary">Logins expire after 2 months.<br />Or after you change your password.</small>
+    </div>
+
+    <div class="modal-action">
+      <form method="dialog">
         <button
           type="button"
           class="btn btn-danger"
@@ -190,10 +194,14 @@
         >
           Reset
         </button>
-      </div>
+      </form>
     </div>
   </div>
-</div>
+
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
 {#if loginStatus == "logged_out"}
   <div class="join">

@@ -15,7 +15,6 @@
       loginButton: document.getElementById("loginButton"),
       topRight: document.getElementById("topRight"),
       darkTheme: document.getElementById("darkTheme"),
-      loginExpiredModal: document.getElementById("loginExpiredModal"),
       left_rock: document.getElementById("left_rock"),
       left_paper: document.getElementById("left_paper"),
       left_scissors: document.getElementById("left_scissors"),
@@ -28,7 +27,6 @@
       start: document.getElementById("start"),
       next: document.getElementById("next"),
     };
-    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
     copyLinkButton = new bootstrap.Popover(elements.copyLinkButton);
 
     loadAndConnect();
@@ -37,7 +35,6 @@
   });
 
   let darkTheme = true;
-  let loginExpiredModal;
   let copyLinkButton;
   let webSocket;
 
@@ -269,24 +266,6 @@
       );
     }
   } //createBracket
-
-  async function loadAndConnect() {
-    load_localStorage();
-    refreshData();
-    if (USER.twitchLogin && !(await checkToken(USER.access_token))) {
-      USER.channel = "";
-      loginExpiredModal.show();
-      return;
-    }
-    if (USER.twitchLogin === false && USER.channel) {
-      resetSettings(true);
-      return;
-    }
-    if (USER.channel) {
-      connect();
-      elements.gameLink.value = `https://chat.vote/rps/play#${USER.channel || ""}`;
-    }
-  } //loadAndConnect
 
   function animateHand(hand, move) {
     elements[`${hand}_rock`].style.display = "";

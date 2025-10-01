@@ -71,8 +71,6 @@
   onMount(async () => {
     elements = {
       //modals
-      dankUpdateModal: document.getElementById("dankUpdateModal"),
-      banlistModal: document.getElementById("banlistModal"),
       bannedUsersList: document.getElementById("bannedUsersList"),
       bannedItemsList: document.getElementById("bannedItemsList"),
       bannedChannelsList: document.getElementById("bannedChannelsList"),
@@ -191,15 +189,8 @@
       volumeSliderValue: document.getElementById("volumeSliderValue"),
     };
 
-    dankUpdateModal = new bootstrap.Modal(elements.dankUpdateModal);
-    banlistModal = new bootstrap.Modal(elements.banlistModal);
     copyLinkButton = new bootstrap.Popover(elements.copyLinkButton);
     togglePlaylistPopover = new bootstrap.Popover(elements.togglePlaylist);
-    loginButtonPopover = new bootstrap.Popover(document.getElementById("loginButtonSpan"));
-
-    elements.banlistModal.addEventListener("show.bs.modal", (event) => {
-      loadBanLists();
-    });
 
     playlistTab = new bootstrap.Tab(elements.playlistTab);
     approvalTab = new bootstrap.Tab(elements.approvalTab);
@@ -246,10 +237,8 @@
     videoEmbedEventListeners();
     tiktokEmbedEventListeners();
   }); //onMount
-  let loginButtonPopover;
 
   let currentTime = 0;
-  let dankUpdateModal, banlistModal;
   let copyLinkButton;
   let playlistTab, approvalTab, historyTab;
   let playlist_open = false;
@@ -267,17 +256,6 @@
   let bannedChannels = new Map();
   let firstTimeChatters = [];
   let skippers = [];
-
-  function checkLogin() {
-    if (!USER.value.channel) {
-      loginButtonPopover.show();
-      setTimeout(function () {
-        loginButtonPopover.hide();
-      }, 4000);
-      return false;
-    }
-    return true;
-  } //checkLogin
 
   async function refreshData() {
     PLAYLIST.value.autoplay = elements.autoplay.checked;
@@ -528,17 +506,11 @@
           //reset localstorage for users that have the old array localstorage
           requests = new Map();
         }
-        let showWarning = false;
         for (let request of requests.values()) {
-          if (!request?.name) {
-            showWarning = true;
-          }
           addToPlaylist(request);
           updatePlaylist(request, true);
         }
-        if (showWarning) {
-          dankUpdateModal.show();
-        }
+
         updateLength();
         rebuildUsersArray();
       }
@@ -3231,241 +3203,216 @@
   <meta property="og:description" content="chat.vote Playlist" />
 </svelte:head>
 
-<div class="modal fade" id="dankUpdateModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Hello :)</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="modal-body">
-          It looks like you have old requests in your playlist, A recent update (9/5/2025) had many changes under the hood that made old requests incompatible. Old requests should still work
-          but their info won't show up on the playlist. These changes also affected the history and ban lists.<br />sorry for any inconvenience :)
+<dialog id="clearHistoryModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Are you sure?</h3>
+    <p>All videos/songs will be removed from the history</p>
+    <p class="text-warning">Favorites will be gone also</p>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-secondary">Cancel</button>
+        <button type="submit" class="btn btn-danger" onclick={clearHistory}><IcBaselineDeleteForever />Clear</button>
+      </form>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
+
+<dialog id="clearFavoritesModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Are you sure?</h3>
+    <p>All favorites will be removed</p>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-secondary">Cancel</button>
+        <button type="submit" class="btn btn-danger" onclick={clearFavorites}><IcBaselineHeartBroken />Clear</button>
+      </form>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
+
+<dialog id="platformsInfoModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold">Platform support details</h3>
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col"></th>
+          <th scope="col">Autoplay</th>
+          <th scope="col">Timestamps<sup>[1]</sup></th>
+          <th scope="col">Duration filters</th>
+          <th scope="col">Volume controls</th>
+          <th scope="col">Moderated platform<sup>[2]</sup></th>
+          <th scope="col">Search Command<sup>[3]</sup></th>
+          <th scope="col">Content age filters</th>
+          <th scope="col">View count filters</th>
+        </tr>
+      </thead>
+      <tbody class="table-group-divider">
+        <tr>
+          <th scope="row">YouTube</th>
+          <td>✔</td>
+          <td>✔</td>
+          <td>✔</td>
+          <td>✔</td>
+          <td>✔</td>
+          <td>✔</td>
+          <td>✔</td>
+          <td>✔</td>
+        </tr>
+        <tr>
+          <th scope="row">Vimeo</th>
+          <td>✔</td>
+          <td>✔</td>
+          <td>✔</td>
+          <td>✔</td>
+          <td>✔</td>
+          <td>✔</td>
+          <td>✔</td>
+          <td>✔</td>
+        </tr>
+        <tr>
+          <th scope="row">Twitch</th>
+          <td>✔<sup>[4]</sup></td>
+          <td>✔<sup>[4]</sup></td>
+          <td>✔</td>
+          <td>✔</td>
+          <td>✔</td>
+          <td>❌</td>
+          <td>✔</td>
+          <td>✔</td>
+        </tr>
+        <tr>
+          <th scope="row">Spotify<sup>[5]</sup></th>
+          <td>✔</td>
+          <td>✔</td>
+          <td>✔</td>
+          <td>❌</td>
+          <td>✔</td>
+          <td>✔</td>
+          <td>✔</td>
+          <td>❌</td>
+        </tr>
+        <tr>
+          <th scope="row">Streamable</th>
+          <td>✔</td>
+          <td>✔</td>
+          <td>✔</td>
+          <td>✔</td>
+          <td>❌</td>
+          <td>❌</td>
+          <td>❌</td>
+          <td>❌</td>
+        </tr>
+        <tr>
+          <th scope="row">TikTok</th>
+          <td>✔</td>
+          <td>✔</td>
+          <td>❌</td>
+          <td>❌</td>
+          <td>✔</td>
+          <td>❌</td>
+          <td>❌</td>
+          <td>❌</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="text-body-secondary">
+      [1]: Viewers can request something at a specific time by requesting a link with a timestamp parameter or adding "start=" at the end of the request. Example:
+      <kbd>!request [link] start=1:30</kbd> will make the video start from 1 minute 30 seconds<br />
+      [2]: Platforms that are marked as moderated might have some automated filters to remove unsafe content. Platforms like Streamable don't require an account, so anyone can upload unsafe videos
+      quickly then request them. This however does not mean that the other platforms will always have safe content.<br />
+      [3]: You can search some platforms directly using the request command. Example: <kbd>!request spotify camellia ghost</kbd> <br />
+      [4]: Twitch clips autoplay and timestamps might break sometimes, especially if you keep the clips in the playlist for more than a day.<br />
+      [5]: You need to login to Spotify on this browser to listen to full songs instead of previews. You might also need to enable 3rd party cookies.
+    </div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-secondary">OK</button>
+      </form>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
+
+<dialog id="banlistModal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
+    </form>
+    <h3 class="text-lg font-bold"><IcBaselineGavel />Ban list</h3>
+    <ul class="nav nav-tabs bg-body-tertiary" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="usersTab" data-bs-toggle="tab" data-bs-target="#users-tab-pane" type="button" role="tab" aria-controls="users-tab-pane" aria-selected="true">
+          <IcBaselineGroup />Users
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="itemsTab" data-bs-toggle="tab" data-bs-target="#items-tab-pane" type="button" role="tab" aria-controls="items-tab-pane" aria-selected="false">
+          <IcBaselinePlayArrow />Videos/Songs
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="channelsTab" data-bs-toggle="tab" data-bs-target="#channels-tab-pane" type="button" role="tab" aria-controls="channels-tab-pane" aria-selected="false">
+          <IcBaselineLiveTv />Channels/Artists
+        </button>
+      </li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane fade show active" id="users-tab-pane" role="tabpanel" aria-labelledby="usersTab" tabindex="0">
+        <button class="btn btn-outline-warning m-2" type="button" onclick={unbanAllUsers}>
+          <IcBaselineDeleteForever />Unban all (<span id="bannedUserCount">0 Users</span>)
+        </button>
+
+        <div id="bannedUsersListDiv">
+          <ul class="list-group" id="bannedUsersList"></ul>
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
-      </div>
-    </div>
-  </div>
-</div>
+      <div class="tab-pane fade" id="items-tab-pane" role="tabpanel" aria-labelledby="itemsTab" tabindex="0">
+        <button class="btn btn-outline-warning m-2" type="button" onclick={unbanAllItems}>
+          <IcBaselineDeleteForever />Unban all (<span id="bannedItemCount">0 Videos/Songs</span>)
+        </button>
 
-<div class="modal fade" id="clearHistoryModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Are you sure?</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p>All videos/songs will be removed from the history</p>
-        <p class="text-warning">Favorites will be gone also</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick={clearHistory}><IcBaselineDeleteForever />Clear</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="clearFavoritesModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Are you sure?</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p>All favorites will be removed</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick={clearFavorites}><IcBaselineHeartBroken />Clear</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal modal-xl fade" id="platformsInfoModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Platform support details</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th scope="col"></th>
-              <th scope="col">Autoplay</th>
-              <th scope="col">Timestamps<sup>[1]</sup></th>
-              <th scope="col">Duration filters</th>
-              <th scope="col">Volume controls</th>
-              <th scope="col">Moderated platform<sup>[2]</sup></th>
-              <th scope="col">Search Command<sup>[3]</sup></th>
-              <th scope="col">Content age filters</th>
-              <th scope="col">View count filters</th>
-            </tr>
-          </thead>
-          <tbody class="table-group-divider">
-            <tr>
-              <th scope="row">YouTube</th>
-              <td>✔</td>
-              <td>✔</td>
-              <td>✔</td>
-              <td>✔</td>
-              <td>✔</td>
-              <td>✔</td>
-              <td>✔</td>
-              <td>✔</td>
-            </tr>
-            <tr>
-              <th scope="row">Vimeo</th>
-              <td>✔</td>
-              <td>✔</td>
-              <td>✔</td>
-              <td>✔</td>
-              <td>✔</td>
-              <td>✔</td>
-              <td>✔</td>
-              <td>✔</td>
-            </tr>
-            <tr>
-              <th scope="row">Twitch</th>
-              <td>✔<sup>[4]</sup></td>
-              <td>✔<sup>[4]</sup></td>
-              <td>✔</td>
-              <td>✔</td>
-              <td>✔</td>
-              <td>❌</td>
-              <td>✔</td>
-              <td>✔</td>
-            </tr>
-            <tr>
-              <th scope="row">Spotify<sup>[5]</sup></th>
-              <td>✔</td>
-              <td>✔</td>
-              <td>✔</td>
-              <td>❌</td>
-              <td>✔</td>
-              <td>✔</td>
-              <td>✔</td>
-              <td>❌</td>
-            </tr>
-            <tr>
-              <th scope="row">Streamable</th>
-              <td>✔</td>
-              <td>✔</td>
-              <td>✔</td>
-              <td>✔</td>
-              <td>❌</td>
-              <td>❌</td>
-              <td>❌</td>
-              <td>❌</td>
-            </tr>
-            <tr>
-              <th scope="row">TikTok</th>
-              <td>✔</td>
-              <td>✔</td>
-              <td>❌</td>
-              <td>❌</td>
-              <td>✔</td>
-              <td>❌</td>
-              <td>❌</td>
-              <td>❌</td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="text-body-secondary">
-          [1]: Viewers can request something at a specific time by requesting a link with a timestamp parameter or adding "start=" at the end of the request. Example:
-          <kbd>!request [link] start=1:30</kbd> will make the video start from 1 minute 30 seconds<br />
-          [2]: Platforms that are marked as moderated might have some automated filters to remove unsafe content. Platforms like Streamable don't require an account, so anyone can upload unsafe
-          videos quickly then request them. This however does not mean that the other platforms will always have safe content.<br />
-          [3]: You can search some platforms directly using the request command. Example: <kbd>!request spotify camellia ghost</kbd> <br />
-          [4]: Twitch clips autoplay and timestamps might break sometimes, especially if you keep the clips in the playlist for more than a day.<br />
-          [5]: You need to login to Spotify on this browser to listen to full songs instead of previews. You might also need to enable 3rd party cookies.
+        <div id="bannedItemsListDiv">
+          <ul class="list-group" id="bannedItemsList"></ul>
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
-      </div>
-    </div>
-  </div>
-</div>
+      <div class="tab-pane fade" id="channels-tab-pane" role="tabpanel" aria-labelledby="channelsTab" tabindex="0">
+        <button class="btn btn-outline-warning m-2" type="button" onclick={unbanAllChannels}>
+          <IcBaselineDeleteForever />Unban all (<span id="bannedChannelCount">0 Channels/Artists</span>)
+        </button>
 
-<div class="modal fade" id="banlistModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title"><IcBaselineGavel />Ban list</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body p-0">
-        <ul class="nav nav-tabs bg-body-tertiary" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="usersTab" data-bs-toggle="tab" data-bs-target="#users-tab-pane" type="button" role="tab" aria-controls="users-tab-pane" aria-selected="true">
-              <IcBaselineGroup />Users
-            </button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="itemsTab" data-bs-toggle="tab" data-bs-target="#items-tab-pane" type="button" role="tab" aria-controls="items-tab-pane" aria-selected="false">
-              <IcBaselinePlayArrow />Videos/Songs
-            </button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button
-              class="nav-link"
-              id="channelsTab"
-              data-bs-toggle="tab"
-              data-bs-target="#channels-tab-pane"
-              type="button"
-              role="tab"
-              aria-controls="channels-tab-pane"
-              aria-selected="false"
-            >
-              <IcBaselineLiveTv />Channels/Artists
-            </button>
-          </li>
-        </ul>
-        <div class="tab-content">
-          <div class="tab-pane fade show active" id="users-tab-pane" role="tabpanel" aria-labelledby="usersTab" tabindex="0">
-            <button class="btn btn-outline-warning m-2" type="button" onclick={unbanAllUsers}>
-              <IcBaselineDeleteForever />Unban all (<span id="bannedUserCount">0 Users</span>)
-            </button>
-
-            <div id="bannedUsersListDiv">
-              <ul class="list-group" id="bannedUsersList"></ul>
-            </div>
-          </div>
-          <div class="tab-pane fade" id="items-tab-pane" role="tabpanel" aria-labelledby="itemsTab" tabindex="0">
-            <button class="btn btn-outline-warning m-2" type="button" onclick={unbanAllItems}>
-              <IcBaselineDeleteForever />Unban all (<span id="bannedItemCount">0 Videos/Songs</span>)
-            </button>
-
-            <div id="bannedItemsListDiv">
-              <ul class="list-group" id="bannedItemsList"></ul>
-            </div>
-          </div>
-          <div class="tab-pane fade" id="channels-tab-pane" role="tabpanel" aria-labelledby="channelsTab" tabindex="0">
-            <button class="btn btn-outline-warning m-2" type="button" onclick={unbanAllChannels}>
-              <IcBaselineDeleteForever />Unban all (<span id="bannedChannelCount">0 Channels/Artists</span>)
-            </button>
-
-            <div id="bannedChannelsListDiv">
-              <ul class="list-group" id="bannedChannelsList"></ul>
-            </div>
-          </div>
+        <div id="bannedChannelsListDiv">
+          <ul class="list-group" id="bannedChannelsList"></ul>
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
+    </div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="submit" class="btn btn-secondary">Close</button>
+      </form>
     </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
 <div id="voteSkipDiv" class="bg-body-tertiary" style="display: none">
   <small class="text-body-secondary">
@@ -3575,7 +3522,7 @@
                 <div class="p-1 align-self-start">
                   <h5 class="mb-2"><IcBaselineHistory />History (<span id="historyCount">0 requests</span>)</h5>
 
-                  <button class="btn btn-outline-warning" type="button" data-bs-toggle="modal" data-bs-target="#clearHistoryModal">
+                  <button class="btn btn-outline-warning" type="button" onclick={() => clearHistoryModal.showModal()}>
                     <IcBaselineDeleteForever />Clear history
                   </button>
                   <br /><small class="text-body-secondary">Will clear favorites also</small>
@@ -3589,7 +3536,7 @@
                 <div class="p-1 align-self-start">
                   <h5 class="mb-2"><IcBaselineFavorite />Favorites (<span id="favoriteCount">0 requests</span>)</h5>
 
-                  <button class="btn btn-outline-warning mb-2" type="button" data-bs-toggle="modal" data-bs-target="#clearFavoritesModal">
+                  <button class="btn btn-outline-warning mb-2" type="button" onclick={() => clearFavoritesModal.showModal()}>
                     <IcBaselineHeartBroken />Clear favorites
                   </button>
 
@@ -3631,7 +3578,7 @@
                 <div class="card mb-3">
                   <div class="card-header">
                     <span class="align-middle"><IcBaselineChecklist />Enabled Platforms</span>
-                    <button type="button" class="btn btn-sm btn-primary float-end" data-bs-toggle="modal" data-bs-target="#platformsInfoModal">
+                    <button type="button" class="btn btn-sm btn-primary float-end" onclick={() => platformsInfoModal.showModal()}>
                       <IcBaselineInfo /> Platform support details
                     </button>
                   </div>
@@ -3773,8 +3720,8 @@
                   </div>
                   <div class="card-footer text-body-secondary">
                     <small class="text-warning">
-                      See <span class="cursor-pointer text-info" data-bs-toggle="modal" data-bs-target="#platformsInfoModal">Platform support details</span> for info about which platforms work
-                      with these filters
+                      See <span class="cursor-pointer text-info" onclick={() => platformsInfoModal.showModal()}>Platform support details</span> for info about which platforms work with these
+                      filters
                     </small>
                   </div>
                 </div>
@@ -3996,7 +3943,16 @@
                 <div class="card mb-3">
                   <div class="card-header"><IcBaselineShield />Moderation Settings</div>
                   <div class="card-body">
-                    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#banlistModal"><IcBaselineGavel />Ban list</button>
+                    <button
+                      type="button"
+                      class="btn btn-primary mb-3"
+                      onclick={() => {
+                        loadBanLists();
+                        banlistModal.showModal();
+                      }}
+                    >
+                      <IcBaselineGavel />Ban list
+                    </button>
 
                     <div class="form-check form-switch mb-3" style="display: none">
                       <input disabled class="form-check-input" type="checkbox" role="switch" id="approvalQueue" />

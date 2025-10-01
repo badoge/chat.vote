@@ -10,7 +10,6 @@
       me: document.getElementById("me"),
       opponent: document.getElementById("opponent"),
       topRight: document.getElementById("topRight"),
-      loginExpiredModal: document.getElementById("loginExpiredModal"),
       left_rock: document.getElementById("left_rock"),
       left_paper: document.getElementById("left_paper"),
       left_scissors: document.getElementById("left_scissors"),
@@ -24,7 +23,6 @@
       paper: document.getElementById("paper"),
       scissors: document.getElementById("scissors"),
     };
-    loginExpiredModal = new bootstrap.Modal(elements.loginExpiredModal);
 
     loadAndConnect();
   });
@@ -33,7 +31,6 @@
   let channel = $state(data.slug.toLowerCase().replace(/\s/g, ""));
 
   let darkTheme = true;
-  let loginExpiredModal;
   let streamer = "";
   let webSocket;
 
@@ -225,36 +222,6 @@
     elements.paper.disabled = true;
     elements.scissors.disabled = true;
   } //showReset
-
-  async function loadAndConnect() {
-    load_localStorage();
-    refreshData();
-
-    let input = location.hash;
-    streamer = input.replace("#", "").toLowerCase().replace(/\s/g, "");
-
-    // if (!streamer) {
-    //   elements.info.innerHTML = `<span class="text-warning">No channel provided</span> Get the game link from your streamer.<br>Example: chat.vote/rps/play#forsen`;
-    //   elements.info.style.display = "";
-    //   return;
-    // }
-
-    if (USER.twitchLogin && !(await checkToken(USER.access_token))) {
-      USER.channel = "";
-      loginExpiredModal.show();
-      return;
-    }
-    if (USER.twitchLogin === false && USER.channel) {
-      resetSettings(true);
-      return;
-    }
-    if (USER.channel) {
-      connect();
-    } else {
-      elements.info.innerHTML = `<span class="text-warning">Not signed in.</span> Sign in with the button above.`;
-      elements.info.style.display = "";
-    }
-  } //loadAndConnect
 
   function animateHand(hand, move) {
     elements[`${hand}_rock`].style.display = "";
