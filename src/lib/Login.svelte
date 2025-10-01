@@ -4,6 +4,7 @@
   import { checkToken, get7TVPFP, getTwitchPFP, getUserID, loadBadges } from "./functions";
   import MdiTwitch from "~icons/mdi/twitch";
   import IcBaselineLogout from "~icons/ic/baseline-logout";
+  import IcBaselineArrowDropDown from "~icons/ic/baseline-arrow-drop-down";
   import { CLIENT_ID } from "$lib/consts";
 
   import tmi from "tmi.js";
@@ -195,22 +196,20 @@
 </div>
 
 {#if loginStatus == "logged_out"}
-  <div class="btn-group">
-    <button type="button" class="btn btn-twitch" onclick={login}><MdiTwitch />Sign in with Twitch</button>
-    <button type="button" class="btn btn-twitch dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
-      <span class="visually-hidden">Toggle Dropdown</span>
-    </button>
-    <div class="dropdown-menu dropdown-menu-end">
-      <div class="p-4" style="width: 300px">
-        <label for="channelName" class="form-label">Connect to chat directly</label>
-        <div class="input-group">
-          <span class="input-group-text" id="directLoginChannel">twitch.tv/</span>
-          <input type="text" class="form-control" id="channelName" placeholder="Username" bind:value={channelInput} onkeydown={handleKeydown} aria-describedby="directLoginChannel" />
-        </div>
-        <small class="text-body-secondary">Some features will be unavailable if you connect directly</small>
-        <br />
-        <button type="button" onclick={manualConnect} class="btn btn-primary float-end mb-3">Connect</button>
+  <div class="join">
+    <button class="btn btn-twitch join-item"><MdiTwitch />Sign in with Twitch</button>
+    <button class="btn btn-twitch join-item p-1" popovertarget="loginDropdown" style="anchor-name:--loginDropdownAnchor"><IcBaselineArrowDropDown /></button>
+  </div>
+  <div class="dropdown dropdown-end menu w-52 rounded-box bg-base-100 shadow-sm" popover id="loginDropdown" style="position-anchor:--loginDropdownAnchor">
+    <div class="p-4" style="width: 300px">
+      <label for="channelName" class="form-label">Connect to chat directly</label>
+      <div class="input-group">
+        <span class="input-group-text" id="directLoginChannel">twitch.tv/</span>
+        <input type="text" class="form-control" id="channelName" placeholder="Username" bind:value={channelInput} onkeydown={handleKeydown} aria-describedby="directLoginChannel" />
       </div>
+      <small class="text-body-secondary">Some features will be unavailable if you connect directly</small>
+      <br />
+      <button type="button" onclick={manualConnect} class="btn btn-primary float-end mb-3">Connect</button>
     </div>
   </div>
 {:else if loginStatus == "login_prompted"}

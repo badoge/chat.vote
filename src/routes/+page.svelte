@@ -1,8 +1,4 @@
 <script>
-  import NavbarLinks from "$lib/NavbarLinks.svelte";
-  import ThemeSwitcher from "$lib/ThemeSwitcher.svelte";
-  import Login from "$lib/Login.svelte";
-
   import {
     addBadges,
     changeSiteLinkTarget,
@@ -50,12 +46,12 @@
   import IcBaselinePause from "~icons/ic/baseline-pause";
   import IcBaselinePlayArrow from "~icons/ic/baseline-play-arrow";
   import MdiTwitch from "~icons/mdi/twitch";
-  import HomepageLink from "$lib/HomepageLink.svelte";
 
   import Chart from "chart.js/auto";
   import { createGrid, themeQuartz, ModuleRegistry, AllCommunityModule } from "ag-grid-community";
   import { donkStorage, resetSettings } from "$lib/donkStorage.svelte";
   import { showToast } from "./+layout.svelte";
+  import Navbar from "$lib/Navbar.svelte";
 
   /**
    * @type {{ pollOption: any; settingsOffcanvas: any; enableVoting: any; enableSuggestions: any; randomOptionModal: any; timeOverModal: any; yesnoTimeOverModal: any; tieModal: any; randomYesnoModal: any; enableVotingDropdown: any; enableSuggestionsDropdown: any; tableTabButton: any; chartTabButton: any; yesnoTabButton: any; overlayTabButton: any; questionLabel: any; hideQuestion: any; voteWithNumbers: any; multiChoiceExample: any; voteWithText: any; sortChart: any; suggestionLimit: any; suggestionPrefix: any; suggestionsCommand: any; confettiLevel: any; linkPreviewThumbnailsEnabled: any; showChat: any; multiChoice: any; subMode: any; subOnlyAlert: any; restartYesno: any; pickRandom: any; hideScore: any; allowChange: any; suggestionLimitUser: any; timerValueMinutes: any; chartCanvas: any; refreshWarningEnabled: any; sortChartLabel: any; overlayLink: any; connectOverlayButton: any; voteHint: any; totalVotes: any; remove: any; randomOptionWinner: any; removeRandomWinner: any; tieModalText: any; coin: any; bttvGlobalEmotes: any; ffzGlobalEmotes: any; seventvGlobalEmotes: any; bttvChannelEmotes: any; ffzChannelEmotes: any; seventvChannelEmotes: any; yeaPic: any; nayPic: any; yeaCount: any; nayCount: any; yesnoTotalVotes: any; optionList: any; numberStats: any; json_selected: any; voters_selected: any; txt_selected: any; averageNumber: any; medianNumber: any; hideScoreIcon: any; chat: any; countdown: any; unpauseTimer: any; pauseTimer: any; stopTimer: any; yesnoTimeOverWinner: any; timeOverWinner: any; enableVotingText: any; enableSuggestionsText: any; generateOverlayButton: any; restartPoll?: HTMLElement | null; addOption?: HTMLElement | null; options?: HTMLElement | null; chatiframe?: HTMLElement | null; yesnoDiv?: HTMLElement | null; }}
@@ -2273,39 +2269,7 @@
   </div>
 </div>
 
-<nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
-  <div class="container-fluid">
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLinks" aria-controls="navbarLinks" aria-expanded="false" aria-label="Toggle site links">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <HomepageLink />
-    <a class="navbar-brand notranslate site-link" href="/" target="_self"> chat.vote </a>
-
-    <div class="collapse navbar-collapse" id="navbarLinks">
-      <ul class="navbar-nav">
-        <NavbarLinks />
-      </ul>
-    </div>
-
-    <div class="navbar-nav">
-      <span
-        id="loginButtonSpan"
-        data-bs-container="body"
-        data-bs-placement="bottom"
-        data-bs-trigger="manual"
-        data-bs-toggle="popover"
-        data-bs-title="Not signed in"
-        data-bs-content="You need sign in before doing that"
-      >
-        <Login messageHandler={handleMessage} timeoutHandler={handleTimeout} loginEvent={() => USER.refresh()} />
-      </span>
-    </div>
-
-    <div class="navbar-nav">
-      <ThemeSwitcher />
-    </div>
-  </div>
-</nav>
+<Navbar messageHandler={handleMessage} timeoutHandler={handleTimeout} loginEvent={() => USER.refresh()} />
 
 <div class="container-fluid">
   <div class="row">

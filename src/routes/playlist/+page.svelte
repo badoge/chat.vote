@@ -1,7 +1,6 @@
 <script>
-  import NavbarLinks from "$lib/NavbarLinks.svelte";
-  import ThemeSwitcher from "$lib/ThemeSwitcher.svelte";
-  import Login from "$lib/Login.svelte";
+  import Navbar from "$lib/Navbar.svelte";
+
   import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
   import IcBaselineVisibility from "~icons/ic/baseline-visibility";
   import IcBaselineSettings from "~icons/ic/baseline-settings";
@@ -56,7 +55,6 @@
   import MdiSpotify from "~icons/mdi/spotify";
   import MdiVimeo from "~icons/mdi/vimeo";
   import IcBaselineTiktok from "~icons/ic/baseline-tiktok";
-  import HomepageLink from "$lib/HomepageLink.svelte";
 
   import { convertTwitchVODDuration, escapeString, formatViewCount, replacer, secondsToTimeString, timeStringToSeconds, timeToSeconds } from "$lib/functions";
   import { animate } from "animejs";
@@ -3950,39 +3948,7 @@
   </div>
 </div>
 
-<nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
-  <div class="container-fluid">
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLinks" aria-controls="navbarLinks" aria-expanded="false" aria-label="Toggle site links">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <HomepageLink />
-    <a class="navbar-brand notranslate site-link" href="/playlist" target="_self"> chat.vote Playlist</a>
-
-    <div class="collapse navbar-collapse" id="navbarLinks">
-      <ul class="navbar-nav">
-        <NavbarLinks />
-      </ul>
-    </div>
-
-    <div class="navbar-nav">
-      <span
-        id="loginButtonSpan"
-        data-bs-container="body"
-        data-bs-placement="bottom"
-        data-bs-trigger="manual"
-        data-bs-toggle="popover"
-        data-bs-title="Not signed in"
-        data-bs-content="You need sign in before doing that"
-      >
-        <Login messageHandler={handleMessage} messageDeletedHandler={handleMessageDeleted} loginEvent={() => USER.refresh()} />
-      </span>
-    </div>
-
-    <div class="navbar-nav">
-      <ThemeSwitcher />
-    </div>
-  </div>
-</nav>
+<Navbar messageHandler={handleMessage} messageDeletedHandler={handleMessageDeleted} loginEvent={() => USER.refresh()} />
 
 <div class="container-fluid">
   <div class="row" id="mainRow">

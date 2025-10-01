@@ -609,13 +609,13 @@ export async function getLinkInfo(element, allowThumbnails) {
       return;
     }
     url = `LINKPREVIEW${encodeURIComponent(url)}`;
-    let tooltip = bootstrap.Tooltip.getInstance(element);
+    //let tooltip = bootstrap.Tooltip.getInstance(element);
     try {
       let response = await fetch(`https://helper.donk.workers.dev/cors/?${url}`);
       let result = await response.json();
       if (result?.status != 200 && result?.message) {
         element.setAttribute("data-bs-title", result.message);
-        tooltip.setContent({ ".tooltip-inner": result.message });
+        //tooltip.setContent({ ".tooltip-inner": result.message });
         return;
       }
       let preview = DOMPurify.sanitize(decodeURIComponent(result.tooltip), { ALLOWED_TAGS: ["div", "li", "br", "b", "span", "hr"] });
@@ -623,10 +623,10 @@ export async function getLinkInfo(element, allowThumbnails) {
         preview = `<img class="previewThumbnail" src="${result.thumbnail}" alt="link preview thumbnail">` + preview;
       }
       element.setAttribute("data-bs-title", preview);
-      tooltip.setContent({ ".tooltip-inner": preview });
+      //tooltip.setContent({ ".tooltip-inner": preview });
     } catch (error) {
       element.setAttribute("data-bs-title", "Could not get link preview :(");
-      tooltip.setContent({ ".tooltip-inner": "Could not get link preview :(" });
+      //tooltip.setContent({ ".tooltip-inner": "Could not get link preview :(" });
     }
   }
 } //getLinkInfo

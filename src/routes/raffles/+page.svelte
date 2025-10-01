@@ -1,7 +1,4 @@
 <script>
-  import NavbarLinks from "$lib/NavbarLinks.svelte";
-  import ThemeSwitcher from "$lib/ThemeSwitcher.svelte";
-  import Login from "$lib/Login.svelte";
   import IcBaselineRefresh from "~icons/ic/baseline-refresh";
   import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
   import IcBaselineAccountCircle from "~icons/ic/baseline-account-circle";
@@ -38,7 +35,7 @@
   import { showToast } from "../+layout.svelte";
 
   import { donkStorage } from "$lib/donkStorage.svelte";
-  import HomepageLink from "$lib/HomepageLink.svelte";
+  import Navbar from "$lib/Navbar.svelte";
 
   let USER = donkStorage("USER", null);
 
@@ -1332,39 +1329,7 @@
   </div>
 </div>
 
-<nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
-  <div class="container-fluid">
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLinks" aria-controls="navbarLinks" aria-expanded="false" aria-label="Toggle site links">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <HomepageLink />
-    <a class="navbar-brand notranslate site-link" href="/raffles" target="_self"> chat.vote Raffles</a>
-
-    <div class="collapse navbar-collapse" id="navbarLinks">
-      <ul class="navbar-nav">
-        <NavbarLinks />
-      </ul>
-    </div>
-
-    <div class="navbar-nav">
-      <span
-        id="loginButtonSpan"
-        data-bs-container="body"
-        data-bs-placement="bottom"
-        data-bs-trigger="manual"
-        data-bs-toggle="popover"
-        data-bs-title="Not signed in"
-        data-bs-content="You need sign in before doing that"
-      >
-        <Login messageHandler={handleMessage} timeoutHandler={handleTimeout} loginEvent={() => USER.refresh()} />
-      </span>
-    </div>
-
-    <div class="navbar-nav">
-      <ThemeSwitcher />
-    </div>
-  </div>
-</nav>
+<Navbar messageHandler={handleMessage} timeoutHandler={handleTimeout} loginEvent={() => USER.refresh()} />
 
 <div class="container-fluid mt-3">
   <div class="row">

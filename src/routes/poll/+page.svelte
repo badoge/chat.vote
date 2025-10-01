@@ -1,7 +1,4 @@
 <script>
-  import NavbarLinks from "$lib/NavbarLinks.svelte";
-  import ThemeSwitcher from "$lib/ThemeSwitcher.svelte";
-  import Login from "$lib/Login.svelte";
   import { changeSiteLinkTarget, escapeString } from "$lib/functions";
   import { onMount } from "svelte";
   import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
@@ -15,8 +12,8 @@
   import IcBaselineSecurity from "~icons/ic/baseline-security";
   import IcBaselineHowToVote from "~icons/ic/baseline-how-to-vote";
   import IcBaselineCreate from "~icons/ic/baseline-create";
-  import HomepageLink from "$lib/HomepageLink.svelte";
   import { showToast } from "../+layout.svelte";
+  import Navbar from "$lib/Navbar.svelte";
 
   let elements;
   onMount(async () => {
@@ -771,29 +768,7 @@
   </div>
 </div>
 
-<nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
-  <div class="container-fluid">
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLinks" aria-controls="navbarLinks" aria-expanded="false" aria-label="Toggle site links">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <HomepageLink />
-    <a class="navbar-brand notranslate site-link" href="/poll" target="_self"> chat.vote Polls</a>
-
-    <div class="collapse navbar-collapse" id="navbarLinks">
-      <ul class="navbar-nav">
-        <NavbarLinks />
-      </ul>
-    </div>
-
-    <div class="navbar-nav">
-      <Login />
-    </div>
-
-    <div class="navbar-nav">
-      <ThemeSwitcher />
-    </div>
-  </div>
-</nav>
+<Navbar />
 
 <div class="container-fluid">
   <div class="row" id="mainrow">

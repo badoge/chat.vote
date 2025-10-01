@@ -1,8 +1,5 @@
 <script>
-  import NavbarLinks from "$lib/NavbarLinks.svelte";
-  import ThemeSwitcher from "$lib/ThemeSwitcher.svelte";
-  import Login from "$lib/Login.svelte";
-  import HomepageLink from "$lib/HomepageLink.svelte";
+  import Navbar from "$lib/Navbar.svelte";
 </script>
 
 <svelte:head>
@@ -16,29 +13,7 @@
   <meta property="og:description" content="Learn about all the features of chat.vote" />
 </svelte:head>
 
-<nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
-  <div class="container-fluid">
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLinks" aria-controls="navbarLinks" aria-expanded="false" aria-label="Toggle site links">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <HomepageLink />
-    <a class="navbar-brand notranslate site-link" href="/home" target="_self"> chat.vote Homepage</a>
-
-    <div class="collapse navbar-collapse" id="navbarLinks">
-      <ul class="navbar-nav">
-        <NavbarLinks />
-      </ul>
-    </div>
-
-    <div class="navbar-nav">
-      <Login />
-    </div>
-
-    <div class="navbar-nav">
-      <ThemeSwitcher />
-    </div>
-  </div>
-</nav>
+<Navbar />
 
 <h1 class="display-4 text-center">chat.vote pages</h1>
 

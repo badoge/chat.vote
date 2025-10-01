@@ -1,11 +1,8 @@
 <script>
-  import NavbarLinks from "$lib/NavbarLinks.svelte";
-  import ThemeSwitcher from "$lib/ThemeSwitcher.svelte";
-  import Login from "$lib/Login.svelte";
   import { switchGame } from "$lib/functions";
   import { onMount } from "svelte";
   import IcRoundOpenInNew from "~icons/ic/round-open-in-new";
-  import HomepageLink from "$lib/HomepageLink.svelte";
+  import Navbar from "$lib/Navbar.svelte";
 
   let { children } = $props();
 
@@ -59,29 +56,7 @@
   </div>
 </div>
 
-<nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
-  <div class="container-fluid">
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLinks" aria-controls="navbarLinks" aria-expanded="false" aria-label="Toggle site links">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <HomepageLink />
-    <a class="navbar-brand notranslate site-link" href="/games" target="_self"> chat.vote Games</a>
-
-    <div class="collapse navbar-collapse" id="navbarLinks">
-      <ul class="navbar-nav">
-        <NavbarLinks />
-      </ul>
-    </div>
-
-    <div class="navbar-nav">
-      <Login />
-    </div>
-
-    <div class="navbar-nav">
-      <ThemeSwitcher />
-    </div>
-  </div>
-</nav>
+<Navbar />
 
 <div class="container-fluid">
   <div id="grid" class="mt-3" style="display: none;">
