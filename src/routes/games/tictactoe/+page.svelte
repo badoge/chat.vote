@@ -1,11 +1,8 @@
 <script>
-  import { enablePopovers, enableTooltips } from "$lib/functions";
   import { onMount } from "svelte";
   let elements;
   let TTT;
-  let bootstrap;
   onMount(async () => {
-    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
     elements = {
       //modals
       grid: document.getElementById("grid"),
@@ -45,9 +42,6 @@
         O: "text-warning",
       },
     }; //TTT
-
-    enableTooltips(bootstrap);
-    enablePopovers(bootstrap);
 
     initGraph();
     listeners();

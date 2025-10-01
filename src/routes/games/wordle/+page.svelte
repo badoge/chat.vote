@@ -1,22 +1,16 @@
 <script>
-  import { enablePopovers, enableTooltips } from "$lib/functions";
   import { onMount } from "svelte";
   import { showToast } from "../../+layout.svelte";
 
   import IcBaselinePlusOne from "~icons/ic/baseline-plus-one";
   import IcBaselineSpellcheck from "~icons/ic/baseline-spellcheck";
   let elements;
-  let bootstrap;
   onMount(async () => {
-    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
     elements = {
       //modals
       grid: document.getElementById("grid"),
       gameDiv: document.getElementById("gameDiv"),
     };
-
-    enableTooltips(bootstrap);
-    enablePopovers(bootstrap);
 
     listeners();
     loadwords();
@@ -95,10 +89,10 @@
 
   function startnw() {
     if (WORDLE.wordList.length < 2) {
-      showToast(bootstrap, `Chat needs to submit at least 2 words before you can start.`, "warning", 6000);
+      showToast(`Chat needs to submit at least 2 words before you can start.`, "warning", 6000);
       return;
     } else {
-      showToast(bootstrap, `A random word has been picked from chat's suggestions. Start guessing :)`, "success", 6000);
+      showToast(`A random word has been picked from chat's suggestions. Start guessing :)`, "success", 6000);
     }
     document.getElementById("nwoutput2").innerHTML = "";
     shownw();
@@ -172,7 +166,7 @@
         return;
       }
       if (WORDLE.verifywords && !WORDLE.words.includes(guess.join(""))) {
-        showToast(bootstrap, `"${guess.join("")}" is not a word <img src="/pics/donk.png" alt="donk" style="height:24px; width:24px;">`, "danger", 3000);
+        showToast(`"${guess.join("")}" is not a word <img src="/pics/donk.png" alt="donk" style="height:24px; width:24px;">`, "danger", 3000);
         return;
       }
       for (let index = 0; index < WORDLE.wordlength; index++) {

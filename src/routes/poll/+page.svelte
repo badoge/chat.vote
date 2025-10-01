@@ -2,7 +2,7 @@
   import NavbarLinks from "$lib/NavbarLinks.svelte";
   import ThemeSwitcher from "$lib/ThemeSwitcher.svelte";
   import Login from "$lib/Login.svelte";
-  import { changeSiteLinkTarget, enablePopovers, enableTooltips, escapeString } from "$lib/functions";
+  import { changeSiteLinkTarget, escapeString } from "$lib/functions";
   import { onMount } from "svelte";
   import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
   import IcBaselineVisibility from "~icons/ic/baseline-visibility";
@@ -19,9 +19,7 @@
   import { showToast } from "../+layout.svelte";
 
   let elements;
-  let bootstrap;
   onMount(async () => {
-    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
     elements = {
       //modals
       pollModal: document.getElementById("pollModal"),
@@ -68,9 +66,6 @@
 
     pollModal = new bootstrap.Modal(elements.pollModal);
     captchaModal = new bootstrap.Modal(elements.captchaModal);
-
-    enableTooltips(bootstrap);
-    enablePopovers(bootstrap);
 
     elements.pollTitle.addEventListener("keydown", function (event) {
       if (event.key === "Tab") {
@@ -361,7 +356,7 @@
 
   async function createPoll() {
     if (checkEmpty()) {
-      showToast(bootstrap, "No poll options added", "warning", 3000);
+      showToast("No poll options added", "warning", 3000);
       return;
     }
 
@@ -370,7 +365,7 @@
     }
 
     if (checkSize()) {
-      showToast(bootstrap, "Too many poll options", "danger", 3000);
+      showToast("Too many poll options", "danger", 3000);
       return;
     }
 
@@ -428,7 +423,7 @@
     }
 
     if (pollOptionsArray.length < 2) {
-      showToast(bootstrap, "You can't create a poll with less than 2 options", "warning", 3000);
+      showToast("You can't create a poll with less than 2 options", "warning", 3000);
       return;
     }
 
@@ -666,7 +661,7 @@
       if (optionCards.length > 2) {
         optionCards[index].remove();
       } else {
-        showToast(bootstrap, "You can't have less than 2 options", "danger", 3000);
+        showToast("You can't have less than 2 options", "danger", 3000);
       }
     }
   } //deleteInput

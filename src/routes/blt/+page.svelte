@@ -31,7 +31,7 @@
   import IcBaselineCreate from "~icons/ic/baseline-create";
   import IcBaselineChat from "~icons/ic/baseline-chat";
 
-  import { addBadges, changeSiteLinkTarget, enablePopovers, enableTooltips, escapeString, getUserID, ISO8601ToSeconds } from "$lib/functions";
+  import { addBadges, changeSiteLinkTarget, escapeString, getUserID, ISO8601ToSeconds } from "$lib/functions";
   import { showToast } from "../+layout.svelte";
 
   import localforage from "localforage";
@@ -898,7 +898,7 @@
     if (type.value == "image") {
       let image = option?.value.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g) || null;
       if (!image) {
-        showToast(bootstrap, "Invalid image URL", "warning", 3000);
+        showToast("Invalid image URL", "warning", 3000);
         button.innerHTML = `<i class="material-icons notranslate">preview</i>Preview`;
         return;
       }
@@ -1028,7 +1028,7 @@
     if (questionType.value == "image") {
       let image = questionMedia?.value.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g) || null;
       if (!image) {
-        showToast(bootstrap, "Invalid image URL", "warning", 3000);
+        showToast("Invalid image URL", "warning", 3000);
         button.innerHTML = `<i class="material-icons notranslate">preview</i>Preview`;
         return;
       }
@@ -1167,7 +1167,7 @@
         link.duration = result.data[0].duration;
         link.views = result.data[0].view_count;
       } catch (error) {
-        showToast(bootstrap, "Could not get clip info", "warning", 3000);
+        showToast("Could not get clip info", "warning", 3000);
         console.log("getRequestInfo twitch clip error", error);
         return;
       }
@@ -1183,11 +1183,11 @@
         link.thumbnail = result.tracks[0].album.images[0].url;
         link.duration = result.tracks[0].duration_ms / 1000;
         if (!result.tracks[0].is_playable) {
-          showToast(bootstrap, "This song is not playable", "warning", 3000);
+          showToast("This song is not playable", "warning", 3000);
           return;
         }
       } catch (error) {
-        showToast(bootstrap, "Could not get song info", "warning", 3000);
+        showToast("Could not get song info", "warning", 3000);
         console.log("getRequestInfo spotify error", error);
         return;
       }
@@ -1204,11 +1204,11 @@
         link.duration = ISO8601ToSeconds(result.items[0].contentDetails.duration);
         link.views = result.items[0].statistics.viewCount;
         if (result.items[0].contentDetails?.contentRating?.ytRating == "ytAgeRestricted" || !result.items[0].status?.embeddable) {
-          showToast(bootstrap, "This video is age restricted or not embeddable", "warning", 3000);
+          showToast("This video is age restricted or not embeddable", "warning", 3000);
           return;
         }
       } catch (error) {
-        showToast(bootstrap, "Could not get video info", "warning", 3000);
+        showToast("Could not get video info", "warning", 3000);
         console.log("getRequestInfo youtube error", error);
         return;
       }
@@ -1225,7 +1225,7 @@
         link.duration = result.files.mp4.duration;
         link.video = result.files.mp4.url;
       } catch (error) {
-        showToast(bootstrap, "Could not get video info", "warning", 3000);
+        showToast("Could not get video info", "warning", 3000);
         console.log("getRequestInfo streamable error", error);
         return;
       }
@@ -1421,7 +1421,7 @@
       }
     }
     if (bracket.options.length < 2) {
-      showToast(bootstrap, "Bracket must have 2 options at least", "warning", 3000);
+      showToast("Bracket must have 2 options at least", "warning", 3000);
       return;
     }
     if (bracket.options.flatMap((e) => e.type).includes("spotify")) {
@@ -1452,7 +1452,7 @@
     let id = parseInt(startID, 10);
     let bracket = structuredClone(BRACKETS.brackets.find((x) => x.id === id));
     if (bracket.options.length < 2) {
-      showToast(bootstrap, "Bracket must have 2 options at least", "warning", 3000);
+      showToast("Bracket must have 2 options at least", "warning", 3000);
       return;
     }
     let format = elements.formatSelect.value || "single";
@@ -1472,7 +1472,7 @@
         startTierlist(bracket);
         break;
       default:
-        showToast(bootstrap, "Unknown format", "warning", 3000);
+        showToast("Unknown format", "warning", 3000);
         return;
     }
     changeSiteLinkTarget("_blank");
@@ -1687,7 +1687,7 @@
 
     //check if trivia is done
     if (questionNumber == questionsArray.length) {
-      showToast(bootstrap, "No more questions", "warning", 2000);
+      showToast("No more questions", "warning", 2000);
       return;
     }
     questionNumber++;
@@ -1750,7 +1750,7 @@
   let correctChoiceIndex;
   function getChoices() {
     if (triviaAnswer.length < 4) {
-      showToast(bootstrap, "Question has less than 4 choices", "danger", 3000);
+      showToast("Question has less than 4 choices", "danger", 3000);
     }
 
     //reset the button colors
@@ -1989,7 +1989,7 @@
       if (info) {
         item.id = info.id;
       } else {
-        showToast(bootstrap, "Could not load video", "warning", 3000);
+        showToast("Could not load video", "warning", 3000);
       }
     }
 
@@ -2075,7 +2075,7 @@
     }
 
     if (vote_results.left == vote_results.right && !winner) {
-      showToast(bootstrap, "Options are tied, can't pick a winner", "warning", 3000);
+      showToast("Options are tied, can't pick a winner", "warning", 3000);
       return;
     }
     if (!winner) {
@@ -2104,11 +2104,11 @@
           return;
         }
       }
-      showToast(bootstrap, "Could not pick winner", "warning", 4000);
+      showToast("Could not pick winner", "warning", 4000);
     } else {
       let sorted = [...currentTierlistData].sort((a, b) => b.score - a.score);
       if (sorted[0].score == sorted[1].score) {
-        showToast(bootstrap, "Top 2 tiers are tied, unable to place item", "warning", 4000);
+        showToast("Top 2 tiers are tied, unable to place item", "warning", 4000);
         return;
       }
       placeTierlistItem(sorted[0]);
@@ -2221,7 +2221,7 @@
       if (info) {
         option.id = info.id;
       } else {
-        showToast(bootstrap, "Could not load video", "warning", 3000);
+        showToast("Could not load video", "warning", 3000);
       }
     }
 
@@ -2307,7 +2307,7 @@
         elements.image_trivia.innerHTML = `<img src="https://proxy.donk.workers.dev/?url=${encodeURI(mediaLink)}" class="option-image">`;
         return;
       } //image
-      showToast(bootstrap, "Could not load media", "warning", 3000);
+      showToast("Could not load media", "warning", 3000);
     }
 
     if (option.type == "youtube") {
@@ -2572,7 +2572,6 @@
     loadBrackets();
     saveSettings();
     elements.bracketEditor.style.display = "none";
-    enableTooltips(bootstrap);
   } //deleteBracket
 
   function deleteTrivia(id) {
@@ -2584,7 +2583,6 @@
     loadTrivia();
     saveSettings();
     elements.triviaEditor.style.display = "none";
-    enableTooltips(bootstrap);
   } //deleteTrivia
 
   function loadBrackets() {
@@ -2639,8 +2637,6 @@
   </div>`;
     }
     elements.myBrackets.innerHTML = html;
-    enableTooltips(bootstrap);
-    enablePopovers(bootstrap);
   } //loadBrackets
 
   function loadTrivia() {
@@ -2694,8 +2690,6 @@
   </div>`;
     }
     elements.myTrivia.innerHTML = html;
-    enableTooltips(bootstrap);
-    enablePopovers(bootstrap);
   } //loadTrivia
 
   function closeBracketEditor() {
@@ -2721,7 +2715,7 @@
   async function previewSpotifyPlaylist() {
     let playlist = elements.spotifyPlaylistLink.value?.replace(/\s+/g, "").match(spotifyURLRegex);
     if (!playlist[2]) {
-      showToast(bootstrap, "Invalid playlist URL provided", "warning", 3000);
+      showToast("Invalid playlist URL provided", "warning", 3000);
       return;
     }
     try {
@@ -2767,7 +2761,7 @@
       } </p>${html}`;
     } catch (error) {
       console.log(error);
-      showToast(bootstrap, "Could not load playlist", "warning", 3000);
+      showToast("Could not load playlist", "warning", 3000);
       return;
     }
   } //previewSpotifyPlaylist
@@ -2778,7 +2772,7 @@
     let number = id.slice(id.lastIndexOf("-") + 1);
 
     if (!id) {
-      showToast(bootstrap, "Could not find the provided tier list", "warning", 3000);
+      showToast("Could not find the provided tier list", "warning", 3000);
       return;
     }
     let images = 0;
@@ -2801,7 +2795,7 @@
       if (!format) {
         format = await testImage(`https://tiermaker.com/images/template_images/2022/${number}/${id}/${list[1]}`, 2);
         if (!format) {
-          showToast(bootstrap, "Could not load tier list :(", "warning", 3000);
+          showToast("Could not load tier list :(", "warning", 3000);
           return;
         }
       }
@@ -2829,7 +2823,7 @@
       elements.tiermakerPreview.innerHTML = `<p>${list.length - 1} images</p> <p class="text-warning">Make sure the images load by testing one of the links below</p>${html}`;
     } catch (error) {
       console.log(error);
-      showToast(bootstrap, "Could not find the provided tier list", "warning", 3000);
+      showToast("Could not find the provided tier list", "warning", 3000);
       return;
     }
   } //previewTiermaker
@@ -2837,7 +2831,7 @@
   async function previewClips() {
     let channel = elements.clipsChannel.value?.replace(/\s+/g, "");
     if (!channel) {
-      showToast(bootstrap, "No channel provided", "warning", 3000);
+      showToast("No channel provided", "warning", 3000);
       return;
     }
     let id = await getUserID(channel);
@@ -2853,7 +2847,7 @@
       let result = await response.json();
       let clips = result.data;
       if (clips == 0) {
-        showToast(bootstrap, "Could not load clips", "warning", 3000);
+        showToast("Could not load clips", "warning", 3000);
         return;
       }
 
@@ -2880,7 +2874,7 @@
       elements.clipsPreview.innerHTML = `<p>${clips.length} ${clips.length == 1 ? "clip" : "clips"} </p>${html}`;
     } catch (error) {
       console.log(error);
-      showToast(bootstrap, "Could not load clips", "warning", 3000);
+      showToast("Could not load clips", "warning", 3000);
       return;
     }
   } //previewClips
@@ -2888,7 +2882,7 @@
   async function previewEmotes() {
     let channel = elements.emotesChannel.value?.replace(/\s+/g, "")?.toLowerCase() || null;
     if (!channel) {
-      showToast(bootstrap, "No channel provided", "warning", 3000);
+      showToast("No channel provided", "warning", 3000);
       return;
     }
     try {
@@ -2915,7 +2909,7 @@
       elements.emotesPreview.innerHTML = `<p>${emotes.length == 0 ? "Channel has no emotes" : `${emotes.length} ${emotes.length == 1 ? "emote" : "emotes"}`} </p>${html}`;
     } catch (error) {
       console.log(error);
-      showToast(bootstrap, "Could not load emotes for the provided channel", "warning", 3000);
+      showToast("Could not load emotes for the provided channel", "warning", 3000);
       return;
     }
   } //previewEmotes
@@ -2924,7 +2918,7 @@
     let link = elements.uwufufuLink.value?.replace(/\s+/g, "")?.toLowerCase() || null;
 
     if (!link) {
-      showToast(bootstrap, "No link provided", "warning", 3000);
+      showToast("No link provided", "warning", 3000);
       return;
     }
     let videos = 0;
@@ -2932,7 +2926,7 @@
     try {
       let id = link.match(/\/quiz\/worldcup\/(.+?)(\/rank)?(\?.*)?$/)[1];
       if (id.length !== 24) {
-        showToast(bootstrap, "Could not find the provided bracket", "warning", 3000);
+        showToast("Could not find the provided bracket", "warning", 3000);
         return;
       }
       elements.uwufufuPreview.innerHTML = spinner;
@@ -2984,7 +2978,7 @@
       elements.uwufufuPreview.innerHTML = `<p>${videos > 0 ? `${videos} videos` : ""} ${images > 0 ? `${images} images` : ""}</p>${html}`;
     } catch (error) {
       console.log(error);
-      showToast(bootstrap, "Could not find the provided bracket", "warning", 3000);
+      showToast("Could not find the provided bracket", "warning", 3000);
       return;
     }
   } //previewUwufufu
@@ -2992,13 +2986,13 @@
   async function previewYTChannel() {
     let channel = elements.ytchannelLink.value?.replace(/\s+/g, "");
     if (!channel) {
-      showToast(bootstrap, "No channel provided", "warning", 3000);
+      showToast("No channel provided", "warning", 3000);
       return;
     }
 
     let id = await getYTChannelID(channel);
     if (!id?.items[0]?.id?.channelId) {
-      showToast(bootstrap, "Could not find channel", "warning", 3000);
+      showToast("Could not find channel", "warning", 3000);
       return;
     }
     id = id.items[0].id.channelId;
@@ -3035,7 +3029,7 @@
       elements.ytchannelPreview.innerHTML = `<p>${numberOfVideos} ${numberOfVideos == 1 ? "video" : "videos"} </p>${html}`;
     } catch (error) {
       console.log(error);
-      showToast(bootstrap, "Could not channel videos", "warning", 3000);
+      showToast("Could not channel videos", "warning", 3000);
       return;
     }
   } //previewYTChannel
@@ -3043,12 +3037,12 @@
   async function previewYTPlaylist() {
     let link = elements.ytplaylistLink.value?.replace(/\s+/g, "");
     if (!link) {
-      showToast(bootstrap, "No playlist link provided", "warning", 3000);
+      showToast("No playlist link provided", "warning", 3000);
       return;
     }
     let id = link.match(/^.*(youtu.be\/|list=)([^#\&\?]*).*/);
     if (!id[2] || id[2].length !== 34) {
-      showToast(bootstrap, "Invalid playlist link provided", "warning", 3000);
+      showToast("Invalid playlist link provided", "warning", 3000);
       return;
     }
     try {
@@ -3080,7 +3074,7 @@
       elements.ytplaylistPreview.innerHTML = `<p>${videos.length} ${videos.length == 1 ? "video" : "videos"} </p>${html}`;
     } catch (error) {
       console.log(error);
-      showToast(bootstrap, "Could not load playlist", "warning", 3000);
+      showToast("Could not load playlist", "warning", 3000);
       return;
     }
   } //previewYTPlaylist
@@ -3088,12 +3082,12 @@
   async function generateBracket() {
     let type = elements.generateBracketType.value?.replace(/\s+/g, "")?.toLowerCase() || null;
     if (!type) {
-      showToast(bootstrap, "No bracket type selected", "warning", 3000);
+      showToast("No bracket type selected", "warning", 3000);
       return;
     }
 
     if (previewedBracket.length == 0) {
-      showToast(bootstrap, `You must <button type="button" class="btn btn-info" ><i class="material-icons notranslate">file_download</i> Load</button> the bracket first`, "warning", 3000);
+      showToast(`You must <button type="button" class="btn btn-info" ><i class="material-icons notranslate">file_download</i> Load</button> the bracket first`, "warning", 3000);
       return;
     }
     createBracket(true, type);
@@ -3116,7 +3110,7 @@
     const bracketIndex = BRACKETS.brackets.findIndex((e) => e.id === id);
 
     if (BRACKETS.brackets[bracketIndex].options.length < 2) {
-      showToast(bootstrap, "Bracket must have 2 options at least", "warning", 3000);
+      showToast("Bracket must have 2 options at least", "warning", 3000);
       e.innerHTML = `<i class="material-icons notranslate">cloud_upload</i>`;
       return;
     }
@@ -3138,7 +3132,7 @@
       let response = await fetch(`https://blt.donk.workers.dev/publish`, requestOptions);
       let result = await response.json();
       console.log(result);
-      showToast(bootstrap, result.message, "info", 3000);
+      showToast(result.message, "info", 3000);
       if (response.status == 200) {
         BRACKETS.brackets[bracketIndex].published = true;
         elements.bracketCode.innerHTML = result.id;
@@ -3149,7 +3143,7 @@
       }
       e.innerHTML = `<i class="material-icons notranslate">cloud_upload</i>`;
     } catch (error) {
-      showToast(bootstrap, "Could not publish bracket", "danger", 3000);
+      showToast("Could not publish bracket", "danger", 3000);
       e.innerHTML = `<i class="material-icons notranslate">cloud_upload</i>`;
       console.log("publishBracket error", error);
     }
@@ -3165,7 +3159,7 @@
     }
 
     if (!code || code.length != 4) {
-      showToast(bootstrap, "Invalid bracket code", "warning", 3000);
+      showToast("Invalid bracket code", "warning", 3000);
       return;
     }
     elements.shareCode.value = "";
@@ -3330,12 +3324,7 @@
 
   function generateChatBracket() {
     if (chatBracket.length == 0) {
-      showToast(
-        bootstrap,
-        `You must <button type="button" class="btn btn-success" ><i class="material-icons notranslate">file_download</i> Load</button> the playlist first`,
-        "warning",
-        3000,
-      );
+      showToast(`You must <button type="button" class="btn btn-success" ><i class="material-icons notranslate">file_download</i> Load</button> the playlist first`, "warning", 3000);
       return;
     }
     createBracket(true);

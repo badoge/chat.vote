@@ -21,7 +21,6 @@
   import IcBaselineVisibilityOff from "~icons/ic/baseline-visibility-off";
   import IcBaselineCheck from "~icons/ic/baseline-check";
 
-  import { enableTooltips } from "$lib/functions";
   import { onMount } from "svelte";
   let elements;
 
@@ -71,9 +70,6 @@
     };
 
     settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
-
-    enableTooltips(bootstrap);
-    enablePopovers(bootstrap);
 
     DRAW.canvas = new fabric.Canvas("canvas", {
       isDrawingMode: true,
@@ -298,7 +294,7 @@
       selectedemotes = selectedemotes.filter((list) => list.name !== element);
     });
     if (selectedemotes.length < 2) {
-      showToast(bootstrap, `Not enough emotes selected`, "warning", 3000);
+      showToast(`Not enough emotes selected`, "warning", 3000);
       settingsOffcanvas.show();
       return;
     }
@@ -328,7 +324,7 @@
 
   function correct(user) {
     if (DRAW.correctUsers >= DRAW.points) {
-      showToast(bootstrap, `No more points left; starting new round`, "warning", 3000);
+      showToast(`No more points left; starting new round`, "warning", 3000);
       start();
       return;
     }

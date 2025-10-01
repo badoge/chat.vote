@@ -1,5 +1,4 @@
 <script>
-  import { enablePopovers, enableTooltips } from "$lib/functions";
   import { showToast } from "../../+layout.svelte";
 
   import { onMount } from "svelte";
@@ -10,9 +9,7 @@
   import IcBaselineVideogameAsset from "~icons/ic/baseline-videogame-asset";
   let elements;
 
-  let bootstrap;
   onMount(async () => {
-    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
     elements = {
       //modals
       grid: document.getElementById("grid"),
@@ -55,9 +52,6 @@
     };
 
     settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
-
-    enableTooltips(bootstrap);
-    enablePopovers(bootstrap);
 
     elements.twitchGlobal.onchange = function () {
       EMOTEBENCHMARK.twitchGlobal = this.checked;
@@ -274,7 +268,7 @@
       clearInterval(EMOTEBENCHMARK.interval);
       EMOTEBENCHMARK.interval = null;
       EMOTEBENCHMARK.turn = 0;
-      showToast(bootstrap, "Not enough emotes remaining.", "warning", 5000);
+      showToast("Not enough emotes remaining.", "warning", 5000);
       settingsOffcanvas.show();
       elements.start.disabled = false;
       return;

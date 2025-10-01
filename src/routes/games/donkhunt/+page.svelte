@@ -1,5 +1,4 @@
 <script>
-  import { enablePopovers, enableTooltips } from "$lib/functions";
   import { onMount } from "svelte";
   import { showToast } from "../../+layout.svelte";
 
@@ -158,7 +157,7 @@
                 if (ableToMoveCount < 1)
                   setTimeout(() => {
                     //wrap into arrow func to render new DOM
-                    showToast(bootstrap, "Hunters have no valid moves! Skipping turn.", "warning", 3000);
+                    showToast("Hunters have no valid moves! Skipping turn.", "warning", 3000);
                     DONKHUNT.functions.turn(1);
                   }, 50);
                 break;
@@ -252,7 +251,7 @@
                 }
               } else {
                 console.warn("Bot: Hunters cannot move!");
-                showToast(bootstrap, "Hunters have no valid moves - they skip their turn.", "warning", 3000);
+                showToast("Hunters have no valid moves - they skip their turn.", "warning", 3000);
               }
               break;
             case "target":
@@ -346,7 +345,7 @@
               if (movableCount < 1) {
                 setTimeout(() => {
                   //wrap into arrow func to render new DOM
-                  showToast(bootstrap, "Hunters have no valid moves! Skipping turn.", "warning", 3000);
+                  showToast("Hunters have no valid moves! Skipping turn.", "warning", 3000);
                   DONKHUNT.functions.turn(1);
                 }, 50);
               }
@@ -497,9 +496,6 @@
         });
       },
     }; //DONKHUNT
-
-    enableTooltips(bootstrap);
-    enablePopovers(bootstrap);
 
     initGraph();
 

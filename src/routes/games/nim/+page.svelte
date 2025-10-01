@@ -1,11 +1,8 @@
 <script>
-  import { enablePopovers, enableTooltips } from "$lib/functions";
   import { onMount } from "svelte";
   let elements;
   let NIM;
-  let bootstrap;
   onMount(async () => {
-    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
     elements = {
       //modals
       grid: document.getElementById("grid"),
@@ -45,9 +42,6 @@
     for (let i = 0; i < popsicles.length; i++) {
       popsicles[i].style.filter = `hue-rotate(${Math.random() * 360}deg)`;
     }
-
-    enableTooltips(bootstrap);
-    enablePopovers(bootstrap);
 
     initGraph();
     elements.overlay.innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;

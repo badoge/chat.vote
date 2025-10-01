@@ -1,14 +1,5 @@
 <script>
-  import { enableTooltips } from "$lib/functions.js";
   import { showToast } from "../../+layout.svelte";
-
-  import { onMount } from "svelte";
-
-  let bootstrap;
-  onMount(async () => {
-    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
-    enableTooltips(bootstrap);
-  });
 
   let { data } = $props();
   let channel = $state(data.slug.toLowerCase().replace(/\s/g, ""));
@@ -18,7 +9,7 @@
    */
   function copyCommand(command) {
     navigator.clipboard.writeText(command);
-    showToast(bootstrap, "Command copied :)", "info", 1000);
+    showToast("Command copied :)", "info", 1000);
   } //copyLink
 
   /**

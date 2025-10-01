@@ -37,8 +37,6 @@
     restartTier3RaffleModal = new bootstrap.Modal(elements.restartTier3RaffleModal);
     fancyRaffleModal = new bootstrap.Modal(elements.fancyRaffleModal);
 
-    enableTooltips();
-
     tickSound = new Howl({
       src: ["/raffles/tick.mp3"],
     });

@@ -1,5 +1,4 @@
 <script>
-  import { enablePopovers, enableTooltips } from "$lib/functions";
   import { showToast } from "../../+layout.svelte";
 
   let voters = [];
@@ -7,9 +6,7 @@
   import { onMount } from "svelte";
   let elements;
   let SHAPES;
-  let bootstrap;
   onMount(async () => {
-    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
     elements = {
       //modals
       grid: document.getElementById("grid"),
@@ -46,9 +43,6 @@
         gameStarted: false,
       },
     }; //SHAPES
-
-    enableTooltips(bootstrap);
-    enablePopovers(bootstrap);
 
     initGraph();
 
@@ -234,7 +228,7 @@
         updateGraph();
         SHAPES.shapesGame.lives -= 1;
         SHAPES.shapesGame.choices[selected].isKnownToBeIncorrect(true);
-        showToast(bootstrap, "Incorrect choice!", "danger", 3000);
+        showToast("Incorrect choice!", "danger", 3000);
 
         if (SHAPES.shapesGame.lives < 1) {
           endGame(false);

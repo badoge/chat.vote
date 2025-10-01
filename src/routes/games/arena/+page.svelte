@@ -43,7 +43,7 @@
         html.streamerPriest.disabled = true;
         html.streamerShaman.disabled = true;
       } catch (error) {
-        showToast(bootstrap, error, "warning", 3000);
+        showToast(error, "warning", 3000);
       }
     });
 
@@ -57,7 +57,7 @@
         let color = Math.round(Math.random()) ? "yellow" : null; // null = random
         arena.aux.addUnit(name, color, pClass); // might fail if arena is full or is not ready
       } catch (error) {
-        showToast(bootstrap, error, "warning", 3000);
+        showToast(error, "warning", 3000);
       }
     });
     html.bulkAddBotBtn.addEventListener("click", () => {
@@ -66,7 +66,7 @@
       if (isNaN(count)) return void console.warn("Bulk add: User input is NaN");
 
       if (arena.settings.unitLimit && count > arena.settings.unitLimit) {
-        showToast(bootstrap, `You've requested too many units! \nWill spawn as many as possible instead.`, "warning", 6000);
+        showToast(`You've requested too many units! \nWill spawn as many as possible instead.`, "warning", 6000);
         count = arena.settings.unitLimit;
       }
       while (count > 0) {
@@ -109,7 +109,7 @@
         arena.aux.addPlayer(USER.channel, "#FF0000", "rogue");
       } catch (error) {
         // can fail if player already joined the arena
-        showToast(bootstrap, error, "warning", 3000);
+        showToast(error, "warning", 3000);
       }
     });
     html.streamerHunter.addEventListener("click", () => {
@@ -121,7 +121,7 @@
         arena.aux.addPlayer(USER.channel, "#FF0000", "hunter");
       } catch (error) {
         // can fail if player already joined the arena
-        showToast(bootstrap, error, "warning", 3000);
+        showToast(error, "warning", 3000);
       }
     });
     html.streamerMage.addEventListener("click", () => {
@@ -133,7 +133,7 @@
         arena.aux.addPlayer(USER.channel, "#FF0000", "mage");
       } catch (error) {
         // can fail if player already joined the arena
-        showToast(bootstrap, error, "warning", 3000);
+        showToast(error, "warning", 3000);
       }
     });
     html.streamerPaladin.addEventListener("click", () => {
@@ -145,7 +145,7 @@
         arena.aux.addPlayer(USER.channel, "#FF0000", "paladin");
       } catch (error) {
         // can fail if player already joined the arena
-        showToast(bootstrap, error, "warning", 3000);
+        showToast(error, "warning", 3000);
       }
     });
     html.streamerPriest.addEventListener("click", () => {
@@ -157,7 +157,7 @@
         arena.aux.addPlayer(USER.channel, "#FF0000", "priest");
       } catch (error) {
         // can fail if player already joined the arena
-        showToast(bootstrap, error, "warning", 3000);
+        showToast(error, "warning", 3000);
       }
     });
     html.streamerShaman.addEventListener("click", () => {
@@ -169,7 +169,7 @@
         arena.aux.addPlayer(USER.channel, "#FF0000", "shaman");
       } catch (error) {
         // can fail if player already joined the arena
-        showToast(bootstrap, error, "warning", 3000);
+        showToast(error, "warning", 3000);
       }
     });
 
