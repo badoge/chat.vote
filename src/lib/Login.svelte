@@ -23,12 +23,9 @@
 
   let channelInput = $state("");
 
-  let bootstrap;
   let loginExpiredModal;
 
   onMount(async () => {
-    bootstrap = await import("bootstrap/dist/js/bootstrap.bundle.js");
-
     loginExpiredModal = new bootstrap.Modal(document.getElementById("loginExpiredModal"));
 
     //listen to storage events from the login windows

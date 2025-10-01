@@ -602,7 +602,7 @@ export function switchGame(game) {
   }
 } //switchGame
 
-export async function getLinkInfo(element, allowThumbnails, bootstrap) {
+export async function getLinkInfo(element, allowThumbnails) {
   if (element.getAttribute("data-bs-title") == spinner) {
     let url = element.getAttribute("href");
     if (!url) {
@@ -653,7 +653,7 @@ export async function checkImage(url) {
  * @param {string} id
  * @param {any} allowThumbnails
  */
-export function linkifyElementID(id, allowThumbnails, bootstrap) {
+export function linkifyElementID(id, allowThumbnails) {
   linkifyElement(
     document.getElementById(id),
     {
@@ -679,7 +679,7 @@ export function linkifyElementID(id, allowThumbnails, bootstrap) {
   const tooltipList = [...tooltipTriggerList].map(function (tooltipTriggerEl) {
     if (tooltipTriggerEl.getAttribute("data-bs-title") == spinner) {
       tooltipTriggerEl.addEventListener("show.bs.tooltip", function () {
-        getLinkInfo(tooltipTriggerEl, allowThumbnails, bootstrap);
+        getLinkInfo(tooltipTriggerEl, allowThumbnails);
       });
     }
     const elements = document.getElementsByClassName("tooltip show");
@@ -694,27 +694,6 @@ export function linkifyElementID(id, allowThumbnails, bootstrap) {
     });
   });
 } //linkifyElementID
-
-export function enableTooltips(bootstrap) {
-  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-  const tooltipList = [...tooltipTriggerList].map(
-    (tooltipTriggerEl) =>
-      new bootstrap.Tooltip(tooltipTriggerEl, {
-        trigger: "hover",
-      }),
-  );
-} //enableTooltips
-
-export function enablePopovers(bootstrap) {
-  const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
-  for (let index = 0; index < popoverTriggerList.length; index++) {
-    if (popoverTriggerList[index].classList.contains("html-popover")) {
-      const popover = new bootstrap.Popover(popoverTriggerList[index], { trigger: "focus", html: true, sanitize: false });
-    } else {
-      const popover = new bootstrap.Popover(popoverTriggerList[index]);
-    }
-  }
-} //enablePopovers
 
 /**
  * @description converts the values from the number input and unit select to seconds
