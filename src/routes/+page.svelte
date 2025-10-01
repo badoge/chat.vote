@@ -53,9 +53,6 @@
   import { showToast } from "./+layout.svelte";
   import Navbar from "$lib/Navbar.svelte";
 
-  /**
-   * @type {{ pollOption: any; settingsOffcanvas: any; enableVoting: any; enableSuggestions: any; randomOptionModal: any; timeOverModal: any; yesnoTimeOverModal: any; tieModal: any; randomYesnoModal: any; enableVotingDropdown: any; enableSuggestionsDropdown: any; tableTabButton: any; chartTabButton: any; yesnoTabButton: any; overlayTabButton: any; questionLabel: any; hideQuestion: any; voteWithNumbers: any; multiChoiceExample: any; voteWithText: any; sortChart: any; suggestionLimit: any; suggestionPrefix: any; suggestionsCommand: any; confettiLevel: any; linkPreviewThumbnailsEnabled: any; showChat: any; multiChoice: any; subMode: any; subOnlyAlert: any; restartYesno: any; pickRandom: any; hideScore: any; allowChange: any; suggestionLimitUser: any; timerValueMinutes: any; chartCanvas: any; refreshWarningEnabled: any; sortChartLabel: any; overlayLink: any; connectOverlayButton: any; voteHint: any; totalVotes: any; remove: any; randomOptionWinner: any; removeRandomWinner: any; tieModalText: any; coin: any; bttvGlobalEmotes: any; ffzGlobalEmotes: any; seventvGlobalEmotes: any; bttvChannelEmotes: any; ffzChannelEmotes: any; seventvChannelEmotes: any; yeaPic: any; nayPic: any; yeaCount: any; nayCount: any; yesnoTotalVotes: any; optionList: any; numberStats: any; json_selected: any; voters_selected: any; txt_selected: any; averageNumber: any; medianNumber: any; hideScoreIcon: any; chat: any; countdown: any; unpauseTimer: any; pauseTimer: any; stopTimer: any; yesnoTimeOverWinner: any; timeOverWinner: any; enableVotingText: any; enableSuggestionsText: any; generateOverlayButton: any; restartPoll?: HTMLElement | null; addOption?: HTMLElement | null; options?: HTMLElement | null; chatiframe?: HTMLElement | null; yesnoDiv?: HTMLElement | null; }}
-   */
   let elements;
   /**
    * @type {import("ag-grid-community").GridApi<{ Command: string; Option: string; By: number; Score: number; Delete: number; }>}
@@ -123,9 +120,6 @@
       removeRandomWinner: document.getElementById("removeRandomWinner"),
       randomYesnoModal: document.getElementById("randomYesnoModal"),
       coin: document.getElementById("coin"),
-
-      //settings
-      settingsOffcanvas: document.getElementById("settingsOffcanvas"),
 
       //start voting button
       enableVoting: document.getElementById("enableVoting"),
@@ -219,16 +213,8 @@
 
     elements.pollOption.focus();
     elements.pollOption.select();
-    settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
     votePopover = new bootstrap.Popover(elements.enableVoting);
     suggestPopover = new bootstrap.Popover(elements.enableSuggestions);
-
-    let resetSettingsPopover = new bootstrap.Popover("#resetSettingsPopover", {
-      trigger: "focus",
-      html: true,
-      sanitize: false,
-      container: ".offcanvas-body",
-    });
 
     loginButtonPopover = new bootstrap.Popover(document.getElementById("loginButtonSpan"));
 
@@ -463,7 +449,6 @@
   let randomOptionModal, timeOverModal, yesnoTimeOverModal, tieModal, randomYesnoModal;
   let enableVotingDropdown, enableSuggestionsDropdown;
   let tableTab, chartTab, yesnoTab, overlayTab;
-  let settingsOffcanvas;
 
   let thirdPartyEmotes = [];
 
@@ -1820,7 +1805,7 @@
 
   function changeSuggestionCommand() {
     enableSuggestionsDropdown.hide();
-    settingsOffcanvas.show();
+    document.getElementById("settingsDrawer").checked = true;
     elements.suggestionPrefix.focus();
     elements.suggestionPrefix.select();
     elements.suggestionPrefix.scrollIntoView();
@@ -2086,184 +2071,6 @@
       <div class="modal-body">dank</div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="settingsOffcanvas" aria-labelledby="settingsOffcanvasLabel">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="settingsOffcanvasLabel"><IcBaselineSettings />Settings</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body">
-    <div class="card mb-2">
-      <div class="card-body">
-        <div class="form-group">
-          <label for="suggestionPrefix" class="form-label"> Suggestion command</label>
-          <input type="text" class="form-control notranslate" id="suggestionPrefix" value="!suggest" aria-describedby="description3" />
-          <small id="description3" class="text-body-secondary">The command to put before a suggestion. <br />Example: <span class="notranslate">!suggest my summer car</span></small>
-        </div>
-      </div>
-    </div>
-
-    <div class="card mb-2">
-      <div class="card-body">
-        <div id="removeContainer">
-          <div class="input-group flex-nowrap restart" id="removeDiv">
-            <label class="input-group-text text-light" for="remove">Keep top</label>
-            <select id="remove" class="form-control" style="max-width: 4em">
-              <option selected value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-              <option value="10">10</option>
-            </select>
-            <label class="input-group-text text-light" for="remove">options and</label>
-            <button class="btn btn-secondary" type="button" onclick={removeAndRestart}>restart<IcBaselineRefresh /></button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card mb-2">
-      <div class="card-body">
-        <div class="form-check form-switch mb-3">
-          <input type="checkbox" class="form-check-input" id="multiChoice" aria-describedby="multiChoiceDesc" />
-          <label class="form-check-label" for="multiChoice"> <IcBaselinePlusOne /> Allow multiple choices</label><br />
-          <small id="multiChoiceDesc" class="text-body-secondary">
-            Viewers will be able to vote for multiple options at once.<br />
-            <span id="multiChoiceExample">Example: <span class="notranslate">1 2 3</span></span>
-          </small>
-          <br />
-          <small class="yesno-warning text-warning" style="display: none"> Does not support <img src="/pics/yeanay.webp" alt="yeanay" style="height: 1.2em" />Mode </small>
-        </div>
-        <div class="form-check form-switch mb-3">
-          <input type="checkbox" class="form-check-input" id="allowChange" onchange={saveSettings} aria-describedby="allowChangeDesc" />
-          <label class="form-check-label" for="allowChange"> <IcBaselineSwapHoriz /> Allow vote changing</label><br />
-          <small id="allowChangeDesc" class="text-body-secondary"> Viewers will be able to change the option they selected by voting again. They can change their vote only once.</small><br
-          />
-          <small class="yesno-warning text-warning" style="display: none"> Does not support <img src="/pics/yeanay.webp" alt="yeanay" style="height: 1.2em" />Mode </small>
-        </div>
-        <div class="form-check form-switch">
-          <input type="checkbox" class="form-check-input" id="subMode" aria-describedby="submodedesc" />
-          <label class="form-check-label" for="subMode"> <IcBaselineAttachMoney /> Subscribers only poll</label>
-          <small id="submodedesc" class="text-body-secondary"><br />Viewers that are not subscribed to your channel will not be able to vote or make suggestions. </small>
-        </div>
-      </div>
-    </div>
-
-    <div class="card mb-2">
-      <div class="card-body">
-        <div class="form-check form-switch mb-3">
-          <input type="checkbox" class="form-check-input" id="showChat" aria-describedby="showChatDesc" />
-          <label class="form-check-label" id="showChatDesc" for="showChat">
-            <MdiTwitch /> Show chat
-          </label>
-          <br /><small class="text-body-secondary">Shows your Twitch chat on the right side</small>
-        </div>
-
-        <div class="form-check form-switch mb-3">
-          <input class="form-check-input" type="checkbox" id="refreshWarningEnabled" onchange={saveSettings} />
-          <label class="form-check-label" for="refreshWarningEnabled"> <IcBaselineNotificationImportant /> Enable close/refresh warning</label>
-          <br /><small class="text-body-secondary">Shows a warning before leaving/refreshing the site so that you don't accidentally lose your poll results.</small>
-        </div>
-
-        <div class="form-check form-switch mb-3">
-          <input class="form-check-input" type="checkbox" id="linkPreviewThumbnailsEnabled" />
-          <label class="form-check-label" for="linkPreviewThumbnailsEnabled"> <IcBaselinePreview /> Show thumbnails in link preview </label>
-          <br /><small class="text-body-secondary"><b class="text-danger">Use with caution; viewers might link images that break Twitch's TOS.</b></small>
-        </div>
-
-        <div class="input-group">
-          <span class="input-group-text"><IcBaselineCelebration />Confetti</span>
-          <select class="form-select" id="confettiLevel" style="max-width: 7em">
-            <option value="0" selected>Off</option>
-            <option value="1">Low</option>
-            <option value="2">Medium</option>
-            <option value="3">High</option>
-            <option value="4">INSANE ZULOL</option>
-          </select>
-        </div>
-        <small class="text-body-secondary">Confetti triggers when the timer runs out or when you pick a random option.</small>
-      </div>
-    </div>
-
-    <div class="card mb-2">
-      <div class="card-body">
-        <div class="input-group mb-0">
-          <span class="input-group-text blueborder">Refresh 3rd party emotes</span>
-          <button class="btn btn-outline-info" type="button" onclick={getEmotes}><IcBaselineRefresh /></button>
-        </div>
-        <div class="text-body-secondary mb-3">
-          Loaded emotes (global/channel): BTTV: <span id="bttvGlobalEmotes">0</span>/<span id="bttvChannelEmotes">0</span> | FFZ: <span id="ffzGlobalEmotes">0</span>/<span
-            id="ffzChannelEmotes">0</span
-          >
-          | 7TV: <span id="seventvGlobalEmotes">0</span>/<span id="seventvChannelEmotes">0</span>
-        </div>
-
-        <a
-          id="resetSettingsPopover"
-          tabindex="0"
-          class="btn btn-danger"
-          role="button"
-          data-bs-toggle="popover"
-          data-bs-trigger="focus"
-          data-bs-title="Are you sure?"
-          data-bs-content="All settings will be reset and the page will reload<br>
-          <button type='button' class='btn btn-danger float-end my-3' onclick='resetSettings()'>
-          <i class='material-icons notranslate'>delete_forever</i>Reset settings</button>"
-        >
-          <IcBaselineDeleteForever />Reset all settings
-        </a>
-        <br />
-        <small class="text-body-secondary">Resets all settings and reloads the page.</small>
-      </div>
-    </div>
-
-    <div class="card mb-2">
-      <div class="card-body">
-        <h5 class="card-title">Export Data</h5>
-        <label>Data to be Exported:</label>
-        <div class="form-group mb-3">
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="voters_selected" value="List of Voters" checked />
-            <label class="form-check-label" for="voters_selected">List of Voters</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="options_selected" value="Poll Options" />
-            <label class="form-check-label" for="options_selected">Poll Options</label>
-          </div>
-        </div>
-        <label>File Format:</label>
-        <div class="form-group mb-3">
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="inlineRadioOptions2" id="json_selected" value="JSON" checked />
-            <label class="form-check-label" for="json_selected">JSON</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="inlineRadioOptions2" id="txt_selected" value="TXT" />
-            <label class="form-check-label" for="txt_selected">TXT</label>
-          </div>
-        </div>
-
-        <button type="button" onclick={download} class="btn btn-primary"><IcBaselineFileDownload /> Download</button>
-      </div>
-    </div>
-
-    <div class="card mb-2">
-      <div class="card-body">
-        <h5>Contact info:</h5>
-        <p>
-          Site by <a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/badoge">badoge</a> :) <br />If you find any issues or if you have suggestions or questions, you can
-          contact me: <br /><a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/popout/badoge/chat?popout=">in this chat</a> <br />or on
-          <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/FR8bgQdPUT">discord</a> <br />or by
-          <a href="mailto:contact@chat.vote">email</a>
-        </p>
       </div>
     </div>
   </div>
@@ -2615,16 +2422,189 @@
               </div>
             </div>
 
-            <button
-              class="btn btn-secondary float-center defaultbtn mt-2 me-2"
-              id="settingsButton"
-              type="button"
-              data-bs-toggle="offcanvas"
-              data-bs-target="#settingsOffcanvas"
-              aria-controls="settingsOffcanvas"
-            >
-              <IcBaselineSettings />Settings
-            </button>
+            <div class="drawer">
+              <input id="settingsDrawer" type="checkbox" class="drawer-toggle" />
+              <div class="drawer-content">
+                <label for="settingsDrawer" class="btn btn-primary drawer-button defaultbtn mt-2 me-2"><IcBaselineSettings />Settings</label>
+              </div>
+              <div class="drawer-side">
+                <label for="settingsDrawer" aria-label="close sidebar" class="drawer-overlay"></label>
+                <div class="menu bg-base-200 text-base-content min-h-full w-80 p-4">
+                  <div class="card mb-2">
+                    <div class="card-body">
+                      <div class="form-group">
+                        <label for="suggestionPrefix" class="form-label"> Suggestion command</label>
+                        <input type="text" class="form-control notranslate" id="suggestionPrefix" value="!suggest" aria-describedby="description3" />
+                        <small id="description3" class="text-body-secondary"
+                          >The command to put before a suggestion. <br />Example: <span class="notranslate">!suggest my summer car</span></small
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card mb-2">
+                    <div class="card-body">
+                      <div id="removeContainer">
+                        <div class="input-group flex-nowrap restart" id="removeDiv">
+                          <label class="input-group-text text-light" for="remove">Keep top</label>
+                          <select id="remove" class="form-control" style="max-width: 4em">
+                            <option selected value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                          </select>
+                          <label class="input-group-text text-light" for="remove">options and</label>
+                          <button class="btn btn-secondary" type="button" onclick={removeAndRestart}>restart<IcBaselineRefresh /></button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card mb-2">
+                    <div class="card-body">
+                      <div class="form-check form-switch mb-3">
+                        <input type="checkbox" class="form-check-input" id="multiChoice" aria-describedby="multiChoiceDesc" />
+                        <label class="form-check-label" for="multiChoice"> <IcBaselinePlusOne /> Allow multiple choices</label><br />
+                        <small id="multiChoiceDesc" class="text-body-secondary">
+                          Viewers will be able to vote for multiple options at once.<br />
+                          <span id="multiChoiceExample">Example: <span class="notranslate">1 2 3</span></span>
+                        </small>
+                        <br />
+                        <small class="yesno-warning text-warning" style="display: none"> Does not support <img src="/pics/yeanay.webp" alt="yeanay" style="height: 1.2em" />Mode </small>
+                      </div>
+                      <div class="form-check form-switch mb-3">
+                        <input type="checkbox" class="form-check-input" id="allowChange" onchange={saveSettings} aria-describedby="allowChangeDesc" />
+                        <label class="form-check-label" for="allowChange"> <IcBaselineSwapHoriz /> Allow vote changing</label><br />
+                        <small id="allowChangeDesc" class="text-body-secondary">
+                          Viewers will be able to change the option they selected by voting again. They can change their vote only once.</small
+                        ><br />
+                        <small class="yesno-warning text-warning" style="display: none"> Does not support <img src="/pics/yeanay.webp" alt="yeanay" style="height: 1.2em" />Mode </small>
+                      </div>
+                      <div class="form-check form-switch">
+                        <input type="checkbox" class="form-check-input" id="subMode" aria-describedby="submodedesc" />
+                        <label class="form-check-label" for="subMode"> <IcBaselineAttachMoney /> Subscribers only poll</label>
+                        <small id="submodedesc" class="text-body-secondary"><br />Viewers that are not subscribed to your channel will not be able to vote or make suggestions. </small>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card mb-2">
+                    <div class="card-body">
+                      <div class="form-check form-switch mb-3">
+                        <input type="checkbox" class="form-check-input" id="showChat" aria-describedby="showChatDesc" />
+                        <label class="form-check-label" id="showChatDesc" for="showChat">
+                          <MdiTwitch /> Show chat
+                        </label>
+                        <br /><small class="text-body-secondary">Shows your Twitch chat on the right side</small>
+                      </div>
+
+                      <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="refreshWarningEnabled" onchange={saveSettings} />
+                        <label class="form-check-label" for="refreshWarningEnabled"> <IcBaselineNotificationImportant /> Enable close/refresh warning</label>
+                        <br /><small class="text-body-secondary">Shows a warning before leaving/refreshing the site so that you don't accidentally lose your poll results.</small>
+                      </div>
+
+                      <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="linkPreviewThumbnailsEnabled" />
+                        <label class="form-check-label" for="linkPreviewThumbnailsEnabled"> <IcBaselinePreview /> Show thumbnails in link preview </label>
+                        <br /><small class="text-body-secondary"><b class="text-danger">Use with caution; viewers might link images that break Twitch's TOS.</b></small>
+                      </div>
+
+                      <div class="input-group">
+                        <span class="input-group-text"><IcBaselineCelebration />Confetti</span>
+                        <select class="form-select" id="confettiLevel" style="max-width: 7em">
+                          <option value="0" selected>Off</option>
+                          <option value="1">Low</option>
+                          <option value="2">Medium</option>
+                          <option value="3">High</option>
+                          <option value="4">INSANE ZULOL</option>
+                        </select>
+                      </div>
+                      <small class="text-body-secondary">Confetti triggers when the timer runs out or when you pick a random option.</small>
+                    </div>
+                  </div>
+
+                  <div class="card mb-2">
+                    <div class="card-body">
+                      <div class="input-group mb-0">
+                        <span class="input-group-text blueborder">Refresh 3rd party emotes</span>
+                        <button class="btn btn-outline-info" type="button" onclick={getEmotes}><IcBaselineRefresh /></button>
+                      </div>
+                      <div class="text-body-secondary mb-3">
+                        Loaded emotes (global/channel): BTTV: <span id="bttvGlobalEmotes">0</span>/<span id="bttvChannelEmotes">0</span> | FFZ: <span id="ffzGlobalEmotes">0</span>/<span
+                          id="ffzChannelEmotes">0</span
+                        >
+                        | 7TV: <span id="seventvGlobalEmotes">0</span>/<span id="seventvChannelEmotes">0</span>
+                      </div>
+
+                      <a
+                        id="resetSettingsPopover"
+                        tabindex="0"
+                        class="btn btn-danger"
+                        role="button"
+                        data-bs-toggle="popover"
+                        data-bs-trigger="focus"
+                        data-bs-title="Are you sure?"
+                        data-bs-content="All settings will be reset and the page will reload<br>
+          <button type='button' class='btn btn-danger float-end my-3' onclick='resetSettings()'>
+          <i class='material-icons notranslate'>delete_forever</i>Reset settings</button>"
+                      >
+                        <IcBaselineDeleteForever />Reset all settings
+                      </a>
+                      <br />
+                      <small class="text-body-secondary">Resets all settings and reloads the page.</small>
+                    </div>
+                  </div>
+
+                  <div class="card mb-2">
+                    <div class="card-body">
+                      <h5 class="card-title">Export Data</h5>
+                      <label>Data to be Exported:</label>
+                      <div class="form-group mb-3">
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="inlineRadioOptions" id="voters_selected" value="List of Voters" checked />
+                          <label class="form-check-label" for="voters_selected">List of Voters</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="inlineRadioOptions" id="options_selected" value="Poll Options" />
+                          <label class="form-check-label" for="options_selected">Poll Options</label>
+                        </div>
+                      </div>
+                      <label>File Format:</label>
+                      <div class="form-group mb-3">
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="inlineRadioOptions2" id="json_selected" value="JSON" checked />
+                          <label class="form-check-label" for="json_selected">JSON</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="inlineRadioOptions2" id="txt_selected" value="TXT" />
+                          <label class="form-check-label" for="txt_selected">TXT</label>
+                        </div>
+                      </div>
+
+                      <button type="button" onclick={download} class="btn btn-primary"><IcBaselineFileDownload /> Download</button>
+                    </div>
+                  </div>
+
+                  <div class="card mb-2">
+                    <div class="card-body">
+                      <h5>Contact info:</h5>
+                      <p>
+                        Site by <a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/badoge">badoge</a> :) <br />If you find any issues or if you have suggestions or
+                        questions, you can contact me: <br /><a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/popout/badoge/chat?popout=">in this chat</a> <br />or on
+                        <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/FR8bgQdPUT">discord</a> <br />or by
+                        <a href="mailto:contact@chat.vote">email</a>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <div class="float-end mt-2" role="group" aria-label="Restart, random option, hide score, and delete all buttons">
               <button
@@ -2835,11 +2815,6 @@
   #mainButtonsCard {
     padding-top: 5px;
     padding-bottom: 5px;
-  }
-
-  #settingsOffcanvas {
-    width: 450px;
-    max-width: 80vw;
   }
 
   .resizable {

@@ -85,7 +85,6 @@
       voteSkipVotes: document.getElementById("voteSkipVotes"),
 
       //settings
-      settingsOffcanvas: document.getElementById("settingsOffcanvas"),
       allowSpotifySongs: document.getElementById("allowSpotifySongs"),
       allowStreamable: document.getElementById("allowStreamable"),
       allowTwitchClips: document.getElementById("allowTwitchClips"),
@@ -194,20 +193,12 @@
 
     dankUpdateModal = new bootstrap.Modal(elements.dankUpdateModal);
     banlistModal = new bootstrap.Modal(elements.banlistModal);
-    settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
     copyLinkButton = new bootstrap.Popover(elements.copyLinkButton);
     togglePlaylistPopover = new bootstrap.Popover(elements.togglePlaylist);
     loginButtonPopover = new bootstrap.Popover(document.getElementById("loginButtonSpan"));
 
     elements.banlistModal.addEventListener("show.bs.modal", (event) => {
       loadBanLists();
-    });
-
-    let resetSettingsPopover = new bootstrap.Popover("#resetSettingsPopover", {
-      trigger: "focus",
-      html: true,
-      sanitize: false,
-      container: ".offcanvas-body",
     });
 
     playlistTab = new bootstrap.Tab(elements.playlistTab);
@@ -258,7 +249,6 @@
   let loginButtonPopover;
 
   let currentTime = 0;
-  let settingsOffcanvas;
   let dankUpdateModal, banlistModal;
   let copyLinkButton;
   let playlistTab, approvalTab, historyTab;
@@ -2868,7 +2858,7 @@
   } //checkCommands
 
   function editRequestCommand(alias = false) {
-    settingsOffcanvas.show();
+    document.getElementById("settingsDrawer").checked = true;
     setTimeout(() => {
       if (alias) {
         elements.requestCommandAlias.focus();
@@ -3485,469 +3475,6 @@
   <span id="voteSkipVotes">100 votes needed to skip</span>
 </div>
 
-<div class="offcanvas offcanvas-start" tabindex="-1" id="settingsOffcanvas" aria-labelledby="settingsOffcanvasLabel">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="settingsOffcanvasLabel"><IcBaselineSettings />Settings</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body">
-    <div class="card mb-3">
-      <div class="card-header">
-        <span class="align-middle"><IcBaselineChecklist />Enabled Platforms</span>
-        <button type="button" class="btn btn-sm btn-primary float-end" data-bs-toggle="modal" data-bs-target="#platformsInfoModal">
-          <IcBaselineInfo /> Platform support details
-        </button>
-      </div>
-      <div class="card-body">
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-xl-4">
-              <h6><MdiSpotify />Spotify</h6>
-              <div class="form-check form-switch mb-3">
-                <input class="form-check-input" type="checkbox" role="switch" id="allowSpotifySongs" onchange={saveSettings} checked />
-                <label class="form-check-label" for="allowSpotifySongs">Songs</label>
-              </div>
-
-              <h6>Streamable</h6>
-              <div class="form-check form-switch mb-3">
-                <input class="form-check-input" type="checkbox" role="switch" id="allowStreamable" onchange={saveSettings} checked />
-                <label class="form-check-label" for="allowStreamable">Videos</label>
-              </div>
-
-              <h6><IcBaselineTiktok />TikTok</h6>
-              <div class="form-check form-switch mb-3">
-                <input class="form-check-input" type="checkbox" role="switch" id="allowTiktokVideos" onchange={saveSettings} checked />
-                <label class="form-check-label" for="allowTiktokVideos">Videos</label>
-              </div>
-            </div>
-            <div class="col-xl-4">
-              <h6><MdiTwitch />Twitch</h6>
-              <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchClips" onchange={saveSettings} checked />
-                <label class="form-check-label" for="allowTwitchClips">Clips</label>
-              </div>
-              <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchStreams" onchange={saveSettings} checked />
-                <label class="form-check-label" for="allowTwitchStreams">Live Streams</label>
-              </div>
-              <div class="form-check form-switch mb-3">
-                <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchVODs" onchange={saveSettings} checked />
-                <label class="form-check-label" for="allowTwitchVODs">VODs</label>
-              </div>
-
-              <h6><MdiVimeo />Vimeo</h6>
-              <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" role="switch" id="allowVimeoVideos" onchange={saveSettings} checked />
-                <label class="form-check-label" for="allowVimeoVideos">Videos</label>
-              </div>
-            </div>
-            <div class="col-xl-4">
-              <h6><MdiYoutube />YouTube</h6>
-              <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" role="switch" id="allowYTStreams" onchange={saveSettings} checked />
-                <label class="form-check-label" for="allowYTStreams">Live Streams</label>
-              </div>
-              <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" role="switch" id="allowYTShorts" onchange={saveSettings} checked />
-                <label class="form-check-label" for="allowYTShorts">Shorts</label>
-              </div>
-              <div class="form-check form-switch mb-3">
-                <input class="form-check-input" type="checkbox" role="switch" id="allowYTVideos" onchange={saveSettings} checked />
-                <label class="form-check-label" for="allowYTVideos">Videos</label>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card mb-3">
-      <div class="card-header"><IcBaselineSettings />Playlist limits</div>
-      <div class="card-body">
-        <div class="input-group">
-          <span class="input-group-text"><IcBaselineSchedule />Max playlist duration</span>
-          <input type="number" aria-label="Max playlist duration" id="maxDuration" placeholder="Unlimited" min="1" class="form-control" onchange={saveSettings} />
-          <select class="form-select" id="maxDurationUnit" onchange={saveSettings}>
-            <option selected value="m">Minutes</option>
-            <option value="h">Hours</option>
-          </select>
-        </div>
-        <small class="text-body-secondary">The max duration of all requests added up</small>
-
-        <div class="input-group mt-3">
-          <span class="input-group-text"><IcBaselineTimelapse />Max song/video length</span>
-          <input type="number" aria-label="Max song/video length" id="maxLength" placeholder="Unlimited" min="1" class="form-control" onchange={saveSettings} />
-          <span class="input-group-text">Minutes</span>
-        </div>
-        <small class="text-body-secondary">How long a single request can be</small>
-
-        <div class="input-group mt-3">
-          <span class="input-group-text"><IcBaselineFormatListNumbered />Max playlist size</span>
-          <input type="number" aria-label="Max playlist length" id="maxSize" placeholder="Unlimited" min="1" class="form-control" onchange={saveSettings} />
-        </div>
-        <small class="text-body-secondary">How many requests are allowed to be in the playlist</small>
-
-        <div class="input-group mt-3">
-          <span class="input-group-text"><IcBaselineVisibility />Min view count</span>
-          <input type="number" aria-label="Minimum view count" id="minViewCount" placeholder="Unlimited" min="1" class="form-control" onchange={saveSettings} />
-        </div>
-        <small class="text-body-secondary">Requests that have a view count lower than the limit will be blocked</small>
-
-        <p class="mt-3 mb-0">
-          <IcBaselineCalendarToday />Content age limits
-
-          <IcBaselineHelp
-            data-bs-toggle="tooltip"
-            data-bs-placement="top"
-            data-bs-html="true"
-            data-bs-title="Set one or both fields to limit how old or new a request can be<br><i>Leave empty to disable</i>"
-          />
-        </p>
-        <div class="input-group">
-          <span class="input-group-text"><IcBaselineDateRange />Older than</span>
-          <input type="number" aria-label="Min upload age" id="minUploadAge" placeholder="Unlimited" min="1" class="form-control" onchange={saveSettings} />
-          <select class="form-select" id="minUploadAgeUnit" onchange={saveSettings}>
-            <option selected value="h">Hours</option>
-            <option value="d">Days</option>
-            <option value="mo">Months</option>
-            <option value="y">Years</option>
-          </select>
-        </div>
-        <div class="input-group mt-1">
-          <span class="input-group-text"><IcBaselineCalendarMonth />Newer than</span>
-          <input type="number" aria-label="Max upload age" id="maxUploadAge" placeholder="Unlimited" min="1" class="form-control" onchange={saveSettings} />
-          <select class="form-select" id="maxUploadAgeUnit" onchange={saveSettings}>
-            <option selected value="h">Hours</option>
-            <option value="d">Days</option>
-            <option value="mo">Months</option>
-            <option value="y">Years</option>
-          </select>
-        </div>
-        <small class="fst-italic" id="uploadAgeDesc">No age limits set</small>
-
-        <div class="form-check form-switch mt-3">
-          <input class="form-check-input" type="checkbox" role="switch" id="uniqueOnly" onchange={saveSettings} />
-          <label class="form-check-label" for="uniqueOnly"><IcBaselineHistoryToggleOff />Skip non unique requests</label>
-          <br />
-          <small class="text-body-secondary">
-            Any request found in the <span class="text-primary"><IcBaselineHistory />History</span> tab will be skipped
-          </small>
-        </div>
-      </div>
-      <div class="card-footer text-body-secondary">
-        <small class="text-warning">
-          See <span class="cursor-pointer text-info" data-bs-toggle="modal" data-bs-target="#platformsInfoModal">Platform support details</span> for info about which platforms work with these
-          filters
-        </small>
-      </div>
-    </div>
-
-    <div class="card mb-3">
-      <div class="card-header"><IcBaselineChat />Chat Commands</div>
-      <div class="card-body">
-        <div class="input-group">
-          <span class="input-group-text"><IcBaselineAdd />Request</span>
-          <input type="text" id="requestCommand" data-default="!request" value="!request" aria-label="Request command" placeholder="command" class="form-control" onchange={saveSettings} />
-          <input type="text" id="requestCommandAlias" data-default="!r" value="!r" aria-label="Request command alias" placeholder="alias" class="form-control" onchange={saveSettings} />
-        </div>
-        <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" role="switch" id="noCommand" onchange={saveSettings} />
-          <label class="form-check-label" for="noCommand"><IcBaselineLink />Add any supported link in chat to the playlist</label>
-        </div>
-
-        <div class="form-check form-switch mt-5">
-          <input class="form-check-input" type="checkbox" role="switch" id="allowVoteSkip" onchange={saveSettings} />
-          <label class="form-check-label" for="allowVoteSkip"><IcBaselineHowToVote />Allow viewers to vote skip</label>
-        </div>
-        <div class="input-group mb-1">
-          <span class="input-group-text"><IcBaselineDoubleArrow /> Vote Skip command</span>
-          <input
-            type="text"
-            id="voteskipCommand"
-            data-default="!voteskip"
-            value="!voteskip"
-            aria-label="vote skip command"
-            placeholder="command"
-            class="form-control"
-            onchange={saveSettings}
-          />
-          <input type="text" id="voteskipCommandAlias" data-default="!vs" value="!vs" aria-label="vote skip command alias" placeholder="alias" class="form-control" onchange={saveSettings} />
-        </div>
-        <div class="input-group mb-5">
-          <span class="input-group-text"><IcBaselineIncompleteCircle /> Skip after</span>
-          <input type="number" aria-label="vote skip votes needed" id="voteskipCount" placeholder="100" value="100" min="1" class="form-control" onchange={saveSettings} />
-          <span class="input-group-text">votes</span>
-        </div>
-
-        <div class="form-check form-switch mb-3">
-          <input class="form-check-input" type="checkbox" role="switch" id="enableBot" onchange={saveSettings} />
-          <label class="form-check-label" for="enableBot"><IcBaselineSmartToy />Enable chat bot</label>
-          <br />
-          <small class="text-body-secondary">
-            Enables the bot commands below and adds confirmation replies for some commands - Make sure to mod the bot <kbd>/mod chatvote</kbd> so that it can post links without getting timed
-            out by other bots
-          </small>
-        </div>
-        <div class="input-group mb-3">
-          <span class="input-group-text"><IcBaselineHourglassTop />Bot commands cooldown</span>
-          <input type="number" aria-label="Bot commands cooldown" id="botCooldown" placeholder="1" value="1" min="1" class="form-control" onchange={saveSettings} />
-          <span class="input-group-text">seconds</span>
-        </div>
-        <h6>Bot Commands</h6>
-        <div class="input-group mb-3">
-          <span class="input-group-text"><IcBaselineLink />Request name & link</span>
-          <input type="text" id="songCommand" data-default="!song" value="!song" aria-label="Song name command" placeholder="command" class="form-control" onchange={saveSettings} />
-          <input
-            type="text"
-            id="songCommandAlias"
-            data-default="!video"
-            value="!video"
-            aria-label="Song name command alias"
-            placeholder="alias"
-            class="form-control"
-            onchange={saveSettings}
-          />
-        </div>
-        <div class="input-group mb-3">
-          <span class="input-group-text"><IcBaselineLanguage />Playlist link</span>
-          <input
-            type="text"
-            id="playlistCommand"
-            data-default="!playlist"
-            value="!playlist"
-            aria-label="Playlist command"
-            placeholder="command"
-            class="form-control"
-            onchange={saveSettings}
-          />
-          <input type="text" id="playlistCommandAlias" data-default="!pl" value="!pl" aria-label="Playlist command alias" placeholder="alias" class="form-control" onchange={saveSettings} />
-        </div>
-      </div>
-    </div>
-
-    <div class="card mb-3">
-      <div class="card-header"><IcBaselineGroup />Who can send requests</div>
-      <div class="card-body">
-        <p id="whoCanRequest">Everyone will be able to request.<br />Everyone will get 1 request.</p>
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th scope="col">Role</th>
-              <th scope="col">
-                Request limit
-
-                <IcBaselineInfo
-                  data-bs-toggle="tooltip"
-                  data-bs-placement="top"
-                  data-bs-html="true"
-                  data-bs-title="<i>Leave empty for unlimited requests</i><br>The final limit for each user will be based on the highest role limit they have"
-                />
-              </th>
-            </tr>
-          </thead>
-          <tbody class="table-group-divider">
-            <tr>
-              <th scope="row">
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" role="switch" id="allowPlebs" onchange={saveSettings} checked />
-                  <label class="form-check-label" for="allowPlebs"><img src="/pics/pleb.png" class="role-badge" /> Non subscriber</label>
-                </div>
-              </th>
-              <td>
-                <input type="number" class="form-control request-limit" id="plebLimit" onchange={saveSettings} value="1" min="1" placeholder="Unlimited" />
-              </td>
-            </tr>
-            <tr>
-              <th scope="row">
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" role="switch" id="allowSubs" onchange={saveSettings} checked />
-                  <label class="form-check-label" for="allowSubs"><img src="/pics/sub.png" class="role-badge" /> Subscriber</label>
-                </div>
-              </th>
-              <td>
-                <input type="number" class="form-control request-limit" id="subLimit" onchange={saveSettings} value="1" min="1" placeholder="Unlimited" />
-              </td>
-            </tr>
-
-            <tr>
-              <th scope="row">
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" role="switch" id="allowMods" onchange={saveSettings} checked />
-                  <label class="form-check-label" for="allowMods"><img src="/pics/mod.png" class="role-badge" /> Mod</label>
-                </div>
-              </th>
-              <td>
-                <input type="number" class="form-control request-limit" id="modLimit" onchange={saveSettings} value="1" min="1" placeholder="Unlimited" />
-              </td>
-            </tr>
-            <tr>
-              <th scope="row">
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" role="switch" id="allowVips" onchange={saveSettings} checked />
-                  <label class="form-check-label" for="allowVips"><img src="/pics/vip.png" class="role-badge" /> VIP</label>
-                </div>
-              </th>
-              <td>
-                <input type="number" class="form-control request-limit" id="vipLimit" onchange={saveSettings} value="1" min="1" placeholder="Unlimited" />
-              </td>
-            </tr>
-            <tr>
-              <th scope="row">
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" role="switch" id="allowFirstTimeChatters" onchange={saveSettings} checked />
-                  <label class="form-check-label" for="allowFirstTimeChatters"><img src="/pics/firstmsg.png" class="role-badge" /> First time chatter</label>
-                </div>
-              </th>
-              <td>
-                <input type="number" class="form-control request-limit" id="firstTimeChatterLimit" onchange={saveSettings} value="1" min="1" placeholder="Unlimited" />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="btn-group" role="group" aria-label="Check all/Uncheck all">
-          <button type="button" id="selectAll" class="btn btn-sm btn-success">Select all</button>
-          <button type="button" id="unselectAll" class="btn btn-sm btn-danger">Unselect all</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="card mb-3">
-      <div class="card-header"><IcBaselineShield />Moderation Settings</div>
-      <div class="card-body">
-        <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#banlistModal"><IcBaselineGavel />Ban list</button>
-
-        <div class="form-check form-switch mb-3" style="display: none">
-          <input disabled class="form-check-input" type="checkbox" role="switch" id="approvalQueue" />
-          <label class="form-check-label" for="approvalQueue"><IcBaselineRule />Approval queue</label>
-          <br /><small class="text-body-secondary">Requests will have to be manually approved by you before they get added to the playlist</small>
-        </div>
-
-        <h6>Moderation Commands</h6>
-        <div class="input-group mb-1">
-          <span class="input-group-text"><IcBaselinePlaylistAddCheck />Open playlist</span>
-          <input
-            type="text"
-            id="openCommand"
-            data-default="!open"
-            value="!open"
-            aria-label="Open playlist command"
-            placeholder="Open playlist command"
-            class="form-control"
-            onchange={saveSettings}
-          />
-        </div>
-        <div class="input-group mb-1">
-          <span class="input-group-text"><IcBaselinePlaylistRemove />Close playlist</span>
-          <input
-            type="text"
-            id="closeCommand"
-            data-default="!close"
-            value="!close"
-            aria-label="Close playlist command"
-            placeholder="Close playlist command"
-            class="form-control"
-            onchange={saveSettings}
-          />
-        </div>
-        <div class="input-group mb-1">
-          <span class="input-group-text"><IcBaselinePlayArrow />Play current request</span>
-          <input type="text" id="playCommand" data-default="!play" value="!play" aria-label="Play command" placeholder="Play command" class="form-control" onchange={saveSettings} />
-        </div>
-        <div class="input-group mb-1">
-          <span class="input-group-text"><IcBaselinePause />Pause current request</span>
-          <input type="text" id="pauseCommand" data-default="!pause" value="!pause" aria-label="Pause command" placeholder="Pause command" class="form-control" onchange={saveSettings} />
-        </div>
-        <div class="input-group mb-1">
-          <span class="input-group-text"><IcBaselinePlaylistPlay />Toggle autoplay</span>
-          <input
-            type="text"
-            id="autoplayCommand"
-            data-default="!autoplay"
-            value="!autoplay"
-            aria-label="Autoplay command"
-            placeholder="Autoplay command"
-            class="form-control"
-            onchange={saveSettings}
-          />
-        </div>
-        <div class="input-group mb-1">
-          <span class="input-group-text"><IcBaselineSkipNext />Skip current request</span>
-          <input type="text" id="skipCommand" data-default="!skip" value="!skip" aria-label="Skip command" placeholder="Skip command" class="form-control" onchange={saveSettings} />
-        </div>
-        <div class="input-group mb-1">
-          <span class="input-group-text"><IcBaselineSkipPrevious />Go back to previous request</span>
-          <input
-            type="text"
-            id="rewindCommand"
-            data-default="!rewind"
-            value="!rewind"
-            aria-label="Rewind command"
-            placeholder="Rewind command"
-            class="form-control"
-            onchange={saveSettings}
-          />
-        </div>
-        <div class="input-group mb-1">
-          <span class="input-group-text">
-            <IcBaselineDelete />Delete request by ID
-
-            <IcBaselineHelp
-              class="cursor-pointer"
-              data-bs-toggle="tooltip"
-              data-bs-placement="top"
-              data-bs-title="Mods will be able to delete requests by copying the command from your playlist.chat.vote/username page"
-            />
-          </span>
-          <input
-            type="text"
-            id="deleteCommand"
-            data-default="!delete"
-            value="!delete"
-            aria-label="Delete command"
-            placeholder="Delete command"
-            class="form-control"
-            onchange={saveSettings}
-          />
-        </div>
-        <div class="form-check form-switch mb-3">
-          <input class="form-check-input" type="checkbox" role="switch" id="modCommands" onchange={saveSettings} checked />
-          <label class="form-check-label" for="modCommands"><IcBaselineVerifiedUser />Allow mods to use moderation commands</label>
-        </div>
-
-        <div class="form-check form-switch mb-3">
-          <input class="form-check-input" type="checkbox" role="switch" id="enableFavorites" onchange={saveSettings} />
-          <label class="form-check-label" for="enableFavorites"><IcBaselineFavorite />Enable request favoriting</label>
-          <br />
-          <small class="text-body-secondary">
-            Adds a button to the bottom bar that allows you to favorite a request<br />
-            Favorited requests can be seen in the <span class="text-primary"><IcBaselineHistory />History</span> tab<br />
-            Clearing history will also clear favorites
-          </small>
-        </div>
-
-        <small class="text-body-secondary">
-          <IcBaselineLightbulb /> Tip: Mods can delete a request by
-          <a class="link-body-emphasis" href="https://twitter.com/TwitchSupport/status/1070135668980871168" target="_blank" rel="noopener noreferrer"> deleteing the message in chat </a>
-        </small>
-      </div>
-    </div>
-
-    <a
-      id="resetSettingsPopover"
-      tabindex="0"
-      class="btn btn-danger"
-      role="button"
-      data-bs-toggle="popover"
-      data-bs-trigger="focus"
-      data-bs-title="Are you sure?"
-      data-bs-content="All settings will be reset and the page will reload<br><button type='button' class='btn btn-danger float-end my-3' onclick='resetSettings()'><i class='material-icons notranslate'>delete_forever</i>Reset settings</button>"
-      ><IcBaselineDeleteForever />Reset all settings</a
-    >
-    <br />
-    <small class="text-body-secondary">Resets all settings and reloads the page.</small>
-  </div>
-</div>
-
 <Navbar messageHandler={handleMessage} messageDeletedHandler={handleMessageDeleted} loginEvent={() => USER.refresh()} />
 
 <div class="container-fluid">
@@ -4092,9 +3619,546 @@
     <div class="col">
       <div class="hstack gap-2">
         <div class="p-1">
-          <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#settingsOffcanvas" aria-controls="settingsOffcanvas">
-            <IcBaselineSettings /> Settings
-          </button>
+          <div class="drawer">
+            <input id="settingsDrawer" type="checkbox" class="drawer-toggle" />
+            <div class="drawer-content">
+              <!-- Page content here -->
+              <label for="settingsDrawer" class="btn btn-primary drawer-button"><IcBaselineSettings />Settings</label>
+            </div>
+            <div class="drawer-side">
+              <label for="settingsDrawer" aria-label="close sidebar" class="drawer-overlay"></label>
+              <div class="menu bg-base-200 text-base-content min-h-full w-80 p-4">
+                <div class="card mb-3">
+                  <div class="card-header">
+                    <span class="align-middle"><IcBaselineChecklist />Enabled Platforms</span>
+                    <button type="button" class="btn btn-sm btn-primary float-end" data-bs-toggle="modal" data-bs-target="#platformsInfoModal">
+                      <IcBaselineInfo /> Platform support details
+                    </button>
+                  </div>
+                  <div class="card-body">
+                    <div class="container-fluid">
+                      <div class="row">
+                        <div class="col-xl-4">
+                          <h6><MdiSpotify />Spotify</h6>
+                          <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" role="switch" id="allowSpotifySongs" onchange={saveSettings} checked />
+                            <label class="form-check-label" for="allowSpotifySongs">Songs</label>
+                          </div>
+
+                          <h6>Streamable</h6>
+                          <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" role="switch" id="allowStreamable" onchange={saveSettings} checked />
+                            <label class="form-check-label" for="allowStreamable">Videos</label>
+                          </div>
+
+                          <h6><IcBaselineTiktok />TikTok</h6>
+                          <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" role="switch" id="allowTiktokVideos" onchange={saveSettings} checked />
+                            <label class="form-check-label" for="allowTiktokVideos">Videos</label>
+                          </div>
+                        </div>
+                        <div class="col-xl-4">
+                          <h6><MdiTwitch />Twitch</h6>
+                          <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchClips" onchange={saveSettings} checked />
+                            <label class="form-check-label" for="allowTwitchClips">Clips</label>
+                          </div>
+                          <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchStreams" onchange={saveSettings} checked />
+                            <label class="form-check-label" for="allowTwitchStreams">Live Streams</label>
+                          </div>
+                          <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchVODs" onchange={saveSettings} checked />
+                            <label class="form-check-label" for="allowTwitchVODs">VODs</label>
+                          </div>
+
+                          <h6><MdiVimeo />Vimeo</h6>
+                          <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="allowVimeoVideos" onchange={saveSettings} checked />
+                            <label class="form-check-label" for="allowVimeoVideos">Videos</label>
+                          </div>
+                        </div>
+                        <div class="col-xl-4">
+                          <h6><MdiYoutube />YouTube</h6>
+                          <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="allowYTStreams" onchange={saveSettings} checked />
+                            <label class="form-check-label" for="allowYTStreams">Live Streams</label>
+                          </div>
+                          <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="allowYTShorts" onchange={saveSettings} checked />
+                            <label class="form-check-label" for="allowYTShorts">Shorts</label>
+                          </div>
+                          <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" role="switch" id="allowYTVideos" onchange={saveSettings} checked />
+                            <label class="form-check-label" for="allowYTVideos">Videos</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card mb-3">
+                  <div class="card-header"><IcBaselineSettings />Playlist limits</div>
+                  <div class="card-body">
+                    <div class="input-group">
+                      <span class="input-group-text"><IcBaselineSchedule />Max playlist duration</span>
+                      <input type="number" aria-label="Max playlist duration" id="maxDuration" placeholder="Unlimited" min="1" class="form-control" onchange={saveSettings} />
+                      <select class="form-select" id="maxDurationUnit" onchange={saveSettings}>
+                        <option selected value="m">Minutes</option>
+                        <option value="h">Hours</option>
+                      </select>
+                    </div>
+                    <small class="text-body-secondary">The max duration of all requests added up</small>
+
+                    <div class="input-group mt-3">
+                      <span class="input-group-text"><IcBaselineTimelapse />Max song/video length</span>
+                      <input type="number" aria-label="Max song/video length" id="maxLength" placeholder="Unlimited" min="1" class="form-control" onchange={saveSettings} />
+                      <span class="input-group-text">Minutes</span>
+                    </div>
+                    <small class="text-body-secondary">How long a single request can be</small>
+
+                    <div class="input-group mt-3">
+                      <span class="input-group-text"><IcBaselineFormatListNumbered />Max playlist size</span>
+                      <input type="number" aria-label="Max playlist length" id="maxSize" placeholder="Unlimited" min="1" class="form-control" onchange={saveSettings} />
+                    </div>
+                    <small class="text-body-secondary">How many requests are allowed to be in the playlist</small>
+
+                    <div class="input-group mt-3">
+                      <span class="input-group-text"><IcBaselineVisibility />Min view count</span>
+                      <input type="number" aria-label="Minimum view count" id="minViewCount" placeholder="Unlimited" min="1" class="form-control" onchange={saveSettings} />
+                    </div>
+                    <small class="text-body-secondary">Requests that have a view count lower than the limit will be blocked</small>
+
+                    <p class="mt-3 mb-0">
+                      <IcBaselineCalendarToday />Content age limits
+
+                      <IcBaselineHelp
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-html="true"
+                        data-bs-title="Set one or both fields to limit how old or new a request can be<br><i>Leave empty to disable</i>"
+                      />
+                    </p>
+                    <div class="input-group">
+                      <span class="input-group-text"><IcBaselineDateRange />Older than</span>
+                      <input type="number" aria-label="Min upload age" id="minUploadAge" placeholder="Unlimited" min="1" class="form-control" onchange={saveSettings} />
+                      <select class="form-select" id="minUploadAgeUnit" onchange={saveSettings}>
+                        <option selected value="h">Hours</option>
+                        <option value="d">Days</option>
+                        <option value="mo">Months</option>
+                        <option value="y">Years</option>
+                      </select>
+                    </div>
+                    <div class="input-group mt-1">
+                      <span class="input-group-text"><IcBaselineCalendarMonth />Newer than</span>
+                      <input type="number" aria-label="Max upload age" id="maxUploadAge" placeholder="Unlimited" min="1" class="form-control" onchange={saveSettings} />
+                      <select class="form-select" id="maxUploadAgeUnit" onchange={saveSettings}>
+                        <option selected value="h">Hours</option>
+                        <option value="d">Days</option>
+                        <option value="mo">Months</option>
+                        <option value="y">Years</option>
+                      </select>
+                    </div>
+                    <small class="fst-italic" id="uploadAgeDesc">No age limits set</small>
+
+                    <div class="form-check form-switch mt-3">
+                      <input class="form-check-input" type="checkbox" role="switch" id="uniqueOnly" onchange={saveSettings} />
+                      <label class="form-check-label" for="uniqueOnly"><IcBaselineHistoryToggleOff />Skip non unique requests</label>
+                      <br />
+                      <small class="text-body-secondary">
+                        Any request found in the <span class="text-primary"><IcBaselineHistory />History</span> tab will be skipped
+                      </small>
+                    </div>
+                  </div>
+                  <div class="card-footer text-body-secondary">
+                    <small class="text-warning">
+                      See <span class="cursor-pointer text-info" data-bs-toggle="modal" data-bs-target="#platformsInfoModal">Platform support details</span> for info about which platforms work
+                      with these filters
+                    </small>
+                  </div>
+                </div>
+
+                <div class="card mb-3">
+                  <div class="card-header"><IcBaselineChat />Chat Commands</div>
+                  <div class="card-body">
+                    <div class="input-group">
+                      <span class="input-group-text"><IcBaselineAdd />Request</span>
+                      <input
+                        type="text"
+                        id="requestCommand"
+                        data-default="!request"
+                        value="!request"
+                        aria-label="Request command"
+                        placeholder="command"
+                        class="form-control"
+                        onchange={saveSettings}
+                      />
+                      <input
+                        type="text"
+                        id="requestCommandAlias"
+                        data-default="!r"
+                        value="!r"
+                        aria-label="Request command alias"
+                        placeholder="alias"
+                        class="form-control"
+                        onchange={saveSettings}
+                      />
+                    </div>
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" role="switch" id="noCommand" onchange={saveSettings} />
+                      <label class="form-check-label" for="noCommand"><IcBaselineLink />Add any supported link in chat to the playlist</label>
+                    </div>
+
+                    <div class="form-check form-switch mt-5">
+                      <input class="form-check-input" type="checkbox" role="switch" id="allowVoteSkip" onchange={saveSettings} />
+                      <label class="form-check-label" for="allowVoteSkip"><IcBaselineHowToVote />Allow viewers to vote skip</label>
+                    </div>
+                    <div class="input-group mb-1">
+                      <span class="input-group-text"><IcBaselineDoubleArrow /> Vote Skip command</span>
+                      <input
+                        type="text"
+                        id="voteskipCommand"
+                        data-default="!voteskip"
+                        value="!voteskip"
+                        aria-label="vote skip command"
+                        placeholder="command"
+                        class="form-control"
+                        onchange={saveSettings}
+                      />
+                      <input
+                        type="text"
+                        id="voteskipCommandAlias"
+                        data-default="!vs"
+                        value="!vs"
+                        aria-label="vote skip command alias"
+                        placeholder="alias"
+                        class="form-control"
+                        onchange={saveSettings}
+                      />
+                    </div>
+                    <div class="input-group mb-5">
+                      <span class="input-group-text"><IcBaselineIncompleteCircle /> Skip after</span>
+                      <input type="number" aria-label="vote skip votes needed" id="voteskipCount" placeholder="100" value="100" min="1" class="form-control" onchange={saveSettings} />
+                      <span class="input-group-text">votes</span>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                      <input class="form-check-input" type="checkbox" role="switch" id="enableBot" onchange={saveSettings} />
+                      <label class="form-check-label" for="enableBot"><IcBaselineSmartToy />Enable chat bot</label>
+                      <br />
+                      <small class="text-body-secondary">
+                        Enables the bot commands below and adds confirmation replies for some commands - Make sure to mod the bot <kbd>/mod chatvote</kbd> so that it can post links without getting
+                        timed out by other bots
+                      </small>
+                    </div>
+                    <div class="input-group mb-3">
+                      <span class="input-group-text"><IcBaselineHourglassTop />Bot commands cooldown</span>
+                      <input type="number" aria-label="Bot commands cooldown" id="botCooldown" placeholder="1" value="1" min="1" class="form-control" onchange={saveSettings} />
+                      <span class="input-group-text">seconds</span>
+                    </div>
+                    <h6>Bot Commands</h6>
+                    <div class="input-group mb-3">
+                      <span class="input-group-text"><IcBaselineLink />Request name & link</span>
+                      <input
+                        type="text"
+                        id="songCommand"
+                        data-default="!song"
+                        value="!song"
+                        aria-label="Song name command"
+                        placeholder="command"
+                        class="form-control"
+                        onchange={saveSettings}
+                      />
+                      <input
+                        type="text"
+                        id="songCommandAlias"
+                        data-default="!video"
+                        value="!video"
+                        aria-label="Song name command alias"
+                        placeholder="alias"
+                        class="form-control"
+                        onchange={saveSettings}
+                      />
+                    </div>
+                    <div class="input-group mb-3">
+                      <span class="input-group-text"><IcBaselineLanguage />Playlist link</span>
+                      <input
+                        type="text"
+                        id="playlistCommand"
+                        data-default="!playlist"
+                        value="!playlist"
+                        aria-label="Playlist command"
+                        placeholder="command"
+                        class="form-control"
+                        onchange={saveSettings}
+                      />
+                      <input
+                        type="text"
+                        id="playlistCommandAlias"
+                        data-default="!pl"
+                        value="!pl"
+                        aria-label="Playlist command alias"
+                        placeholder="alias"
+                        class="form-control"
+                        onchange={saveSettings}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card mb-3">
+                  <div class="card-header"><IcBaselineGroup />Who can send requests</div>
+                  <div class="card-body">
+                    <p id="whoCanRequest">Everyone will be able to request.<br />Everyone will get 1 request.</p>
+                    <table class="table table-hover">
+                      <thead>
+                        <tr>
+                          <th scope="col">Role</th>
+                          <th scope="col">
+                            Request limit
+
+                            <IcBaselineInfo
+                              data-bs-toggle="tooltip"
+                              data-bs-placement="top"
+                              data-bs-html="true"
+                              data-bs-title="<i>Leave empty for unlimited requests</i><br>The final limit for each user will be based on the highest role limit they have"
+                            />
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody class="table-group-divider">
+                        <tr>
+                          <th scope="row">
+                            <div class="form-check form-switch">
+                              <input class="form-check-input" type="checkbox" role="switch" id="allowPlebs" onchange={saveSettings} checked />
+                              <label class="form-check-label" for="allowPlebs"><img src="/pics/pleb.png" class="role-badge" /> Non subscriber</label>
+                            </div>
+                          </th>
+                          <td>
+                            <input type="number" class="form-control request-limit" id="plebLimit" onchange={saveSettings} value="1" min="1" placeholder="Unlimited" />
+                          </td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <div class="form-check form-switch">
+                              <input class="form-check-input" type="checkbox" role="switch" id="allowSubs" onchange={saveSettings} checked />
+                              <label class="form-check-label" for="allowSubs"><img src="/pics/sub.png" class="role-badge" /> Subscriber</label>
+                            </div>
+                          </th>
+                          <td>
+                            <input type="number" class="form-control request-limit" id="subLimit" onchange={saveSettings} value="1" min="1" placeholder="Unlimited" />
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <th scope="row">
+                            <div class="form-check form-switch">
+                              <input class="form-check-input" type="checkbox" role="switch" id="allowMods" onchange={saveSettings} checked />
+                              <label class="form-check-label" for="allowMods"><img src="/pics/mod.png" class="role-badge" /> Mod</label>
+                            </div>
+                          </th>
+                          <td>
+                            <input type="number" class="form-control request-limit" id="modLimit" onchange={saveSettings} value="1" min="1" placeholder="Unlimited" />
+                          </td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <div class="form-check form-switch">
+                              <input class="form-check-input" type="checkbox" role="switch" id="allowVips" onchange={saveSettings} checked />
+                              <label class="form-check-label" for="allowVips"><img src="/pics/vip.png" class="role-badge" /> VIP</label>
+                            </div>
+                          </th>
+                          <td>
+                            <input type="number" class="form-control request-limit" id="vipLimit" onchange={saveSettings} value="1" min="1" placeholder="Unlimited" />
+                          </td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <div class="form-check form-switch">
+                              <input class="form-check-input" type="checkbox" role="switch" id="allowFirstTimeChatters" onchange={saveSettings} checked />
+                              <label class="form-check-label" for="allowFirstTimeChatters"><img src="/pics/firstmsg.png" class="role-badge" /> First time chatter</label>
+                            </div>
+                          </th>
+                          <td>
+                            <input type="number" class="form-control request-limit" id="firstTimeChatterLimit" onchange={saveSettings} value="1" min="1" placeholder="Unlimited" />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <div class="btn-group" role="group" aria-label="Check all/Uncheck all">
+                      <button type="button" id="selectAll" class="btn btn-sm btn-success">Select all</button>
+                      <button type="button" id="unselectAll" class="btn btn-sm btn-danger">Unselect all</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card mb-3">
+                  <div class="card-header"><IcBaselineShield />Moderation Settings</div>
+                  <div class="card-body">
+                    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#banlistModal"><IcBaselineGavel />Ban list</button>
+
+                    <div class="form-check form-switch mb-3" style="display: none">
+                      <input disabled class="form-check-input" type="checkbox" role="switch" id="approvalQueue" />
+                      <label class="form-check-label" for="approvalQueue"><IcBaselineRule />Approval queue</label>
+                      <br /><small class="text-body-secondary">Requests will have to be manually approved by you before they get added to the playlist</small>
+                    </div>
+
+                    <h6>Moderation Commands</h6>
+                    <div class="input-group mb-1">
+                      <span class="input-group-text"><IcBaselinePlaylistAddCheck />Open playlist</span>
+                      <input
+                        type="text"
+                        id="openCommand"
+                        data-default="!open"
+                        value="!open"
+                        aria-label="Open playlist command"
+                        placeholder="Open playlist command"
+                        class="form-control"
+                        onchange={saveSettings}
+                      />
+                    </div>
+                    <div class="input-group mb-1">
+                      <span class="input-group-text"><IcBaselinePlaylistRemove />Close playlist</span>
+                      <input
+                        type="text"
+                        id="closeCommand"
+                        data-default="!close"
+                        value="!close"
+                        aria-label="Close playlist command"
+                        placeholder="Close playlist command"
+                        class="form-control"
+                        onchange={saveSettings}
+                      />
+                    </div>
+                    <div class="input-group mb-1">
+                      <span class="input-group-text"><IcBaselinePlayArrow />Play current request</span>
+                      <input
+                        type="text"
+                        id="playCommand"
+                        data-default="!play"
+                        value="!play"
+                        aria-label="Play command"
+                        placeholder="Play command"
+                        class="form-control"
+                        onchange={saveSettings}
+                      />
+                    </div>
+                    <div class="input-group mb-1">
+                      <span class="input-group-text"><IcBaselinePause />Pause current request</span>
+                      <input
+                        type="text"
+                        id="pauseCommand"
+                        data-default="!pause"
+                        value="!pause"
+                        aria-label="Pause command"
+                        placeholder="Pause command"
+                        class="form-control"
+                        onchange={saveSettings}
+                      />
+                    </div>
+                    <div class="input-group mb-1">
+                      <span class="input-group-text"><IcBaselinePlaylistPlay />Toggle autoplay</span>
+                      <input
+                        type="text"
+                        id="autoplayCommand"
+                        data-default="!autoplay"
+                        value="!autoplay"
+                        aria-label="Autoplay command"
+                        placeholder="Autoplay command"
+                        class="form-control"
+                        onchange={saveSettings}
+                      />
+                    </div>
+                    <div class="input-group mb-1">
+                      <span class="input-group-text"><IcBaselineSkipNext />Skip current request</span>
+                      <input
+                        type="text"
+                        id="skipCommand"
+                        data-default="!skip"
+                        value="!skip"
+                        aria-label="Skip command"
+                        placeholder="Skip command"
+                        class="form-control"
+                        onchange={saveSettings}
+                      />
+                    </div>
+                    <div class="input-group mb-1">
+                      <span class="input-group-text"><IcBaselineSkipPrevious />Go back to previous request</span>
+                      <input
+                        type="text"
+                        id="rewindCommand"
+                        data-default="!rewind"
+                        value="!rewind"
+                        aria-label="Rewind command"
+                        placeholder="Rewind command"
+                        class="form-control"
+                        onchange={saveSettings}
+                      />
+                    </div>
+                    <div class="input-group mb-1">
+                      <span class="input-group-text">
+                        <IcBaselineDelete />Delete request by ID
+
+                        <IcBaselineHelp
+                          class="cursor-pointer"
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="top"
+                          data-bs-title="Mods will be able to delete requests by copying the command from your playlist.chat.vote/username page"
+                        />
+                      </span>
+                      <input
+                        type="text"
+                        id="deleteCommand"
+                        data-default="!delete"
+                        value="!delete"
+                        aria-label="Delete command"
+                        placeholder="Delete command"
+                        class="form-control"
+                        onchange={saveSettings}
+                      />
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                      <input class="form-check-input" type="checkbox" role="switch" id="modCommands" onchange={saveSettings} checked />
+                      <label class="form-check-label" for="modCommands"><IcBaselineVerifiedUser />Allow mods to use moderation commands</label>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                      <input class="form-check-input" type="checkbox" role="switch" id="enableFavorites" onchange={saveSettings} />
+                      <label class="form-check-label" for="enableFavorites"><IcBaselineFavorite />Enable request favoriting</label>
+                      <br />
+                      <small class="text-body-secondary">
+                        Adds a button to the bottom bar that allows you to favorite a request<br />
+                        Favorited requests can be seen in the <span class="text-primary"><IcBaselineHistory />History</span> tab<br />
+                        Clearing history will also clear favorites
+                      </small>
+                    </div>
+
+                    <small class="text-body-secondary">
+                      <IcBaselineLightbulb /> Tip: Mods can delete a request by
+                      <a class="link-body-emphasis" href="https://twitter.com/TwitchSupport/status/1070135668980871168" target="_blank" rel="noopener noreferrer">
+                        deleteing the message in chat
+                      </a>
+                    </small>
+                  </div>
+                </div>
+
+                <a
+                  id="resetSettingsPopover"
+                  tabindex="0"
+                  class="btn btn-danger"
+                  role="button"
+                  data-bs-toggle="popover"
+                  data-bs-trigger="focus"
+                  data-bs-title="Are you sure?"
+                  data-bs-content="All settings will be reset and the page will reload<br><button type='button' class='btn btn-danger float-end my-3' onclick='resetSettings()'><i class='material-icons notranslate'>delete_forever</i>Reset settings</button>"
+                  ><IcBaselineDeleteForever />Reset all settings</a
+                >
+                <br />
+                <small class="text-body-secondary">Resets all settings and reloads the page.</small>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="vr"></div>
@@ -4232,10 +4296,6 @@
   #voteSkipDiv > small {
     font-size: 1.1rem;
     margin-left: 10px;
-  }
-
-  #settingsOffcanvas {
-    width: 30vw;
   }
 
   #commandHint {

@@ -64,12 +64,9 @@
       clearCanvas: document.getElementById("clearCanvas"),
       redo: document.getElementById("redo"),
       undo: document.getElementById("undo"),
-      settingsOffcanvas: document.getElementById("settingsOffcanvas"),
       countdown: document.getElementById("countdown"),
       countdownValue: document.getElementById("countdownValue"),
     };
-
-    settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
 
     DRAW.canvas = new fabric.Canvas("canvas", {
       isDrawingMode: true,
@@ -200,7 +197,6 @@
     emoji: [],
   };
 
-  let settingsOffcanvas;
   let timer;
 
   let USER = {
@@ -295,7 +291,7 @@
     });
     if (selectedemotes.length < 2) {
       showToast(`Not enough emotes selected`, "warning", 3000);
-      settingsOffcanvas.show();
+      document.getElementById("settingsDrawer").checked = true;
       return;
     }
 
@@ -629,110 +625,6 @@
   </div>
 </div>
 
-<div class="offcanvas offcanvas-end" tabindex="-1" id="settingsOffcanvas" aria-labelledby="settingsOffcanvasLabel">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="settingsOffcanvasLabel"><IcBaselineSettings />Settings</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body">
-    <h4><IcBaselineCheck />Enabled emotes</h4>
-    <div class="row">
-      <div class="col-auto">
-        <div class="form-check form-switch">
-          <input type="checkbox" class="form-check-input" id="twitchGlobal" aria-describedby="twitchGlobalCount" />
-          <label class="form-check-label" for="twitchGlobal">Twitch global</label>
-          <small id="twitchGlobalCount" class="form-text text-body-secondary"><br />0 emotes</small>
-        </div>
-
-        <div class="form-check form-switch">
-          <input type="checkbox" class="form-check-input" id="bttvGlobal" aria-describedby="bttvGlobalCount" />
-          <label class="form-check-label" for="bttvGlobal">BTTV global</label>
-          <small id="bttvGlobalCount" class="form-text text-body-secondary"><br />0 emotes</small>
-        </div>
-
-        <div class="form-check form-switch">
-          <input type="checkbox" class="form-check-input" id="ffzGlobal" aria-describedby="ffzGlobalCount" />
-          <label class="form-check-label" for="ffzGlobal">FFZ global</label>
-          <small id="ffzGlobalCount" class="form-text text-body-secondary"><br />0 emotes</small>
-        </div>
-
-        <div class="form-check form-switch">
-          <input type="checkbox" class="form-check-input" id="seventvGlobal" aria-describedby="seventvGlobalCount" />
-          <label class="form-check-label" for="seventvGlobal">7TV global</label>
-          <small id="seventvGlobalCount" class="form-text text-body-secondary"><br />0 emotes</small>
-        </div>
-
-        <div class="form-check form-switch">
-          <input type="checkbox" class="form-check-input" id="emoji" aria-describedby="emojiCount" />
-          <label class="form-check-label" for="emoji">Emoji</label>
-          <small id="emojiCount" class="form-text text-body-secondary"><br />0 emoji</small>
-        </div>
-      </div>
-
-      <div class="col-auto">
-        <div class="form-check form-switch">
-          <input type="checkbox" class="form-check-input" id="twitch" aria-describedby="twitchCount" />
-          <label class="form-check-label" for="twitch">Twitch channel</label>
-          <small id="twitchCount" class="form-text text-body-secondary"><br />0 emotes</small>
-        </div>
-
-        <div class="form-check form-switch">
-          <input type="checkbox" class="form-check-input" id="bttv" aria-describedby="bttvCount" />
-          <label class="form-check-label" for="bttv">BTTV channel</label>
-          <small id="bttvCount" class="form-text text-body-secondary"><br />0 emotes</small>
-        </div>
-
-        <div class="form-check form-switch">
-          <input type="checkbox" class="form-check-input" id="ffz" aria-describedby="ffzCount" />
-          <label class="form-check-label" for="ffz">FFZ channel</label>
-          <small id="ffzCount" class="form-text text-body-secondary"><br />0 emotes</small>
-        </div>
-
-        <div class="form-check form-switch">
-          <input type="checkbox" class="form-check-input" id="seventv" aria-describedby="seventvCount" />
-          <label class="form-check-label" for="seventv">7TV channel</label>
-          <small id="seventvCount" class="form-text text-body-secondary"><br />0 emotes</small>
-        </div>
-      </div>
-    </div>
-    <br />
-
-    <div class="mb-3">
-      <label for="turnLength" class="form-label"><IcBaselineTimer />Round timer</label>
-      <div class="input-group">
-        <input type="number" min="0" value="0" max="300" class="form-control" id="turnLength" aria-describedby="timerDesc" />
-        <span class="input-group-text" id="timerDesc">seconds</span>
-      </div>
-      <small>Set to 0 to disable the timer</small>
-      <div class="form-check form-switch mt-3">
-        <input class="form-check-input" type="checkbox" role="switch" id="timerReveal" />
-        <label class="form-check-label" for="timerReveal"><IcBaselineVisibilityOff />Show answer after timer runs out only</label>
-      </div>
-    </div>
-
-    <br />
-    <h4><IcBaselineScoreboard />Scoring & Points</h4>
-    <div class="form-check mb-3">
-      <input class="form-check-input" type="radio" name="drawscoring" id="drawscoring1" checked />
-      <label class="form-check-label" for="drawscoring1"><IcBaselineSort />Fastest answer</label>
-      <br /><small>First correct guess is worth 10 points, 2nd is worth 9 and so on.</small>
-    </div>
-    <div class="form-check mb-5">
-      <input class="form-check-input" type="radio" name="drawscoring" id="drawscoring2" />
-      <label class="form-check-label" for="drawscoring2"><IcBaselineBolt />First answer only</label>
-      <br /><small>Only the first viewer to guess correctly will get points.</small>
-    </div>
-    <div class="input-group mb-3">
-      <span class="input-group-text"><IcBaselineScoreboard />Points per round</span>
-      <input id="points" type="number" min="1" max="1000000" value="10" class="form-control" />
-    </div>
-    <div class="input-group mb-3">
-      <span class="input-group-text"><IcBaselineEmojiEvents />Points needed to win</span>
-      <input id="pointsTarget" type="number" min="1" max="1000000" value="100" class="form-control" />
-    </div>
-  </div>
-</div>
-
 <div class="container-fluid">
   <div class="container-fluid p-0" id="gameDiv">
     <div class="row">
@@ -837,9 +729,114 @@
             <button type="button" onclick={start} class="btn btn-success"><IcBaselinePlayArrow />Start</button>
             <button type="button" onclick={start} class="btn btn-warning"><IcBaselineSkipNext />Skip emote</button>
             <button type="button" onclick={() => reset()} class="btn btn-danger"><IcBaselineClear />Reset</button>
-            <button type="button" class="btn btn-secondary" data-bs-toggle="offcanvas" data-bs-target="#settingsOffcanvas" aria-controls="settingsOffcanvas">
-              <IcBaselineSettings /> Settings
-            </button>
+
+            <div class="drawer">
+              <input id="settingsDrawer" type="checkbox" class="drawer-toggle" />
+              <div class="drawer-content">
+                <!-- Page content here -->
+                <label for="settingsDrawer" class="btn btn-primary drawer-button"><IcBaselineSettings /> Settings</label>
+              </div>
+              <div class="drawer-side">
+                <label for="settingsDrawer" aria-label="close sidebar" class="drawer-overlay"></label>
+                <div class="menu bg-base-200 text-base-content min-h-full w-80 p-4">
+                  <h4><IcBaselineCheck />Enabled emotes</h4>
+                  <div class="row">
+                    <div class="col-auto">
+                      <div class="form-check form-switch">
+                        <input type="checkbox" class="form-check-input" id="twitchGlobal" aria-describedby="twitchGlobalCount" />
+                        <label class="form-check-label" for="twitchGlobal">Twitch global</label>
+                        <small id="twitchGlobalCount" class="form-text text-body-secondary"><br />0 emotes</small>
+                      </div>
+
+                      <div class="form-check form-switch">
+                        <input type="checkbox" class="form-check-input" id="bttvGlobal" aria-describedby="bttvGlobalCount" />
+                        <label class="form-check-label" for="bttvGlobal">BTTV global</label>
+                        <small id="bttvGlobalCount" class="form-text text-body-secondary"><br />0 emotes</small>
+                      </div>
+
+                      <div class="form-check form-switch">
+                        <input type="checkbox" class="form-check-input" id="ffzGlobal" aria-describedby="ffzGlobalCount" />
+                        <label class="form-check-label" for="ffzGlobal">FFZ global</label>
+                        <small id="ffzGlobalCount" class="form-text text-body-secondary"><br />0 emotes</small>
+                      </div>
+
+                      <div class="form-check form-switch">
+                        <input type="checkbox" class="form-check-input" id="seventvGlobal" aria-describedby="seventvGlobalCount" />
+                        <label class="form-check-label" for="seventvGlobal">7TV global</label>
+                        <small id="seventvGlobalCount" class="form-text text-body-secondary"><br />0 emotes</small>
+                      </div>
+
+                      <div class="form-check form-switch">
+                        <input type="checkbox" class="form-check-input" id="emoji" aria-describedby="emojiCount" />
+                        <label class="form-check-label" for="emoji">Emoji</label>
+                        <small id="emojiCount" class="form-text text-body-secondary"><br />0 emoji</small>
+                      </div>
+                    </div>
+
+                    <div class="col-auto">
+                      <div class="form-check form-switch">
+                        <input type="checkbox" class="form-check-input" id="twitch" aria-describedby="twitchCount" />
+                        <label class="form-check-label" for="twitch">Twitch channel</label>
+                        <small id="twitchCount" class="form-text text-body-secondary"><br />0 emotes</small>
+                      </div>
+
+                      <div class="form-check form-switch">
+                        <input type="checkbox" class="form-check-input" id="bttv" aria-describedby="bttvCount" />
+                        <label class="form-check-label" for="bttv">BTTV channel</label>
+                        <small id="bttvCount" class="form-text text-body-secondary"><br />0 emotes</small>
+                      </div>
+
+                      <div class="form-check form-switch">
+                        <input type="checkbox" class="form-check-input" id="ffz" aria-describedby="ffzCount" />
+                        <label class="form-check-label" for="ffz">FFZ channel</label>
+                        <small id="ffzCount" class="form-text text-body-secondary"><br />0 emotes</small>
+                      </div>
+
+                      <div class="form-check form-switch">
+                        <input type="checkbox" class="form-check-input" id="seventv" aria-describedby="seventvCount" />
+                        <label class="form-check-label" for="seventv">7TV channel</label>
+                        <small id="seventvCount" class="form-text text-body-secondary"><br />0 emotes</small>
+                      </div>
+                    </div>
+                  </div>
+                  <br />
+
+                  <div class="mb-3">
+                    <label for="turnLength" class="form-label"><IcBaselineTimer />Round timer</label>
+                    <div class="input-group">
+                      <input type="number" min="0" value="0" max="300" class="form-control" id="turnLength" aria-describedby="timerDesc" />
+                      <span class="input-group-text" id="timerDesc">seconds</span>
+                    </div>
+                    <small>Set to 0 to disable the timer</small>
+                    <div class="form-check form-switch mt-3">
+                      <input class="form-check-input" type="checkbox" role="switch" id="timerReveal" />
+                      <label class="form-check-label" for="timerReveal"><IcBaselineVisibilityOff />Show answer after timer runs out only</label>
+                    </div>
+                  </div>
+
+                  <br />
+                  <h4><IcBaselineScoreboard />Scoring & Points</h4>
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="radio" name="drawscoring" id="drawscoring1" checked />
+                    <label class="form-check-label" for="drawscoring1"><IcBaselineSort />Fastest answer</label>
+                    <br /><small>First correct guess is worth 10 points, 2nd is worth 9 and so on.</small>
+                  </div>
+                  <div class="form-check mb-5">
+                    <input class="form-check-input" type="radio" name="drawscoring" id="drawscoring2" />
+                    <label class="form-check-label" for="drawscoring2"><IcBaselineBolt />First answer only</label>
+                    <br /><small>Only the first viewer to guess correctly will get points.</small>
+                  </div>
+                  <div class="input-group mb-3">
+                    <span class="input-group-text"><IcBaselineScoreboard />Points per round</span>
+                    <input id="points" type="number" min="1" max="1000000" value="10" class="form-control" />
+                  </div>
+                  <div class="input-group mb-3">
+                    <span class="input-group-text"><IcBaselineEmojiEvents />Points needed to win</span>
+                    <input id="pointsTarget" type="number" min="1" max="1000000" value="100" class="form-control" />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="card-body">

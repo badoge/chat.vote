@@ -56,7 +56,6 @@
       enableRaffleText: document.getElementById("enableRaffleText"),
       raffleCommandButton: document.getElementById("raffleCommandButton"),
       raffleCommandText: document.getElementById("raffleCommandText"),
-      settingsOffcanvas: document.getElementById("settingsOffcanvas"),
       raffleUsers: document.getElementById("raffleUsers"),
       entrants: document.getElementById("entrants"),
       raffleOutput: document.getElementById("raffleOutput"),
@@ -134,23 +133,11 @@
       titleHint: document.getElementById("titleHint"),
     };
 
-    let resetSettingsPopover = new bootstrap.Popover("#resetSettingsPopover", {
-      trigger: "focus",
-      html: true,
-      sanitize: false,
-      container: ".offcanvas-body",
-    });
     loginButtonPopover = new bootstrap.Popover(document.getElementById("loginButtonSpan"));
 
     rafflePopover = new bootstrap.Popover(elements.enableRaffle);
 
     fancyRaffleModal = new bootstrap.Modal(elements.fancyRaffleModal);
-
-    settingsOffcanvas = new bootstrap.Offcanvas(elements.settingsOffcanvas);
-
-    elements.settingsOffcanvas.addEventListener("hide.bs.offcanvas", function () {
-      saveSettings();
-    });
 
     elements.enableRaffle.addEventListener("click", function () {
       if (raffle_open) {
@@ -263,7 +250,6 @@
   let fancyRaffleModal;
   let currentRaffleWinner = "";
   let raffleWinners = [];
-  let settingsOffcanvas;
   let tickSound, revealSound;
   let thirdPartyEmotes = [];
   let firstTimeChatters = [];
@@ -1093,7 +1079,7 @@
       !RAFFLES.value.allowFirstTimeChatters
     ) {
       showToast("No one will be able to join the raffle", "danger", 3000);
-      settingsOffcanvas.show();
+      document.getElementById("settingsDrawer").checked = true;
       elements.whoCanJoinCard.scrollIntoView();
       let flashBorder = setInterval(() => {
         elements.whoCanJoinCard.classList.toggle("border-info");
@@ -1120,7 +1106,7 @@
   } //disableRaffleButton
 
   function changeRaffleCommand() {
-    settingsOffcanvas.show();
+    document.getElementById("settingsDrawer").checked = true;
     setTimeout(() => {
       elements.raffleCommand.focus();
       elements.raffleCommand.select();
@@ -1382,9 +1368,391 @@
             <IcBaselineRefresh />Restart raffle
           </a>
           <br />
-          <button class="btn btn-secondary m-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#settingsOffcanvas" aria-controls="settingsOffcanvas">
-            <IcBaselineSettings /> Settings
-          </button>
+
+          <div class="drawer">
+            <input id="settingsDrawer" type="checkbox" class="drawer-toggle" />
+            <div class="drawer-content">
+              <!-- Page content here -->
+              <label for="settingsDrawer" class="btn btn-primary drawer-button"><IcBaselineSettings />Settings</label>
+            </div>
+            <div class="drawer-side">
+              <label for="settingsDrawer" aria-label="close sidebar" class="drawer-overlay"></label>
+              <div class="menu bg-base-200 text-base-content min-h-full w-80 p-4">
+                <div class="card m-3" style="width: 30rem">
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col">
+                        <div class="form-group">
+                          <label for="raffleCommand" class="form-label">Raffle join command</label>
+                          <input
+                            type="text"
+                            class="form-control notranslate"
+                            id="raffleCommand"
+                            onchange={saveSettings}
+                            value="!join"
+                            placeholder="!join"
+                            aria-describedby="raffleCommandDesc"
+                          />
+                          <small id="raffleCommandDesc" class="text-body-secondary">The command to use to enter the raffle.</small>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="form-check form-switch mb-3">
+                          <input type="checkbox" class="form-check-input" id="removeWinner" onchange={saveSettings} aria-describedby="removeWinnerDesc" checked />
+                          <label class="form-check-label" for="removeWinner"><IcBaselineBlock /> Remove winner from raffle</label>
+                          <small id="removeWinnerDesc" class="text-body-secondary">
+                            <br />Removes the winner from the raffle and prevents them from joining again. If this is off then a viewer can win multiple times
+                          </small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card m-3" id="whoCanJoinCard" style="width: 35rem">
+                  <div class="card-header">Who can join</div>
+                  <div class="card-body">
+                    <p id="whoCanJoin">Everyone will be able to join the raffle.<br />Entrants will get 1 ticket</p>
+                    <table class="table table-hover">
+                      <thead>
+                        <tr>
+                          <th scope="col">Allowed to join?</th>
+                          <th scope="col">Role</th>
+                          <th
+                            scope="col"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            data-bs-title="Everyone will get 1 ticket + this amount on bonus tickets. Bonus tickets stack for viewers that have more than 1 role"
+                          >
+                            Bonus Tickets
+                          </th>
+                          <th scope="col"></th>
+                        </tr>
+                      </thead>
+                      <tbody class="table-group-divider">
+                        <tr>
+                          <th scope="row">
+                            <div class="form-check form-switch">
+                              <input class="form-check-input" type="checkbox" role="switch" id="allowPlebs" onchange={saveSettings} checked />
+                            </div>
+                          </th>
+                          <td>Non subscriber</td>
+                          <td>
+                            <input type="number" style="width: 80px" class="form-control" id="plebBonus" onchange={saveSettings} value="0" min="0" placeholder="0" />
+                          </td>
+                          <td></td>
+                        </tr>
+                        <tr style="display: none">
+                          <th scope="row">
+                            <div class="form-check form-switch">
+                              <input class="form-check-input" type="checkbox" role="switch" id="allowFollowers" onchange={saveSettings} checked />
+                            </div>
+                          </th>
+                          <td>Follower</td>
+                          <td>
+                            <input type="number" style="width: 80px" class="form-control" id="followerBonus" onchange={saveSettings} value="0" min="0" placeholder="0" />
+                          </td>
+                          <td>
+                            <div class="input-group flex-nowrap">
+                              <label class="input-group-text" for="followAge">Must be following for at least</label>
+                              <input
+                                type="number"
+                                id="followAge"
+                                onchange={saveSettings}
+                                style="max-width: 5em"
+                                class="form-control"
+                                value="0"
+                                min="0"
+                                placeholder="0"
+                                aria-label="Text input for follow age"
+                              />
+                              <select style="max-width: 110px" class="form-select" id="followAgeUnit" onchange={saveSettings}>
+                                <option value="min" selected>Minutes</option>
+                                <option value="hr">Hours</option>
+                                <option value="day">Days</option>
+                                <option value="week">Weeks</option>
+                              </select>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr id="subsRow">
+                          <th scope="row">
+                            <div class="form-check form-switch">
+                              <input class="form-check-input" type="checkbox" role="switch" id="allowSubs" onchange={saveSettings} checked />
+                            </div>
+                          </th>
+                          <td>Subscriber</td>
+                          <td>
+                            <input type="number" style="width: 80px" class="form-control" id="subBonus" onchange={saveSettings} value="0" min="0" placeholder="0" />
+                          </td>
+                          <td>
+                            <div class="input-group flex-nowrap" style="display: none">
+                              <label class="input-group-text" for="subAge">Must be subscribed for at least</label>
+                              <input
+                                type="number"
+                                id="subAge"
+                                onchange={saveSettings}
+                                style="max-width: 5em"
+                                class="form-control"
+                                value="0"
+                                min="0"
+                                placeholder="0"
+                                aria-label="Text input for sub age"
+                              />
+                              <label class="input-group-text" for="subAge">months</label>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr id="tier1Row" style="display: none">
+                          <th scope="row">
+                            <div class="form-check form-switch">
+                              <input class="form-check-input" type="checkbox" role="switch" id="allowTier1" onchange={saveSettings} checked />
+                            </div>
+                          </th>
+                          <td>Tier 1 Subscriber</td>
+                          <td>
+                            <input type="number" style="width: 80px" class="form-control" id="tier1Bonus" onchange={saveSettings} value="0" min="0" placeholder="0" />
+                          </td>
+                          <td>
+                            <div class="input-group flex-nowrap" style="display: none">
+                              <label class="input-group-text" for="tier1SubAge">Must be subscribed for at least</label>
+                              <input
+                                type="number"
+                                id="tier1SubAge"
+                                onchange={saveSettings}
+                                style="max-width: 5em"
+                                class="form-control"
+                                value="0"
+                                min="0"
+                                placeholder="0"
+                                aria-label="Text input for tier 2 sub age"
+                              />
+                              <label class="input-group-text" for="tier1SubAge">months</label>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr id="tier2Row" style="display: none">
+                          <th scope="row">
+                            <div class="form-check form-switch">
+                              <input class="form-check-input" type="checkbox" role="switch" id="allowTier2" onchange={saveSettings} checked />
+                            </div>
+                          </th>
+                          <td>Tier 2 Subscriber</td>
+                          <td>
+                            <input type="number" style="width: 80px" class="form-control" id="tier2Bonus" onchange={saveSettings} value="0" min="0" placeholder="0" />
+                          </td>
+                          <td>
+                            <div class="input-group flex-nowrap" style="display: none">
+                              <label class="input-group-text" for="tier2SubAge">Must be subscribed for at least</label>
+                              <input
+                                type="number"
+                                id="tier2SubAge"
+                                onchange={saveSettings}
+                                style="max-width: 5em"
+                                class="form-control"
+                                value="0"
+                                min="0"
+                                placeholder="0"
+                                aria-label="Text input for tier 2 sub age"
+                              />
+                              <label class="input-group-text" for="tier2SubAge">months</label>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr id="tier3Row" style="display: none">
+                          <th scope="row">
+                            <div class="form-check form-switch">
+                              <input class="form-check-input" type="checkbox" role="switch" id="allowTier3" onchange={saveSettings} checked />
+                            </div>
+                          </th>
+                          <td>Tier 3 Subscriber</td>
+                          <td>
+                            <input type="number" style="width: 80px" class="form-control" id="tier3Bonus" onchange={saveSettings} value="0" min="0" placeholder="0" />
+                          </td>
+                          <td>
+                            <div class="input-group flex-nowrap" style="display: none">
+                              <label class="input-group-text" for="tier3SubAge">Must be subscribed for at least</label>
+                              <input
+                                type="number"
+                                id="tier3SubAge"
+                                onchange={saveSettings}
+                                style="max-width: 5em"
+                                class="form-control"
+                                value="0"
+                                min="0"
+                                placeholder="0"
+                                aria-label="Text input for sub luck"
+                              />
+                              <label class="input-group-text" for="tier3SubAge">months</label>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <div class="form-check form-switch">
+                              <input class="form-check-input" type="checkbox" role="switch" id="allowMods" onchange={saveSettings} checked />
+                            </div>
+                          </th>
+                          <td>Mod</td>
+                          <td>
+                            <input type="number" style="width: 80px" class="form-control" id="modBonus" onchange={saveSettings} value="0" min="0" placeholder="0" />
+                          </td>
+                          <td></td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <div class="form-check form-switch">
+                              <input class="form-check-input" type="checkbox" role="switch" id="allowVips" onchange={saveSettings} checked />
+                            </div>
+                          </th>
+                          <td>VIP</td>
+                          <td>
+                            <input type="number" style="width: 80px" class="form-control" id="vipBonus" onchange={saveSettings} value="0" min="0" placeholder="0" />
+                          </td>
+                          <td></td>
+                        </tr>
+                        <tr>
+                          <th scope="row">
+                            <div class="form-check form-switch">
+                              <input class="form-check-input" type="checkbox" role="switch" id="allowFirstTimeChatters" onchange={saveSettings} checked />
+                            </div>
+                          </th>
+                          <td>First time chatter</td>
+                          <td>
+                            <input type="number" style="width: 80px" class="form-control" id="firstTimeChatterBonus" onchange={saveSettings} value="0" min="0" placeholder="0" />
+                          </td>
+                          <td></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <div class="btn-group mb-3" role="group" aria-label="Check all/Uncheck all">
+                      <button type="button" id="selectAll" class="btn btn-sm btn-success">Select all</button>
+                      <button type="button" id="unselectAll" class="btn btn-sm btn-danger">Unselect all</button>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                      <input type="checkbox" class="form-check-input" id="splitTiers" aria-describedby="splitTiersDesc" />
+                      <label class="form-check-label" for="splitTiers"><IcBaselineCallSplit />Split Tier 1/2/3 subscribers into separate roles</label>
+                      <br />
+                      <small id="splitTiersDesc" class="text-body-secondary">
+                        Adds separate roles for each tier so that you can give each role a different amount of bonus tickets or only allow some of them to join
+                      </small>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card m-3" style="width: 25rem">
+                  <div class="card-header">Bot settings</div>
+                  <div class="card-body">
+                    <div class="form-check form-switch mb-3">
+                      <input type="checkbox" class="form-check-input" id="announceWinner" onchange={saveSettings} aria-describedby="announceWinnerDesc" disabled />
+                      <label class="form-check-label" for="announceWinner"><IcBaselineSmartToy /> Announce winner in chat</label><br />
+                      <small id="announceWinnerDesc" class="text-body-secondary"> Posts a message in chat to notify the winner </small><br />
+                      <small class="text-warning no-twitch-warn">You need to sign in using Twitch to use this feature</small>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                      <input type="checkbox" class="form-check-input" id="confirmJoin" onchange={saveSettings} aria-describedby="confirmJoinDesc" disabled />
+                      <label class="form-check-label" for="confirmJoin"><IcBaselineSmartToy /> Confirm joining in chat</label><br />
+                      <small id="confirmJoinDesc" class="text-body-secondary">
+                        Notifies each viewer that joins the raffle in chat to confirm that they joined.<br />
+                        Make sure to mod the bot (@chatvote) so that it does not get timed out by other bots for spamming :)</small
+                      ><br />
+                      <small class="text-warning no-twitch-warn">You need to sign in using Twitch to use this feature</small>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card m-3" style="width: 35rem">
+                  <div class="card-header">Animation</div>
+                  <div class="card-body">
+                    <div class="form-check form-switch mb-3">
+                      <input type="checkbox" class="form-check-input" id="animateDrawing" onchange={saveSettings} aria-describedby="animateDrawingDesc" checked />
+                      <label class="form-check-label" for="animateDrawing"><IcBaselineStar /> Animate raffle drawing</label><br />
+                      <small id="animateDrawingDesc" class="text-body-secondary">
+                        Plays a CS:GO style case unboxing animation when drawing the winner using placeholder
+                        <img src="/pics/donk.png" alt="donk" style="height: 22px; width: 22px" /> avatars that use the chatters' chat color
+                      </small>
+                    </div>
+                    <div class="form-check form-switch ms-5">
+                      <input type="checkbox" class="form-check-input" id="useTwitchPFP" onchange={saveSettings} aria-describedby="useTwitchPFPDesc" />
+                      <label class="form-check-label" for="useTwitchPFP"><IcBaselineAccountCircle /> Use Twitch profile pictures</label>
+                      <small id="useTwitchPFPDesc" class="text-body-secondary"><br />Replaces the placeholder avatars with the viewers' Twitch avatars </small><br />
+                      <small class="text-danger">Use with caution; Some viewers might have avatars that break Twitch's TOS.</small> <br />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card m-3" style="width: 38rem">
+                  <div class="card-header">Timers</div>
+                  <div class="card-body">
+                    <div class="input-group" id="rerollDiv">
+                      <div class="input-group-text">
+                        <input class="form-check-input mt-0" id="autoRerollEnabled" type="checkbox" value="" aria-label="Checkbox for following text input for automatic redraw" />
+                      </div>
+                      <span class="input-group-text">Redraw if winner does not respond within</span>
+                      <input
+                        disabled
+                        type="number"
+                        id="rerollTimerValueMinutes"
+                        onchange={saveSettings}
+                        style="max-width: 5em"
+                        class="form-control"
+                        value="0"
+                        min="0"
+                        placeholder="0"
+                        aria-label="Text input with checkbox for reroll timer"
+                      />
+                      <span class="input-group-text">minutes</span>
+                    </div>
+                    <small class="text-body-secondary">Will automatically draw another winner if the current winner does not type anything in chat.</small>
+
+                    <div class="form-check form-switch mt-3">
+                      <input type="checkbox" class="form-check-input" id="extraTimerEnabled" aria-describedby="extratimerswitchdesc" />
+                      <label class="form-check-label" for="extraTimerEnabled"><IcBaselineTimer /> Extra countdown timer</label>
+                      <small id="extratimerswitchdesc" class="text-body-secondary"><br />A separate timer that you control manually.</small>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card m-3" style="width: 40rem">
+                  <div class="card-body">
+                    <div class="form-check form-switch mb-3">
+                      <input class="form-check-input" type="checkbox" id="linkPreviewThumbnailsEnabled" />
+                      <label class="form-check-label" for="linkPreviewThumbnailsEnabled"> <IcBaselinePreview />Show thumbnails in link preview </label>
+                      <br /><small class="text-body-secondary"><b class="text-danger">Use with caution; viewers might link images that break Twitch's TOS</b></small>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                      <input class="form-check-input" type="checkbox" id="refreshWarningEnabled" onchange={saveSettings} />
+                      <label class="form-check-label" for="refreshWarningEnabled"><IcBaselineNotificationImportant />Enable close/refresh warning</label>
+                      <br /><small class="text-body-secondary">Shows a warning before leaving/refreshing the site so that you don't accidentally lose your raffle results.</small>
+                    </div>
+                    <div class="input-group mb-0">
+                      <span class="input-group-text blueborder">Refresh 3rd party emotes</span>
+                      <button class="btn btn-outline-info" type="button" onclick={getEmotes}><IcBaselineRefresh /></button>
+                    </div>
+                    <div class="text-body-secondary mb-3">
+                      Loaded emotes (global/channel): BTTV: <span id="bttvGlobalEmotes">0</span>/<span id="bttvChannelEmotes">0</span> | FFZ: <span id="ffzGlobalEmotes">0</span>/<span
+                        id="ffzChannelEmotes">0</span
+                      >
+                      | 7TV: <span id="seventvGlobalEmotes">0</span>/<span id="seventvChannelEmotes">0</span>
+                    </div>
+
+                    <a
+                      id="resetSettingsPopover"
+                      tabindex="0"
+                      class="btn btn-danger"
+                      role="button"
+                      data-bs-toggle="popover"
+                      data-bs-trigger="focus"
+                      data-bs-title="Are you sure?"
+                      data-bs-content="All settings will be reset and the page will reload<br><button type='button' class='btn btn-danger float-end my-3' onclick='resetSettings()'><i class='material-icons notranslate'>delete_forever</i>Reset settings</button>"
+                      ><IcBaselineDeleteForever />Reset all settings</a
+                    >
+                    <br />
+                    <small class="text-body-secondary">Resets all settings and reloads the page.</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <div id="extraTimerDiv" class="mt-3" style="display: none">
             <div class="input-group">
@@ -1448,387 +1816,9 @@
   </div>
 </div>
 
-<div class="offcanvas offcanvas-start" tabindex="-1" id="settingsOffcanvas" aria-labelledby="settingsOffcanvasLabel">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="settingsOffcanvasLabel"><IcBaselineSettings /> Raffle Settings</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body">
-    <div class="card m-3" style="width: 30rem">
-      <div class="card-body">
-        <div class="row">
-          <div class="col">
-            <div class="form-group">
-              <label for="raffleCommand" class="form-label">Raffle join command</label>
-              <input type="text" class="form-control notranslate" id="raffleCommand" onchange={saveSettings} value="!join" placeholder="!join" aria-describedby="raffleCommandDesc" />
-              <small id="raffleCommandDesc" class="text-body-secondary">The command to use to enter the raffle.</small>
-            </div>
-          </div>
-          <div class="col">
-            <div class="form-check form-switch mb-3">
-              <input type="checkbox" class="form-check-input" id="removeWinner" onchange={saveSettings} aria-describedby="removeWinnerDesc" checked />
-              <label class="form-check-label" for="removeWinner"><IcBaselineBlock /> Remove winner from raffle</label>
-              <small id="removeWinnerDesc" class="text-body-secondary">
-                <br />Removes the winner from the raffle and prevents them from joining again. If this is off then a viewer can win multiple times
-              </small>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="card m-3" id="whoCanJoinCard" style="width: 35rem">
-      <div class="card-header">Who can join</div>
-      <div class="card-body">
-        <p id="whoCanJoin">Everyone will be able to join the raffle.<br />Entrants will get 1 ticket</p>
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th scope="col">Allowed to join?</th>
-              <th scope="col">Role</th>
-              <th
-                scope="col"
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-                data-bs-title="Everyone will get 1 ticket + this amount on bonus tickets. Bonus tickets stack for viewers that have more than 1 role"
-              >
-                Bonus Tickets
-              </th>
-              <th scope="col"></th>
-            </tr>
-          </thead>
-          <tbody class="table-group-divider">
-            <tr>
-              <th scope="row">
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" role="switch" id="allowPlebs" onchange={saveSettings} checked />
-                </div>
-              </th>
-              <td>Non subscriber</td>
-              <td>
-                <input type="number" style="width: 80px" class="form-control" id="plebBonus" onchange={saveSettings} value="0" min="0" placeholder="0" />
-              </td>
-              <td></td>
-            </tr>
-            <tr style="display: none">
-              <th scope="row">
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" role="switch" id="allowFollowers" onchange={saveSettings} checked />
-                </div>
-              </th>
-              <td>Follower</td>
-              <td>
-                <input type="number" style="width: 80px" class="form-control" id="followerBonus" onchange={saveSettings} value="0" min="0" placeholder="0" />
-              </td>
-              <td>
-                <div class="input-group flex-nowrap">
-                  <label class="input-group-text" for="followAge">Must be following for at least</label>
-                  <input
-                    type="number"
-                    id="followAge"
-                    onchange={saveSettings}
-                    style="max-width: 5em"
-                    class="form-control"
-                    value="0"
-                    min="0"
-                    placeholder="0"
-                    aria-label="Text input for follow age"
-                  />
-                  <select style="max-width: 110px" class="form-select" id="followAgeUnit" onchange={saveSettings}>
-                    <option value="min" selected>Minutes</option>
-                    <option value="hr">Hours</option>
-                    <option value="day">Days</option>
-                    <option value="week">Weeks</option>
-                  </select>
-                </div>
-              </td>
-            </tr>
-            <tr id="subsRow">
-              <th scope="row">
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" role="switch" id="allowSubs" onchange={saveSettings} checked />
-                </div>
-              </th>
-              <td>Subscriber</td>
-              <td>
-                <input type="number" style="width: 80px" class="form-control" id="subBonus" onchange={saveSettings} value="0" min="0" placeholder="0" />
-              </td>
-              <td>
-                <div class="input-group flex-nowrap" style="display: none">
-                  <label class="input-group-text" for="subAge">Must be subscribed for at least</label>
-                  <input
-                    type="number"
-                    id="subAge"
-                    onchange={saveSettings}
-                    style="max-width: 5em"
-                    class="form-control"
-                    value="0"
-                    min="0"
-                    placeholder="0"
-                    aria-label="Text input for sub age"
-                  />
-                  <label class="input-group-text" for="subAge">months</label>
-                </div>
-              </td>
-            </tr>
-            <tr id="tier1Row" style="display: none">
-              <th scope="row">
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" role="switch" id="allowTier1" onchange={saveSettings} checked />
-                </div>
-              </th>
-              <td>Tier 1 Subscriber</td>
-              <td>
-                <input type="number" style="width: 80px" class="form-control" id="tier1Bonus" onchange={saveSettings} value="0" min="0" placeholder="0" />
-              </td>
-              <td>
-                <div class="input-group flex-nowrap" style="display: none">
-                  <label class="input-group-text" for="tier1SubAge">Must be subscribed for at least</label>
-                  <input
-                    type="number"
-                    id="tier1SubAge"
-                    onchange={saveSettings}
-                    style="max-width: 5em"
-                    class="form-control"
-                    value="0"
-                    min="0"
-                    placeholder="0"
-                    aria-label="Text input for tier 2 sub age"
-                  />
-                  <label class="input-group-text" for="tier1SubAge">months</label>
-                </div>
-              </td>
-            </tr>
-            <tr id="tier2Row" style="display: none">
-              <th scope="row">
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" role="switch" id="allowTier2" onchange={saveSettings} checked />
-                </div>
-              </th>
-              <td>Tier 2 Subscriber</td>
-              <td>
-                <input type="number" style="width: 80px" class="form-control" id="tier2Bonus" onchange={saveSettings} value="0" min="0" placeholder="0" />
-              </td>
-              <td>
-                <div class="input-group flex-nowrap" style="display: none">
-                  <label class="input-group-text" for="tier2SubAge">Must be subscribed for at least</label>
-                  <input
-                    type="number"
-                    id="tier2SubAge"
-                    onchange={saveSettings}
-                    style="max-width: 5em"
-                    class="form-control"
-                    value="0"
-                    min="0"
-                    placeholder="0"
-                    aria-label="Text input for tier 2 sub age"
-                  />
-                  <label class="input-group-text" for="tier2SubAge">months</label>
-                </div>
-              </td>
-            </tr>
-            <tr id="tier3Row" style="display: none">
-              <th scope="row">
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" role="switch" id="allowTier3" onchange={saveSettings} checked />
-                </div>
-              </th>
-              <td>Tier 3 Subscriber</td>
-              <td>
-                <input type="number" style="width: 80px" class="form-control" id="tier3Bonus" onchange={saveSettings} value="0" min="0" placeholder="0" />
-              </td>
-              <td>
-                <div class="input-group flex-nowrap" style="display: none">
-                  <label class="input-group-text" for="tier3SubAge">Must be subscribed for at least</label>
-                  <input
-                    type="number"
-                    id="tier3SubAge"
-                    onchange={saveSettings}
-                    style="max-width: 5em"
-                    class="form-control"
-                    value="0"
-                    min="0"
-                    placeholder="0"
-                    aria-label="Text input for sub luck"
-                  />
-                  <label class="input-group-text" for="tier3SubAge">months</label>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <th scope="row">
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" role="switch" id="allowMods" onchange={saveSettings} checked />
-                </div>
-              </th>
-              <td>Mod</td>
-              <td>
-                <input type="number" style="width: 80px" class="form-control" id="modBonus" onchange={saveSettings} value="0" min="0" placeholder="0" />
-              </td>
-              <td></td>
-            </tr>
-            <tr>
-              <th scope="row">
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" role="switch" id="allowVips" onchange={saveSettings} checked />
-                </div>
-              </th>
-              <td>VIP</td>
-              <td>
-                <input type="number" style="width: 80px" class="form-control" id="vipBonus" onchange={saveSettings} value="0" min="0" placeholder="0" />
-              </td>
-              <td></td>
-            </tr>
-            <tr>
-              <th scope="row">
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" role="switch" id="allowFirstTimeChatters" onchange={saveSettings} checked />
-                </div>
-              </th>
-              <td>First time chatter</td>
-              <td>
-                <input type="number" style="width: 80px" class="form-control" id="firstTimeChatterBonus" onchange={saveSettings} value="0" min="0" placeholder="0" />
-              </td>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="btn-group mb-3" role="group" aria-label="Check all/Uncheck all">
-          <button type="button" id="selectAll" class="btn btn-sm btn-success">Select all</button>
-          <button type="button" id="unselectAll" class="btn btn-sm btn-danger">Unselect all</button>
-        </div>
-        <div class="form-check form-switch mb-3">
-          <input type="checkbox" class="form-check-input" id="splitTiers" aria-describedby="splitTiersDesc" />
-          <label class="form-check-label" for="splitTiers"><IcBaselineCallSplit />Split Tier 1/2/3 subscribers into separate roles</label>
-          <br />
-          <small id="splitTiersDesc" class="text-body-secondary">
-            Adds separate roles for each tier so that you can give each role a different amount of bonus tickets or only allow some of them to join
-          </small>
-        </div>
-      </div>
-    </div>
-
-    <div class="card m-3" style="width: 25rem">
-      <div class="card-header">Bot settings</div>
-      <div class="card-body">
-        <div class="form-check form-switch mb-3">
-          <input type="checkbox" class="form-check-input" id="announceWinner" onchange={saveSettings} aria-describedby="announceWinnerDesc" disabled />
-          <label class="form-check-label" for="announceWinner"><IcBaselineSmartToy /> Announce winner in chat</label><br />
-          <small id="announceWinnerDesc" class="text-body-secondary"> Posts a message in chat to notify the winner </small><br />
-          <small class="text-warning no-twitch-warn">You need to sign in using Twitch to use this feature</small>
-        </div>
-        <div class="form-check form-switch mb-3">
-          <input type="checkbox" class="form-check-input" id="confirmJoin" onchange={saveSettings} aria-describedby="confirmJoinDesc" disabled />
-          <label class="form-check-label" for="confirmJoin"><IcBaselineSmartToy /> Confirm joining in chat</label><br />
-          <small id="confirmJoinDesc" class="text-body-secondary">
-            Notifies each viewer that joins the raffle in chat to confirm that they joined.<br />
-            Make sure to mod the bot (@chatvote) so that it does not get timed out by other bots for spamming :)</small
-          ><br />
-          <small class="text-warning no-twitch-warn">You need to sign in using Twitch to use this feature</small>
-        </div>
-      </div>
-    </div>
-
-    <div class="card m-3" style="width: 35rem">
-      <div class="card-header">Animation</div>
-      <div class="card-body">
-        <div class="form-check form-switch mb-3">
-          <input type="checkbox" class="form-check-input" id="animateDrawing" onchange={saveSettings} aria-describedby="animateDrawingDesc" checked />
-          <label class="form-check-label" for="animateDrawing"><IcBaselineStar /> Animate raffle drawing</label><br />
-          <small id="animateDrawingDesc" class="text-body-secondary">
-            Plays a CS:GO style case unboxing animation when drawing the winner using placeholder
-            <img src="/pics/donk.png" alt="donk" style="height: 22px; width: 22px" /> avatars that use the chatters' chat color
-          </small>
-        </div>
-        <div class="form-check form-switch ms-5">
-          <input type="checkbox" class="form-check-input" id="useTwitchPFP" onchange={saveSettings} aria-describedby="useTwitchPFPDesc" />
-          <label class="form-check-label" for="useTwitchPFP"><IcBaselineAccountCircle /> Use Twitch profile pictures</label>
-          <small id="useTwitchPFPDesc" class="text-body-secondary"><br />Replaces the placeholder avatars with the viewers' Twitch avatars </small><br />
-          <small class="text-danger">Use with caution; Some viewers might have avatars that break Twitch's TOS.</small> <br />
-        </div>
-      </div>
-    </div>
-
-    <div class="card m-3" style="width: 38rem">
-      <div class="card-header">Timers</div>
-      <div class="card-body">
-        <div class="input-group" id="rerollDiv">
-          <div class="input-group-text">
-            <input class="form-check-input mt-0" id="autoRerollEnabled" type="checkbox" value="" aria-label="Checkbox for following text input for automatic redraw" />
-          </div>
-          <span class="input-group-text">Redraw if winner does not respond within</span>
-          <input
-            disabled
-            type="number"
-            id="rerollTimerValueMinutes"
-            onchange={saveSettings}
-            style="max-width: 5em"
-            class="form-control"
-            value="0"
-            min="0"
-            placeholder="0"
-            aria-label="Text input with checkbox for reroll timer"
-          />
-          <span class="input-group-text">minutes</span>
-        </div>
-        <small class="text-body-secondary">Will automatically draw another winner if the current winner does not type anything in chat.</small>
-
-        <div class="form-check form-switch mt-3">
-          <input type="checkbox" class="form-check-input" id="extraTimerEnabled" aria-describedby="extratimerswitchdesc" />
-          <label class="form-check-label" for="extraTimerEnabled"><IcBaselineTimer /> Extra countdown timer</label>
-          <small id="extratimerswitchdesc" class="text-body-secondary"><br />A separate timer that you control manually.</small>
-        </div>
-      </div>
-    </div>
-
-    <div class="card m-3" style="width: 40rem">
-      <div class="card-body">
-        <div class="form-check form-switch mb-3">
-          <input class="form-check-input" type="checkbox" id="linkPreviewThumbnailsEnabled" />
-          <label class="form-check-label" for="linkPreviewThumbnailsEnabled"> <IcBaselinePreview />Show thumbnails in link preview </label>
-          <br /><small class="text-body-secondary"><b class="text-danger">Use with caution; viewers might link images that break Twitch's TOS</b></small>
-        </div>
-        <div class="form-check form-switch mb-3">
-          <input class="form-check-input" type="checkbox" id="refreshWarningEnabled" onchange={saveSettings} />
-          <label class="form-check-label" for="refreshWarningEnabled"><IcBaselineNotificationImportant />Enable close/refresh warning</label>
-          <br /><small class="text-body-secondary">Shows a warning before leaving/refreshing the site so that you don't accidentally lose your raffle results.</small>
-        </div>
-        <div class="input-group mb-0">
-          <span class="input-group-text blueborder">Refresh 3rd party emotes</span>
-          <button class="btn btn-outline-info" type="button" onclick={getEmotes}><IcBaselineRefresh /></button>
-        </div>
-        <div class="text-body-secondary mb-3">
-          Loaded emotes (global/channel): BTTV: <span id="bttvGlobalEmotes">0</span>/<span id="bttvChannelEmotes">0</span> | FFZ: <span id="ffzGlobalEmotes">0</span>/<span
-            id="ffzChannelEmotes">0</span
-          >
-          | 7TV: <span id="seventvGlobalEmotes">0</span>/<span id="seventvChannelEmotes">0</span>
-        </div>
-
-        <a
-          id="resetSettingsPopover"
-          tabindex="0"
-          class="btn btn-danger"
-          role="button"
-          data-bs-toggle="popover"
-          data-bs-trigger="focus"
-          data-bs-title="Are you sure?"
-          data-bs-content="All settings will be reset and the page will reload<br><button type='button' class='btn btn-danger float-end my-3' onclick='resetSettings()'><i class='material-icons notranslate'>delete_forever</i>Reset settings</button>"
-          ><IcBaselineDeleteForever />Reset all settings</a
-        >
-        <br />
-        <small class="text-body-secondary">Resets all settings and reloads the page.</small>
-      </div>
-    </div>
-  </div>
-</div>
-
 <style>
   .card-header {
     cursor: pointer;
-  }
-
-  #settingsOffcanvas {
-    width: 750px;
-    max-width: 80vw;
   }
 
   [data-placeholder]:empty:before {
