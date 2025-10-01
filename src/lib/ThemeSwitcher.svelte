@@ -230,7 +230,8 @@
   }
 
   #theme-label-container {
-    margin: -10px -16px -14px -4px;
-    scale: 0.7;
+    overflow: hidden;
+    margin: -10px -5px -10px -5px;
+    scale: 0.6;
   }
 </style>

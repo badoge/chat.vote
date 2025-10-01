@@ -1,5 +1,46 @@
 <script>
   import Navbar from "$lib/Navbar.svelte";
+
+  const pages = [
+    {
+      link: "/",
+      name: "chat.vote",
+      description: "chat.vote allows you to make polls that you vote on by typing in chat, it can also be used to collect suggestions from viewers",
+      thumbnail: "https://screenshot.donk.workers.dev/?url=https://chat.vote",
+    },
+    {
+      link: "/poll",
+      name: "chat.vote Polls",
+      description: "Shareable polls. Anyone can vote by visiting a link instead of typing in chat",
+      thumbnail: "https://screenshot.donk.workers.dev/?url=https://chat.vote/poll",
+    },
+
+    {
+      link: "/games",
+      name: "chat.vote Games",
+      description: "A collection of mini games with Twitch chat interaction",
+      thumbnail: "https://screenshot.donk.workers.dev/?url=https://chat.vote/games",
+    },
+    {
+      link: "/raffles",
+      name: "chat.vote Raffles",
+      description: "A raffles tool for Twitch chat",
+      thumbnail: "https://screenshot.donk.workers.dev/?url=https://chat.vote/raffles",
+    },
+    {
+      link: "/blt",
+      name: "chat.vote Brackets, (tier)Lists & trivia",
+      description:
+        "Brackets, tier lists, and trivia maker with Twitch chat integration. Can generate brackets and tier lists automatically from Spotify playlists, TierMaker.com tier lists, A Twitch channel's clips or emotes, YouTube channels or playlists",
+      thumbnail: "https://screenshot.donk.workers.dev/?url=https://chat.vote/blt",
+    },
+    {
+      link: "/playlist",
+      name: "chat.vote Playlist",
+      description: "Allows viewers to send song & video requests. Supports YouTube, Twitch, Spotify, Vimeo, TikTok, and Streamable",
+      thumbnail: "https://screenshot.donk.workers.dev/?url=https://chat.vote/playlist",
+    },
+  ];
 </script>
 
 <svelte:head>
@@ -15,145 +56,39 @@
 
 <Navbar />
 
-<h1 class="display-4 text-center">chat.vote pages</h1>
+<div class="flex flex-row">
+  <div class="lg:w-150 grow"></div>
 
-<div class="container-fluid">
-  <div class="row mt-5">
-    <div class="col-2"></div>
-    <div class="col-8">
-      <div class="card mb-5">
-        <div class="row g-0">
-          <div class="col-md-4">
-            <a target="_blank" rel="noopener noreferrer" href="/">
-              <img src="https://screenshot.donk.workers.dev/?url=https://chat.vote/" class="img-fluid rounded-start" alt="chat.vote" />
-            </a>
-          </div>
-          <div class="col-md-8">
-            <div class="card-body">
-              <h3 class="card-title"><a target="_blank" rel="noopener noreferrer" href="/">chat.vote</a></h3>
-              <p>chat.vote allows you to make polls that you vote on by typing in chat, it can also be used to collect suggestions from viewers.</p>
-            </div>
-          </div>
-        </div>
-      </div>
+  <div class="grow-0">
+    <div class="text-5xl font-extrabold text-center my-5">chat.vote pages</div>
 
-      <div class="card mb-5">
-        <div class="row g-0">
-          <div class="col-md-4">
-            <a target="_blank" rel="noopener noreferrer" href="/poll">
-              <img src="https://screenshot.donk.workers.dev/?url=https://chat.vote/poll" class="img-fluid rounded-start" alt="chat.vote/poll" />
-            </a>
-          </div>
-          <div class="col-md-8">
-            <div class="card-body">
-              <h3 class="card-title"><a target="_blank" rel="noopener noreferrer" href="/poll">chat.vote/poll</a></h3>
-              <p>chat.vote/poll allows you to make polls that can be shared using a link.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card mb-5">
-        <div class="row g-0">
-          <div class="col-md-4">
-            <a target="_blank" rel="noopener noreferrer" href="/games">
-              <img src="https://screenshot.donk.workers.dev/?url=https://chat.vote/games" class="img-fluid rounded-start" alt="chat.vote/games" />
-            </a>
-          </div>
-          <div class="col-md-8">
-            <div class="card-body">
-              <h3 class="card-title"><a target="_blank" rel="noopener noreferrer" href="/games">chat.vote/games</a></h3>
-              <p>A collection of mini games with Twitch chat interaction.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card mb-5">
-        <div class="row g-0">
-          <div class="col-md-4">
-            <a target="_blank" rel="noopener noreferrer" href="/raffles">
-              <img src="https://screenshot.donk.workers.dev/?url=https://chat.vote/raffles" class="img-fluid rounded-start" alt="chat.vote/raffles" />
-            </a>
-          </div>
-          <div class="col-md-8">
-            <div class="card-body">
-              <h3 class="card-title"><a target="_blank" rel="noopener noreferrer" href="/raffles">chat.vote/raffles</a></h3>
-              <p>A raffles tool for Twitch chat.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card mb-5">
-        <div class="row g-0">
-          <div class="col-md-4">
-            <a target="_blank" rel="noopener noreferrer" href="/blt/">
-              <img src="https://screenshot.donk.workers.dev/?url=https://chat.vote/blt" class="img-fluid rounded-start" alt="chat.vote/blt" />
-            </a>
-          </div>
-          <div class="col-md-8">
-            <div class="card-body">
-              <h3 class="card-title"><a target="_blank" rel="noopener noreferrer" href="/blt/">chat.vote/blt</a></h3>
-              <p>
-                Brackets, tier lists, and trivia maker with Twitch chat integration. Can generate brackets and tier lists automatically from Spotify playlists, TierMaker.com tier lists, A
-                Twitch channel's clips or emotes, uwufufu.com brackets, YouTube channels or playlists.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card mb-5">
-        <div class="row g-0">
-          <div class="col-md-4">
-            <a target="_blank" rel="noopener noreferrer" href="/playlist/">
-              <img src="https://screenshot.donk.workers.dev/?url=https://chat.vote/playlist" class="img-fluid rounded-start" alt="chat.vote/playlist" />
-            </a>
-          </div>
-          <div class="col-md-8">
-            <div class="card-body">
-              <h3 class="card-title"><a target="_blank" rel="noopener noreferrer" href="/playlist/">chat.vote/playlist</a></h3>
-              <p>Allows viewers to send song & video requests. Supports YouTube, Twitch, Spotify, Vimeo, TikTok, and Streamable.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card mb-5">
-        <div class="row g-0">
-          <div class="col-md-4">
-            <a target="_blank" rel="noopener noreferrer" href="/thebutton"><img src="/pics/thebutton.png" class="img-fluid rounded-start" alt="chat.vote/thebutton" /></a>
-          </div>
-          <div class="col-md-8">
-            <div class="card-body">
-              <h3 class="card-title"><a target="_blank" rel="noopener noreferrer" href="/thebutton">chat.vote/thebutton</a></h3>
-              <p>(Deprecated) A Twitch extension that lets viewers click a button :)</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card mb-5">
+    {#each pages as page}
+      <div class="card lg:card-side bg-base-100 shadow-lg m-5">
+        <figure>
+          <a href={page.link}><img src={page.thumbnail} alt={page.name} /></a>
+        </figure>
         <div class="card-body">
-          <h3 class="card-title">Work in progress/Test pages/proof of concepts that are not being worked on :)</h3>
-          <p><a target="_blank" rel="noopener noreferrer" href="/tts">chat.vote/tts</a> Some simple tts command that can be used from chat</p>
-          <p><a target="_blank" rel="noopener noreferrer" href="/waytoodank/">chat.vote/waytoodank</a> A WAYTOODANK OBS music visualizer</p>
-          <p><a target="_blank" rel="noopener noreferrer" href="/viewers/">chat.vote/viewers</a> A graph that shows the view count of a channel over time</p>
-          <p><a target="_blank" rel="noopener noreferrer" href="/forsen/">chat.vote/forsen</a> A raffles site for forsen that works with 1 click only :)</p>
-          <p>
-            <a target="_blank" rel="noopener noreferrer" href="/vts/">chat.vote/vts</a> A site that lets viewers control your VTube Studio model using chat commands or channel points. Deprecated
-            since VTS has this functionality built-in now.
-          </p>
+          <h2 class="card-title"><a href={page.link}>{page.name}</a></h2>
+          <p>{page.description}</p>
         </div>
+      </div>
+    {/each}
+
+    <div class="card bg-base-100 shadow-lg mb-5">
+      <div class="card-body">
+        <h2 class="card-title">Work in progress/Test pages/proof of concepts that are not being worked on :)</h2>
+        <p><a class="link font-bold" href="/tts">chat.vote/tts</a> Some simple tts command that can be used from chat</p>
+        <p><a class="link font-bold" href="/waytoodank">chat.vote/waytoodank</a> A WAYTOODANK OBS music visualizer</p>
+        <p><a class="link font-bold" href="/viewers">chat.vote/viewers</a> A graph that shows the view count of a channel over time</p>
+        <p><a class="link font-bold" href="/forsen">chat.vote/forsen</a> A raffles site for forsen that works with 1 click only :)</p>
+        <p><a class="link font-bold" href="/thebutton">chat.vote/thebutton</a> A Twitch extension that lets viewers click a button :)</p>
+        <p>
+          <a class="link font-bold" href="/vts">chat.vote/vts</a> A site that lets viewers control your VTube Studio model using chat commands or channel points. Deprecated since VTS has this
+          functionality built-in now.
+        </p>
       </div>
     </div>
-    <div class="col-2"></div>
   </div>
-</div>
 
-<style>
-  body {
-    margin-bottom: 500px;
-  }
-</style>
+  <div class="lg:w-150 grow"></div>
+</div>

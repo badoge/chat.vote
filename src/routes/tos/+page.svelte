@@ -6,5 +6,9 @@
 
 <Navbar />
 
-<h1>Terms of Service</h1>
-<p>Be nice :)</p>
+<div class="flex justify-center m-5">
+  <article class="prose">
+    <h1>Terms of Service</h1>
+    <h2>Be nice :)</h2>
+  </article>
+</div>

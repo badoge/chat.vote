@@ -51,28 +51,12 @@
   <title>chat.vote login</title>
 </svelte:head>
 
-<div class="container-fluid text-center" id="main">
-  <div class="row align-items-center">
-    <div class="col align-self-center">
-      <div class="text-success" id="success">
-        <img src="/pics/donk.png" alt="donk" style="height: 1.5em" />
-        <br />
-        You can close this window now
-      </div>
+<div class="flex flex-col text-center overflow-hidden mt-[100px] m-5">
+  <div class="justify-center">
+    <div class="text-success font-bold text-3xl">
+      <img src="/pics/donk.png" alt="donk" class="mx-auto h-15" />
+      <br />
+      You can close this window now
     </div>
   </div>
 </div>
-
-<style>
-  #main {
-    margin-top: 50px;
-    overflow: hidden;
-  }
-
-  #success {
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 10px;
-    text-align: center;
-  }
-</style>

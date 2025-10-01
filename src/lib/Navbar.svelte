@@ -6,7 +6,7 @@
   let { messageHandler = null, timeoutHandler = null, messageDeletedHandler = null, loginEvent = null } = $props();
 </script>
 
-<div class="navbar bg-base-100 shadow-sm">
+<div class="navbar bg-base-200 shadow-sm">
   <div class="navbar-start">
     <div class="dropdown">
       <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
@@ -30,11 +30,7 @@
     </ul>
   </div>
   <div class="navbar-end">
-    <div>
-      <Login {messageHandler} {timeoutHandler} {messageDeletedHandler} {loginEvent} />
-    </div>
-    <div>
-      <ThemeSwitcher />
-    </div>
+    <Login {messageHandler} {timeoutHandler} {messageDeletedHandler} {loginEvent} />
+    <ThemeSwitcher />
   </div>
 </div>

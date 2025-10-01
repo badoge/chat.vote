@@ -1,15 +1,18 @@
 <script>
   import { page } from "$app/state";
+  import Navbar from "$lib/Navbar.svelte";
   /** @type {{ [key: string]: any }} */
   let aliases = {
     blt: ["brackets", "bracket", "tierlist", "tierlists", "trivia", "blt", "btl"],
     forsen: ["forsen", "fors"],
-    games: ["games", "game", "arena", "draw", "emotes", "emotebenchmark", "donkhunt", "shapes", "nim", "wordle", "notwordle", "connect4", "c4", "tictactoe", "ttt"],
+    games: ["games", "game", "arena", "draw", "emotes", "emotebenchmark", "donkhunt", "shapes", "nim", "wordle", "notwordle", "connect4", "c4", "tictactoe", "ttt", "xo"],
     home: ["home", "homepage", "main", "info", "about", "contact"],
+    playlist: ["playlist", "playlists", "queue", "sr", "q", "songrequest", "songrequests", "request", "requests", "clipqueue", "videos", "songs"],
     poll: ["poll", "polls", "poll", "pols", "strawpoll", "strawpolls"],
-    playlist: ["playlist", "playlists", "queue", "sr", "q", "songrequest", "songrequests", "request", "requests"],
+    pp: ["pp", "privacy", "privacypolicy"],
     raffles: ["raffles", "raffle", "rafle", "rafles", "giveaway", "giveaways", "sweepstakes", "sweepstake"],
     thebutton: ["thebutton", "button", "extensions", "extension"],
+    tos: ["tos", "rules", "terms"],
     tts: ["tts"],
     viewers: ["viewers"],
     vts: ["vts", "vtube", "vtubestudio", "vtuber"],
@@ -37,56 +40,15 @@
   <meta property="og:description" content="Create twitch chat polls and vote through chat commands easily and quickly using chat.vote" />
 </svelte:head>
 
-<h1>404</h1>
-<p>NOTHING HERE</p>
-<img src="/pics/donk.png" alt="donk" style="width: 200px" />
+<Navbar />
 
-<p id="hint">{@html hint}</p>
-
-<style>
-  body {
-    background-color: #212529;
-    text-align: center;
-    color: white;
-    font-family:
-      system-ui,
-      -apple-system,
-      "Segoe UI",
-      Roboto,
-      "Helvetica Neue",
-      "Noto Sans",
-      "Liberation Sans",
-      Arial,
-      sans-serif,
-      "Apple Color Emoji",
-      "Segoe UI Emoji",
-      "Segoe UI Symbol",
-      "Noto Color Emoji";
-    font-size: 1.2rem;
-  }
-
-  h1 {
-    font-size: 4rem;
-    margin-top: 3rem;
-  }
-
-  p {
-    font-size: 1.5rem;
-    margin-top: 1rem;
-    margin-bottom: 3rem;
-  }
-
-  #hint {
-    font-size: 2rem;
-    margin-top: 2rem;
-  }
-
-  a {
-    color: #fffc4e;
-    text-decoration: none;
-  }
-
-  a:hover {
-    text-decoration: underline;
-  }
-</style>
+<div class="flex justify-center">
+  <div class="flex flex-col text-center">
+    <span class="text-6xl font-extrabold"> 404</span>
+    <span class="text-5xl font-thin"> NOTHING HERE</span>
+    <br />
+    <img src="/pics/donk.png" alt="donk" class="w-50 mx-auto" />
+    <br />
+    <p class="font-bold text-2xl" id="hint">{@html hint}</p>
+  </div>
+</div>

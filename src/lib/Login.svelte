@@ -205,7 +205,7 @@
 
 {#if loginStatus == "logged_out"}
   <div class="join">
-    <button class="btn btn-twitch join-item"><MdiTwitch />Sign in with Twitch</button>
+    <button class="btn btn-twitch join-item" onclick={login}><MdiTwitch />Sign in with Twitch</button>
     <button class="btn btn-twitch join-item p-1" popovertarget="loginDropdown" style="anchor-name:--loginDropdownAnchor"><IcBaselineArrowDropDown /></button>
   </div>
   <div class="dropdown dropdown-end menu w-52 rounded-box bg-base-100 shadow-sm" popover id="loginDropdown" style="position-anchor:--loginDropdownAnchor">

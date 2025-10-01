@@ -23,39 +23,24 @@
   <title>chat.vote login prompt</title>
 </svelte:head>
 
-<div class="container-fluid text-center" id="main">
-  <div class="row align-items-center">
-    <div class="col align-self-center">
-      <div class="text-danger" id="warning">
-        <img src="/pics/donk.png" alt="donk" style="height: 1.5em" />
-        <br />
-        Don't show this on stream
-      </div>
+<div class="flex flex-col text-center overflow-hidden mt-[100px] m-5">
+  <div class="justify-center">
+    <div class="text-error font-bold text-3xl">
+      <img src="/pics/donk.png" alt="donk" class="mx-auto h-15" />
       <br />
-      <a class="btn btn-twitch" href="https://id.twitch.tv/oauth2/authorize?client_id={CLIENT_ID}&redirect_uri={redirect_uri}&response_type=token{scopes}">
-        <MdiTwitch /> Sign in with Twitch
-      </a>
-      <br />
-      <span class="text-body-secondary" style="text-align: center">Address bar will show sensitive data</span>
+      Don't show this on stream
     </div>
+    <br />
+    <a class="btn btn-twitch" href="https://id.twitch.tv/oauth2/authorize?client_id={CLIENT_ID}&redirect_uri={redirect_uri}&response_type=token{scopes}">
+      <MdiTwitch /> Sign in with Twitch
+    </a>
+    <br />
+    <span class="opacity-70">Address bar will show sensitive data</span>
   </div>
 </div>
 
 <style>
-  #main {
-    margin-top: 50px;
-    overflow: hidden;
-  }
-
-  #warning {
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 10px;
-    text-align: center;
-  }
-
   .btn-twitch {
-    line-height: 2rem;
     font-size: 1.5rem;
     color: #ffffff;
     background-color: #9933ff !important;

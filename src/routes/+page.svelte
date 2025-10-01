@@ -2051,119 +2051,88 @@
 
 <Navbar messageHandler={handleMessage} timeoutHandler={handleTimeout} loginEvent={() => USER.refresh()} />
 
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-xxl-2"></div>
+<div id="questionDiv" class="mb-2 mt-2">
+  <div class="card bg-dark-subtle border-dark-subtle">
+    <div id="questionCard" class="card-body">
+      <IcOutlineArrowDropUp id="hideQuestion" />
+      <label contenteditable="true" spellcheck="false" id="questionLabel" class="pull-left" data-placeholder="Type your question here"></label>
+    </div>
+  </div>
+</div>
 
-    <div class="col-xxl-8">
-      <div id="questionDiv" class="mb-2 mt-2">
-        <div class="card bg-dark-subtle border-dark-subtle">
-          <div id="questionCard" class="card-body">
-            <IcOutlineArrowDropUp id="hideQuestion" />
-            <label contenteditable="true" spellcheck="false" id="questionLabel" class="pull-left" data-placeholder="Type your question here"></label>
-          </div>
-        </div>
-      </div>
-
-      <div class="card bg-dark-subtle border-dark-subtle mb-2 mt-2" id="enterPollOptionCard">
-        <div class="card-body" id="enterPollOptionCardBody">
-          <label for="pollOption" id="pollOptionLabel" class="form-label">Enter poll option:</label>
-          <div class="input-group">
-            <input type="text" id="pollOption" class="form-control" placeholder="Poll option" aria-label="Poll option input text field" />
-            <button
-              class="btn btn-outline-secondary"
-              type="button"
-              id="addOption"
-              onclick={addOption}
-              data-bs-toggle="tooltip"
-              data-bs-placement="top"
-              data-bs-title="or just press enter :)"
-            >
-              Add
-            </button>
-            <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-              <span class="visually-hidden">Toggle Dropdown</span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="#" data-bs-toggle="modal" onclick={() => bulkAddModal.showModal()}>Add multiple options</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div class="alert alert-info alert-dismissible mb-2 mt-2" id="subOnlyAlert" role="alert" style="display: none">
-        <IcBaselineAttachMoney /> Subscribers only poll. Click on the subscribe button, you might have a free prime sub
-        <img src="/pics/smile.png" alt="bot" style="height: 1.5em" />
-        <button type="button" class="btn btn-info">
-          <svg width="1.5em" height="1.5em" style="fill: white" version="1.1" viewBox="0 0 20 20" x="20px" y="20px">
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M18 5v8a2 2 0 0 1-2 2H4a2.002 2.002 0 0 1-2-2V5l4 3 4-4 4 4 4-3z"></path>
-          </svg>
-          Subscribe Free
-        </button>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-
-      <div class="card border-danger text-center mb-2 mt-2" id="countdown" style="display: none">
-        <div class="card-body">
-          <div class="values d-inline-flex" style="font-size: 3em"></div>
-          <div class="btn-group float-end h-100" role="group" aria-label="Timer controls" id="timerControls">
-            <button class="btn btn-outline-secondary" type="button" id="stopTimer" onclick={stopTimer}>
-              <IcBaselineStop />
-            </button>
-            <button class="btn btn-outline-secondary" type="button" id="pauseTimer" onclick={pauseTimer}>
-              <IcBaselinePause />
-            </button>
-            <button class="btn btn-outline-secondary" type="button" style="display: none" id="unpauseTimer" onclick={unpauseTimer}>
-              <IcBaselinePlayArrow />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <ul class="nav nav-tabs bg-body-tertiary" id="tableAndChart" role="tablist">
-        <li class="nav-item" role="presentation">
-          <button
-            class="nav-link main-tabs active"
-            id="tableTabButton"
-            data-bs-toggle="tab"
-            data-bs-target="#tableTab"
-            type="button"
-            role="tab"
-            aria-controls="tableTab"
-            aria-selected="true"
-          >
-            <IcBaselineToc /> Table view
-          </button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link main-tabs" id="chartTabButton" data-bs-toggle="tab" data-bs-target="#chartTab" type="button" role="tab" aria-controls="chartTab" aria-selected="false">
-            <IcBaselineStackedBarChart style="transform: rotateZ(90deg)" /> Chart view
-          </button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link main-tabs" id="yesnoTabButton" data-bs-toggle="tab" data-bs-target="#yesnoTab" type="button" role="tab" aria-controls="yesnoTab" aria-selected="false">
-            <img src="/pics/yeanay.webp" alt="yeanay" style="height: 20px" />Mode
-          </button>
-        </li>
-        <li class="nav-item" role="presentation" style="display: none" id="overlaytabli">
-          <button
-            class="nav-link main-tabs"
-            id="overlayTabButton"
-            data-bs-toggle="tab"
-            data-bs-target="#overlayTab"
-            type="button"
-            role="tab"
-            aria-controls="overlayTab"
-            aria-selected="false"
-          >
-            <IcBaselineLayers /> Overlay
-          </button>
-        </li>
+<div class="card bg-dark-subtle border-dark-subtle mb-2 mt-2" id="enterPollOptionCard">
+  <div class="card-body" id="enterPollOptionCardBody">
+    <label for="pollOption" id="pollOptionLabel" class="form-label">Enter poll option:</label>
+    <div class="input-group">
+      <input type="text" id="pollOption" class="form-control" placeholder="Poll option" aria-label="Poll option input text field" />
+      <button class="btn btn-outline-secondary" type="button" id="addOption" onclick={addOption} data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="or just press enter :)">
+        Add
+      </button>
+      <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="visually-hidden">Toggle Dropdown</span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" onclick={() => bulkAddModal.showModal()}>Add multiple options</a></li>
       </ul>
-      <div class="tab-content bg-dark-subtle">
-        <div class="tab-pane fade show active" id="tableTab" role="tabpanel" aria-labelledby="tableTabButton" tabindex="0">
-          <div id="table" data-ag-theme-mode="bs-dark" style="height:50vh;"></div>
-          <!-- <table id="options" class="table table-bordered" style="width: 100%">
+    </div>
+  </div>
+</div>
+
+<div class="alert alert-info alert-dismissible mb-2 mt-2" id="subOnlyAlert" role="alert" style="display: none">
+  <IcBaselineAttachMoney /> Subscribers only poll. Click on the subscribe button, you might have a free prime sub
+  <img src="/pics/smile.png" alt="bot" style="height: 1.5em" />
+  <button type="button" class="btn btn-info">
+    <svg width="1.5em" height="1.5em" style="fill: white" version="1.1" viewBox="0 0 20 20" x="20px" y="20px">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M18 5v8a2 2 0 0 1-2 2H4a2.002 2.002 0 0 1-2-2V5l4 3 4-4 4 4 4-3z"></path>
+    </svg>
+    Subscribe Free
+  </button>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+<div class="card border-danger text-center mb-2 mt-2" id="countdown" style="display: none">
+  <div class="card-body">
+    <div class="values d-inline-flex" style="font-size: 3em"></div>
+    <div class="btn-group float-end h-100" role="group" aria-label="Timer controls" id="timerControls">
+      <button class="btn btn-outline-secondary" type="button" id="stopTimer" onclick={stopTimer}>
+        <IcBaselineStop />
+      </button>
+      <button class="btn btn-outline-secondary" type="button" id="pauseTimer" onclick={pauseTimer}>
+        <IcBaselinePause />
+      </button>
+      <button class="btn btn-outline-secondary" type="button" style="display: none" id="unpauseTimer" onclick={unpauseTimer}>
+        <IcBaselinePlayArrow />
+      </button>
+    </div>
+  </div>
+</div>
+
+<ul class="nav nav-tabs bg-body-tertiary" id="tableAndChart" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link main-tabs active" id="tableTabButton" data-bs-toggle="tab" data-bs-target="#tableTab" type="button" role="tab" aria-controls="tableTab" aria-selected="true">
+      <IcBaselineToc /> Table view
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link main-tabs" id="chartTabButton" data-bs-toggle="tab" data-bs-target="#chartTab" type="button" role="tab" aria-controls="chartTab" aria-selected="false">
+      <IcBaselineStackedBarChart style="transform: rotateZ(90deg)" /> Chart view
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link main-tabs" id="yesnoTabButton" data-bs-toggle="tab" data-bs-target="#yesnoTab" type="button" role="tab" aria-controls="yesnoTab" aria-selected="false">
+      <img src="/pics/yeanay.webp" alt="yeanay" style="height: 20px" />Mode
+    </button>
+  </li>
+  <li class="nav-item" role="presentation" style="display: none" id="overlaytabli">
+    <button class="nav-link main-tabs" id="overlayTabButton" data-bs-toggle="tab" data-bs-target="#overlayTab" type="button" role="tab" aria-controls="overlayTab" aria-selected="false">
+      <IcBaselineLayers /> Overlay
+    </button>
+  </li>
+</ul>
+<div class="tab-content bg-dark-subtle">
+  <div class="tab-pane fade show active" id="tableTab" role="tabpanel" aria-labelledby="tableTabButton" tabindex="0">
+    <div id="table" data-ag-theme-mode="bs-dark" style="height:50vh;"></div>
+    <!-- <table id="options" class="table table-bordered" style="width: 100%">
             <thead>
               <tr>
                 <th>ID</th>
@@ -2176,471 +2145,463 @@
             </thead>
             <tbody></tbody>
           </table> -->
-        </div>
-        <div class="tab-pane fade" id="chartTab" role="tabpanel" aria-labelledby="chartTabButton" tabindex="0">
-          <div class="container-fluid p-0">
-            <div id="chartDiv" class="row">
-              <small id="voteHint" style="height: 0px" class="text-center"></small>
-              <canvas id="chartCanvas"></canvas>
-            </div>
-            <div class="row p-2">
-              <div class="col">
-                <input type="checkbox" class="btn-check" id="sortChart" autocomplete="off" />
-                <label class="btn btn-outline-success" for="sortChart" id="sortChartLabel" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Sort chart">
-                  <IcBaselineSort />
-                </label>
-                <div class="chartStatDiv">Total votes: <span id="totalVotes">0</span></div>
-
-                <div style="display: none" class="chartStatDiv ms-1" id="numberStats">
-                  <div class="me-1">Average: <span id="averageNumber">0</span> • Median: <span id="medianNumber">0</span></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="tab-pane fade" id="yesnoTab" role="tabpanel" aria-labelledby="yesnoTabButton" tabindex="0">
-          <div class="container-fluid text-center">
-            <div class="row">
-              <div class="col">
-                Type <img src="/pics/yea.webp" alt="yea" style="height: 24px; width: 24px" />|yes or <img src="/pics/nay.webp" alt="nay" style="height: 24px; width: 24px" />|no in chat to
-                vote
-              </div>
-            </div>
-            <div id="yesnoDiv" class="row align-items-center">
-              <div class="col">
-                <img id="yeaPic" src="/pics/yea.webp" alt="yea" style="height: 150px" />
-                <br /><span id="yeaCount">0 Votes (0%)</span>
-              </div>
-              <div class="col">
-                <img id="nayPic" src="/pics/nay.webp" alt="nay" style="height: 150px" />
-                <br /><span id="nayCount">0 Votes (0%)</span>
-              </div>
-            </div>
-            <div class="row p-2">
-              <div class="col">
-                <div class="chartStatDiv">Total votes: <span id="yesnoTotalVotes">0</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="tab-pane fade" id="overlayTab" role="tabpanel" aria-labelledby="overlayTabButton" tabindex="0">
-          <div class="container-fluid text-center">
-            <div class="row">
-              <div class="col">
-                <div class="input-group my-3">
-                  <span class="input-group-text">Overlay URL</span>
-                  <input
-                    id="overlayLink"
-                    type="password"
-                    readonly
-                    class="form-control"
-                    placeholder="Click 'Generate new overlay link' to get your overlay URL"
-                    aria-label="Click 'Generate new overlay link' to get your overlay URL"
-                  />
-                  <button class="btn btn-outline-secondary" type="button" onclick={copyOverlayLink}> <IcBaselineContentCopy /> </button>
-                  <button class="btn btn-success" type="button" id="connectOverlayButton" onclick={connectOverlay} disabled>
-                    <IcBaselineConnectWithoutContact /> Connect overlay
-                  </button>
-                  <button class="btn btn-danger" type="button" id="generateOverlayButton" onclick={generateOverlay}>
-                    <IcBaselineRestartAlt /> Generate new overlay link
-                  </button>
-                  <button class="btn btn-info" type="button" data-bs-toggle="modal" onclick={() => overlayModal.showModal()}><IcBaselineHelp /></button>
-                </div>
-
-                <label for="overlayX" class="form-label">x</label>
-                <input disabled type="range" class="form-range" oninput={moveX(event)} id="overlayX" value="50" min="0" max="100" />
-
-                <label for="overlayY" class="form-label">y</label>
-                <input disabled type="range" class="form-range" oninput={moveY(event)} id="overlayY" value="50" min="0" max="100" />
-              </div>
-            </div>
-          </div>
-        </div>
+  </div>
+  <div class="tab-pane fade" id="chartTab" role="tabpanel" aria-labelledby="chartTabButton" tabindex="0">
+    <div class="container-fluid p-0">
+      <div id="chartDiv" class="row">
+        <small id="voteHint" style="height: 0px" class="text-center"></small>
+        <canvas id="chartCanvas"></canvas>
       </div>
+      <div class="row p-2">
+        <div class="col">
+          <input type="checkbox" class="btn-check" id="sortChart" autocomplete="off" />
+          <label class="btn btn-outline-success" for="sortChart" id="sortChartLabel" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Sort chart">
+            <IcBaselineSort />
+          </label>
+          <div class="chartStatDiv">Total votes: <span id="totalVotes">0</span></div>
 
-      <div class="container-fluid p-0" id="hotbar">
-        <div class="row">
-          <div class="col">
-            <div class="btn-group defaultbtn mt-2 me-2">
-              <button
-                type="button"
-                id="enableVoting"
-                class="btn btn-success"
-                data-bs-container="body"
-                data-bs-trigger="manual"
-                data-bs-placement="bottom"
-                data-bs-toggle="popover"
-                data-bs-title="Voting disabled"
-                data-bs-content="A viewer is trying to vote but voting is disabled"
-              >
-                <span id="enableVotingText">Start Voting</span>
-              </button>
-              <button
-                type="button"
-                id="enableVotingDropdown"
-                class="btn btn-success dropdown-toggle dropdown-toggle-split"
-                data-bs-toggle="dropdown"
-                data-bs-auto-close="outside"
-                aria-expanded="false"
-              >
-                <span class="visually-hidden">Toggle Dropdown</span>
-              </button>
-              <div class="dropdown-menu dropdown-menu-end p-3" style="width: 400px; font-size: 0.9rem">
-                <h6>Voting mode</h6>
-
-                <div class="form-check mb-3">
-                  <input class="form-check-input" type="radio" name="votingmode" id="voteWithNumbers" aria-describedby="voteWithNumbersdesc" checked />
-                  <label class="form-check-label" for="voteWithNumbers">
-                    Type number to vote
-
-                    <IcBaselineHelp
-                      class="cursor-pointer"
-                      data-bs-toggle="tooltip"
-                      data-bs-custom-class="wide-tooltip"
-                      data-bs-placement="auto"
-                      data-bs-html="true"
-                      data-bs-title="<img src='/pics/m2.webp'/>"
-                    />
-                  </label>
-                  <small id="voteWithNumbersdesc" class="text-body-secondary"> <br />Viewers vote by typing the number of the option (1, 2)</small>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="votingmode" id="voteWithText" aria-describedby="voteWithTextdesc" />
-                  <label class="form-check-label" for="voteWithText">
-                    Type option to vote
-
-                    <IcBaselineHelp
-                      class="cursor-pointer"
-                      data-bs-toggle="tooltip"
-                      data-bs-custom-class="wide-tooltip"
-                      data-bs-placement="auto"
-                      data-bs-html="true"
-                      data-bs-title="<img src='/pics/m3.webp'/>"
-                    />
-                  </label>
-                  <small id="voteWithTextdesc" class="text-body-secondary"> <br />Viewers vote by typing the option name (option1, option2).</small>
-                </div>
-                <hr />
-
-                <div class="mb-3">
-                  <label for="timerValueMinutes" class="form-label"><IcBaselineTimer />Poll timer</label>
-                  <div class="input-group mb-3">
-                    <input type="number" min="0" value="0" class="form-control" id="timerValueMinutes" onchange={saveSettings} aria-describedby="timerDesc" />
-                    <span class="input-group-text" id="timerDesc">minutes</span>
-                  </div>
-                  <div class="form-text">Timer automatically starts when you start voting. Set to 0 to disable the timer</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="btn-group defaultbtn mt-2 me-2">
-              <button
-                type="button"
-                id="enableSuggestions"
-                class="btn btn-success"
-                data-bs-container="body"
-                data-bs-trigger="manual"
-                data-bs-placement="bottom"
-                data-bs-toggle="popover"
-                data-bs-title="Viewer suggestions disabled"
-                data-bs-content="A viewer is trying to post a suggestion but viewer suggestions are disabled"
-              >
-                <span id="enableSuggestionsText">Enable viewer suggestions</span>
-                <br /><small id="suggestionsCommand" class="notranslate">!suggest</small>
-              </button>
-              <button
-                type="button"
-                id="enableSuggestionsDropdown"
-                class="btn btn-success dropdown-toggle dropdown-toggle-split"
-                data-bs-toggle="dropdown"
-                data-bs-auto-close="outside"
-                aria-expanded="false"
-              >
-                <span class="visually-hidden">Toggle Dropdown</span>
-              </button>
-              <div class="dropdown-menu dropdown-menu-end p-3" style="width: 300px">
-                <div class="input-group">
-                  <span class="input-group-text">Per user suggestion limit</span>
-                  <input
-                    type="number"
-                    id="suggestionLimitUser"
-                    onchange={saveSettings}
-                    style="max-width: 5em"
-                    class="form-control"
-                    min="0"
-                    value="1"
-                    step="1"
-                    aria-label="Text input with checkbox for user suggestion limit"
-                  />
-                </div>
-                <small class="text-body-secondary">How many suggestions each viewer can send. 0=unlimited</small>
-
-                <div class="input-group mt-3">
-                  <span class="input-group-text">Total suggestion limit</span>
-                  <input
-                    type="number"
-                    id="suggestionLimit"
-                    style="max-width: 5em"
-                    class="form-control"
-                    min="0"
-                    value="0"
-                    step="1"
-                    aria-label="Text input with checkbox for total suggestion limit"
-                  />
-                </div>
-                <small class="text-body-secondary">The total amount of suggestions from all viewers. 0=unlimited</small>
-                <hr />
-                The suggestion command can be changed
-                <span onclick={changeSuggestionCommand} style="color: #00bc8c; cursor: pointer">here</span>
-              </div>
-            </div>
-
-            <div class="drawer">
-              <input id="settingsDrawer" type="checkbox" class="drawer-toggle" />
-              <div class="drawer-content">
-                <label for="settingsDrawer" class="btn btn-primary drawer-button defaultbtn mt-2 me-2"><IcBaselineSettings />Settings</label>
-              </div>
-              <div class="drawer-side">
-                <label for="settingsDrawer" aria-label="close sidebar" class="drawer-overlay"></label>
-                <div class="menu bg-base-200 text-base-content min-h-full w-80 p-4">
-                  <div class="card mb-2">
-                    <div class="card-body">
-                      <div class="form-group">
-                        <label for="suggestionPrefix" class="form-label"> Suggestion command</label>
-                        <input type="text" class="form-control notranslate" id="suggestionPrefix" value="!suggest" aria-describedby="description3" />
-                        <small id="description3" class="text-body-secondary"
-                          >The command to put before a suggestion. <br />Example: <span class="notranslate">!suggest my summer car</span></small
-                        >
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="card mb-2">
-                    <div class="card-body">
-                      <div id="removeContainer">
-                        <div class="input-group flex-nowrap restart" id="removeDiv">
-                          <label class="input-group-text text-light" for="remove">Keep top</label>
-                          <select id="remove" class="form-control" style="max-width: 4em">
-                            <option selected value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                          </select>
-                          <label class="input-group-text text-light" for="remove">options and</label>
-                          <button class="btn btn-secondary" type="button" onclick={removeAndRestart}>restart<IcBaselineRefresh /></button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="card mb-2">
-                    <div class="card-body">
-                      <div class="form-check form-switch mb-3">
-                        <input type="checkbox" class="form-check-input" id="multiChoice" aria-describedby="multiChoiceDesc" />
-                        <label class="form-check-label" for="multiChoice"> <IcBaselinePlusOne /> Allow multiple choices</label><br />
-                        <small id="multiChoiceDesc" class="text-body-secondary">
-                          Viewers will be able to vote for multiple options at once.<br />
-                          <span id="multiChoiceExample">Example: <span class="notranslate">1 2 3</span></span>
-                        </small>
-                        <br />
-                        <small class="yesno-warning text-warning" style="display: none"> Does not support <img src="/pics/yeanay.webp" alt="yeanay" style="height: 1.2em" />Mode </small>
-                      </div>
-                      <div class="form-check form-switch mb-3">
-                        <input type="checkbox" class="form-check-input" id="allowChange" onchange={saveSettings} aria-describedby="allowChangeDesc" />
-                        <label class="form-check-label" for="allowChange"> <IcBaselineSwapHoriz /> Allow vote changing</label><br />
-                        <small id="allowChangeDesc" class="text-body-secondary">
-                          Viewers will be able to change the option they selected by voting again. They can change their vote only once.</small
-                        ><br />
-                        <small class="yesno-warning text-warning" style="display: none"> Does not support <img src="/pics/yeanay.webp" alt="yeanay" style="height: 1.2em" />Mode </small>
-                      </div>
-                      <div class="form-check form-switch">
-                        <input type="checkbox" class="form-check-input" id="subMode" aria-describedby="submodedesc" />
-                        <label class="form-check-label" for="subMode"> <IcBaselineAttachMoney /> Subscribers only poll</label>
-                        <small id="submodedesc" class="text-body-secondary"><br />Viewers that are not subscribed to your channel will not be able to vote or make suggestions. </small>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="card mb-2">
-                    <div class="card-body">
-                      <div class="form-check form-switch mb-3">
-                        <input type="checkbox" class="form-check-input" id="showChat" aria-describedby="showChatDesc" />
-                        <label class="form-check-label" id="showChatDesc" for="showChat">
-                          <MdiTwitch /> Show chat
-                        </label>
-                        <br /><small class="text-body-secondary">Shows your Twitch chat on the right side</small>
-                      </div>
-
-                      <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" id="refreshWarningEnabled" onchange={saveSettings} />
-                        <label class="form-check-label" for="refreshWarningEnabled"> <IcBaselineNotificationImportant /> Enable close/refresh warning</label>
-                        <br /><small class="text-body-secondary">Shows a warning before leaving/refreshing the site so that you don't accidentally lose your poll results.</small>
-                      </div>
-
-                      <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" id="linkPreviewThumbnailsEnabled" />
-                        <label class="form-check-label" for="linkPreviewThumbnailsEnabled"> <IcBaselinePreview /> Show thumbnails in link preview </label>
-                        <br /><small class="text-body-secondary"><b class="text-danger">Use with caution; viewers might link images that break Twitch's TOS.</b></small>
-                      </div>
-
-                      <div class="input-group">
-                        <span class="input-group-text"><IcBaselineCelebration />Confetti</span>
-                        <select class="form-select" id="confettiLevel" style="max-width: 7em">
-                          <option value="0" selected>Off</option>
-                          <option value="1">Low</option>
-                          <option value="2">Medium</option>
-                          <option value="3">High</option>
-                          <option value="4">INSANE ZULOL</option>
-                        </select>
-                      </div>
-                      <small class="text-body-secondary">Confetti triggers when the timer runs out or when you pick a random option.</small>
-                    </div>
-                  </div>
-
-                  <div class="card mb-2">
-                    <div class="card-body">
-                      <div class="input-group mb-0">
-                        <span class="input-group-text blueborder">Refresh 3rd party emotes</span>
-                        <button class="btn btn-outline-info" type="button" onclick={getEmotes}><IcBaselineRefresh /></button>
-                      </div>
-                      <div class="text-body-secondary mb-3">
-                        Loaded emotes (global/channel): BTTV: <span id="bttvGlobalEmotes">0</span>/<span id="bttvChannelEmotes">0</span> | FFZ: <span id="ffzGlobalEmotes">0</span>/<span
-                          id="ffzChannelEmotes">0</span
-                        >
-                        | 7TV: <span id="seventvGlobalEmotes">0</span>/<span id="seventvChannelEmotes">0</span>
-                      </div>
-
-                      <a
-                        id="resetSettingsPopover"
-                        tabindex="0"
-                        class="btn btn-danger"
-                        role="button"
-                        data-bs-toggle="popover"
-                        data-bs-trigger="focus"
-                        data-bs-title="Are you sure?"
-                        data-bs-content="All settings will be reset and the page will reload<br>
-          <button type='button' class='btn btn-danger float-end my-3' onclick='resetSettings()'>
-          <i class='material-icons notranslate'>delete_forever</i>Reset settings</button>"
-                      >
-                        <IcBaselineDeleteForever />Reset all settings
-                      </a>
-                      <br />
-                      <small class="text-body-secondary">Resets all settings and reloads the page.</small>
-                    </div>
-                  </div>
-
-                  <div class="card mb-2">
-                    <div class="card-body">
-                      <h5 class="card-title">Export Data</h5>
-                      <label>Data to be Exported:</label>
-                      <div class="form-group mb-3">
-                        <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="inlineRadioOptions" id="voters_selected" value="List of Voters" checked />
-                          <label class="form-check-label" for="voters_selected">List of Voters</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="inlineRadioOptions" id="options_selected" value="Poll Options" />
-                          <label class="form-check-label" for="options_selected">Poll Options</label>
-                        </div>
-                      </div>
-                      <label>File Format:</label>
-                      <div class="form-group mb-3">
-                        <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="inlineRadioOptions2" id="json_selected" value="JSON" checked />
-                          <label class="form-check-label" for="json_selected">JSON</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="inlineRadioOptions2" id="txt_selected" value="TXT" />
-                          <label class="form-check-label" for="txt_selected">TXT</label>
-                        </div>
-                      </div>
-
-                      <button type="button" onclick={download} class="btn btn-primary"><IcBaselineFileDownload /> Download</button>
-                    </div>
-                  </div>
-
-                  <div class="card mb-2">
-                    <div class="card-body">
-                      <h5>Contact info:</h5>
-                      <p>
-                        Site by <a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/badoge">badoge</a> :) <br />If you find any issues or if you have suggestions or
-                        questions, you can contact me: <br /><a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/popout/badoge/chat?popout=">in this chat</a> <br />or on
-                        <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/FR8bgQdPUT">discord</a> <br />or by
-                        <a href="mailto:contact@chat.vote">email</a>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="float-end mt-2" role="group" aria-label="Restart, random option, hide score, and delete all buttons">
-              <button
-                type="button"
-                class="btn btn-outline-warning quick-actions"
-                id="restartPoll"
-                onclick={restartPoll}
-                data-bs-toggle="tooltip"
-                data-bs-placement="bottom"
-                data-bs-title="Restart the poll with the same options"
-                style="margin-right: 1px"
-              >
-                <IcBaselineRefresh />
-              </button>
-              <button
-                type="button"
-                id="pickRandom"
-                class="btn btn-outline-info quick-actions"
-                data-bs-toggle="tooltip"
-                data-bs-placement="bottom"
-                data-bs-title="Pick a random option"
-                style="margin-right: 1px"
-              >
-                <IcBaselineCasino />
-              </button>
-              <button
-                type="button"
-                id="hideScore"
-                class="btn btn-outline-primary quick-actions"
-                data-bs-toggle="tooltip"
-                data-bs-placement="bottom"
-                data-bs-title="Hide score"
-                style="margin-right: 1px"
-              >
-                <IcBaselineVisibility id="hideScoreIcon" />
-              </button>
-              <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove all options from the poll">
-                <a
-                  id="deleteAll"
-                  tabindex="0"
-                  class="btn btn-outline-danger quick-actions html-popover"
-                  role="button"
-                  data-bs-toggle="popover"
-                  data-bs-placement="top"
-                  data-bs-trigger="focus"
-                  data-bs-title="Are you sure?"
-                  data-bs-content="All poll options will be deleted<br><button type='button' class='btn btn-danger float-end my-3' onclick='resetPoll'><i class='material-icons notranslate'>delete_forever</i>Delete all</button>"
-                  style="padding-top: 14px"
-                >
-                  <IcBaselineDeleteForever />
-                </a>
-              </span>
-            </div>
+          <div style="display: none" class="chartStatDiv ms-1" id="numberStats">
+            <div class="me-1">Average: <span id="averageNumber">0</span> • Median: <span id="medianNumber">0</span></div>
           </div>
         </div>
       </div>
     </div>
+  </div>
+  <div class="tab-pane fade" id="yesnoTab" role="tabpanel" aria-labelledby="yesnoTabButton" tabindex="0">
+    <div class="container-fluid text-center">
+      <div class="row">
+        <div class="col">
+          Type <img src="/pics/yea.webp" alt="yea" style="height: 24px; width: 24px" />|yes or <img src="/pics/nay.webp" alt="nay" style="height: 24px; width: 24px" />|no in chat to vote
+        </div>
+      </div>
+      <div id="yesnoDiv" class="row align-items-center">
+        <div class="col">
+          <img id="yeaPic" src="/pics/yea.webp" alt="yea" style="height: 150px" />
+          <br /><span id="yeaCount">0 Votes (0%)</span>
+        </div>
+        <div class="col">
+          <img id="nayPic" src="/pics/nay.webp" alt="nay" style="height: 150px" />
+          <br /><span id="nayCount">0 Votes (0%)</span>
+        </div>
+      </div>
+      <div class="row p-2">
+        <div class="col">
+          <div class="chartStatDiv">Total votes: <span id="yesnoTotalVotes">0</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane fade" id="overlayTab" role="tabpanel" aria-labelledby="overlayTabButton" tabindex="0">
+    <div class="container-fluid text-center">
+      <div class="row">
+        <div class="col">
+          <div class="input-group my-3">
+            <span class="input-group-text">Overlay URL</span>
+            <input
+              id="overlayLink"
+              type="password"
+              readonly
+              class="form-control"
+              placeholder="Click 'Generate new overlay link' to get your overlay URL"
+              aria-label="Click 'Generate new overlay link' to get your overlay URL"
+            />
+            <button class="btn btn-outline-secondary" type="button" onclick={copyOverlayLink}> <IcBaselineContentCopy /> </button>
+            <button class="btn btn-success" type="button" id="connectOverlayButton" onclick={connectOverlay} disabled>
+              <IcBaselineConnectWithoutContact /> Connect overlay
+            </button>
+            <button class="btn btn-danger" type="button" id="generateOverlayButton" onclick={generateOverlay}>
+              <IcBaselineRestartAlt /> Generate new overlay link
+            </button>
+            <button class="btn btn-info" type="button" data-bs-toggle="modal" onclick={() => overlayModal.showModal()}><IcBaselineHelp /></button>
+          </div>
 
-    <div class="col-xxl-2 p-0 m-0">
-      <div id="chat"></div>
+          <label for="overlayX" class="form-label">x</label>
+          <input disabled type="range" class="form-range" oninput={moveX(event)} id="overlayX" value="50" min="0" max="100" />
+
+          <label for="overlayY" class="form-label">y</label>
+          <input disabled type="range" class="form-range" oninput={moveY(event)} id="overlayY" value="50" min="0" max="100" />
+        </div>
+      </div>
     </div>
   </div>
 </div>
+
+<div class="container-fluid p-0" id="hotbar">
+  <div class="row">
+    <div class="col">
+      <div class="btn-group defaultbtn mt-2 me-2">
+        <button
+          type="button"
+          id="enableVoting"
+          class="btn btn-success"
+          data-bs-container="body"
+          data-bs-trigger="manual"
+          data-bs-placement="bottom"
+          data-bs-toggle="popover"
+          data-bs-title="Voting disabled"
+          data-bs-content="A viewer is trying to vote but voting is disabled"
+        >
+          <span id="enableVotingText">Start Voting</span>
+        </button>
+        <button
+          type="button"
+          id="enableVotingDropdown"
+          class="btn btn-success dropdown-toggle dropdown-toggle-split"
+          data-bs-toggle="dropdown"
+          data-bs-auto-close="outside"
+          aria-expanded="false"
+        >
+          <span class="visually-hidden">Toggle Dropdown</span>
+        </button>
+        <div class="dropdown-menu dropdown-menu-end p-3" style="width: 400px; font-size: 0.9rem">
+          <h6>Voting mode</h6>
+
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="radio" name="votingmode" id="voteWithNumbers" aria-describedby="voteWithNumbersdesc" checked />
+            <label class="form-check-label" for="voteWithNumbers">
+              Type number to vote
+
+              <IcBaselineHelp
+                class="cursor-pointer"
+                data-bs-toggle="tooltip"
+                data-bs-custom-class="wide-tooltip"
+                data-bs-placement="auto"
+                data-bs-html="true"
+                data-bs-title="<img src='/pics/m2.webp'/>"
+              />
+            </label>
+            <small id="voteWithNumbersdesc" class="text-body-secondary"> <br />Viewers vote by typing the number of the option (1, 2)</small>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="votingmode" id="voteWithText" aria-describedby="voteWithTextdesc" />
+            <label class="form-check-label" for="voteWithText">
+              Type option to vote
+
+              <IcBaselineHelp
+                class="cursor-pointer"
+                data-bs-toggle="tooltip"
+                data-bs-custom-class="wide-tooltip"
+                data-bs-placement="auto"
+                data-bs-html="true"
+                data-bs-title="<img src='/pics/m3.webp'/>"
+              />
+            </label>
+            <small id="voteWithTextdesc" class="text-body-secondary"> <br />Viewers vote by typing the option name (option1, option2).</small>
+          </div>
+          <hr />
+
+          <div class="mb-3">
+            <label for="timerValueMinutes" class="form-label"><IcBaselineTimer />Poll timer</label>
+            <div class="input-group mb-3">
+              <input type="number" min="0" value="0" class="form-control" id="timerValueMinutes" onchange={saveSettings} aria-describedby="timerDesc" />
+              <span class="input-group-text" id="timerDesc">minutes</span>
+            </div>
+            <div class="form-text">Timer automatically starts when you start voting. Set to 0 to disable the timer</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-group defaultbtn mt-2 me-2">
+        <button
+          type="button"
+          id="enableSuggestions"
+          class="btn btn-success"
+          data-bs-container="body"
+          data-bs-trigger="manual"
+          data-bs-placement="bottom"
+          data-bs-toggle="popover"
+          data-bs-title="Viewer suggestions disabled"
+          data-bs-content="A viewer is trying to post a suggestion but viewer suggestions are disabled"
+        >
+          <span id="enableSuggestionsText">Enable viewer suggestions</span>
+          <br /><small id="suggestionsCommand" class="notranslate">!suggest</small>
+        </button>
+        <button
+          type="button"
+          id="enableSuggestionsDropdown"
+          class="btn btn-success dropdown-toggle dropdown-toggle-split"
+          data-bs-toggle="dropdown"
+          data-bs-auto-close="outside"
+          aria-expanded="false"
+        >
+          <span class="visually-hidden">Toggle Dropdown</span>
+        </button>
+        <div class="dropdown-menu dropdown-menu-end p-3" style="width: 300px">
+          <div class="input-group">
+            <span class="input-group-text">Per user suggestion limit</span>
+            <input
+              type="number"
+              id="suggestionLimitUser"
+              onchange={saveSettings}
+              style="max-width: 5em"
+              class="form-control"
+              min="0"
+              value="1"
+              step="1"
+              aria-label="Text input with checkbox for user suggestion limit"
+            />
+          </div>
+          <small class="text-body-secondary">How many suggestions each viewer can send. 0=unlimited</small>
+
+          <div class="input-group mt-3">
+            <span class="input-group-text">Total suggestion limit</span>
+            <input
+              type="number"
+              id="suggestionLimit"
+              style="max-width: 5em"
+              class="form-control"
+              min="0"
+              value="0"
+              step="1"
+              aria-label="Text input with checkbox for total suggestion limit"
+            />
+          </div>
+          <small class="text-body-secondary">The total amount of suggestions from all viewers. 0=unlimited</small>
+          <hr />
+          The suggestion command can be changed
+          <span onclick={changeSuggestionCommand} style="color: #00bc8c; cursor: pointer">here</span>
+        </div>
+      </div>
+
+      <div class="drawer">
+        <input id="settingsDrawer" type="checkbox" class="drawer-toggle" />
+        <div class="drawer-content">
+          <label for="settingsDrawer" class="btn btn-primary drawer-button defaultbtn mt-2 me-2"><IcBaselineSettings />Settings</label>
+        </div>
+        <div class="drawer-side">
+          <label for="settingsDrawer" aria-label="close sidebar" class="drawer-overlay"></label>
+          <div class="menu bg-base-200 text-base-content min-h-full w-80 p-4">
+            <div class="card mb-2">
+              <div class="card-body">
+                <div class="form-group">
+                  <label for="suggestionPrefix" class="form-label"> Suggestion command</label>
+                  <input type="text" class="form-control notranslate" id="suggestionPrefix" value="!suggest" aria-describedby="description3" />
+                  <small id="description3" class="text-body-secondary">The command to put before a suggestion. <br />Example: <span class="notranslate">!suggest my summer car</span></small>
+                </div>
+              </div>
+            </div>
+
+            <div class="card mb-2">
+              <div class="card-body">
+                <div id="removeContainer">
+                  <div class="input-group flex-nowrap restart" id="removeDiv">
+                    <label class="input-group-text text-light" for="remove">Keep top</label>
+                    <select id="remove" class="form-control" style="max-width: 4em">
+                      <option selected value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
+                      <option value="6">6</option>
+                      <option value="7">7</option>
+                      <option value="8">8</option>
+                      <option value="9">9</option>
+                      <option value="10">10</option>
+                    </select>
+                    <label class="input-group-text text-light" for="remove">options and</label>
+                    <button class="btn btn-secondary" type="button" onclick={removeAndRestart}>restart<IcBaselineRefresh /></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card mb-2">
+              <div class="card-body">
+                <div class="form-check form-switch mb-3">
+                  <input type="checkbox" class="form-check-input" id="multiChoice" aria-describedby="multiChoiceDesc" />
+                  <label class="form-check-label" for="multiChoice"> <IcBaselinePlusOne /> Allow multiple choices</label><br />
+                  <small id="multiChoiceDesc" class="text-body-secondary">
+                    Viewers will be able to vote for multiple options at once.<br />
+                    <span id="multiChoiceExample">Example: <span class="notranslate">1 2 3</span></span>
+                  </small>
+                  <br />
+                  <small class="yesno-warning text-warning" style="display: none"> Does not support <img src="/pics/yeanay.webp" alt="yeanay" style="height: 1.2em" />Mode </small>
+                </div>
+                <div class="form-check form-switch mb-3">
+                  <input type="checkbox" class="form-check-input" id="allowChange" onchange={saveSettings} aria-describedby="allowChangeDesc" />
+                  <label class="form-check-label" for="allowChange"> <IcBaselineSwapHoriz /> Allow vote changing</label><br />
+                  <small id="allowChangeDesc" class="text-body-secondary">
+                    Viewers will be able to change the option they selected by voting again. They can change their vote only once.</small
+                  ><br />
+                  <small class="yesno-warning text-warning" style="display: none"> Does not support <img src="/pics/yeanay.webp" alt="yeanay" style="height: 1.2em" />Mode </small>
+                </div>
+                <div class="form-check form-switch">
+                  <input type="checkbox" class="form-check-input" id="subMode" aria-describedby="submodedesc" />
+                  <label class="form-check-label" for="subMode"> <IcBaselineAttachMoney /> Subscribers only poll</label>
+                  <small id="submodedesc" class="text-body-secondary"><br />Viewers that are not subscribed to your channel will not be able to vote or make suggestions. </small>
+                </div>
+              </div>
+            </div>
+
+            <div class="card mb-2">
+              <div class="card-body">
+                <div class="form-check form-switch mb-3">
+                  <input type="checkbox" class="form-check-input" id="showChat" aria-describedby="showChatDesc" />
+                  <label class="form-check-label" id="showChatDesc" for="showChat">
+                    <MdiTwitch /> Show chat
+                  </label>
+                  <br /><small class="text-body-secondary">Shows your Twitch chat on the right side</small>
+                </div>
+
+                <div class="form-check form-switch mb-3">
+                  <input class="form-check-input" type="checkbox" id="refreshWarningEnabled" onchange={saveSettings} />
+                  <label class="form-check-label" for="refreshWarningEnabled"> <IcBaselineNotificationImportant /> Enable close/refresh warning</label>
+                  <br /><small class="text-body-secondary">Shows a warning before leaving/refreshing the site so that you don't accidentally lose your poll results.</small>
+                </div>
+
+                <div class="form-check form-switch mb-3">
+                  <input class="form-check-input" type="checkbox" id="linkPreviewThumbnailsEnabled" />
+                  <label class="form-check-label" for="linkPreviewThumbnailsEnabled"> <IcBaselinePreview /> Show thumbnails in link preview </label>
+                  <br /><small class="text-body-secondary"><b class="text-danger">Use with caution; viewers might link images that break Twitch's TOS.</b></small>
+                </div>
+
+                <div class="input-group">
+                  <span class="input-group-text"><IcBaselineCelebration />Confetti</span>
+                  <select class="form-select" id="confettiLevel" style="max-width: 7em">
+                    <option value="0" selected>Off</option>
+                    <option value="1">Low</option>
+                    <option value="2">Medium</option>
+                    <option value="3">High</option>
+                    <option value="4">INSANE ZULOL</option>
+                  </select>
+                </div>
+                <small class="text-body-secondary">Confetti triggers when the timer runs out or when you pick a random option.</small>
+              </div>
+            </div>
+
+            <div class="card mb-2">
+              <div class="card-body">
+                <div class="input-group mb-0">
+                  <span class="input-group-text blueborder">Refresh 3rd party emotes</span>
+                  <button class="btn btn-outline-info" type="button" onclick={getEmotes}><IcBaselineRefresh /></button>
+                </div>
+                <div class="text-body-secondary mb-3">
+                  Loaded emotes (global/channel): BTTV: <span id="bttvGlobalEmotes">0</span>/<span id="bttvChannelEmotes">0</span> | FFZ: <span id="ffzGlobalEmotes">0</span>/<span
+                    id="ffzChannelEmotes">0</span
+                  >
+                  | 7TV: <span id="seventvGlobalEmotes">0</span>/<span id="seventvChannelEmotes">0</span>
+                </div>
+
+                <a
+                  id="resetSettingsPopover"
+                  tabindex="0"
+                  class="btn btn-danger"
+                  role="button"
+                  data-bs-toggle="popover"
+                  data-bs-trigger="focus"
+                  data-bs-title="Are you sure?"
+                  data-bs-content="All settings will be reset and the page will reload<br>
+          <button type='button' class='btn btn-danger float-end my-3' onclick='resetSettings()'>
+          <i class='material-icons notranslate'>delete_forever</i>Reset settings</button>"
+                >
+                  <IcBaselineDeleteForever />Reset all settings
+                </a>
+                <br />
+                <small class="text-body-secondary">Resets all settings and reloads the page.</small>
+              </div>
+            </div>
+
+            <div class="card mb-2">
+              <div class="card-body">
+                <h5 class="card-title">Export Data</h5>
+                <label>Data to be Exported:</label>
+                <div class="form-group mb-3">
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="voters_selected" value="List of Voters" checked />
+                    <label class="form-check-label" for="voters_selected">List of Voters</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="options_selected" value="Poll Options" />
+                    <label class="form-check-label" for="options_selected">Poll Options</label>
+                  </div>
+                </div>
+                <label>File Format:</label>
+                <div class="form-group mb-3">
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions2" id="json_selected" value="JSON" checked />
+                    <label class="form-check-label" for="json_selected">JSON</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions2" id="txt_selected" value="TXT" />
+                    <label class="form-check-label" for="txt_selected">TXT</label>
+                  </div>
+                </div>
+
+                <button type="button" onclick={download} class="btn btn-primary"><IcBaselineFileDownload /> Download</button>
+              </div>
+            </div>
+
+            <div class="card mb-2">
+              <div class="card-body">
+                <h5>Contact info:</h5>
+                <p>
+                  Site by <a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/badoge">badoge</a> :) <br />If you find any issues or if you have suggestions or questions,
+                  you can contact me: <br /><a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/popout/badoge/chat?popout=">in this chat</a> <br />or on
+                  <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/FR8bgQdPUT">discord</a> <br />or by
+                  <a href="mailto:contact@chat.vote">email</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="float-end mt-2" role="group" aria-label="Restart, random option, hide score, and delete all buttons">
+        <button
+          type="button"
+          class="btn btn-outline-warning quick-actions"
+          id="restartPoll"
+          onclick={restartPoll}
+          data-bs-toggle="tooltip"
+          data-bs-placement="bottom"
+          data-bs-title="Restart the poll with the same options"
+          style="margin-right: 1px"
+        >
+          <IcBaselineRefresh />
+        </button>
+        <button
+          type="button"
+          id="pickRandom"
+          class="btn btn-outline-info quick-actions"
+          data-bs-toggle="tooltip"
+          data-bs-placement="bottom"
+          data-bs-title="Pick a random option"
+          style="margin-right: 1px"
+        >
+          <IcBaselineCasino />
+        </button>
+        <button
+          type="button"
+          id="hideScore"
+          class="btn btn-outline-primary quick-actions"
+          data-bs-toggle="tooltip"
+          data-bs-placement="bottom"
+          data-bs-title="Hide score"
+          style="margin-right: 1px"
+        >
+          <IcBaselineVisibility id="hideScoreIcon" />
+        </button>
+        <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove all options from the poll">
+          <a
+            id="deleteAll"
+            tabindex="0"
+            class="btn btn-outline-danger quick-actions html-popover"
+            role="button"
+            data-bs-toggle="popover"
+            data-bs-placement="top"
+            data-bs-trigger="focus"
+            data-bs-title="Are you sure?"
+            data-bs-content="All poll options will be deleted<br><button type='button' class='btn btn-danger float-end my-3' onclick='resetPoll'><i class='material-icons notranslate'>delete_forever</i>Delete all</button>"
+            style="padding-top: 14px"
+          >
+            <IcBaselineDeleteForever />
+          </a>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="chat"></div>
 
 <style>
   body {

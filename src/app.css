@@ -2,8 +2,8 @@
 @plugin "@tailwindcss/typography";
 @plugin "daisyui" {
   themes:
-    forest,
-    lemonade --default;
+    forest --default,
+    lemonade;
 }
 
 ::-webkit-scrollbar {

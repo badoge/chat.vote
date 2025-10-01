@@ -1,6 +1,6 @@
 <script>
   import Navbar from "$lib/Navbar.svelte";
-
+  import IcBaselineClose from "~icons/ic/baseline-close";
   import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
   import IcBaselineVisibility from "~icons/ic/baseline-visibility";
   import IcBaselineSettings from "~icons/ic/baseline-settings";
