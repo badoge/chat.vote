@@ -3333,10 +3333,10 @@
     </table>
     <div class="text-body-secondary">
       [1]: Viewers can request something at a specific time by requesting a link with a timestamp parameter or adding "start=" at the end of the request. Example:
-      <kbd>!request [link] start=1:30</kbd> will make the video start from 1 minute 30 seconds<br />
+      <kbd class="kbd">!request [link] start=1:30</kbd> will make the video start from 1 minute 30 seconds<br />
       [2]: Platforms that are marked as moderated might have some automated filters to remove unsafe content. Platforms like Streamable don't require an account, so anyone can upload unsafe videos
       quickly then request them. This however does not mean that the other platforms will always have safe content.<br />
-      [3]: You can search some platforms directly using the request command. Example: <kbd>!request spotify camellia ghost</kbd> <br />
+      [3]: You can search some platforms directly using the request command. Example: <kbd class="kbd">!request spotify camellia ghost</kbd> <br />
       [4]: Twitch clips autoplay and timestamps might break sometimes, especially if you keep the clips in the playlist for more than a day.<br />
       [5]: You need to login to Spotify on this browser to listen to full songs instead of previews. You might also need to enable 3rd party cookies.
     </div>
@@ -3795,8 +3795,8 @@
                       <label class="form-check-label" for="enableBot"><IcBaselineSmartToy />Enable chat bot</label>
                       <br />
                       <small class="text-body-secondary">
-                        Enables the bot commands below and adds confirmation replies for some commands - Make sure to mod the bot <kbd>/mod chatvote</kbd> so that it can post links without getting
-                        timed out by other bots
+                        Enables the bot commands below and adds confirmation replies for some commands - Make sure to mod the bot <kbd class="kbd">/mod chatvote</kbd> so that it can post links
+                        without getting timed out by other bots
                       </small>
                     </div>
                     <div class="input-group mb-3">

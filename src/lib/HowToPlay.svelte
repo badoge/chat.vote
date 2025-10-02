@@ -8,15 +8,15 @@
 
 {#if route === "/games/arena"}
   <h4>Streamer controls:</h4>
-  <p>Move: arrows<br />Attack: <kbd>Space</kbd><br />Use ability: <kbd>Shift</kbd></p>
+  <p>Move: arrows<br />Attack: <kbd class="kbd">Space</kbd><br />Use ability: <kbd class="kbd">Shift</kbd></p>
   <h4>Chat:</h4>
-  Type<kbd>!join [class]</kbd> in chat to join<br />
-  <kbd>!join rogue</kbd> or <kbd>DonkRogue</kbd><br />
-  <kbd>!join hunter</kbd> or <kbd>DonkHunter</kbd><br />
-  <kbd>!join mage</kbd> or <kbd>DonkMage</kbd><br />
-  <kbd>!join paladin</kbd> or <kbd>DonkPaladin</kbd><br />
-  <kbd>!join priest</kbd> or <kbd>DonkPriest</kbd><br />
-  <kbd>!join shaman</kbd> or <kbd>DonkShaman</kbd>
+  Type<kbd class="kbd">!join [class]</kbd> in chat to join<br />
+  <kbd class="kbd">!join rogue</kbd> or <kbd class="kbd">DonkRogue</kbd><br />
+  <kbd class="kbd">!join hunter</kbd> or <kbd class="kbd">DonkHunter</kbd><br />
+  <kbd class="kbd">!join mage</kbd> or <kbd class="kbd">DonkMage</kbd><br />
+  <kbd class="kbd">!join paladin</kbd> or <kbd class="kbd">DonkPaladin</kbd><br />
+  <kbd class="kbd">!join priest</kbd> or <kbd class="kbd">DonkPriest</kbd><br />
+  <kbd class="kbd">!join shaman</kbd> or <kbd class="kbd">DonkShaman</kbd>
 {:else if route === "/games/connect4"}
   <p>1. Streamer makes a move</p>
   <p>2. Chat picks a column by typing a number in chat</p>

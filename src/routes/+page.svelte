@@ -22,11 +22,13 @@
   import IcBaselineRefresh from "~icons/ic/baseline-refresh";
   import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
   import IcBaselineVisibility from "~icons/ic/baseline-visibility";
+  import IcBaselineVisibilityOff from "~icons/ic/baseline-visibility-off";
   import IcBaselineCasino from "~icons/ic/baseline-casino";
   import IcBaselineSettings from "~icons/ic/baseline-settings";
   import IcOutlineArrowDropUp from "~icons/ic/outline-arrow-drop-up";
   import IcBaselineArrowDropDown from "~icons/ic/baseline-arrow-drop-down";
   import IcBaselineStackedBarChart from "~icons/ic/baseline-stacked-bar-chart";
+  import IcBaselineBarChart from "~icons/ic/baseline-bar-chart";
   import IcBaselineToc from "~icons/ic/baseline-toc";
   import IcBaselinePlusOne from "~icons/ic/baseline-plus-one";
   import IcBaselineSwapHoriz from "~icons/ic/baseline-swap-horiz";
@@ -59,6 +61,10 @@
    * @type {import("ag-grid-community").GridApi<{ Command: string; Option: string; By: number; Score: number; Delete: number; }>}
    */
   let table;
+
+  let sortChart = $state(false);
+  let questionHidden = $state(false);
+  let scoreHidden = $state(false);
 
   let USER = donkStorage("USER", null);
 
@@ -134,8 +140,6 @@
 
       //hotbar - quick actions
       restartPoll: document.getElementById("restartPoll"),
-      hideScore: document.getElementById("hideScore"),
-      hideScoreIcon: document.getElementById("hideScoreIcon"),
       pickRandom: document.getElementById("pickRandom"),
 
       //timer
@@ -168,12 +172,9 @@
       optionList: document.getElementById("optionList"),
 
       //main
-      hideQuestion: document.getElementById("hideQuestion"),
       countdown: document.getElementById("countdown"),
       voteHint: document.getElementById("voteHint"),
       chartCanvas: document.getElementById("chartCanvas"),
-      sortChart: document.getElementById("sortChart"),
-      sortChartLabel: document.getElementById("sortChartLabel"),
       totalVotes: document.getElementById("totalVotes"),
       numberStats: document.getElementById("numberStats"),
       averageNumber: document.getElementById("averageNumber"),
@@ -181,10 +182,6 @@
       questionLabel: document.getElementById("questionLabel"),
       pollOption: document.getElementById("pollOption"),
       addOption: document.getElementById("addOption"),
-      tableTabButton: document.getElementById("tableTabButton"),
-      chartTabButton: document.getElementById("chartTabButton"),
-      yesnoTabButton: document.getElementById("yesnoTabButton"),
-      overlayTabButton: document.getElementById("overlayTabButton"),
       options: document.getElementById("options"),
       chatiframe: document.getElementById("chatiframe"),
       chat: document.getElementById("chat"),
@@ -209,41 +206,31 @@
     elements.pollOption.focus();
     elements.pollOption.select();
 
-    sortChartTooltip = new bootstrap.Tooltip("#sortChartLabel");
+    // elements.tableTabButton.addEventListener("shown.bs.tab", (event) => {
+    //   if (yesNoMode) {
+    //     yesNoMode = false;
+    //     stopYesNo();
+    //   }
+    // });
 
-    enableVotingDropdown = new bootstrap.Dropdown(elements.enableVotingDropdown);
-    enableSuggestionsDropdown = new bootstrap.Dropdown(elements.enableSuggestionsDropdown);
+    // elements.chartTabButton.addEventListener("shown.bs.tab", (event) => {
+    //   if (yesNoMode) {
+    //     yesNoMode = false;
+    //     stopYesNo();
+    //   }
+    // });
 
-    tableTab = new bootstrap.Tab(elements.tableTabButton);
-    chartTab = new bootstrap.Tab(elements.chartTabButton);
-    yesnoTab = new bootstrap.Tab(elements.yesnoTabButton);
-    overlayTab = new bootstrap.Tab(elements.overlayTabButton);
+    // elements.yesnoTabButton.addEventListener("shown.bs.tab", (event) => {
+    //   yesNoMode = true;
+    //   startYesNo();
+    // });
 
-    elements.tableTabButton.addEventListener("shown.bs.tab", (event) => {
-      if (yesNoMode) {
-        yesNoMode = false;
-        stopYesNo();
-      }
-    });
-
-    elements.chartTabButton.addEventListener("shown.bs.tab", (event) => {
-      if (yesNoMode) {
-        yesNoMode = false;
-        stopYesNo();
-      }
-    });
-
-    elements.yesnoTabButton.addEventListener("shown.bs.tab", (event) => {
-      yesNoMode = true;
-      startYesNo();
-    });
-
-    elements.overlayTabButton.addEventListener("shown.bs.tab", (event) => {
-      if (yesNoMode) {
-        yesNoMode = false;
-        stopYesNo();
-      }
-    });
+    // elements.overlayTabButton.addEventListener("shown.bs.tab", (event) => {
+    //   if (yesNoMode) {
+    //     yesNoMode = false;
+    //     stopYesNo();
+    //   }
+    // });
 
     elements.questionLabel.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
@@ -265,19 +252,6 @@
       } else {
         enableSuggestButton();
       }
-    });
-
-    elements.hideQuestion.addEventListener("click", function () {
-      if (elements.hideQuestion.innerHTML == "arrow_drop_up") {
-        CHATVOTE.value.questionHidden = true;
-        elements.hideQuestion.innerHTML = "arrow_drop_down";
-        elements.questionLabel.style.display = "none";
-      } else {
-        CHATVOTE.value.questionHidden = false;
-        elements.hideQuestion.innerHTML = "arrow_drop_up";
-        elements.questionLabel.style.display = "block";
-      }
-      saveSettings();
     });
 
     elements.pollOption.addEventListener("keydown", (event) => {
@@ -305,9 +279,7 @@
       updateHint();
     };
 
-    elements.sortChart.onchange = function () {
-      sortChartTooltip.setContent({ ".tooltip-inner": this.checked ? "Unsort chart" : "Sort chart" });
-      saveSettings();
+    document.getElementById("sortChart").onchange = function () {
       loadChart();
       updateChart();
     };
@@ -330,22 +302,22 @@
       saveSettings();
     };
 
-    elements.linkPreviewThumbnailsEnabled.onchange = function () {
-      saveSettings();
-      const tooltipTriggerList = document.querySelectorAll("a.linktooltip");
-      const tooltipList = [...tooltipTriggerList].map(function (tooltipTriggerEl) {
-        tooltipTriggerEl.setAttribute("data-bs-title", spinner);
-        tooltipTriggerEl.addEventListener("show.bs.tooltip", function () {
-          getLinkInfo(tooltipTriggerEl, CHATVOTE.value.linkPreviewThumbnailsEnabled);
-        });
-        return new bootstrap.Tooltip(tooltipTriggerEl, {
-          animation: false,
-          html: true,
-          delay: { show: 200, hide: 0 },
-          trigger: "hover",
-        });
-      });
-    };
+    // elements.linkPreviewThumbnailsEnabled.onchange = function () {
+    //   saveSettings();
+    //   const tooltipTriggerList = document.querySelectorAll("a.linktooltip");
+    //   const tooltipList = [...tooltipTriggerList].map(function (tooltipTriggerEl) {
+    //     tooltipTriggerEl.setAttribute("data-bs-title", spinner);
+    //     tooltipTriggerEl.addEventListener("show.bs.tooltip", function () {
+    //       getLinkInfo(tooltipTriggerEl, CHATVOTE.value.linkPreviewThumbnailsEnabled);
+    //     });
+    //     return new bootstrap.Tooltip(tooltipTriggerEl, {
+    //       animation: false,
+    //       html: true,
+    //       delay: { show: 200, hide: 0 },
+    //       trigger: "hover",
+    //     });
+    //   });
+    // };
 
     elements.showChat.onchange = function () {
       CHATVOTE.value.showChat = this.checked;
@@ -386,12 +358,6 @@
       pickRandomOption();
     });
 
-    elements.hideScore.addEventListener("click", function () {
-      const tooltip = bootstrap.Tooltip.getInstance("#hideScore");
-      tooltip.setContent({ ".tooltip-inner": scoreHidden ? "Hide score" : "Show score" });
-      hideScore();
-    });
-
     window.onbeforeunload = function () {
       // sendData("chat.vote", USER.value.channel, USER.value.platform == "twitch" ? `twitch - ${USER.value.twitchLogin}` : "youtube", {
       //   table: table.column(2).data().toArray(),
@@ -404,7 +370,6 @@
     }; //onbeforeunload
   }); //onMount
 
-  let sortChartTooltip;
   let voters = [];
   let voters_options = [];
   let vote_results = [];
@@ -420,12 +385,9 @@
   let numberOfSuggestions = 0;
   let suggestionLimitReached = false;
   let yesNoMode = false;
-  let scoreHidden = false;
   let allNumbers = false;
   let timer;
   let currentTime = 0;
-  let enableVotingDropdown, enableSuggestionsDropdown;
-  let tableTab, chartTab, yesnoTab, overlayTab;
 
   let thirdPartyEmotes = [];
 
@@ -435,7 +397,8 @@
     CHATVOTE.value.suggestion_prefix = elements.suggestionPrefix.value.replace(/\s+/g, "").toLowerCase();
 
     CHATVOTE.value.votingMode = elements.voteWithText.checked ? "text" : "numbers";
-    CHATVOTE.value.sortChart = elements.sortChart.checked;
+    CHATVOTE.value.sortChart = sortChart;
+    CHATVOTE.value.questionHidden = questionHidden;
 
     if (!CHATVOTE.value.suggestion_prefix) {
       CHATVOTE.value.suggestion_prefix = "!suggest";
@@ -467,7 +430,8 @@
     elements.voteWithNumbers.checked = CHATVOTE.value.votingMode === "numbers";
     elements.voteWithText.checked = CHATVOTE.value.votingMode === "text";
 
-    elements.sortChart.checked = CHATVOTE.value.sortChart ?? false;
+    sortChart = CHATVOTE.value.sortChart ?? false;
+    questionHidden = CHATVOTE.value.questionHidden ?? false;
     elements.suggestionPrefix.value = CHATVOTE.value.suggestion_prefix || "!suggest";
     elements.suggestionLimitUser.value = parseInt(CHATVOTE.value.suggestionLimitUser, 10) ?? 1;
     elements.suggestionLimit.value = parseInt(CHATVOTE.value.suggestionLimit, 10) || 0;
@@ -480,14 +444,6 @@
     elements.confettiLevel.value = CHATVOTE.value.confettiLevel || 0;
     elements.refreshWarningEnabled.checked = CHATVOTE.value.refreshWarningEnabled ?? false;
     elements.linkPreviewThumbnailsEnabled.checked = CHATVOTE.value.linkPreviewThumbnailsEnabled ?? false;
-
-    if (CHATVOTE.value.questionHidden) {
-      elements.hideQuestion.innerHTML = "arrow_drop_down";
-      elements.questionLabel.style.display = "none";
-    } else {
-      elements.hideQuestion.innerHTML = "arrow_drop_up";
-      elements.questionLabel.style.display = "block";
-    }
 
     if (CHATVOTE.value.votingMode === "numbers") {
       elements.multiChoiceExample.innerText = `Example: "1 2 3"`;
@@ -503,10 +459,6 @@
 
     if (CHATVOTE.value.showChat) {
       showChat();
-    }
-
-    if (elements.sortChart.checked) {
-      elements.sortChartLabel.setAttribute("data-bs-title", "Unsort chart");
     }
 
     if (!localStorage.getItem("OVERLAY")) {
@@ -1470,7 +1422,7 @@
     let total = 0;
 
     //sort the data if the button checkbox is checked in the chart tab and score is not hidden
-    if (CHATVOTE.value.sortChart && !scoreHidden) {
+    if (sortChart && !scoreHidden) {
       vote_results_copy.sort(function (a, b) {
         return a.score > b.score ? -1 : a.score == b.score ? 0 : 1;
       });
@@ -1563,7 +1515,6 @@
 
   function hideScore() {
     scoreHidden = !scoreHidden;
-    elements.hideScoreIcon.innerHTML = scoreHidden ? "visibility_off" : "visibility";
     if (yesNoMode) {
       updateYesNo();
     } else {
@@ -1726,13 +1677,13 @@
       }
     }
     if (!hasImages && !yesNoMode) {
-      chartTab.show();
+      //chartTab.show();
     }
     voting_enabled = true;
     elements.enableVoting.classList.remove("btn-success");
-    elements.enableVoting.classList.add("btn-danger");
+    elements.enableVoting.classList.add("btn-error");
     elements.enableVotingDropdown.classList.remove("btn-success");
-    elements.enableVotingDropdown.classList.add("btn-danger");
+    elements.enableVotingDropdown.classList.add("btn-error");
     elements.enableVotingText.innerText = "Stop Voting";
   } //enableVoteButton
 
@@ -1741,9 +1692,9 @@
     if (timer && timer.isRunning()) {
       stopTimer();
     }
-    elements.enableVoting.classList.remove("btn-danger");
+    elements.enableVoting.classList.remove("btn-error");
     elements.enableVoting.classList.add("btn-success");
-    elements.enableVotingDropdown.classList.remove("btn-danger");
+    elements.enableVotingDropdown.classList.remove("btn-error");
     elements.enableVotingDropdown.classList.add("btn-success");
     elements.enableVotingText.innerText = "Start Voting";
   } //disableVoteButton
@@ -2051,209 +2002,173 @@
 
 <Navbar messageHandler={handleMessage} timeoutHandler={handleTimeout} loginEvent={() => USER.refresh()} />
 
-<div id="questionDiv" class="mb-2 mt-2">
-  <div class="card bg-dark-subtle border-dark-subtle">
-    <div id="questionCard" class="card-body">
-      <IcOutlineArrowDropUp id="hideQuestion" />
-      <label contenteditable="true" spellcheck="false" id="questionLabel" class="pull-left" data-placeholder="Type your question here"></label>
-    </div>
-  </div>
-</div>
-
-<div class="card bg-dark-subtle border-dark-subtle mb-2 mt-2" id="enterPollOptionCard">
-  <div class="card-body" id="enterPollOptionCardBody">
-    <label for="pollOption" id="pollOptionLabel" class="form-label">Enter poll option:</label>
-    <div class="input-group">
-      <input type="text" id="pollOption" class="form-control" placeholder="Poll option" aria-label="Poll option input text field" />
-      <button class="btn btn-outline-secondary" type="button" id="addOption" onclick={addOption} data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="or just press enter :)">
-        Add
-      </button>
-      <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-        <span class="visually-hidden">Toggle Dropdown</span>
-      </button>
-      <ul class="dropdown-menu dropdown-menu-end">
-        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" onclick={() => bulkAddModal.showModal()}>Add multiple options</a></li>
-      </ul>
-    </div>
-  </div>
-</div>
-
-<div class="alert alert-info alert-dismissible mb-2 mt-2" id="subOnlyAlert" role="alert" style="display: none">
-  <IcBaselineAttachMoney /> Subscribers only poll. Click on the subscribe button, you might have a free prime sub
-  <img src="/pics/smile.png" alt="bot" style="height: 1.5em" />
-  <button type="button" class="btn btn-info">
-    <svg width="1.5em" height="1.5em" style="fill: white" version="1.1" viewBox="0 0 20 20" x="20px" y="20px">
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M18 5v8a2 2 0 0 1-2 2H4a2.002 2.002 0 0 1-2-2V5l4 3 4-4 4 4 4-3z"></path>
-    </svg>
-    Subscribe Free
-  </button>
-  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-
-<div class="card border-danger text-center mb-2 mt-2" id="countdown" style="display: none">
-  <div class="card-body">
-    <div class="values d-inline-flex" style="font-size: 3em"></div>
-    <div class="btn-group float-end h-100" role="group" aria-label="Timer controls" id="timerControls">
-      <button class="btn btn-outline-secondary" type="button" id="stopTimer" onclick={stopTimer}>
-        <IcBaselineStop />
-      </button>
-      <button class="btn btn-outline-secondary" type="button" id="pauseTimer" onclick={pauseTimer}>
-        <IcBaselinePause />
-      </button>
-      <button class="btn btn-outline-secondary" type="button" style="display: none" id="unpauseTimer" onclick={unpauseTimer}>
-        <IcBaselinePlayArrow />
-      </button>
-    </div>
-  </div>
-</div>
-
-<ul class="nav nav-tabs bg-body-tertiary" id="tableAndChart" role="tablist">
-  <li class="nav-item" role="presentation">
-    <button class="nav-link main-tabs active" id="tableTabButton" data-bs-toggle="tab" data-bs-target="#tableTab" type="button" role="tab" aria-controls="tableTab" aria-selected="true">
-      <IcBaselineToc /> Table view
-    </button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button class="nav-link main-tabs" id="chartTabButton" data-bs-toggle="tab" data-bs-target="#chartTab" type="button" role="tab" aria-controls="chartTab" aria-selected="false">
-      <IcBaselineStackedBarChart style="transform: rotateZ(90deg)" /> Chart view
-    </button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button class="nav-link main-tabs" id="yesnoTabButton" data-bs-toggle="tab" data-bs-target="#yesnoTab" type="button" role="tab" aria-controls="yesnoTab" aria-selected="false">
-      <img src="/pics/yeanay.webp" alt="yeanay" style="height: 20px" />Mode
-    </button>
-  </li>
-  <li class="nav-item" role="presentation" style="display: none" id="overlaytabli">
-    <button class="nav-link main-tabs" id="overlayTabButton" data-bs-toggle="tab" data-bs-target="#overlayTab" type="button" role="tab" aria-controls="overlayTab" aria-selected="false">
-      <IcBaselineLayers /> Overlay
-    </button>
-  </li>
-</ul>
-<div class="tab-content bg-dark-subtle">
-  <div class="tab-pane fade show active" id="tableTab" role="tabpanel" aria-labelledby="tableTabButton" tabindex="0">
-    <div id="table" data-ag-theme-mode="bs-dark" style="height:50vh;"></div>
-    <!-- <table id="options" class="table table-bordered" style="width: 100%">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Command</th>
-                <th>Option</th>
-                <th>by</th>
-                <th>Score</th>
-                <th>Delete</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table> -->
-  </div>
-  <div class="tab-pane fade" id="chartTab" role="tabpanel" aria-labelledby="chartTabButton" tabindex="0">
-    <div class="container-fluid p-0">
-      <div id="chartDiv" class="row">
-        <small id="voteHint" style="height: 0px" class="text-center"></small>
-        <canvas id="chartCanvas"></canvas>
+<div class="flex justify-center mb-50">
+  <div class="w-[80%]">
+    <div class="card bg-base-200 w-full shadow-lg my-3">
+      <div class="card-body py-1">
+        <label class="swap swap-rotate top-0 right-0 absolute" style="margin-top: -4px; margin-right: 2px;">
+          <input type="checkbox" bind:checked={questionHidden} onchange={refreshData} />
+          <IcBaselineArrowDropDown class="swap-on" />
+          <IcOutlineArrowDropUp class="swap-off" />
+        </label>
+        {#if !questionHidden}
+          <label class="py-2" contenteditable="true" spellcheck="false" id="questionLabel" data-placeholder="Type your question here"></label>
+        {/if}
       </div>
-      <div class="row p-2">
-        <div class="col">
-          <input type="checkbox" class="btn-check" id="sortChart" autocomplete="off" />
-          <label class="btn btn-outline-success" for="sortChart" id="sortChartLabel" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Sort chart">
-            <IcBaselineSort />
-          </label>
-          <div class="chartStatDiv">Total votes: <span id="totalVotes">0</span></div>
+    </div>
 
-          <div style="display: none" class="chartStatDiv ms-1" id="numberStats">
-            <div class="me-1">Average: <span id="averageNumber">0</span> • Median: <span id="medianNumber">0</span></div>
+    <div class="card bg-base-200 w-full shadow-lg my-3" id="enterPollOptionCard">
+      <div class="card-body" id="enterPollOptionCardBody">
+        <h2 class="card-title mt-2">Add poll options:</h2>
+        <div class="join mb-2">
+          <input class="input join-item grow-1" type="text" id="pollOption" placeholder="Poll option" />
+          <div class="tooltip" data-tip="or just press enter :)">
+            <button class="btn btn-secondary join-item" id="addOption" onclick={addOption}><IcBaselineAdd />Add</button>
+          </div>
+          <button class="btn btn-secondary join-item p-1" popovertarget="bulkAddDropdown" style="anchor-name:--bulkAddDropdownAnchor"><IcBaselineArrowDropDown /></button>
+        </div>
+        <div class="dropdown dropdown-end menu w-52 rounded-box bg-base-100 shadow-sm" popover id="bulkAddDropdown" style="position-anchor:--bulkAddDropdownAnchor">
+          <ul class="p-1">
+            <li><a onclick={() => bulkAddModal.showModal()} role="button">Add multiple options</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-info alert-dismissible my-3" id="subOnlyAlert" role="alert" style="display: none">
+      <IcBaselineAttachMoney /> Subscribers only poll. Click on the subscribe button, you might have a free prime sub
+      <img src="/pics/smile.png" alt="bot" style="height: 1.5em" />
+      <button type="button" class="btn btn-info">
+        <svg width="1.5em" height="1.5em" style="fill: white" version="1.1" viewBox="0 0 20 20" x="20px" y="20px">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M18 5v8a2 2 0 0 1-2 2H4a2.002 2.002 0 0 1-2-2V5l4 3 4-4 4 4 4-3z"></path>
+        </svg>
+        Subscribe Free
+      </button>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="card border-danger text-center my-3" id="countdown" style="display: none">
+      <div class="card-body">
+        <div class="values d-inline-flex" style="font-size: 3em"></div>
+        <div class="btn-group float-end h-100" role="group" aria-label="Timer controls" id="timerControls">
+          <button class="btn btn-outline-secondary" type="button" id="stopTimer" onclick={stopTimer}>
+            <IcBaselineStop />
+          </button>
+          <button class="btn btn-outline-secondary" type="button" id="pauseTimer" onclick={pauseTimer}>
+            <IcBaselinePause />
+          </button>
+          <button class="btn btn-outline-secondary" type="button" style="display: none" id="unpauseTimer" onclick={unpauseTimer}>
+            <IcBaselinePlayArrow />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs tabs-lift my-3">
+      <label class="tab">
+        <input type="radio" name="mainTabs" checked />
+        <IcBaselineToc /> Table view
+      </label>
+      <div class="tab-content bg-base-100 border-base-300 p-6">
+        <div id="table" data-ag-theme-mode="bs-dark" style="height:50vh;"></div>
+      </div>
+
+      <label class="tab">
+        <input type="radio" name="mainTabs" />
+        <IcBaselineStackedBarChart style="transform: rotateZ(90deg)" /> Chart view
+      </label>
+      <div class="tab-content bg-base-100 border-base-300 p-6">
+        <div id="chartDiv" class="row">
+          <small id="voteHint" style="height: 0px" class="text-center"></small>
+          <canvas id="chartCanvas"></canvas>
+        </div>
+        <div class="row p-2">
+          <div class="col">
+            <label class="swap swap-rotate tooltip" id="sortChartLabel" data-tip={sortChart ? "Unsort chart" : "Sort chart"}>
+              <input type="checkbox" id="sortChart" bind:checked={sortChart} />
+              <div class="swap-on"><IcBaselineBarChart style="transform: rotateZ(90deg)" /></div>
+              <div class="swap-off"><IcBaselineSort /></div>
+            </label>
+
+            <div class="chartStatDiv">Total votes: <span id="totalVotes">0</span></div>
+            <div style="display: none" class="chartStatDiv ms-1" id="numberStats">
+              <div class="me-1">Average: <span id="averageNumber">0</span> • Median: <span id="medianNumber">0</span></div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-  <div class="tab-pane fade" id="yesnoTab" role="tabpanel" aria-labelledby="yesnoTabButton" tabindex="0">
-    <div class="container-fluid text-center">
-      <div class="row">
-        <div class="col">
-          Type <img src="/pics/yea.webp" alt="yea" style="height: 24px; width: 24px" />|yes or <img src="/pics/nay.webp" alt="nay" style="height: 24px; width: 24px" />|no in chat to vote
-        </div>
-      </div>
-      <div id="yesnoDiv" class="row align-items-center">
-        <div class="col">
-          <img id="yeaPic" src="/pics/yea.webp" alt="yea" style="height: 150px" />
-          <br /><span id="yeaCount">0 Votes (0%)</span>
-        </div>
-        <div class="col">
-          <img id="nayPic" src="/pics/nay.webp" alt="nay" style="height: 150px" />
-          <br /><span id="nayCount">0 Votes (0%)</span>
-        </div>
-      </div>
-      <div class="row p-2">
-        <div class="col">
-          <div class="chartStatDiv">Total votes: <span id="yesnoTotalVotes">0</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="tab-pane fade" id="overlayTab" role="tabpanel" aria-labelledby="overlayTabButton" tabindex="0">
-    <div class="container-fluid text-center">
-      <div class="row">
-        <div class="col">
-          <div class="input-group my-3">
-            <span class="input-group-text">Overlay URL</span>
-            <input
-              id="overlayLink"
-              type="password"
-              readonly
-              class="form-control"
-              placeholder="Click 'Generate new overlay link' to get your overlay URL"
-              aria-label="Click 'Generate new overlay link' to get your overlay URL"
-            />
-            <button class="btn btn-outline-secondary" type="button" onclick={copyOverlayLink}> <IcBaselineContentCopy /> </button>
-            <button class="btn btn-success" type="button" id="connectOverlayButton" onclick={connectOverlay} disabled>
-              <IcBaselineConnectWithoutContact /> Connect overlay
-            </button>
-            <button class="btn btn-danger" type="button" id="generateOverlayButton" onclick={generateOverlay}>
-              <IcBaselineRestartAlt /> Generate new overlay link
-            </button>
-            <button class="btn btn-info" type="button" data-bs-toggle="modal" onclick={() => overlayModal.showModal()}><IcBaselineHelp /></button>
+
+      <label class="tab">
+        <input type="radio" name="mainTabs" />
+        <img src="/pics/yeanay.webp" alt="yeanay" style="height: 20px" />Mode
+      </label>
+      <div class="tab-content bg-base-100 border-base-300 p-6">
+        <div class="row">
+          <div class="col">
+            Type <img src="/pics/yea.webp" alt="yea" style="height: 24px; width: 24px" />|yes or <img src="/pics/nay.webp" alt="nay" style="height: 24px; width: 24px" />|no in chat to vote
           </div>
-
-          <label for="overlayX" class="form-label">x</label>
-          <input disabled type="range" class="form-range" oninput={moveX(event)} id="overlayX" value="50" min="0" max="100" />
-
-          <label for="overlayY" class="form-label">y</label>
-          <input disabled type="range" class="form-range" oninput={moveY(event)} id="overlayY" value="50" min="0" max="100" />
+        </div>
+        <div id="yesnoDiv" class="row align-items-center">
+          <div class="col">
+            <img id="yeaPic" src="/pics/yea.webp" alt="yea" style="height: 150px" />
+            <br /><span id="yeaCount">0 Votes (0%)</span>
+          </div>
+          <div class="col">
+            <img id="nayPic" src="/pics/nay.webp" alt="nay" style="height: 150px" />
+            <br /><span id="nayCount">0 Votes (0%)</span>
+          </div>
+        </div>
+        <div class="row p-2">
+          <div class="col">
+            <div class="chartStatDiv">Total votes: <span id="yesnoTotalVotes">0</span></div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
 
-<div class="container-fluid p-0" id="hotbar">
-  <div class="row">
-    <div class="col">
-      <div class="btn-group defaultbtn mt-2 me-2">
-        <button
-          type="button"
-          id="enableVoting"
-          class="btn btn-success"
-          data-bs-container="body"
-          data-bs-trigger="manual"
-          data-bs-placement="bottom"
-          data-bs-toggle="popover"
-          data-bs-title="Voting disabled"
-          data-bs-content="A viewer is trying to vote but voting is disabled"
-        >
+      <label id="overlayTabButton" class="tab" style="display: none;">
+        <input type="radio" name="mainTabs" />
+        <IcBaselineLayers /> Overlay
+      </label>
+      <div class="tab-content bg-base-100 border-base-300 p-6">
+        <div class="input-group my-3">
+          <span class="input-group-text">Overlay URL</span>
+          <input
+            id="overlayLink"
+            type="password"
+            readonly
+            class="form-control"
+            placeholder="Click 'Generate new overlay link' to get your overlay URL"
+            aria-label="Click 'Generate new overlay link' to get your overlay URL"
+          />
+          <button class="btn btn-outline-secondary" type="button" onclick={copyOverlayLink}> <IcBaselineContentCopy /> </button>
+          <button class="btn btn-success" type="button" id="connectOverlayButton" onclick={connectOverlay} disabled>
+            <IcBaselineConnectWithoutContact /> Connect overlay
+          </button>
+          <button class="btn btn-danger" type="button" id="generateOverlayButton" onclick={generateOverlay}>
+            <IcBaselineRestartAlt /> Generate new overlay link
+          </button>
+          <button class="btn btn-info" type="button" data-bs-toggle="modal" onclick={() => overlayModal.showModal()}><IcBaselineHelp /></button>
+        </div>
+
+        <label for="overlayX" class="form-label">x</label>
+        <input disabled type="range" class="form-range" oninput={moveX} id="overlayX" value="50" min="0" max="100" />
+
+        <label for="overlayY" class="form-label">y</label>
+        <input disabled type="range" class="form-range" oninput={moveY} id="overlayY" value="50" min="0" max="100" />
+      </div>
+    </div>
+
+    <div class="flex flex-row my-3">
+      <div class="join">
+        <button class="btn btn-success join-item defaultbtn" id="enableVoting" data-bs-title="Voting disabled" data-bs-content="A viewer is trying to vote but voting is disabled">
           <span id="enableVotingText">Start Voting</span>
         </button>
-        <button
-          type="button"
-          id="enableVotingDropdown"
-          class="btn btn-success dropdown-toggle dropdown-toggle-split"
-          data-bs-toggle="dropdown"
-          data-bs-auto-close="outside"
-          aria-expanded="false"
-        >
-          <span class="visually-hidden">Toggle Dropdown</span>
+        <button class="btn btn-success join-item defaultbtn p-1" id="enableVotingDropdown" popovertarget="votingSettingsDropdown" style="anchor-name:--votingSettingsDropdownAnchor">
+          <IcBaselineArrowDropDown />
         </button>
-        <div class="dropdown-menu dropdown-menu-end p-3" style="width: 400px; font-size: 0.9rem">
+      </div>
+      <div class="dropdown dropdown-center menu w-100 rounded-box bg-base-100 shadow-sm" popover id="votingSettingsDropdown" style="position-anchor:--votingSettingsDropdownAnchor">
+        <div class="p-4">
           <h6>Voting mode</h6>
 
           <div class="form-check mb-3">
@@ -2301,32 +2216,27 @@
         </div>
       </div>
 
-      <div class="btn-group defaultbtn mt-2 me-2">
+      <div class="join">
         <button
-          type="button"
+          class="btn btn-success join-item defaultbtn"
           id="enableSuggestions"
-          class="btn btn-success"
-          data-bs-container="body"
-          data-bs-trigger="manual"
-          data-bs-placement="bottom"
-          data-bs-toggle="popover"
           data-bs-title="Viewer suggestions disabled"
           data-bs-content="A viewer is trying to post a suggestion but viewer suggestions are disabled"
         >
-          <span id="enableSuggestionsText">Enable viewer suggestions</span>
-          <br /><small id="suggestionsCommand" class="notranslate">!suggest</small>
+          <span id="enableSuggestionsText">Enable viewer suggestions</span><br />
+          <small id="suggestionsCommand" class="notranslate">!suggest</small>
         </button>
         <button
-          type="button"
+          class="btn btn-success join-item defaultbtn p-1"
           id="enableSuggestionsDropdown"
-          class="btn btn-success dropdown-toggle dropdown-toggle-split"
-          data-bs-toggle="dropdown"
-          data-bs-auto-close="outside"
-          aria-expanded="false"
+          popovertarget="suggestionSettingsDropdown"
+          style="anchor-name:--suggestionSettingsDropdownAnchor"
         >
-          <span class="visually-hidden">Toggle Dropdown</span>
+          <IcBaselineArrowDropDown />
         </button>
-        <div class="dropdown-menu dropdown-menu-end p-3" style="width: 300px">
+      </div>
+      <div class="dropdown dropdown-start menu w-100 rounded-box bg-base-100 shadow-sm" popover id="suggestionSettingsDropdown" style="position-anchor:--suggestionSettingsDropdownAnchor">
+        <div class="p-4">
           <div class="input-group">
             <span class="input-group-text">Per user suggestion limit</span>
             <input
@@ -2366,7 +2276,7 @@
       <div class="drawer">
         <input id="settingsDrawer" type="checkbox" class="drawer-toggle" />
         <div class="drawer-content">
-          <label for="settingsDrawer" class="btn btn-primary drawer-button defaultbtn mt-2 me-2"><IcBaselineSettings />Settings</label>
+          <label for="settingsDrawer" class="btn btn-primary drawer-button defaultbtn"><IcBaselineSettings />Settings</label>
         </div>
         <div class="drawer-side">
           <label for="settingsDrawer" aria-label="close sidebar" class="drawer-overlay"></label>
@@ -2545,83 +2455,48 @@
         </div>
       </div>
 
-      <div class="float-end mt-2" role="group" aria-label="Restart, random option, hide score, and delete all buttons">
-        <button
-          type="button"
-          class="btn btn-outline-warning quick-actions"
-          id="restartPoll"
-          onclick={restartPoll}
-          data-bs-toggle="tooltip"
-          data-bs-placement="bottom"
-          data-bs-title="Restart the poll with the same options"
-          style="margin-right: 1px"
-        >
-          <IcBaselineRefresh />
-        </button>
-        <button
-          type="button"
-          id="pickRandom"
-          class="btn btn-outline-info quick-actions"
-          data-bs-toggle="tooltip"
-          data-bs-placement="bottom"
-          data-bs-title="Pick a random option"
-          style="margin-right: 1px"
-        >
-          <IcBaselineCasino />
-        </button>
-        <button
-          type="button"
-          id="hideScore"
-          class="btn btn-outline-primary quick-actions"
-          data-bs-toggle="tooltip"
-          data-bs-placement="bottom"
-          data-bs-title="Hide score"
-          style="margin-right: 1px"
-        >
-          <IcBaselineVisibility id="hideScoreIcon" />
-        </button>
-        <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove all options from the poll">
-          <a
-            id="deleteAll"
-            tabindex="0"
-            class="btn btn-outline-danger quick-actions html-popover"
-            role="button"
-            data-bs-toggle="popover"
-            data-bs-placement="top"
-            data-bs-trigger="focus"
-            data-bs-title="Are you sure?"
-            data-bs-content="All poll options will be deleted<br><button type='button' class='btn btn-danger float-end my-3' onclick='resetPoll'><i class='material-icons notranslate'>delete_forever</i>Delete all</button>"
-            style="padding-top: 14px"
-          >
+      <div class="justify-self-end join" role="group" aria-label="Restart, random option, hide score, and delete all buttons">
+        <div class="tooltip tooltip-bottom" data-tip="Restart the poll with the same options">
+          <button class="btn btn-warning join-item quick-actions" id="restartPoll" onclick={restartPoll}>
+            <IcBaselineRefresh />
+          </button>
+        </div>
+
+        <div class="tooltip tooltip-bottom" data-tip="Pick a random option">
+          <button class="btn btn-info join-item quick-actions" id="pickRandom">
+            <IcBaselineCasino />
+          </button>
+        </div>
+
+        <div class="tooltip tooltip-bottom" data-tip={scoreHidden ? "Show score" : "Hide score"}>
+          <button class="btn btn-secondary join-item quick-actions" id="hideScore" onclick={hideScore}>
+            <label class="swap">
+              <input type="checkbox" onclick={hideScore} bind:checked={scoreHidden} />
+              <div class="swap-on"><IcBaselineVisibilityOff /></div>
+              <div class="swap-off"><IcBaselineVisibility /></div>
+            </label>
+          </button>
+        </div>
+
+        <div class="tooltip tooltip-bottom" data-tip="Remove all options from the poll">
+          <button class="btn btn-error join-item quick-actions" id="deleteAll" popovertarget="deleteAllDropdown" style="anchor-name:--deleteAllDropdownAnchor">
             <IcBaselineDeleteForever />
-          </a>
-        </span>
+          </button>
+          <div class="dropdown dropdown-center menu w-52 rounded-box bg-base-100 shadow-sm" popover id="deleteAllDropdown" style="position-anchor:--deleteAllDropdownAnchor">
+            All poll options will be deleted<br />
+            <button type="button" class="btn btn-error float-end my-3" onclick={resetPoll}>
+              <IcBaselineDeleteForever />Delete all
+            </button>
+          </div>
+        </div>
       </div>
     </div>
+
+    <div id="chat"></div>
   </div>
 </div>
 
-<div id="chat"></div>
-
 <style>
-  body {
-    margin-bottom: 300px;
-  }
-
-  .main-tabs.active {
-    background-color: var(--bs-dark-bg-subtle) !important;
-    border-bottom-width: 1.5px;
-    border-bottom-color: var(--bs-dark-bg-subtle) !important;
-  }
-
-  #tableAndChart {
-    border-top-right-radius: 6px;
-    border-top-left-radius: 6px;
-  }
-
-  .row.mt-2.justify-content-between {
-    margin-top: 0 !important;
-  }
   .chartStatDiv {
     height: 40px;
     box-sizing: border-box;
@@ -2643,11 +2518,6 @@
 
   #enterPollOptionCardBody > .input-group {
     padding-bottom: 10px;
-  }
-
-  .card-header,
-  #hideQuestion:hover {
-    cursor: pointer;
   }
 
   #questionLabel:hover {
@@ -2687,10 +2557,7 @@
 
   .quick-actions {
     height: 62px !important;
-    aspect-ratio: 1 / 1;
-  }
-  .quick-actions > i {
-    font-size: 2rem;
+    width: 62px !important;
   }
 
   #removeContainer {
@@ -2721,20 +2588,9 @@
     margin: -10px;
   }
 
-  @media screen and (max-width: 1400px) {
-    .toast {
-      display: none;
-    }
-  }
-
   #randomOptionWinner,
   #timeOverWinner {
     word-wrap: break-word;
-  }
-
-  #pollOptionLabel {
-    font-size: 200%;
-    margin: 0;
   }
 
   #countdown > .card-body {
@@ -2744,11 +2600,6 @@
   #enableVotingText {
     font-size: 1.5rem;
     line-height: 1.5rem;
-  }
-
-  #mainButtonsCard {
-    padding-top: 5px;
-    padding-bottom: 5px;
   }
 
   .resizable {
@@ -2823,20 +2674,6 @@
 
   .tooltip.show {
     opacity: 1;
-  }
-
-  #hideQuestion {
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin-top: -7px;
-    margin-right: -5px;
-  }
-
-  #questionCard {
-    padding-top: 5px;
-    padding-bottom: 5px;
-    padding-left: 10px;
   }
 
   #chartDiv {
