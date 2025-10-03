@@ -18,6 +18,13 @@
     unescapeString,
   } from "$lib/functions";
   import { onMount } from "svelte";
+  import IcBaselineChat from "~icons/ic/baseline-chat";
+  import IcBaselineMode from "~icons/ic/baseline-mode";
+  import IcBaselineInfo from "~icons/ic/baseline-info";
+  import IcBaselineHowToVote from "~icons/ic/baseline-how-to-vote";
+  import IcBaselineFormatListBulleted from "~icons/ic/baseline-format-list-bulleted";
+  import IcBaselineFormatQuote from "~icons/ic/baseline-format-quote";
+  import IcBaseline123 from "~icons/ic/baseline-123";
   import IcBaselineClose from "~icons/ic/baseline-close";
   import IcBaselineRefresh from "~icons/ic/baseline-refresh";
   import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
@@ -55,6 +62,7 @@
   import { donkStorage, resetSettings } from "$lib/donkStorage.svelte";
   import { showToast } from "./+layout.svelte";
   import Navbar from "$lib/Navbar.svelte";
+  import { form } from "$app/server";
 
   let elements;
   /**
@@ -74,7 +82,14 @@
     ModuleRegistry.registerModules([AllCommunityModule]);
 
     let gridOptions = {
-      overlayNoRowsTemplate: `<div><h3>Nothing here <img src="/pics/donk.png" alt="donk" style="height:28px; width:28px;"></h3><br><small>Add options using the text field above</small></div>`,
+      overlayNoRowsTemplate: `
+      <div>
+        <span class="text-xl">
+          Nothing here <img class="align-text-bottom w-8 inline" src="/pics/donk.png" alt="donk">
+        </span>
+        <br>
+        <small>Add options using the text field above</small>
+      </div>`,
       columnDefs: [
         { field: "Command", flex: 1 },
         { field: "Option", flex: 5, editable: true },
@@ -166,9 +181,6 @@
       ffzChannelEmotes: document.getElementById("ffzChannelEmotes"),
       seventvGlobalEmotes: document.getElementById("seventvGlobalEmotes"),
       seventvChannelEmotes: document.getElementById("seventvChannelEmotes"),
-      voters_selected: document.getElementById("voters_selected"),
-      json_selected: document.getElementById("json_selected"),
-      txt_selected: document.getElementById("txt_selected"),
       optionList: document.getElementById("optionList"),
 
       //main
@@ -1268,7 +1280,7 @@
     }
   } //checkNumbers
 
-  function download() {
+  function download(type, format) {
     if (yesNoMode) {
       showToast("Export Data does not support Yea/Nay mode for now :(", "danger", 2000);
       return;
@@ -1277,80 +1289,79 @@
       return;
     }
     let title = elements.questionLabel.innerHTML;
-    if (elements.json_selected.checked) {
-      if (elements.voters_selected.checked) {
-        let votersobj = voters.reduce((obj, user, index) => ({ ...obj, [user]: voters_options[index] }), {});
-        let url = URL.createObjectURL(new Blob([JSON.stringify(votersobj, null, 2)], { type: "application/json" }));
-        let el = document.createElement("a");
-        el.setAttribute("href", url);
-        let filename = !title ? "chatvote list of voters" : title + "-chatvote list of voters";
-        el.setAttribute("download", `${new Date().toISOString()}-${filename}-${USER.value.channel}.json`);
-        document.body.appendChild(el);
-        el.click();
-        setTimeout(function () {
-          document.body.removeChild(el);
-          URL.revokeObjectURL(url);
-        }, 1000);
-      } else {
-        let url = URL.createObjectURL(new Blob([JSON.stringify(vote_results, null, 2)], { type: "application/json" }));
-        let el = document.createElement("a");
-        el.setAttribute("href", url);
-        let filename = !title ? "chatvote poll options" : title + "-chatvote poll options";
-        el.setAttribute("download", `${new Date().toISOString()}-${filename}-${USER.value.channel}.json`);
-        document.body.appendChild(el);
-        el.click();
-        setTimeout(function () {
-          document.body.removeChild(el);
-          URL.revokeObjectURL(url);
-        }, 1000);
-      }
-      return;
+
+    if (type == "voters" && format == "json") {
+      let votersobj = voters.reduce((obj, user, index) => ({ ...obj, [user]: voters_options[index] }), {});
+      let url = URL.createObjectURL(new Blob([JSON.stringify(votersobj, null, 2)], { type: "application/json" }));
+      let el = document.createElement("a");
+      el.setAttribute("href", url);
+      let filename = !title ? "chatvote list of voters" : title + "-chatvote list of voters";
+      el.setAttribute("download", `${new Date().toISOString()}-${filename}-${USER.value.channel}.json`);
+      document.body.appendChild(el);
+      el.click();
+      setTimeout(function () {
+        document.body.removeChild(el);
+        URL.revokeObjectURL(url);
+      }, 1000);
     }
 
-    if (elements.txt_selected.checked) {
-      if (elements.voters_selected.checked) {
-        let votersobj = voters.reduce((obj, user, index) => ({ ...obj, [user]: voters_options[index] }), {});
-        let string = "Username\tOption\n";
-        for (const [key, value] of Object.entries(votersobj)) {
-          string += `${key}\t${value}\n`;
-        }
-        let url = URL.createObjectURL(new Blob([string], { type: "application/json" }));
-        let el = document.createElement("a");
-        el.setAttribute("href", url);
-        let filename = !title ? "chatvote list of voters" : title + "-chatvote list of voters";
-        el.setAttribute("download", `${new Date().toISOString()}-${filename}-${USER.value.channel}.txt`);
-        document.body.appendChild(el);
-        el.click();
-        setTimeout(function () {
-          document.body.removeChild(el);
-          URL.revokeObjectURL(url);
-        }, 1000);
-      } else {
-        let keys = Object.keys(vote_results[0]);
-        let string = "";
-        for (let index = 0, j = keys.length; index < j; index++) {
-          string += keys[index] + "\t";
+    if (type == "voters" && format == "txt") {
+      let votersobj = voters.reduce((obj, user, index) => ({ ...obj, [user]: voters_options[index] }), {});
+      let string = "Username\tOption\n";
+      for (const [key, value] of Object.entries(votersobj)) {
+        string += `${key}\t${value}\n`;
+      }
+      let url = URL.createObjectURL(new Blob([string], { type: "application/json" }));
+      let el = document.createElement("a");
+      el.setAttribute("href", url);
+      let filename = !title ? "chatvote list of voters" : title + "-chatvote list of voters";
+      el.setAttribute("download", `${new Date().toISOString()}-${filename}-${USER.value.channel}.txt`);
+      document.body.appendChild(el);
+      el.click();
+      setTimeout(function () {
+        document.body.removeChild(el);
+        URL.revokeObjectURL(url);
+      }, 1000);
+    }
+
+    if (type == "options" && format == "json") {
+      let url = URL.createObjectURL(new Blob([JSON.stringify(vote_results, null, 2)], { type: "application/json" }));
+      let el = document.createElement("a");
+      el.setAttribute("href", url);
+      let filename = !title ? "chatvote poll options" : title + "-chatvote poll options";
+      el.setAttribute("download", `${new Date().toISOString()}-${filename}-${USER.value.channel}.json`);
+      document.body.appendChild(el);
+      el.click();
+      setTimeout(function () {
+        document.body.removeChild(el);
+        URL.revokeObjectURL(url);
+      }, 1000);
+    }
+
+    if (type == "options" && format == "txt") {
+      let keys = Object.keys(vote_results[0]);
+      let string = "";
+      for (let index = 0, j = keys.length; index < j; index++) {
+        string += keys[index] + "\t";
+      }
+      string += "\n";
+      for (let index = 0, j = vote_results.length; index < j; index++) {
+        for (const [key, value] of Object.entries(vote_results[index])) {
+          string += value + "\t";
         }
         string += "\n";
-        for (let index = 0, j = vote_results.length; index < j; index++) {
-          for (const [key, value] of Object.entries(vote_results[index])) {
-            string += value + "\t";
-          }
-          string += "\n";
-        }
-        let url = URL.createObjectURL(new Blob([string], { type: "application/json" }));
-        let el = document.createElement("a");
-        el.setAttribute("href", url);
-        let filename = !title ? "chatvote poll options" : title + "-chatvote poll options";
-        el.setAttribute("download", `${new Date().toISOString()}-${filename}-${USER.value.channel}.txt`);
-        document.body.appendChild(el);
-        el.click();
-        setTimeout(function () {
-          document.body.removeChild(el);
-          URL.revokeObjectURL(url);
-        }, 1000);
       }
-      return;
+      let url = URL.createObjectURL(new Blob([string], { type: "application/json" }));
+      let el = document.createElement("a");
+      el.setAttribute("href", url);
+      let filename = !title ? "chatvote poll options" : title + "-chatvote poll options";
+      el.setAttribute("download", `${new Date().toISOString()}-${filename}-${USER.value.channel}.txt`);
+      document.body.appendChild(el);
+      el.click();
+      setTimeout(function () {
+        document.body.removeChild(el);
+        URL.revokeObjectURL(url);
+      }, 1000);
     }
   } //download
 
@@ -1722,9 +1733,10 @@
 
   function changeSuggestionCommand() {
     document.getElementById("settingsDrawer").checked = true;
-    elements.suggestionPrefix.focus();
-    elements.suggestionPrefix.select();
-    elements.suggestionPrefix.scrollIntoView();
+    setTimeout(() => {
+      elements.suggestionPrefix.focus();
+      elements.suggestionPrefix.select();
+    }, 500);
   } //changeSuggestionCommand
 
   let overlayID;
@@ -1964,12 +1976,17 @@
 </dialog>
 
 <dialog id="bulkAddModal" class="modal">
-  <div class="modal-box">
+  <div class="modal-box max-w-5xl w-fit">
     <form method="dialog">
       <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
     </form>
-    <h3 class="text-lg font-bold">Add multiple options</h3>
-    <textarea class="form-control" placeholder="1 option per line" id="optionList" style="white-space: pre-wrap" rows="9"></textarea>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend text-lg font-bold"><IcBaselineFormatListBulleted class="text-align-bottom" />Add multiple options</legend>
+      <textarea class="textarea w-100" placeholder="Type your options here" id="optionList" style="white-space: pre-wrap;" rows="9"></textarea>
+      <div class="label">1 option per line</div>
+    </fieldset>
+
     <div class="modal-action">
       <form method="dialog">
         <button type="submit" class="btn btn-secondary">Cancel</button>
@@ -2004,7 +2021,7 @@
 
 <div class="flex justify-center mb-50">
   <div class="w-[80%]">
-    <div class="card bg-base-200 w-full shadow-lg my-3">
+    <div class="card card-border bg-base-200 border-base-300 w-full shadow-lg my-3">
       <div class="card-body py-1">
         <label class="swap swap-rotate top-0 right-0 absolute" style="margin-top: -4px; margin-right: 2px;">
           <input type="checkbox" bind:checked={questionHidden} onchange={refreshData} />
@@ -2017,11 +2034,11 @@
       </div>
     </div>
 
-    <div class="card bg-base-200 w-full shadow-lg my-3" id="enterPollOptionCard">
-      <div class="card-body" id="enterPollOptionCardBody">
-        <h2 class="card-title mt-2">Add poll options:</h2>
-        <div class="join mb-2">
-          <input class="input join-item grow-1" type="text" id="pollOption" placeholder="Poll option" />
+    <div class="card card-border bg-base-200 border-base-300 shadow-lg my-3" id="enterPollOptionCard">
+      <div class="card-body flex-row my-2" id="enterPollOptionCardBody">
+        <span class="text-xl font-bold whitespace-nowrap self-center">Add poll options:</span>
+        <div class="join flex-1">
+          <input class="input join-item w-full flex-1" type="text" id="pollOption" placeholder="Poll option" />
           <div class="tooltip" data-tip="or just press enter :)">
             <button class="btn btn-secondary join-item" id="addOption" onclick={addOption}><IcBaselineAdd />Add</button>
           </div>
@@ -2065,19 +2082,19 @@
     </div>
 
     <div class="tabs tabs-lift my-3">
-      <label class="tab">
+      <label class="tab [--tab-bg:theme(colors.base-200)]">
         <input type="radio" name="mainTabs" checked />
         <IcBaselineToc /> Table view
       </label>
-      <div class="tab-content bg-base-100 border-base-300 p-6">
+      <div class="tab-content bg-base-200 border-base-300 p-6">
         <div id="table" data-ag-theme-mode="bs-dark" style="height:50vh;"></div>
       </div>
 
-      <label class="tab">
+      <label class="tab [--tab-bg:theme(colors.base-200)]">
         <input type="radio" name="mainTabs" />
         <IcBaselineStackedBarChart style="transform: rotateZ(90deg)" /> Chart view
       </label>
-      <div class="tab-content bg-base-100 border-base-300 p-6">
+      <div class="tab-content bg-base-200 border-base-300 p-6">
         <div id="chartDiv" class="row">
           <small id="voteHint" style="height: 0px" class="text-center"></small>
           <canvas id="chartCanvas"></canvas>
@@ -2098,11 +2115,11 @@
         </div>
       </div>
 
-      <label class="tab">
+      <label class="tab [--tab-bg:theme(colors.base-200)]">
         <input type="radio" name="mainTabs" />
         <img src="/pics/yeanay.webp" alt="yeanay" style="height: 20px" />Mode
       </label>
-      <div class="tab-content bg-base-100 border-base-300 p-6">
+      <div class="tab-content bg-base-200 border-base-300 p-6">
         <div class="row">
           <div class="col">
             Type <img src="/pics/yea.webp" alt="yea" style="height: 24px; width: 24px" />|yes or <img src="/pics/nay.webp" alt="nay" style="height: 24px; width: 24px" />|no in chat to vote
@@ -2125,11 +2142,11 @@
         </div>
       </div>
 
-      <label id="overlayTabButton" class="tab" style="display: none;">
+      <label class="tab [--tab-bg:theme(colors.base-200)]" id="overlayTabButton" style="display: none;">
         <input type="radio" name="mainTabs" />
         <IcBaselineLayers /> Overlay
       </label>
-      <div class="tab-content bg-base-100 border-base-300 p-6">
+      <div class="tab-content bg-base-200 border-base-300 p-6">
         <div class="input-group my-3">
           <span class="input-group-text">Overlay URL</span>
           <input
@@ -2158,73 +2175,69 @@
       </div>
     </div>
 
-    <div class="flex flex-row my-3">
-      <div class="join">
+    <div class="flex flex-row flex-wrap gap-2">
+      <div class="join flex-none me-3">
         <button class="btn btn-success join-item defaultbtn" id="enableVoting" data-bs-title="Voting disabled" data-bs-content="A viewer is trying to vote but voting is disabled">
           <span id="enableVotingText">Start Voting</span>
         </button>
         <button class="btn btn-success join-item defaultbtn p-1" id="enableVotingDropdown" popovertarget="votingSettingsDropdown" style="anchor-name:--votingSettingsDropdownAnchor">
-          <IcBaselineArrowDropDown />
+          <IcBaselineSettings />
         </button>
       </div>
-      <div class="dropdown dropdown-center menu w-100 rounded-box bg-base-100 shadow-sm" popover id="votingSettingsDropdown" style="position-anchor:--votingSettingsDropdownAnchor">
+      <div
+        class="dropdown dropdown-top dropdown-center menu w-90 overflow-visible rounded-box bg-base-200 shadow-sm"
+        popover
+        id="votingSettingsDropdown"
+        style="position-anchor:--votingSettingsDropdownAnchor"
+      >
         <div class="p-4">
-          <h6>Voting mode</h6>
-
-          <div class="form-check mb-3">
-            <input class="form-check-input" type="radio" name="votingmode" id="voteWithNumbers" aria-describedby="voteWithNumbersdesc" checked />
-            <label class="form-check-label" for="voteWithNumbers">
-              Type number to vote
-
-              <IcBaselineHelp
-                class="cursor-pointer"
-                data-bs-toggle="tooltip"
-                data-bs-custom-class="wide-tooltip"
-                data-bs-placement="auto"
-                data-bs-html="true"
-                data-bs-title="<img src='/pics/m2.webp'/>"
-              />
-            </label>
-            <small id="voteWithNumbersdesc" class="text-body-secondary"> <br />Viewers vote by typing the number of the option (1, 2)</small>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="votingmode" id="voteWithText" aria-describedby="voteWithTextdesc" />
-            <label class="form-check-label" for="voteWithText">
-              Type option to vote
-
-              <IcBaselineHelp
-                class="cursor-pointer"
-                data-bs-toggle="tooltip"
-                data-bs-custom-class="wide-tooltip"
-                data-bs-placement="auto"
-                data-bs-html="true"
-                data-bs-title="<img src='/pics/m3.webp'/>"
-              />
-            </label>
-            <small id="voteWithTextdesc" class="text-body-secondary"> <br />Viewers vote by typing the option name (option1, option2).</small>
-          </div>
-          <hr />
-
+          <span class="text-xl font-bold"><IcBaselineMode class="inline align-text-bottom" />Voting mode</span>
           <div class="mb-3">
-            <label for="timerValueMinutes" class="form-label"><IcBaselineTimer />Poll timer</label>
-            <div class="input-group mb-3">
-              <input type="number" min="0" value="0" class="form-control" id="timerValueMinutes" onchange={saveSettings} aria-describedby="timerDesc" />
-              <span class="input-group-text" id="timerDesc">minutes</span>
+            <input class="radio" type="radio" name="votingmode" id="voteWithNumbers" aria-describedby="voteWithNumbersdesc" checked />
+            <label for="voteWithNumbers"><IcBaseline123 class="inline text-lg" />Numbers</label>
+            <div class="tooltip tooltip-right align-text-bottom">
+              <div class="tooltip-content max-w-[70vw]">
+                <img src="/pics/m2.webp" alt="vote with numbers example" />
+              </div>
+              <IcBaselineHelp />
             </div>
-            <div class="form-text">Timer automatically starts when you start voting. Set to 0 to disable the timer</div>
+            <br />
+            <small id="voteWithNumbersdesc" class="opacity-70">Viewers vote by typing the number of the option (1, 2)</small>
+            <br />
+            <input class="radio" type="radio" name="votingmode" id="voteWithText" aria-describedby="voteWithTextdesc" />
+            <label for="voteWithText"><IcBaselineFormatQuote class="inline text-lg" />Option name</label>
+            <div class="tooltip tooltip-right align-text-bottom">
+              <div class="tooltip-content max-w-[70vw]">
+                <img src="/pics/m3.webp" alt="vote with option name example" />
+              </div>
+              <IcBaselineHelp />
+            </div>
+            <br />
+            <small id="voteWithTextdesc" class="opacity-70">Viewers vote by typing the option name (option1, option2)</small>
           </div>
+
+          <div class="divider"></div>
+
+          <span class="text-xl font-bold"><IcBaselineTimer class="inline align-text-bottom" />Poll timer</span>
+          <label class="input">
+            <input type="number" min="0" value="0" id="timerValueMinutes" onchange={saveSettings} />
+            <span class="label">minutes</span>
+          </label>
+          <br />
+          <small class="opacity-70">Timer automatically starts when you start voting. Set to 0 to disable the timer</small>
         </div>
       </div>
 
-      <div class="join">
+      <div class="join flex-none me-3">
         <button
-          class="btn btn-success join-item defaultbtn"
+          class="btn btn-success join-item defaultbtn block"
           id="enableSuggestions"
           data-bs-title="Viewer suggestions disabled"
           data-bs-content="A viewer is trying to post a suggestion but viewer suggestions are disabled"
         >
-          <span id="enableSuggestionsText">Enable viewer suggestions</span><br />
-          <small id="suggestionsCommand" class="notranslate">!suggest</small>
+          <span id="enableSuggestionsText" class="text-lg">Enable viewer suggestions</span>
+          <br />
+          <span id="suggestionsCommand" class="notranslate">!suggest</span>
         </button>
         <button
           class="btn btn-success join-item defaultbtn p-1"
@@ -2232,141 +2245,147 @@
           popovertarget="suggestionSettingsDropdown"
           style="anchor-name:--suggestionSettingsDropdownAnchor"
         >
-          <IcBaselineArrowDropDown />
+          <IcBaselineSettings />
         </button>
       </div>
-      <div class="dropdown dropdown-start menu w-100 rounded-box bg-base-100 shadow-sm" popover id="suggestionSettingsDropdown" style="position-anchor:--suggestionSettingsDropdownAnchor">
+      <div
+        class="dropdown dropdown-top dropdown-center menu w-90 rounded-box bg-base-200 shadow-sm"
+        popover
+        id="suggestionSettingsDropdown"
+        style="position-anchor:--suggestionSettingsDropdownAnchor"
+      >
         <div class="p-4">
-          <div class="input-group">
-            <span class="input-group-text">Per user suggestion limit</span>
-            <input
-              type="number"
-              id="suggestionLimitUser"
-              onchange={saveSettings}
-              style="max-width: 5em"
-              class="form-control"
-              min="0"
-              value="1"
-              step="1"
-              aria-label="Text input with checkbox for user suggestion limit"
-            />
-          </div>
-          <small class="text-body-secondary">How many suggestions each viewer can send. 0=unlimited</small>
+          <label class="input">
+            <span class="label">Per user suggestion limit</span>
+            <input type="number" id="suggestionLimitUser" onchange={saveSettings} min="0" value="1" step="1" />
+          </label>
+          <br />
+          <small class="opacity-70">How many suggestions each viewer can send. 0=unlimited</small>
 
-          <div class="input-group mt-3">
-            <span class="input-group-text">Total suggestion limit</span>
-            <input
-              type="number"
-              id="suggestionLimit"
-              style="max-width: 5em"
-              class="form-control"
-              min="0"
-              value="0"
-              step="1"
-              aria-label="Text input with checkbox for total suggestion limit"
-            />
-          </div>
-          <small class="text-body-secondary">The total amount of suggestions from all viewers. 0=unlimited</small>
-          <hr />
-          The suggestion command can be changed
-          <span onclick={changeSuggestionCommand} style="color: #00bc8c; cursor: pointer">here</span>
+          <br />
+
+          <label class="input mt-3">
+            <span class="label">Total suggestion limit</span>
+            <input type="number" id="suggestionLimit" onchange={saveSettings} min="0" value="0" step="1" />
+          </label>
+          <br />
+          <small class="opacity-70">The total amount of suggestions from all viewers. 0=unlimited</small>
+
+          <div class="divider"></div>
+
+          <span>The suggestion command can be changed <a role="button" class="link link-primary" onclick={changeSuggestionCommand}>here</a></span>
         </div>
       </div>
 
-      <div class="drawer">
+      <div class="drawer w-fit me-3">
         <input id="settingsDrawer" type="checkbox" class="drawer-toggle" />
         <div class="drawer-content">
-          <label for="settingsDrawer" class="btn btn-primary drawer-button defaultbtn"><IcBaselineSettings />Settings</label>
+          <label for="settingsDrawer" class="btn btn-accent drawer-button defaultbtn text-xl"><IcBaselineSettings />Settings</label>
         </div>
         <div class="drawer-side">
           <label for="settingsDrawer" aria-label="close sidebar" class="drawer-overlay"></label>
-          <div class="menu bg-base-200 text-base-content min-h-full w-80 p-4">
-            <div class="card mb-2">
-              <div class="card-body">
-                <div class="form-group">
-                  <label for="suggestionPrefix" class="form-label"> Suggestion command</label>
-                  <input type="text" class="form-control notranslate" id="suggestionPrefix" value="!suggest" aria-describedby="description3" />
-                  <small id="description3" class="text-body-secondary">The command to put before a suggestion. <br />Example: <span class="notranslate">!suggest my summer car</span></small>
-                </div>
-              </div>
-            </div>
+          <div class="menu bg-base-200 text-base-content min-h-full w-100 p-4">
+            <h1 class="text-2xl font-bold mb-2"><IcBaselineSettings class="inline align-text-bottom" />Settings</h1>
 
-            <div class="card mb-2">
-              <div class="card-body">
-                <div id="removeContainer">
-                  <div class="input-group flex-nowrap restart" id="removeDiv">
-                    <label class="input-group-text text-light" for="remove">Keep top</label>
-                    <select id="remove" class="form-control" style="max-width: 4em">
-                      <option selected value="2">2</option>
-                      <option value="3">3</option>
-                      <option value="4">4</option>
-                      <option value="5">5</option>
-                      <option value="6">6</option>
-                      <option value="7">7</option>
-                      <option value="8">8</option>
-                      <option value="9">9</option>
-                      <option value="10">10</option>
-                    </select>
-                    <label class="input-group-text text-light" for="remove">options and</label>
-                    <button class="btn btn-secondary" type="button" onclick={removeAndRestart}>restart<IcBaselineRefresh /></button>
+            <div class="card card-border bg-base-100 mb-2">
+              <div class="card-body w-90 p-2">
+                <div class="join">
+                  <div>
+                    <button class="btn btn-outline btn-accent join-item pointer-events-none p-2">Keep top</button>
                   </div>
+                  <select class="select select-accent join-item w-15" id="remove">
+                    <option selected value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                  </select>
+                  <button class="btn btn-outline btn-accent join-item pointer-events-none p-2">options and</button>
+                  <button class="btn btn-accent join-item" onclick={removeAndRestart}>restart<IcBaselineRefresh /></button>
                 </div>
               </div>
             </div>
 
-            <div class="card mb-2">
-              <div class="card-body">
-                <div class="form-check form-switch mb-3">
-                  <input type="checkbox" class="form-check-input" id="multiChoice" aria-describedby="multiChoiceDesc" />
-                  <label class="form-check-label" for="multiChoice"> <IcBaselinePlusOne /> Allow multiple choices</label><br />
-                  <small id="multiChoiceDesc" class="text-body-secondary">
+            <div class="card card-border bg-base-100 mb-2">
+              <div class="card-body w-90 p-2">
+                <h2 class="card-title"><IcBaselineChat />Chat commands</h2>
+                <label class="input">
+                  <span class="label">Suggestion command</span>
+                  <input class="notranslate" type="text" id="suggestionPrefix" value="!suggest" placeholder="!suggest" />
+                </label>
+                <small class="opacity-70">The command to put before a suggestion<br /><span class="notranslate">Example: !suggest my summer car</span></small>
+              </div>
+            </div>
+
+            <div class="card card-border bg-base-100 mb-2">
+              <div class="card-body w-90 p-2">
+                <h2 class="card-title"><IcBaselineHowToVote />Voting settings</h2>
+                <div class="mb-3">
+                  <label class="label">
+                    <input type="checkbox" id="multiChoice" class="toggle toggle-success" onchange={saveSettings} />
+                    <IcBaselinePlusOne /> <span class="font-bold">Allow multiple choices</span>
+                  </label>
+                  <br />
+                  <small id="multiChoiceDesc" class="opacity-70">
                     Viewers will be able to vote for multiple options at once.<br />
                     <span id="multiChoiceExample">Example: <span class="notranslate">1 2 3</span></span>
                   </small>
                   <br />
                   <small class="yesno-warning text-warning" style="display: none"> Does not support <img src="/pics/yeanay.webp" alt="yeanay" style="height: 1.2em" />Mode </small>
                 </div>
-                <div class="form-check form-switch mb-3">
-                  <input type="checkbox" class="form-check-input" id="allowChange" onchange={saveSettings} aria-describedby="allowChangeDesc" />
-                  <label class="form-check-label" for="allowChange"> <IcBaselineSwapHoriz /> Allow vote changing</label><br />
-                  <small id="allowChangeDesc" class="text-body-secondary">
-                    Viewers will be able to change the option they selected by voting again. They can change their vote only once.</small
-                  ><br />
+                <div class="mb-3">
+                  <label class="label">
+                    <input type="checkbox" id="allowChange" class="toggle toggle-success" onchange={saveSettings} />
+                    <IcBaselineSwapHoriz /> <span class="font-bold">Allow vote changing</span>
+                  </label>
+                  <br />
+                  <small class="opacity-70"> Viewers will be able to change the option they selected by voting again. They can change their vote only once </small>
+                  <br />
                   <small class="yesno-warning text-warning" style="display: none"> Does not support <img src="/pics/yeanay.webp" alt="yeanay" style="height: 1.2em" />Mode </small>
                 </div>
-                <div class="form-check form-switch">
-                  <input type="checkbox" class="form-check-input" id="subMode" aria-describedby="submodedesc" />
-                  <label class="form-check-label" for="subMode"> <IcBaselineAttachMoney /> Subscribers only poll</label>
-                  <small id="submodedesc" class="text-body-secondary"><br />Viewers that are not subscribed to your channel will not be able to vote or make suggestions. </small>
+
+                <div class="mb-3">
+                  <label class="label">
+                    <input type="checkbox" id="subMode" class="toggle toggle-success" onchange={saveSettings} />
+                    <IcBaselineAttachMoney /> <span class="font-bold">Subscribers only poll</span>
+                  </label>
+                  <br />
+                  <small class="opacity-70"> Viewers that are not subscribed to your channel will not be able to vote or make suggestions </small>
                 </div>
               </div>
             </div>
 
-            <div class="card mb-2">
-              <div class="card-body">
-                <div class="form-check form-switch mb-3">
-                  <input type="checkbox" class="form-check-input" id="showChat" aria-describedby="showChatDesc" />
-                  <label class="form-check-label" id="showChatDesc" for="showChat">
-                    <MdiTwitch /> Show chat
+            <div class="card card-border bg-base-100 mb-2">
+              <div class="card-body w-90 p-2">
+                <h2 class="card-title"><IcBaselineHowToVote />asd</h2>
+
+                <div class="mb-3">
+                  <label class="label">
+                    <input type="checkbox" id="showChat" class="toggle toggle-success" onchange={saveSettings} />
+                    <MdiTwitch /> <span class="font-bold">Show chat</span>
                   </label>
-                  <br /><small class="text-body-secondary">Shows your Twitch chat on the right side</small>
+                  <br />
+                  <small class="opacity-70"> Shows your Twitch chat on the right side </small>
                 </div>
 
-                <div class="form-check form-switch mb-3">
-                  <input class="form-check-input" type="checkbox" id="refreshWarningEnabled" onchange={saveSettings} />
-                  <label class="form-check-label" for="refreshWarningEnabled"> <IcBaselineNotificationImportant /> Enable close/refresh warning</label>
-                  <br /><small class="text-body-secondary">Shows a warning before leaving/refreshing the site so that you don't accidentally lose your poll results.</small>
+                <div class="mb-3">
+                  <label class="label">
+                    <input type="checkbox" id="refreshWarningEnabled" class="toggle toggle-success" onchange={saveSettings} />
+                    <IcBaselineNotificationImportant /> <span class="font-bold">Enable close/refresh warning</span>
+                  </label>
+                  <br />
+                  <small class="opacity-70"> Shows a warning before leaving/refreshing the site so that you don't accidentally lose your poll results </small>
                 </div>
 
-                <div class="form-check form-switch mb-3">
-                  <input class="form-check-input" type="checkbox" id="linkPreviewThumbnailsEnabled" />
-                  <label class="form-check-label" for="linkPreviewThumbnailsEnabled"> <IcBaselinePreview /> Show thumbnails in link preview </label>
-                  <br /><small class="text-body-secondary"><b class="text-danger">Use with caution; viewers might link images that break Twitch's TOS.</b></small>
-                </div>
-
-                <div class="input-group">
-                  <span class="input-group-text"><IcBaselineCelebration />Confetti</span>
-                  <select class="form-select" id="confettiLevel" style="max-width: 7em">
+                <div class="join">
+                  <div>
+                    <button class="btn btn-outline btn-secondary join-item pointer-events-none p-2"><IcBaselineCelebration />Confetti</button>
+                  </div>
+                  <select class="select select-secondary join-item" id="confettiLevel" onchange={saveSettings}>
                     <option value="0" selected>Off</option>
                     <option value="1">Low</option>
                     <option value="2">Medium</option>
@@ -2374,80 +2393,85 @@
                     <option value="4">INSANE ZULOL</option>
                   </select>
                 </div>
-                <small class="text-body-secondary">Confetti triggers when the timer runs out or when you pick a random option.</small>
+                <small class="opacity-70">Confetti triggers when the timer runs out or when you pick a random option.</small>
               </div>
             </div>
 
-            <div class="card mb-2">
-              <div class="card-body">
-                <div class="input-group mb-0">
-                  <span class="input-group-text blueborder">Refresh 3rd party emotes</span>
-                  <button class="btn btn-outline-info" type="button" onclick={getEmotes}><IcBaselineRefresh /></button>
+            <div class="card card-border bg-base-100 mb-2">
+              <div class="card-body w-90 p-2">
+                <h2 class="card-title"><IcBaselineHowToVote />asd</h2>
+
+                <div class="mb-3">
+                  <label class="label">
+                    <input type="checkbox" id="linkPreviewThumbnailsEnabled" class="toggle toggle-success" onchange={saveSettings} />
+                    <IcBaselinePreview /> <span class="font-bold">Show thumbnails in link preview</span>
+                  </label>
+                  <br />
+                  <small class="text-error"> Use with caution; viewers might link images that break Twitch's TOS </small>
                 </div>
-                <div class="text-body-secondary mb-3">
-                  Loaded emotes (global/channel): BTTV: <span id="bttvGlobalEmotes">0</span>/<span id="bttvChannelEmotes">0</span> | FFZ: <span id="ffzGlobalEmotes">0</span>/<span
-                    id="ffzChannelEmotes">0</span
-                  >
+
+                <div class="join">
+                  <div>
+                    <button class="btn btn-outline btn-info join-item pointer-events-none p-2">Refresh 3rd party emotes</button>
+                  </div>
+                  <div>
+                    <button class="btn btn-info join-item p-2" onclick={getEmotes}><IcBaselineRefresh /></button>
+                  </div>
+                </div>
+
+                <div class="opacity-70">
+                  Loaded emotes (global/channel): BTTV:
+                  <span id="bttvGlobalEmotes">0</span>/<span id="bttvChannelEmotes">0</span> | FFZ: <span id="ffzGlobalEmotes">0</span>/<span id="ffzChannelEmotes">0</span>
                   | 7TV: <span id="seventvGlobalEmotes">0</span>/<span id="seventvChannelEmotes">0</span>
                 </div>
+              </div>
+            </div>
 
-                <a
+            <div class="card card-border bg-base-100 mb-2">
+              <div class="card-body w-90 p-2">
+                <h2 class="card-title"><IcBaselineHowToVote />asd</h2>
+
+                <button class="btn btn-error" popovertarget="resetSettingsPopover" style="anchor-name:--resetSettingsPopoverAnchor"><IcBaselineDeleteForever /> Reset all settings </button>
+                <div
+                  class="dropdown dropdown-right menu w-52 rounded-box bg-base-200 border border-red-200 shadow-sm p-3"
+                  popover
                   id="resetSettingsPopover"
-                  tabindex="0"
-                  class="btn btn-danger"
-                  role="button"
-                  data-bs-toggle="popover"
-                  data-bs-trigger="focus"
-                  data-bs-title="Are you sure?"
-                  data-bs-content="All settings will be reset and the page will reload<br>
-          <button type='button' class='btn btn-danger float-end my-3' onclick='resetSettings()'>
-          <i class='material-icons notranslate'>delete_forever</i>Reset settings</button>"
+                  style="position-anchor:--resetSettingsPopoverAnchor"
                 >
-                  <IcBaselineDeleteForever />Reset all settings
-                </a>
-                <br />
-                <small class="text-body-secondary">Resets all settings and reloads the page.</small>
+                  <span class="text-lg font-bold">Are you sure?</span><br />
+                  All settings will be reset and the page will reload<br />
+                  <button type="button" class="btn btn-error float-end my-3" onclick={() => resetSettings("CHATVOTE")}> <IcBaselineDeleteForever />Reset settings</button>
+                </div>
+                <small class="text-body-secondary">Resets all settings and reloads the page</small>
+              </div>
+            </div>
+            <div class="card card-border bg-base-100 mb-2">
+              <div class="card-body w-90 p-2">
+                <h2 class="card-title"><IcBaselineFileDownload />Export Data</h2>
+
+                <span class="text-lg font-bold">List of voters</span>
+                <div class="join mb-3">
+                  <button class="btn btn-primary join-item" onclick={() => download("voters", "json")}><IcBaselineFileDownload />JSON</button>
+                  <button class="btn btn-primary join-item" onclick={() => download("voters", "txt")}><IcBaselineFileDownload />TXT</button>
+                </div>
+
+                <span class="text-lg font-bold">Poll options</span>
+                <div class="join">
+                  <button class="btn btn-primary join-item" onclick={() => download("options", "json")}><IcBaselineFileDownload />JSON</button>
+                  <button class="btn btn-primary join-item" onclick={() => download("options", "txt")}><IcBaselineFileDownload />TXT</button>
+                </div>
               </div>
             </div>
 
-            <div class="card mb-2">
-              <div class="card-body">
-                <h5 class="card-title">Export Data</h5>
-                <label>Data to be Exported:</label>
-                <div class="form-group mb-3">
-                  <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="voters_selected" value="List of Voters" checked />
-                    <label class="form-check-label" for="voters_selected">List of Voters</label>
-                  </div>
-                  <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="options_selected" value="Poll Options" />
-                    <label class="form-check-label" for="options_selected">Poll Options</label>
-                  </div>
-                </div>
-                <label>File Format:</label>
-                <div class="form-group mb-3">
-                  <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="inlineRadioOptions2" id="json_selected" value="JSON" checked />
-                    <label class="form-check-label" for="json_selected">JSON</label>
-                  </div>
-                  <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="inlineRadioOptions2" id="txt_selected" value="TXT" />
-                    <label class="form-check-label" for="txt_selected">TXT</label>
-                  </div>
-                </div>
-
-                <button type="button" onclick={download} class="btn btn-primary"><IcBaselineFileDownload /> Download</button>
-              </div>
-            </div>
-
-            <div class="card mb-2">
-              <div class="card-body">
-                <h5>Contact info:</h5>
+            <div class="card card-border bg-base-100 mb-2">
+              <div class="card-body w-90 p-2">
+                <h2 class="card-title"><IcBaselineInfo />About</h2>
                 <p>
-                  Site by <a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/badoge">badoge</a> :) <br />If you find any issues or if you have suggestions or questions,
-                  you can contact me: <br /><a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/popout/badoge/chat?popout=">in this chat</a> <br />or on
-                  <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/FR8bgQdPUT">discord</a> <br />or by
-                  <a href="mailto:contact@chat.vote">email</a>
+                  Site by <a class="link" target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/badoge">badoge</a> :)<br />
+                  If you find any issues or if you have suggestions or questions, you can contact me:<br />
+                  <a class="link" target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/popout/badoge/chat?popout=">in this Twitch chat</a><br />
+                  or on <a class="link" target="_blank" rel="noopener noreferrer" href="https://discord.gg/FR8bgQdPUT">Discord</a><br />
+                  or by <a class="link" href="mailto:contact@chat.vote">email</a>
                 </p>
               </div>
             </div>
@@ -2455,16 +2479,16 @@
         </div>
       </div>
 
-      <div class="justify-self-end join" role="group" aria-label="Restart, random option, hide score, and delete all buttons">
+      <div class="join ml-auto" role="group" aria-label="Restart, random option, hide score, and delete all buttons">
         <div class="tooltip tooltip-bottom" data-tip="Restart the poll with the same options">
           <button class="btn btn-warning join-item quick-actions" id="restartPoll" onclick={restartPoll}>
-            <IcBaselineRefresh />
+            <IcBaselineRefresh class="text-2xl" />
           </button>
         </div>
 
         <div class="tooltip tooltip-bottom" data-tip="Pick a random option">
           <button class="btn btn-info join-item quick-actions" id="pickRandom">
-            <IcBaselineCasino />
+            <IcBaselineCasino class="text-2xl" />
           </button>
         </div>
 
@@ -2472,19 +2496,25 @@
           <button class="btn btn-secondary join-item quick-actions" id="hideScore" onclick={hideScore}>
             <label class="swap">
               <input type="checkbox" onclick={hideScore} bind:checked={scoreHidden} />
-              <div class="swap-on"><IcBaselineVisibilityOff /></div>
-              <div class="swap-off"><IcBaselineVisibility /></div>
+              <div class="swap-on"><IcBaselineVisibilityOff class="text-2xl" /></div>
+              <div class="swap-off"><IcBaselineVisibility class="text-2xl" /></div>
             </label>
           </button>
         </div>
 
         <div class="tooltip tooltip-bottom" data-tip="Remove all options from the poll">
           <button class="btn btn-error join-item quick-actions" id="deleteAll" popovertarget="deleteAllDropdown" style="anchor-name:--deleteAllDropdownAnchor">
-            <IcBaselineDeleteForever />
+            <IcBaselineDeleteForever class="text-2xl" />
           </button>
-          <div class="dropdown dropdown-center menu w-52 rounded-box bg-base-100 shadow-sm" popover id="deleteAllDropdown" style="position-anchor:--deleteAllDropdownAnchor">
+          <div
+            class="dropdown dropdown-end menu w-52 rounded-box border border-red-200 bg-base-200 shadow-lg p-3"
+            popover
+            id="deleteAllDropdown"
+            style="position-anchor:--deleteAllDropdownAnchor"
+          >
+            <span class="text-lg font-bold">Are you sure?</span><br />
             All poll options will be deleted<br />
-            <button type="button" class="btn btn-error float-end my-3" onclick={resetPoll}>
+            <button class="btn btn-error rounded float-end" onclick={resetPoll}>
               <IcBaselineDeleteForever />Delete all
             </button>
           </div>
@@ -2558,11 +2588,6 @@
   .quick-actions {
     height: 62px !important;
     width: 62px !important;
-  }
-
-  #removeContainer {
-    max-width: 400px;
-    float: left;
   }
 
   #linkpreview {

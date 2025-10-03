@@ -6,7 +6,7 @@
   let { messageHandler = null, timeoutHandler = null, messageDeletedHandler = null, loginEvent = null } = $props();
 </script>
 
-<div class="navbar bg-base-200 shadow-sm">
+<div class="navbar bg-base-200 shadow-md py-0">
   <div class="navbar-start">
     <div class="dropdown">
       <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
