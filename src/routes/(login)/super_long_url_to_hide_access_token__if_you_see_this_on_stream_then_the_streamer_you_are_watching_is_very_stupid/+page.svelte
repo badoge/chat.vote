@@ -31,18 +31,18 @@
       } catch (error) {
         console.log("error", error);
         localStorage.setItem("loginStatus", "logged_out");
-        localStorage.setItem("USER_TEMP", JSON.stringify({}));
+        localStorage.setItem("USER_TEMP", "");
         window.close();
       }
     } else {
       localStorage.setItem("loginStatus", "logged_out");
-      localStorage.setItem("USER_TEMP", JSON.stringify({}));
+      localStorage.setItem("USER_TEMP", "");
       window.close();
     }
 
     window.onbeforeunload = function () {
       localStorage.setItem("loginStatus", "logged_out");
-      localStorage.setItem("USER_TEMP", JSON.stringify({}));
+      localStorage.setItem("USER_TEMP", "");
     }; //onbeforeunload
   });
 </script>

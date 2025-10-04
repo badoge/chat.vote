@@ -165,7 +165,9 @@ export class DonkStorage {
  * @param {any} value
  */
 export function donkStorage(key, value) {
-  return new DonkStorage(key, value);
+  if (key) {
+    return new DonkStorage(key, value);
+  }
 }
 
 /**

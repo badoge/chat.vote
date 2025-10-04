@@ -39,7 +39,7 @@
 
   let USER = donkStorage("USER", null);
 
-  let RAFFLES = donkStorage("RAFFLES", null).value;
+  let RAFFLES = donkStorage("RAFFLES", null);
 
   let elements;
 

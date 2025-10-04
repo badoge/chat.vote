@@ -48,7 +48,7 @@
           USER.value.access_token = USER_TEMP.access_token;
           USER.value.userID = USER_TEMP.userID;
           USER.value.platform = USER_TEMP.platform;
-          localStorage.setItem("USER_TEMP", JSON.stringify({}));
+          localStorage.setItem("USER_TEMP", "");
           connectIRC();
           loadPFP();
         }
@@ -73,10 +73,8 @@
 
   function connectIRC() {
     chatStatus = { emoji: "🟡", title: "Chat connecting" };
+
     loadBadges(USER.value.channel);
-    if (loginEvent) {
-      loginEvent();
-    }
 
     let options = {
       options: {
@@ -107,6 +105,9 @@
       console.log(`Connected to ${address}:${port}`);
       chatStatus = { emoji: "🟢", title: "Chat connected" };
       //sendUsername(`chat.vote`, USER.value.channel, USER.value.platform == "twitch" ? `twitch - ${USER.value.twitchLogin}` : "youtube");
+      if (loginEvent) {
+        loginEvent();
+      }
     }); //connected
 
     client.on("disconnected", (reason) => {
@@ -127,14 +128,14 @@
     }
     loginStatus = "logged_in";
     localStorage.setItem("loginStatus", "logged_in");
-    localStorage.setItem("USER_TEMP", JSON.stringify({}));
+    localStorage.setItem("USER_TEMP", "");
 
     USER.value.channel = channel;
     USER.value.twitchLogin = false;
     USER.value.access_token = "";
     USER.value.userID = await getUserID(channel);
     USER.value.platform = "twitch";
-    localStorage.setItem("USER_TEMP", JSON.stringify({}));
+    localStorage.setItem("USER_TEMP", "");
     connectIRC();
     loadPFP();
   } //manualConnect
@@ -158,7 +159,7 @@
   function login() {
     loginStatus = "login_prompted";
     localStorage.setItem("loginStatus", "login_prompted");
-    localStorage.setItem("USER_TEMP", JSON.stringify({}));
+    localStorage.setItem("USER_TEMP", "");
     window.open("/prompt", "loginWindow", "toolbar=0,status=0,scrollbars=0,width=500px,height=800px");
     return false;
   } //login
@@ -166,41 +167,29 @@
   function logout() {
     loginStatus = "logged_out";
     localStorage.setItem("loginStatus", "logged_out");
-    localStorage.setItem("USER_TEMP", JSON.stringify({}));
+    localStorage.setItem("USER_TEMP", "");
     resetSettings("USER");
   } //logout
 </script>
 
 <dialog id="loginExpiredModal" class="modal">
   <div class="modal-box">
-    <h3 class="text-lg font-bold">Login expired</h3>
+    <h3 class="text-xl font-bold mb-3">Login expired</h3>
 
-    <div class="row justify-content-center">
-      Renew login:<br />
-      <button type="button" data-bs-dismiss="modal" onclick={login} class="btn btn-twitch"><MdiTwitch />Sign in with Twitch</button>
-      <br /><small class="text-body-secondary">Logins expire after 2 months.<br />Or after you change your password.</small>
-    </div>
+    <button type="button" data-bs-dismiss="modal" onclick={login} class="btn btn-twitch"><MdiTwitch />Renew login</button>
+    <br />
+    <small class="opacity-70">
+      Logins expire when: <i>2 months pass</i> <strong>OR</strong> <i>you change your email/password</i> <strong>OR</strong> <i>you disconnect the app in the Twitch settings</i>
+    </small>
 
     <div class="modal-action">
       <form method="dialog">
-        <button
-          type="button"
-          class="btn btn-danger"
-          data-bs-toggle="tooltip"
-          data-bs-placement="top"
-          data-bs-title="Will reset everything so you can login again."
-          data-bs-dismiss="modal"
-          onclick={() => resetSettings("USER")}
-        >
-          Reset
+        <button type="button" class="btn btn-error" onclick={() => resetSettings("USER")}>
+          <IcBaselineLogout />Log out
         </button>
       </form>
     </div>
   </div>
-
-  <form method="dialog" class="modal-backdrop">
-    <button>close</button>
-  </form>
 </dialog>
 
 {#if loginStatus == "logged_out"}
@@ -208,56 +197,56 @@
     <button class="btn btn-twitch join-item" onclick={login}><MdiTwitch />Sign in with Twitch</button>
     <button class="btn btn-twitch join-item p-1" popovertarget="loginDropdown" style="anchor-name:--loginDropdownAnchor"><IcBaselineArrowDropDown /></button>
   </div>
-  <div class="dropdown dropdown-end menu w-52 rounded-box bg-base-100 shadow-sm" popover id="loginDropdown" style="position-anchor:--loginDropdownAnchor">
-    <div class="p-4" style="width: 300px">
-      <label for="channelName" class="form-label">Connect to chat directly</label>
-      <div class="input-group">
-        <span class="input-group-text" id="directLoginChannel">twitch.tv/</span>
-        <input type="text" class="form-control" id="channelName" placeholder="Username" bind:value={channelInput} onkeydown={handleKeydown} aria-describedby="directLoginChannel" />
-      </div>
-      <small class="text-body-secondary">Some features will be unavailable if you connect directly</small>
-      <br />
-      <button type="button" onclick={manualConnect} class="btn btn-primary float-end mb-3">Connect</button>
-    </div>
+  <div class="dropdown dropdown-end border border-purple-500 menu w-70 rounded-box bg-base-300 shadow-sm p-3" popover id="loginDropdown" style="position-anchor:--loginDropdownAnchor">
+    <label class="text-lg font-bold" for="channelName">Connect to chat anonymously</label>
+
+    <label class="input">
+      <span class="label">twitch.tv/</span>
+      <input type="text" id="channelName" placeholder="Username" bind:value={channelInput} onkeydown={handleKeydown} />
+    </label>
+    <br />
+    <small class="opacity-70">Some features will be unavailable if you connect anonymously</small>
+    <br />
+    <button type="button" onclick={manualConnect} class="btn btn-twitch float-end">Connect</button>
   </div>
 {:else if loginStatus == "login_prompted"}
-  <div class="btn-group" role="group" aria-label="log in button group">
-    <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status" style="width: 1.5em; height: 1.5em"><span class="visually-hidden">Loading...</span></div></button>
-    <div class="btn-group" role="group">
-      <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Log out button dropdown"> </button>
-      <ul class="dropdown-menu dropdown-menu-lg-end" aria-label="Log out">
-        <li><button class="dropdown-item" type="button" onclick={logout}><IcBaselineLogout />Log out</button></li>
-      </ul>
-    </div>
+  <div class="join">
+    <button class="btn btn-twitch join-item" aria-label="Loading..."><span class="loading loading-spinner loading-xl"></span></button>
+    <button class="btn btn-twitch join-item p-1" popovertarget="cancelLoginDropdown" style="anchor-name:--cancelLoginDropdownAnchor"><IcBaselineArrowDropDown /></button>
   </div>
+  <ul class="dropdown dropdown-end border border-purple-500 menu rounded-box bg-base-300 shadow-sm p-1" popover id="cancelLoginDropdown" style="position-anchor:--cancelLoginDropdownAnchor">
+    <li><button onclick={logout}><IcBaselineLogout />Log out</button></li>
+  </ul>
 {:else if loginStatus == "logged_in"}
-  <div class="input-group">
-    <span class="input-group-text pfp-container">
+  <div class="join">
+    <button class="btn btn-outline btn-accent join-item pointer-events-none pfp-container">
       {#if pfpURL}
-        <img src={pfpURL} alt="profile pic" class="rounded-start pfp" />
+        <img src={pfpURL} alt="profile pic" class="rounded-s pfp" />
       {:else}
-        <div class="placeholder-glow" style="width: 100%; height: 100%">
-          <span class="placeholder rounded-start" style="width: 100%; height: 100%"></span>
-        </div>
+        <div class="skeleton rounded-s rounded-e-none pfp-container"></div>
       {/if}
-    </span>
+    </button>
 
-    <span class="input-group-text border-secondary">{USER.value.channel || "Loading..."}</span>
+    <button class="btn btn-outline btn-accent join-item pointer-events-none text-lg font-bold">{USER?.value.channel || "Loading..."}</button>
 
-    <span class="input-group-text border-secondary p-0 cursor-pointer" title={chatStatus.title}>{chatStatus.emoji}</span>
+    <div class="tooltip tooltip-bottom" data-tip={chatStatus.title}>
+      <button class="btn btn-outline btn-accent join-item p-0 pointer-events-none">{chatStatus.emoji}</button>
+    </div>
 
-    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Log out button dropdown"></button>
-    <ul class="dropdown-menu dropdown-menu-end">
-      <li><button class="dropdown-item" type="button" onclick={logout}><IcBaselineLogout />Log out</button></li>
-    </ul>
+    <button class="btn btn-accent join-item p-1" popovertarget="logoutnDropdown" style="anchor-name:--logoutnDropdownAnchor"><IcBaselineArrowDropDown /></button>
   </div>
+  <ul class="dropdown dropdown-end border border-accent menu rounded-box bg-base-300 shadow-sm p-1" popover id="logoutnDropdown" style="position-anchor:--logoutnDropdownAnchor">
+    <li><button onclick={logout}><IcBaselineLogout />Log out</button></li>
+  </ul>
+{:else}
+  Something went wrong :(
 {/if}
 
 <style>
   .pfp-container {
     padding: 0;
-    height: 45.3px;
-    width: 45.3px;
+    height: 40px;
+    width: 40px;
   }
   .pfp {
     object-fit: contain;

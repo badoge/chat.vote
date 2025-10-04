@@ -2641,23 +2641,6 @@
     max-height: 50vh;
   }
 
-  .restart > button,
-  .restart > label {
-    border-color: #9e0f60;
-    background-color: #b91372;
-    border-radius: 6px;
-  }
-
-  .restart > select {
-    border-color: #9e0f60;
-    cursor: pointer;
-  }
-
-  .restart > button:hover {
-    background-color: #960e5b;
-    border-color: #9e0f60;
-  }
-
   .timer > button,
   .timer > label {
     border-color: #b8431f;
@@ -2689,18 +2672,6 @@
     font-size: 2rem;
   }
 
-  .redborder {
-    border-color: #e74c3c;
-  }
-
-  .blueborder {
-    border-color: #3498db;
-  }
-
-  .tooltip.show {
-    opacity: 1;
-  }
-
   #chartDiv {
     position: relative;
     height: 80vh;
@@ -2718,10 +2689,6 @@
     max-height: 300px;
     min-height: 50px;
     transition: height 0.2s ease;
-  }
-
-  #quickActions > div {
-    height: 100%;
   }
 
   #restartPoll,
