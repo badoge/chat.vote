@@ -1,7 +1,7 @@
 <script>
-  import { onMount } from "svelte";
-
   import Navbar from "$lib/Navbar.svelte";
+
+  import { onMount } from "svelte";
 
   import { animate, createTimeline, utils, createDraggable } from "animejs";
   import IcBaselineRefresh from "~icons/ic/baseline-refresh";

@@ -1,237 +1,31 @@
 <script>
   import { onMount } from "svelte";
+  import { themeChange } from "theme-change";
+
   let darkTheme = $state(true);
   onMount(async () => {
-    darkTheme = (localStorage.getItem("darkTheme") || "true") === "true";
-    //switchTheme(darkTheme);
+    themeChange(false);
+    darkTheme = localStorage.getItem("theme") === "dim";
   });
 </script>
 
-<div id="theme-label-container">
-  <label id="theme-label">
-    <input id="darkTheme" type="checkbox" checked />
-    <div class="planet"></div>
-    <div class="theme-elements">
-      <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="250" cy="250" r="200" />
-      </svg>
-      <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="250" cy="250" r="200" />
-      </svg>
-      <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="250" cy="250" r="200" />
-      </svg>
-      <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="250" cy="250" r="200" />
-      </svg>
-      <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="250" cy="250" r="200" />
-      </svg>
-      <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="250" cy="250" r="200" />
-      </svg>
-      <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="250" cy="250" r="200" />
-      </svg>
-      <svg version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="250" cy="250" r="200" />
-      </svg>
-    </div>
+<div class="tooltip tooltip-left" data-tip={darkTheme ? "Switch to light theme" : "Switch to dark theme"}>
+  <label class="swap swap-rotate">
+    <!-- this hidden checkbox controls the state -->
+    <input data-toggle-theme="lemonade,dim" type="checkbox" class="theme-controller" name="theme" bind:checked={darkTheme} />
+
+    <!-- sun icon -->
+    <svg class="swap-on h-10 w-10 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path
+        d="M5.64,17l-.71.71a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0l.71-.71A1,1,0,0,0,5.64,17ZM5,12a1,1,0,0,0-1-1H3a1,1,0,0,0,0,2H4A1,1,0,0,0,5,12Zm7-7a1,1,0,0,0,1-1V3a1,1,0,0,0-2,0V4A1,1,0,0,0,12,5ZM5.64,7.05a1,1,0,0,0,.7.29,1,1,0,0,0,.71-.29,1,1,0,0,0,0-1.41l-.71-.71A1,1,0,0,0,4.93,6.34Zm12,.29a1,1,0,0,0,.7-.29l.71-.71a1,1,0,1,0-1.41-1.41L17,5.64a1,1,0,0,0,0,1.41A1,1,0,0,0,17.66,7.34ZM21,11H20a1,1,0,0,0,0,2h1a1,1,0,0,0,0-2Zm-9,8a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V20A1,1,0,0,0,12,19ZM18.36,17A1,1,0,0,0,17,18.36l.71.71a1,1,0,0,0,1.41,0,1,1,0,0,0,0-1.41ZM12,6.5A5.5,5.5,0,1,0,17.5,12,5.51,5.51,0,0,0,12,6.5Zm0,9A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z"
+      />
+    </svg>
+
+    <!-- moon icon -->
+    <svg class="swap-off h-10 w-10 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path
+        d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z"
+      />
+    </svg>
   </label>
 </div>
-
-<style>
-  :root {
-    --bg-planet-bright: #f2c94c;
-    --bg-planet-shadow: #828894;
-    --bg-planet-lightshadow: #d7d7d820;
-    --dot-size: 0.25rem;
-  }
-
-  #theme-label {
-    cursor: pointer;
-    padding: 1rem;
-    position: relative;
-    overflow: hidden;
-    /* To make outline on mobile invisible */
-    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
-  }
-
-  #darkTheme {
-    height: 0;
-    width: 0;
-    visibility: hidden;
-    position: absolute;
-  }
-
-  #theme-label .planet {
-    width: 2rem;
-    height: 2rem;
-    border-radius: 50%;
-    overflow: hidden;
-    background: radial-gradient(3.75em, 99%, transparent 100%);
-    background-color: var(--bg-planet-bright);
-    background-repeat: no-repeat;
-    position: relative;
-    will-change: background;
-    transition: all 400ms ease;
-
-    /* Safari transition issue */
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    transform: translate3d(0, 0, 0);
-  }
-
-  #theme-label .planet::after {
-    content: "";
-    background-color: var(--bg-planet-shadow);
-    width: 2rem;
-    height: 2rem;
-    position: absolute;
-    border-radius: 50%;
-    will-change: opacity, transform, background-color;
-    opacity: 0;
-    transform: translate(2em, -2em);
-    transition:
-      opacity 400ms ease,
-      transform 400ms ease,
-      background-color 400ms ease;
-  }
-
-  .theme-elements {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    transition: transform 400ms ease;
-  }
-
-  .theme-elements svg {
-    position: absolute;
-    width: 7px;
-    height: 7px;
-    opacity: 1;
-    transition:
-      transform 400ms ease,
-      opacity 200ms ease,
-      width 200ms ease,
-      height 200ms ease;
-  }
-
-  .theme-elements svg circle {
-    fill: var(--bg-planet-bright);
-    transition: fill 400ms ease;
-  }
-
-  .theme-elements svg:first-child {
-    transform: translate(1.8em, 0.35em);
-  }
-
-  .theme-elements svg:nth-child(2) {
-    transform: translate(2.8em, 0.7em);
-  }
-
-  .theme-elements svg:nth-child(3) {
-    transform: translate(3.2em, 1.8em);
-  }
-
-  .theme-elements svg:nth-child(4) {
-    transform: translate(2.8em, 2.8em);
-  }
-
-  .theme-elements svg:nth-child(5) {
-    transform: translate(1.8em, 3.2em);
-  }
-
-  .theme-elements svg:nth-child(6) {
-    transform: translate(0.7em, 2.8em);
-  }
-
-  .theme-elements svg:nth-child(7) {
-    transform: translate(0.35em, 1.8em);
-  }
-
-  .theme-elements svg:nth-child(8) {
-    transform: translate(0.7em, 0.7em);
-  }
-
-  #darkTheme:checked + .planet {
-    --bg-planet-bright: #d7d7d8;
-  }
-
-  #darkTheme:checked + .planet::after {
-    opacity: 1;
-    transform: translate(0.6em, -0.5em);
-  }
-
-  #darkTheme:checked ~ .theme-elements {
-    transform: rotate(180deg);
-  }
-
-  #darkTheme:checked ~ .theme-elements svg:first-child {
-    transform: translate(2em, 1em);
-    opacity: 0;
-  }
-
-  #darkTheme:checked ~ .theme-elements svg:nth-child(2) {
-    transform: translate(3em, 1.5em);
-    opacity: 0;
-  }
-
-  #darkTheme:checked ~ .theme-elements svg:nth-child(3) {
-    transform: translate(3em, 2em);
-    opacity: 0;
-  }
-
-  #darkTheme:checked ~ .theme-elements svg:nth-child(4) {
-    transform: translate(3em, 2em);
-    opacity: 0;
-  }
-
-  #darkTheme:checked ~ .theme-elements svg:nth-child(5) {
-    transform: translate(1.9em, 2.6em);
-    width: 0.3em;
-    height: 0.3em;
-  }
-
-  #darkTheme:checked ~ .theme-elements svg:nth-child(5) circle {
-    fill: var(--bg-planet-lightshadow);
-  }
-
-  #darkTheme:checked ~ .theme-elements svg:nth-child(6) {
-    transform: translate(1.4em, 2.5em);
-    width: 0.3em;
-    height: 0.3em;
-  }
-
-  #darkTheme:checked ~ .theme-elements svg:nth-child(6) circle {
-    fill: var(--bg-planet-lightshadow);
-  }
-
-  #darkTheme:checked ~ .theme-elements svg:nth-child(7) {
-    transform: translate(1.1em, 1.6em);
-    width: 0.7em;
-    height: 0.7em;
-  }
-
-  #darkTheme:checked ~ .theme-elements svg:nth-child(7) circle {
-    fill: var(--bg-planet-lightshadow);
-  }
-
-  #darkTheme:checked ~ .theme-elements svg:nth-child(8) {
-    width: 0.45em;
-    height: 0.45em;
-    transform: translate(1.7em, 2.1em);
-  }
-
-  #darkTheme:checked ~ .theme-elements svg:nth-child(8) circle {
-    fill: var(--bg-planet-lightshadow);
-  }
-
-  #theme-label-container {
-    overflow: hidden;
-    margin: -10px -5px -10px -5px;
-    scale: 0.6;
-  }
-</style>

@@ -1,7 +1,7 @@
 <script>
+  import ThemeSwitcher from "./ThemeSwitcher.svelte";
   import Login from "./Login.svelte";
   import NavbarLinks from "./NavbarLinks.svelte";
-  import ThemeSwitcher from "./ThemeSwitcher.svelte";
 
   let { messageHandler = null, timeoutHandler = null, messageDeletedHandler = null, loginEvent = null } = $props();
 </script>
@@ -29,7 +29,7 @@
       <NavbarLinks />
     </ul>
   </div>
-  <div class="navbar-end">
+  <div class="navbar-end gap-2">
     <Login {messageHandler} {timeoutHandler} {messageDeletedHandler} {loginEvent} />
     <ThemeSwitcher />
   </div>

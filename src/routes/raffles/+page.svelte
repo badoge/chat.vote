@@ -1,4 +1,6 @@
 <script>
+  import Navbar from "$lib/Navbar.svelte";
+
   import IcBaselineRefresh from "~icons/ic/baseline-refresh";
   import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
   import IcBaselineAccountCircle from "~icons/ic/baseline-account-circle";
@@ -35,7 +37,6 @@
   import { showToast } from "../+layout.svelte";
 
   import { donkStorage } from "$lib/donkStorage.svelte";
-  import Navbar from "$lib/Navbar.svelte";
 
   let USER = donkStorage("USER", null);
 

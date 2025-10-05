@@ -1,4 +1,6 @@
 <script>
+  import Navbar from "$lib/Navbar.svelte";
+
   import {
     addBadges,
     changeSiteLinkTarget,
@@ -61,7 +63,6 @@
   import { createGrid, themeQuartz, ModuleRegistry, AllCommunityModule } from "ag-grid-community";
   import { donkStorage, resetSettings } from "$lib/donkStorage.svelte";
   import { showToast } from "./+layout.svelte";
-  import Navbar from "$lib/Navbar.svelte";
   import { form } from "$app/server";
 
   let elements;

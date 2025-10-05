@@ -1,7 +1,8 @@
 <script>
+  import Navbar from "$lib/Navbar.svelte";
+
   import { switchGame } from "$lib/games";
   import IcRoundOpenInNew from "~icons/ic/round-open-in-new";
-  import Navbar from "$lib/Navbar.svelte";
   import IcBaselineClose from "~icons/ic/baseline-close";
   import HowToPlay from "$lib/HowToPlay.svelte";
 

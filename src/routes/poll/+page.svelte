@@ -1,4 +1,6 @@
 <script>
+  import Navbar from "$lib/Navbar.svelte";
+
   import { changeSiteLinkTarget, escapeString } from "$lib/functions";
   import { onMount } from "svelte";
   import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
@@ -13,7 +15,6 @@
   import IcBaselineHowToVote from "~icons/ic/baseline-how-to-vote";
   import IcBaselineCreate from "~icons/ic/baseline-create";
   import { showToast } from "../+layout.svelte";
-  import Navbar from "$lib/Navbar.svelte";
   import IcBaselineClose from "~icons/ic/baseline-close";
 
   let elements;

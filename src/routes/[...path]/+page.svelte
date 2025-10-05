@@ -1,6 +1,7 @@
 <script>
-  import { page } from "$app/state";
   import Navbar from "$lib/Navbar.svelte";
+
+  import { page } from "$app/state";
   /** @type {{ [key: string]: any }} */
   let aliases = {
     blt: ["brackets", "bracket", "tierlist", "tierlists", "trivia", "blt", "btl"],
