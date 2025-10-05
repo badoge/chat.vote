@@ -3,6 +3,7 @@
   import IcBaselineRefresh from "~icons/ic/baseline-refresh";
 
   import IcBaselineCelebration from "~icons/ic/baseline-celebration";
+  import { escape } from "validator";
 
   onDestroy(() => {
     return "Are you sure?";
@@ -738,8 +739,13 @@
     }, 1000);
   };
 
+  /**
+   * @param {{ [x: string]: any; "user-id"?: any; username: any; "display-name"?: any; color: any; badges: any; emotes: any; time?: any; firstmsg?: any; }} context
+   * @param {string} msg
+   * @param {boolean} tier3
+   */
   function raffleWinnerChat(context, msg, tier3) {
-    let msg_s = escapeString(msg);
+    let msg_s = escape(msg);
     if (context.emotes) {
       let emotes = [];
       for (const [key, value] of Object.entries(context.emotes)) {

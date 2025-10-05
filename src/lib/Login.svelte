@@ -57,14 +57,38 @@
 
     //check if the token is still valid if user logged in using twitch
     //if token is not valid set channel to "" to avoid connecting to chat and show the error modal
-    if (USER.value.twitchLogin && !(await checkToken(USER.value.access_token))) {
-      USER.value.channel = "";
-      loginExpiredModal.showModal();
-      return;
+    if (USER?.value.twitchLogin) {
+      let tokenCheck = await checkToken(USER.value.access_token);
+
+      //tokenCheck is false when the the function throws an error or the get request fails
+      if (tokenCheck === false) {
+        USER.value.channel = "";
+        loginExpiredModal.showModal();
+        return;
+      }
+
+      //force user to login again if the token will expire soon
+      if (tokenCheck?.expires_in < 600) {
+        USER.value.channel = "";
+        loginExpiredModal.showModal();
+        return;
+      }
+
+      //user is using a sus token so force them to login again
+      if (tokenCheck?.client_id !== CLIENT_ID) {
+        USER.value.channel = "";
+        loginExpiredModal.showModal();
+        return;
+      }
+
+      //update username incase it changed
+      if (tokenCheck.login !== USER.value.channel) {
+        USER.value.channel = tokenCheck.login;
+      }
     }
 
     //user has a valid token or is using manual login so connect to chat
-    if (USER.value.channel) {
+    if (USER?.value.channel) {
       loginStatus = "logged_in";
       connectIRC();
       loadPFP();
@@ -74,7 +98,7 @@
   function connectIRC() {
     chatStatus = { emoji: "🟡", title: "Chat connecting" };
 
-    loadBadges(USER.value.channel);
+    loadBadges(USER?.value.channel);
 
     let options = {
       options: {
@@ -85,7 +109,7 @@
         secure: true,
         reconnect: true,
       },
-      channels: [USER.value.channel],
+      channels: [USER?.value.channel],
     };
     const client = new tmi.Client(options);
 
@@ -176,7 +200,15 @@
   <div class="modal-box">
     <h3 class="text-xl font-bold mb-3">Login expired</h3>
 
-    <button type="button" data-bs-dismiss="modal" onclick={login} class="btn btn-twitch"><MdiTwitch />Renew login</button>
+    <button
+      type="button"
+      data-bs-dismiss="modal"
+      onclick={() => {
+        loginExpiredModal.close();
+        login();
+      }}
+      class="btn btn-twitch"><MdiTwitch />Renew login</button
+    >
     <br />
     <small class="opacity-70">
       Logins expire when: <i>2 months pass</i> <strong>OR</strong> <i>you change your email/password</i> <strong>OR</strong> <i>you disconnect the app in the Twitch settings</i>

@@ -31,7 +31,7 @@ export function switchGame(game) {
       location.href = "/games/tictactoe";
       break;
     case "guessr":
-      window.open("https://guessr.tv", "_blank").focus();
+      window?.open("https://guessr.tv", "_blank")?.focus();
       break;
     default:
       break;

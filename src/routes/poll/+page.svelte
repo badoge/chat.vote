@@ -1,7 +1,8 @@
 <script>
   import Navbar from "$lib/Navbar.svelte";
+  import { escape } from "validator";
 
-  import { changeSiteLinkTarget, escapeString } from "$lib/functions";
+  import { changeSiteLinkTarget } from "$lib/functions";
   import { onMount } from "svelte";
   import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
   import IcBaselineVisibility from "~icons/ic/baseline-visibility";
@@ -483,7 +484,7 @@
     <ul class="list-unstyled">
       <li>
         <ul>
-          <li>${escapeString(result.data.questions[0].title)}</li>
+          <li>${escape(result.data.questions[0].title)}</li>
         </ul>
       </li>
     </ul>`;
@@ -496,7 +497,7 @@
       for (let index = 0, j = result.data.questions[0].options.length; index < j; index++) {
         options += `
           <li>
-            ${escapeString(result.data.questions[0].options[index].name)}
+            ${escape(result.data.questions[0].options[index].name)}
           </li>`;
       }
       options += `

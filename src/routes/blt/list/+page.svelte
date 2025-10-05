@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import { showToast } from "../../+layout.svelte";
   import IcBaselineClose from "~icons/ic/baseline-close";
-  import { escapeString } from "$lib/functions";
+  import { escape } from "validator";
 
   let elements;
   onMount(async () => {
@@ -36,11 +36,17 @@
   });
 
   let blacklistID = "";
+  /**
+   * @param {string} id
+   */
   function blacklist(id) {
     blacklistID = id;
     blacklistModal.showModal();
   } //blacklist
 
+  /**
+   * @param {any} id
+   */
   function showOptions(id) {
     const i = brackets.findIndex((e) => e.id === id);
     if (i > -1) {
@@ -49,10 +55,10 @@
         let option = brackets[i].bracket.options[index];
         html += `
       <li class="list-group-item">
-      ${escapeString(option.name) || `<span class="text-body-secondary">no name</span>`} - 
-      ${escapeString(option.value) || `<span class="text-body-secondary">no value</span>`} - 
-      ${escapeString(option.type) || `<span class="text-body-secondary">no type</span>`} - 
-      ${escapeString(option.thumbnail) || `<span class="text-body-secondary">no thumbnail</span>`}
+      ${escape(option.name) || `<span class="text-body-secondary">no name</span>`} - 
+      ${escape(option.value) || `<span class="text-body-secondary">no value</span>`} - 
+      ${escape(option.type) || `<span class="text-body-secondary">no type</span>`} - 
+      ${escape(option.thumbnail) || `<span class="text-body-secondary">no thumbnail</span>`}
       </li>`;
       }
       html += `</ul>`;
@@ -88,6 +94,9 @@
     }
   } //blacklistSubmit
 
+  /**
+   * @param {any} id
+   */
   async function unblacklist(id) {
     let body = JSON.stringify({
       id: id,
@@ -141,8 +150,8 @@
         }
         list += `
       <li class="list-group-item">
-      ${bracket.id} - ${escapeString(bracket.username)} - 
-      ${escapeString(bracket.bracket.title)} - ${escapeString(bracket.bracket.description)} - ${bracket.bracket.options.length} options 
+      ${bracket.id} - ${escape(bracket.username)} - 
+      ${escape(bracket.bracket.title)} - ${escape(bracket.bracket.description)} - ${bracket.bracket.options.length} options 
       <br><button type="button" class="btn btn-danger float-end me-2" onclick="blacklist('${bracket.id}')">Blacklist</button>
       <button type="button" class="btn btn-info float-end me-2" onclick="showOptions('${bracket.id}')">Options</button>
       </li>`;
@@ -163,8 +172,8 @@
         }
         blacklisted += `
     <li class="list-group-item">
-    ${bracket.reason || "no reason"} - ${bracket.id} - ${escapeString(bracket.username)} - 
-    ${escapeString(bracket.bracket.title)} - ${escapeString(bracket.bracket.description)} - ${bracket.bracket.options.length} options 
+    ${bracket.reason || "no reason"} - ${bracket.id} - ${escape(bracket.username)} - 
+    ${escape(bracket.bracket.title)} - ${escape(bracket.bracket.description)} - ${bracket.bracket.options.length} options 
     <br><button type="button" class="btn btn-danger float-end me-2" onclick="unblacklist('${bracket.id}')">Unblacklist</button>
     <button type="button" class="btn btn-info float-end me-2" onclick="showOptions('${bracket.id}')">Options</button>
     </li>`;
@@ -190,8 +199,8 @@
   <meta property="og:title" content="chat.vote Brackets - Community brackets" />
   <meta property="og:url" content="https://chat.vote/blt/list" />
   <meta property="og:image" content="/pics/ogimage.png" />
-  <meta property="og:description" content="chat.vote Brackets - Community brackets" /></svelte:head
->
+  <meta property="og:description" content="chat.vote Brackets - Community brackets" />
+</svelte:head>
 
 <nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
   <div class="container-fluid">

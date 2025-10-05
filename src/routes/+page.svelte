@@ -1,10 +1,11 @@
 <script>
   import Navbar from "$lib/Navbar.svelte";
 
+  import { escape, unescape } from "validator";
+
   import {
     addBadges,
     changeSiteLinkTarget,
-    escapeString,
     getChannel7TVEmotes,
     getChannelBTTVEmotes,
     getChannelFFZEmotes,
@@ -17,7 +18,6 @@
     replaceEmotes,
     roundToTwo,
     sendData,
-    unescapeString,
   } from "$lib/functions";
   import { onMount } from "svelte";
   import IcBaselineChat from "~icons/ic/baseline-chat";
@@ -886,8 +886,8 @@
         return;
       }
       let suggestion = input.slice(1).join(" ");
-      let suggestion_emotes = escapeString(suggestion);
-      let suggestion_unchanged = escapeString(suggestion);
+      let suggestion_emotes = escape(suggestion);
+      let suggestion_unchanged = escape(suggestion);
 
       let suggestion_clean = suggestion_unchanged.toLowerCase().replace(/\W/g, "");
       if (CHATVOTE.value.votingMode == "text") {
@@ -1153,7 +1153,7 @@
     let f1 = og.filter(Boolean);
     let f2 = [];
     for (let i = 0, j = f1.length; i < j; i++) {
-      f2[i] = escapeString(f1[i]);
+      f2[i] = escape(f1[i]);
       if (f1[i].startsWith("http")) {
         try {
           let response = await fetch(`https://helper.donk.workers.dev/cors/?${f1[i].split(" ")[0]}`);
@@ -1222,16 +1222,24 @@
       ],
     });
 
-    linkifyElementID("table", CHATVOTE.value.linkPreviewThumbnailsEnabled);
+    linkifyElementID("table", CHATVOTE?.value.linkPreviewThumbnailsEnabled);
     changeSiteLinkTarget("_blank");
   }
 
   let startingHue = Math.random() * 360;
+  /**
+   * @param {number} id
+   * @param {string} option
+   * @param {any} option_emotes
+   * @param {any} by
+   * @param {number} score
+   * @param {null} context
+   */
   function pushVoteResults(id, option, option_emotes, by, score, context) {
     let color = `hsla(${(startingHue += Math.random() * 60 + 20)}, 100%, 50%, 0.8)`;
-    let label = `${id} • "${unescapeString(option)}"`;
+    let label = `${id} • "${unescape(option)}"`;
     let option_clean = option.toLowerCase().replace(/\W/g, "");
-    if (CHATVOTE.value.votingMode == "text") {
+    if (CHATVOTE?.value.votingMode == "text") {
       option = option.replace(/[^a-zA-Z0-9]+/g, "-");
       label = `"${option}"`;
       option_clean = option.toLowerCase().replace(/[^a-zA-Z0-9]+/g, "-");

@@ -2,7 +2,7 @@
   import Navbar from "$lib/Navbar.svelte";
 
   import { onMount } from "svelte";
-
+  import { escape } from "validator";
   import { animate, createTimeline, utils, createDraggable } from "animejs";
   import IcBaselineRefresh from "~icons/ic/baseline-refresh";
   import IcBaselineVisibility from "~icons/ic/baseline-visibility";
@@ -30,7 +30,7 @@
   import IcBaselineCreate from "~icons/ic/baseline-create";
   import IcBaselineChat from "~icons/ic/baseline-chat";
 
-  import { addBadges, changeSiteLinkTarget, escapeString, getUserID, ISO8601ToSeconds } from "$lib/functions";
+  import { addBadges, changeSiteLinkTarget, getUserID, ISO8601ToSeconds } from "$lib/functions";
   import { showToast } from "../+layout.svelte";
 
   import localforage from "localforage";
@@ -253,8 +253,8 @@
       zoomOut(event);
     });
 
-    votePopover = new bootstrap.Popover(elements.enableVoting);
-    votePopoverTierlist = new bootstrap.Popover(elements.enableVotingTierlist);
+    // votePopover = new bootstrap.Popover(elements.enableVoting);
+    // votePopoverTierlist = new bootstrap.Popover(elements.enableVotingTierlist);
 
     elements.previewModal.addEventListener("close", (event) => {
       elements.previewModalBody.innerHTML = "";
@@ -355,12 +355,12 @@
     };
 
     elements.hideScore.addEventListener("click", function () {
-      const tooltip = bootstrap.Tooltip.getInstance("#hideScore");
+      //const tooltip = bootstrap.Tooltip.getInstance("#hideScore");
       tooltip.setContent({ ".tooltip-inner": scoreHidden ? "Hide score" : "Show score" });
       hideScore();
     });
     elements.hideScoreTierlist.addEventListener("click", function () {
-      const tooltip = bootstrap.Tooltip.getInstance("#hideScoreTierlist");
+      //const tooltip = bootstrap.Tooltip.getInstance("#hideScoreTierlist");
       tooltip.setContent({ ".tooltip-inner": scoreHidden ? "Hide score" : "Show score" });
       hideScore();
     });
@@ -447,17 +447,6 @@
   let TRIVIA = {
     trivia: [],
   };
-
-  function resetSettings() {
-    logout();
-    localforage.setItem("BRACKETS_TIERLISTS", JSON.stringify([]));
-    localforage.setItem("TRIVIA", JSON.stringify([]));
-
-    location.reload();
-    return false;
-  } //resetSettings
-
-  async function refreshData() {} //refreshdata
 
   function saveSettings() {
     refreshData();
@@ -850,7 +839,7 @@
       elements.previewModalBody.innerHTML = `
     <div class="card">
     <div class="card-body">
-    ${escapeString(option?.value) || `<span class="text-body-secondary">Empty option</span>`}
+    ${escape(option?.value) || `<span class="text-body-secondary">Empty option</span>`}
     </div>
     </div>`;
       previewModal.showModal();
@@ -980,7 +969,7 @@
       elements.previewModalBody.innerHTML = `
     <div class="card">
     <div class="card-body">
-    ${escapeString(question?.value) || `<span class="text-body-secondary">Empty question</span>`}
+    ${escape(question?.value) || `<span class="text-body-secondary">Empty question</span>`}
     </div>
     </div>`;
       previewModal.showModal();
@@ -1360,6 +1349,9 @@
    * @type {string}
    */
   let startID;
+  /**
+   * @param {string} id
+   */
   function showStartModal(id) {
     startID = id;
     let bracketid = parseInt(startID, 10);
@@ -1393,6 +1385,9 @@
     startModal.showModal();
   } //showStartModal
 
+  /**
+   * @param {string} id
+   */
   function showStartTriviaModal(id) {
     startID = id;
     let triviaID = parseInt(startID, 10);
@@ -1474,7 +1469,7 @@
     elements.editor.style.display = "none";
     elements.bracket.style.display = "";
     elements.title.innerText = bracket.title;
-    elements.winner.innerHTML = `Winner of ${escapeString(bracket.title)}<br>`;
+    elements.winner.innerHTML = `Winner of ${escape(bracket.title)}<br>`;
     elements.pickWinner.innerHTML = `<i class="material-icons notranslate">navigate_next</i>Next match`;
 
     console.log(currentBracket);
@@ -1956,7 +1951,7 @@
 
     if (item.type == "text") {
       elements.text_image_tierlist.style.display = "";
-      elements.text_image_tierlist.innerHTML = escapeString(item.value) || `<span class="text-body-secondary">Empty option</span>`;
+      elements.text_image_tierlist.innerHTML = escape(item.value) || `<span class="text-body-secondary">Empty option</span>`;
     } //text
 
     if (item.type == "image") {
@@ -2186,11 +2181,11 @@
       }
     }
 
-    elements[`${position}_name`].innerHTML = escapeString(option.name) || `<span class="text-body-secondary">Untitled option</span>`;
+    elements[`${position}_name`].innerHTML = escape(option.name) || `<span class="text-body-secondary">Untitled option</span>`;
 
     if (option.type == "text") {
       elements[`text_image_${position}`].style.display = "";
-      elements[`text_image_${position}`].innerHTML = escapeString(option.value) || `<span class="text-body-secondary">Empty option</span>`;
+      elements[`text_image_${position}`].innerHTML = escape(option.value) || `<span class="text-body-secondary">Empty option</span>`;
     } //text
 
     if (option.type == "image") {
@@ -2374,7 +2369,7 @@
    */
   let showWinnerAnimation3;
   function showWinner(first, firstAndSecond) {
-    elements.winner.innerHTML += `<strong>${escapeString(first[0].name)}</strong>`;
+    elements.winner.innerHTML += `<strong>${escape(first[0].name)}</strong>`;
 
     elements.restart.disabled = true;
     elements.hideScore.disabled = true;
@@ -2563,7 +2558,7 @@
         : "";
       html += `<div class="card mb-3">
     <div class="card-header">
-      ${escapeString(BRACKETS.brackets[index].title) || "Untitled bracket"} ${warning}
+      ${escape(BRACKETS.brackets[index].title) || "Untitled bracket"} ${warning}
       <div class="btn-group btn-group-sm float-end" role="group" aria-label="bracket controls">
         <button type="button" class="btn btn-success" onclick="showStartModal(${BRACKETS.brackets[index].id})">
           <i class="material-icons notranslate">play_arrow</i> Start bracket
@@ -2585,7 +2580,7 @@
           data-bs-placement="top"
           data-bs-title="Delete bracket?"
           data-bs-content='<button type="button" class="btn btn-danger" onclick="deleteBracket(${BRACKETS.brackets[index].id})">
-                            <i class="material-icons notranslate">delete_forever</i>Delete "${escapeString(BRACKETS.brackets[index].title)}"</button>'
+                            <i class="material-icons notranslate">delete_forever</i>Delete "${escape(BRACKETS.brackets[index].title)}"</button>'
         >
           <i class="material-icons notranslate">delete_forever</i>
         </a>
@@ -2593,7 +2588,7 @@
     </div>
     <div class="card-body my-bracket-body">
       <h5 class="card-title">${BRACKETS.brackets[index].description || "No description"}</h5>
-      <p class="card-text">${BRACKETS.brackets[index].options.map((e) => `${icons[e.type]} ${escapeString(e.name)}`).join(" • ") || "No options"}</p>
+      <p class="card-text">${BRACKETS.brackets[index].options.map((e) => `${icons[e.type]} ${escape(e.name)}`).join(" • ") || "No options"}</p>
     </div>
   </div>`;
     }
@@ -2616,7 +2611,7 @@
 
       html += `<div class="card mb-3">
     <div class="card-header">
-      ${escapeString(TRIVIA.trivia[index].title) || "Untitled trivia"} ${warning}
+      ${escape(TRIVIA.trivia[index].title) || "Untitled trivia"} ${warning}
       <div class="btn-group btn-group-sm float-end" role="group" aria-label="trivia controls">
         <button type="button" class="btn btn-success" onclick="showStartTriviaModal(${TRIVIA.trivia[index].id})">
           <i class="material-icons notranslate">play_arrow</i> Start trivia
@@ -2638,7 +2633,7 @@
           data-bs-placement="top"
           data-bs-title="Delete trivia?"
           data-bs-content='<button type="button" class="btn btn-danger" onclick="deleteTrivia(${TRIVIA.trivia[index].id})">
-                            <i class="material-icons notranslate">delete_forever</i>Delete "${escapeString(TRIVIA.trivia[index].title)}"</button>'
+                            <i class="material-icons notranslate">delete_forever</i>Delete "${escape(TRIVIA.trivia[index].title)}"</button>'
         >
           <i class="material-icons notranslate">delete_forever</i>
         </a>
@@ -2646,7 +2641,7 @@
     </div>
     <div class="card-body my-trivia-body">
       <h5 class="card-title">${TRIVIA.trivia[index].description || "No description"}</h5>
-      <p class="card-text">${TRIVIA.trivia[index]?.questions?.map((e) => `${icons[e.type]} ${escapeString(e.question)}`).join(" • ") || "No questions"}</p>
+      <p class="card-text">${TRIVIA.trivia[index]?.questions?.map((e) => `${icons[e.type]} ${escape(e.question)}`).join(" • ") || "No questions"}</p>
     </div>
   </div>`;
     }
@@ -2711,13 +2706,13 @@
         });
         html += `
       <li class="list-group-item">
-      <a target="_blank" rel="noopener noreferrer" href="${tracks[index].track.preview_url}">${escapeString(tracks[index].track.name)} - ${tracks[index].track.artists
+      <a target="_blank" rel="noopener noreferrer" href="${tracks[index].track.preview_url}">${escape(tracks[index].track.name)} - ${tracks[index].track.artists
         .map((a) => a.name)
         .join(", ")}</a>
       </li>`;
       }
       html += `</ul>`;
-      elements.spotifyPlaylistPreview.innerHTML = `<p>${escapeString(result[0].name) || "Untitled playlist"} - ${escapeString(result[0].description) || "No description"} - ${
+      elements.spotifyPlaylistPreview.innerHTML = `<p>${escape(result[0].name) || "Untitled playlist"} - ${escape(result[0].description) || "No description"} - ${
         previewedBracket.length == 0 ? "Playlist has no tracks" : `${previewedBracket.length} ${previewedBracket.length == 1 ? "track" : "tracks"}`
       } </p>${html}`;
     } catch (error) {
@@ -2775,7 +2770,7 @@
         html += `
         <li class="list-group-item">
         <a target="_blank" rel="noopener noreferrer" href="https://proxy.donk.workers.dev/?url=${encodeURI(link)}">
-        ${escapeString(name) || "Untitled option"}
+        ${escape(name) || "Untitled option"}
         </a>
         </li>`;
         images++;
@@ -2827,7 +2822,7 @@
         html += `
       <li class="list-group-item">
       <a target="_blank" rel="noopener noreferrer" href="${clips[index].url}">
-      ${escapeString(clips[index].title)} - ${clips[index].view_count.toLocaleString()} ${clips[index].view_count == 1 ? "view" : "views"}
+      ${escape(clips[index].title)} - ${clips[index].view_count.toLocaleString()} ${clips[index].view_count == 1 ? "view" : "views"}
       </a>
       </li>`;
       }
@@ -2929,7 +2924,7 @@
           html += `
         <li class="list-group-item">
         <a target="_blank" rel="noopener noreferrer" href="https://proxy.donk.workers.dev/?url=${encodeURI(previewedBracket[index].value)}">
-        ${escapeString(previewedBracket[index].name) || "Untitled option"}
+        ${escape(previewedBracket[index].name) || "Untitled option"}
         </a>
         </li>`;
           images++;
@@ -2981,7 +2976,7 @@
         html += `
       <li class="list-group-item">
       <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/watch?v=${videos[index].id.videoId}">
-      ${escapeString(videos[index].snippet.title)}
+      ${escape(videos[index].snippet.title)}
       </a>
       </li>`;
       }
@@ -3027,7 +3022,7 @@
         html += `
       <li class="list-group-item">
       <a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/watch?v=${videos[index].snippet.resourceId.videoId}">
-      ${escapeString(videos[index].snippet.title)}
+      ${escape(videos[index].snippet.title)}
       </a>
       </li>`;
       }
@@ -3064,7 +3059,7 @@
 
   async function publishBracket(id, e) {
     e.innerHTML = `<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Loading...</span></div>`;
-    const tooltip = bootstrap.Tooltip.getInstance(e);
+    //const tooltip = bootstrap.Tooltip.getInstance(e);
     tooltip.dispose();
 
     id = parseInt(id, 10);
@@ -3143,13 +3138,13 @@
 
       let html = `
     <div class="card">
-    <div class="card-header">${escapeString(result.bracket.title)} <span class="text-body-secondary">by @${result.username}</span></div>
+    <div class="card-header">${escape(result.bracket.title)} <span class="text-body-secondary">by @${result.username}</span></div>
     <div class="card-body">
-    <p class="card-text">${escapeString(result.bracket.description)}</p>
+    <p class="card-text">${escape(result.bracket.description)}</p>
     Options (${result.bracket.options.length}):
     <ul class="list-group" style="max-height: 400px; overflow: auto">`;
       for (let index = 0; index < result.bracket.options.length; index++) {
-        html += `<li class="list-group-item">${escapeString(result.bracket.options[index].name)} - ${escapeString(result.bracket.options[index].value)}</li>`;
+        html += `<li class="list-group-item">${escape(result.bracket.options[index].name)} - ${escape(result.bracket.options[index].value)}</li>`;
       }
       html += `
     </ul>
@@ -3263,7 +3258,7 @@
           html += `
         <li class="list-group-item">
         <a target="_blank" rel="noopener noreferrer" href="${link}">
-        ${escapeString(req.title)}
+        ${escape(req.title)}
         </a>
         </li>`;
         }

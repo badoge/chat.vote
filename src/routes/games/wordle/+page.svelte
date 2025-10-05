@@ -1,6 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { showToast } from "../../+layout.svelte";
+  import { escape } from "validator";
 
   import IcBaselinePlusOne from "~icons/ic/baseline-plus-one";
   import IcBaselineSpellcheck from "~icons/ic/baseline-spellcheck";
@@ -63,8 +64,12 @@
     },
   }; //WORDLE
 
+  /**
+   * @param {string} word
+   * @param {any} username
+   */
   function addWord(word, username) {
-    word = escapeString(word).toLowerCase();
+    word = escape(word).toLowerCase();
     if (word.length != WORDLE.wordlength) {
       return;
     }

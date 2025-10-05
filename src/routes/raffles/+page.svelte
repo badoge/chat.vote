@@ -18,11 +18,11 @@
   import IcBaselineBlock from "~icons/ic/baseline-block";
   import IcBaselineTimerOff from "~icons/ic/baseline-timer-off";
   import { Howl } from "howler";
+  import { escape } from "validator";
 
   import {
     addBadges,
     changeSiteLinkTarget,
-    escapeString,
     getChannel7TVEmotes,
     getChannelBTTVEmotes,
     getChannelFFZEmotes,
@@ -36,7 +36,7 @@
   import { onMount } from "svelte";
   import { showToast } from "../+layout.svelte";
 
-  import { donkStorage } from "$lib/donkStorage.svelte";
+  import { donkStorage, resetSettings } from "$lib/donkStorage.svelte";
 
   let USER = donkStorage("USER", null);
 
@@ -241,7 +241,14 @@
   let currentTime = 0;
   let currentRaffleWinner = "";
   let raffleWinners = [];
-  let tickSound, revealSound;
+  /**
+   * @type {Howl}
+   */
+  let tickSound;
+  /**
+   * @type {Howl}
+   */
+  let revealSound;
   let thirdPartyEmotes = [];
   let firstTimeChatters = [];
 
@@ -351,56 +358,6 @@
       updateWhoCanJoin();
     }
   } //load_localStorage
-
-  function resetSettings(logout = false) {
-    if (logout) {
-      logout();
-    }
-
-    localStorage?.setItem(
-      "RAFFLES",
-      JSON.stringify({
-        raffleCommand: "!join",
-        removeWinner: true,
-        allowPlebs: true,
-        allowFollowers: true,
-        allowSubs: true,
-        allowTier1: true,
-        allowTier2: true,
-        allowTier3: true,
-        allowMods: true,
-        allowVips: true,
-        allowFirstTimeChatters: true,
-        plebBonus: 0,
-        followerBonus: 0,
-        subBonus: 0,
-        tier1Bonus: 0,
-        tier2Bonus: 0,
-        tier3Bonus: 0,
-        modBonus: 0,
-        vipBonus: 0,
-        firstTimeChatterBonus: 0,
-        followAge: 0,
-        followAgeUnit: "min",
-        subAge: 0,
-        tier1SubAge: 0,
-        tier2SubAge: 0,
-        tier3SubAge: 0,
-        splitTiers: false,
-        animateDrawing: true,
-        useTwitchPFP: false,
-        autoRerollEnabled: false,
-        rerollTimerValueMinutes: 0,
-        extraTimerEnabled: false,
-        announceWinner: false,
-        confirmJoin: false,
-        linkPreviewThumbnailsEnabled: false,
-        refreshWarningEnabled: false,
-      }),
-    );
-    location.reload();
-    return false;
-  } //resetSettings
 
   function restartRaffle() {
     raffle_users = [];
@@ -544,11 +501,18 @@
     } //raffle disabled
 
     if (command == "!reset" && (context.username == USER.value.channel || context.username == "badoge")) {
-      resetSettings();
+      resetSettings("RAFFLES");
       return;
     } //reset settings
   } //handleMessage
 
+  /**
+   * @param {any} channel
+   * @param {string} username
+   * @param {any} reason
+   * @param {any} duration
+   * @param {any} userstate
+   */
   async function handleTimeout(channel, username, reason, duration, userstate) {
     if (username == currentRaffleWinner) {
       let raffleOutput = elements.raffleOutput;
@@ -616,6 +580,11 @@
   } //drawRaffleWinner
 
   class Slot {
+    /**
+     * @param {any} username
+     * @param {any} pfp
+     * @param {any} color
+     */
     constructor(username, pfp, color) {
       this.username = username;
       this.pfp = !pfp ? "/pics/donk.png" : pfp;
@@ -909,7 +878,7 @@
    * @param {any} msg
    */
   function raffleWinnerChat(context, msg, joinMessage = false) {
-    let msg_s = escapeString(msg);
+    let msg_s = escape(msg);
     if (context.emotes) {
       let emotes = [];
       for (const [key, value] of Object.entries(context.emotes)) {
@@ -1711,17 +1680,7 @@
                       | 7TV: <span id="seventvGlobalEmotes">0</span>/<span id="seventvChannelEmotes">0</span>
                     </div>
 
-                    <a
-                      id="resetSettingsPopover"
-                      tabindex="0"
-                      class="btn btn-danger"
-                      role="button"
-                      data-bs-toggle="popover"
-                      data-bs-trigger="focus"
-                      data-bs-title="Are you sure?"
-                      data-bs-content="All settings will be reset and the page will reload<br><button type='button' class='btn btn-danger float-end my-3' onclick='resetSettings()'><i class='material-icons notranslate'>delete_forever</i>Reset settings</button>"
-                      ><IcBaselineDeleteForever />Reset all settings</a
-                    >
+                    <a id="resetSettingsPopover" tabindex="0" class="btn btn-danger" role="button"><IcBaselineDeleteForever />Reset all settings</a>
                     <br />
                     <small class="text-body-secondary">Resets all settings and reloads the page.</small>
                   </div>

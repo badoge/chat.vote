@@ -7,8 +7,14 @@ import "linkify-plugin-mention";
 
 let channelBadges = { subscriber: [], bits: [] };
 let globalBadges = {};
+/**
+ * @type {string | any[]}
+ */
 let customBadges = [];
 
+/**
+ * @param {any} userID
+ */
 export async function get7TVPFP(userID) {
   if (!userID) {
     return "/pics/donk.png";
@@ -30,6 +36,10 @@ export async function get7TVPFP(userID) {
   }
 } //get7TVPFP
 
+/**
+ * @param {any} username
+ * @param {any} access_token
+ */
 export async function getTwitchPFP(username, access_token) {
   let requestOptions = {
     headers: { "client-id": CLIENT_ID, Authorization: `Bearer ${access_token}` },
@@ -176,6 +186,9 @@ export async function getEmoji() {
   }
 } //getEmoji
 
+/**
+ * @param {any} username
+ */
 export async function getTwitchUserId(username) {
   try {
     // if (username == USER.channel && USER.userID) {
@@ -194,6 +207,9 @@ export async function getTwitchUserId(username) {
   }
 } //getTwitchUserId
 
+/**
+ * @param {any} channel
+ */
 export async function getChannelTwitchEmotes(channel, largeEmotes = false) {
   let emotes = [];
   try {
@@ -219,6 +235,9 @@ export async function getChannelTwitchEmotes(channel, largeEmotes = false) {
   }
 } //getChannelTwitchEmotes
 
+/**
+ * @param {any} userID
+ */
 export async function getChannelBTTVEmotes(userID, largeEmotes = false) {
   if (!userID) {
     return [];
@@ -247,6 +266,9 @@ export async function getChannelBTTVEmotes(userID, largeEmotes = false) {
   }
 } //getChannelBTTVEmotes
 
+/**
+ * @param {any} userID
+ */
 export async function getChannelFFZEmotes(userID, largeEmotes = false) {
   let emotes = [];
   try {
@@ -271,6 +293,9 @@ export async function getChannelFFZEmotes(userID, largeEmotes = false) {
   }
 } //getChannelFFZEmotes
 
+/**
+ * @param {any} userID
+ */
 export async function getChannel7TVEmotes(userID, largeEmotes = false) {
   if (!userID) {
     return [];
@@ -312,6 +337,9 @@ export async function getUserID(username) {
   }
 } //getUserID
 
+/**
+ * @param {any} channelId
+ */
 export async function getStreamerColor(channelId) {
   try {
     let response = await fetch(`https://helper.donk.workers.dev/twitch/chat/color?user_id=${channelId}`);
@@ -323,6 +351,11 @@ export async function getStreamerColor(channelId) {
   }
 } //getStreamerColor
 
+/**
+ * @param {any} site
+ * @param {any} channel
+ * @param {any} platform
+ */
 export async function sendUsername(site, channel, platform, stream = null) {
   let lastLog = new Date(localStorage.getItem("logTime1"));
   if (new Date() - lastLog > 24 * 60 * 60 * 1000) {
@@ -348,6 +381,12 @@ export async function sendUsername(site, channel, platform, stream = null) {
   }
 } //sendUsername
 
+/**
+ * @param {any} site
+ * @param {any} channel
+ * @param {any} platform
+ * @param {any} data
+ */
 export async function sendData(site, channel, platform, data, stream = null) {
   if (!channel) {
     return;
@@ -381,6 +420,9 @@ export async function sendData(site, channel, platform, data, stream = null) {
   }
 } //sendData
 
+/**
+ * @param {string} level
+ */
 export function showConfetti(level) {
   let c, s, d;
   switch (parseInt(level, 10)) {
@@ -412,10 +454,16 @@ export function showConfetti(level) {
   confetti.start(d);
 } //showConfetti
 
+/**
+ * @param {string | number} num
+ */
 export function roundToTwo(num) {
   return +(Math.round(num + "e+2") + "e-2");
 } //roundToTwo
 
+/**
+ * @param {any} channel
+ */
 export async function getChannelBadges(channel) {
   try {
     let broadcaster_id = await getTwitchUserId(channel);
@@ -490,6 +538,9 @@ export async function getCustomBadges() {
   }
 } //getCustomBadges
 
+/**
+ * @param {any} channel
+ */
 export async function loadBadges(channel) {
   if (Object.keys(globalBadges).length == 0) {
     globalBadges = await getGlobalBadges();
@@ -502,6 +553,10 @@ export async function loadBadges(channel) {
   }
 } //loadBadges
 
+/**
+ * @param {string} badges
+ * @param {any} userid
+ */
 export function addBadges(badges, userid, firstmsg = null) {
   try {
     let badgesHTML = "";
@@ -536,6 +591,10 @@ export function addBadges(badges, userid, firstmsg = null) {
   }
 } //addBadges
 
+/**
+ * @param {string | string[]} input
+ * @param {string | any[]} thirdPartyEmotes
+ */
 export function replaceEmotes(input, thirdPartyEmotes) {
   input = input.split(" ");
   if (thirdPartyEmotes.length != 0) {
@@ -555,6 +614,9 @@ export function replaceEmotes(input, thirdPartyEmotes) {
   return input.join(" ");
 } //replaceEmotes
 
+/**
+ * @param {string} target
+ */
 export function changeSiteLinkTarget(target) {
   let links = document.getElementsByClassName("site-link");
   for (let index = 0; index < links.length; index++) {
@@ -562,6 +624,10 @@ export function changeSiteLinkTarget(target) {
   }
 } //changeSiteLinkTarget
 
+/**
+ * @param {Element} element
+ * @param {any} allowThumbnails
+ */
 export async function getLinkInfo(element, allowThumbnails) {
   if (element.getAttribute("data-bs-title") == spinner) {
     let url = element.getAttribute("href");
@@ -594,7 +660,7 @@ export async function getLinkInfo(element, allowThumbnails) {
 /**
  * @description checks if url has a image/? media type
  * @param {string} url image url
- * @returns {*} true if url is of an image or false if its not
+ * @returns {Promise<any>} true if url is of an image or false if its not
  */
 export async function checkImage(url) {
   try {
@@ -646,18 +712,18 @@ export function linkifyElementID(id, allowThumbnails) {
     while (elements.length > 0) {
       elements[0].parentNode.removeChild(elements[0]);
     }
-    return new bootstrap.Tooltip(tooltipTriggerEl, {
-      animation: false,
-      html: true,
-      delay: { show: 200, hide: 0 },
-      trigger: "hover",
-    });
+    // return new bootstrap.Tooltip(tooltipTriggerEl, {
+    //   animation: false,
+    //   html: true,
+    //   delay: { show: 200, hide: 0 },
+    //   trigger: "hover",
+    // });
   });
 } //linkifyElementID
 
 /**
  * @description converts the values from the number input and unit select to seconds
- * @param {number} number number input
+ * @param {any} number number input
  * @param {string} unit date unit - m, h, d, mo, y
  * @returns {number} seconds
  */
@@ -685,7 +751,7 @@ export function numberAndUnitToSeconds(number, unit) {
 /**
  * @description checks if the twitch access token is valid
  * @param {string} access_token
- * @returns {Promise<boolean>}
+ * @returns {Promise<any>}
  */
 export async function checkToken(access_token) {
   let requestOptions = {
@@ -693,15 +759,10 @@ export async function checkToken(access_token) {
   };
   try {
     let response = await fetch("https://id.twitch.tv/oauth2/validate", requestOptions);
-    if (!response.ok) {
+    if (!response.ok || response.status !== 200) {
       return false;
     }
-    let result = await response.json();
-    if (result.expires_in < 600) {
-      return false;
-    } else {
-      return true;
-    }
+    return await response.json();
   } catch (error) {
     console.log("checkToken error", error);
     return false;
@@ -732,6 +793,10 @@ export function spotifyReleaseDateToTimestamp(releaseDate, releaseDatePrecision)
   return new Date(date).getTime();
 } //spotifyReleaseDateToTimestamp
 
+/**
+ * @param {any} type
+ * @param {number} count
+ */
 export function spamTest(type, count, delay = 100, votes = null) {
   if (!type && !count) {
     return `spamTest("vote/suggest/join", count, optional max delay in ms, optional number of options for type vote)`;
@@ -840,6 +905,9 @@ export function uuidv4() {
   return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) => (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16));
 } //uuidv4
 
+/**
+ * @param {string} iso8601Duration
+ */
 export function ISO8601ToSeconds(iso8601Duration) {
   let matches = iso8601Duration.match(/(-)?P(?:([.,\d]+)Y)?(?:([.,\d]+)M)?(?:([.,\d]+)W)?(?:([.,\d]+)D)?(?:T(?:([.,\d]+)H)?(?:([.,\d]+)M)?(?:([.,\d]+)S)?)?/);
   let values = {
@@ -855,6 +923,9 @@ export function ISO8601ToSeconds(iso8601Duration) {
   return values.years + values.months + values.weeks + values.days + values.hours + values.minutes + values.seconds;
 } //ISO8601ToSeconds
 
+/**
+ * @param {string} duration
+ */
 export function convertTwitchVODDuration(duration) {
   const durationRegex = /(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?/;
   const match = durationRegex.exec(duration);
@@ -875,6 +946,9 @@ export function convertTwitchVODDuration(duration) {
   return totalSeconds;
 } //convertTwitchVODDuration
 
+/**
+ * @param {number} seconds
+ */
 export function secondsToTimeString(seconds) {
   let string = new Date(seconds * 1000).toISOString().slice(11, 19);
   if (string.startsWith("00:")) {
@@ -884,6 +958,9 @@ export function secondsToTimeString(seconds) {
   }
 } //secondsToTimeString
 
+/**
+ * @param {string | number | bigint} count
+ */
 export function formatViewCount(count) {
   return Intl.NumberFormat("en-US", {
     notation: "compact",
@@ -925,6 +1002,9 @@ export function timeToSeconds(timeString) {
   }
 } //timeToSeconds
 
+/**
+ * @param {string} duration
+ */
 export function timeStringToSeconds(duration) {
   const durationRegex = /(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?/;
   const match = durationRegex.exec(duration);
@@ -945,6 +1025,10 @@ export function timeStringToSeconds(duration) {
   return totalSeconds;
 } //timeStringToSeconds
 
+/**
+ * @param {any} key
+ * @param {any[]} value
+ */
 export function replacer(key, value) {
   if (value instanceof Map) {
     return {
@@ -955,6 +1039,11 @@ export function replacer(key, value) {
     return value;
   }
 } //replacer
+
+/**
+ * @param {any} key
+ * @param {{ dataType: string; value: Iterable<readonly [any, any]> | null | undefined; } | null} value
+ */
 export function reviver(key, value) {
   if (typeof value === "object" && value !== null) {
     if (value.dataType === "Map") {
@@ -963,52 +1052,3 @@ export function reviver(key, value) {
   }
   return value;
 } //reviver
-
-/**
- * @description replace <, >, &, ', ", `, \ and / with HTML entities. - from https://github.com/validatorjs/validator.js
- * @param {*} str
- * @returns {*}
- */
-export function escapeString(str) {
-  assertString(str);
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#x27;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/\//g, "&#x2F;")
-    .replace(/\\/g, "&#x5C;")
-    .replace(/`/g, "&#96;");
-} //escapeString
-
-/**
- * @description replace HTML encoded entities with <, >, &, ', ", `, \ and /. - from https://github.com/validatorjs/validator.js
- * @param {*} str
- * @returns {*}
- */
-export function unescapeString(str) {
-  assertString(str);
-  return str
-    .replace(/&quot;/g, '"')
-    .replace(/&#x27;/g, "'")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&#x2F;/g, "/")
-    .replace(/&#x5C;/g, "\\")
-    .replace(/&#96;/g, "`")
-    .replace(/&amp;/g, "&");
-  // &amp; replacement has to be the last one to prevent
-  // bugs with intermediate strings containing escape sequences
-  // See: https://github.com/validatorjs/validator.js/issues/1827
-} //unescapeString
-
-export function assertString(input) {
-  let isString = typeof input === "string" || input instanceof String;
-  if (!isString) {
-    let invalidType = _typeof(input);
-    if (input === null) invalidType = "null";
-    else if (invalidType === "object") invalidType = input.constructor.name;
-    throw new TypeError("Expected a string but received a ".concat(invalidType));
-  }
-} //assertString

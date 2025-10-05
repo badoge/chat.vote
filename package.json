@@ -24,9 +24,11 @@
 		"@tailwindcss/vite": "^4.1.14",
 		"@tmi.js/chat": "^0.4.1",
 		"@twemoji/api": "^16.0.1",
+		"@types/howler": "^2.2.12",
 		"@types/tmi.js": "^1.8.6",
+		"@types/validator": "^13.15.3",
 		"ag-grid-community": "^34.2.0",
-		"animejs": "^4.2.0",
+		"animejs": "^4.2.1",
 		"chart.js": "^4.5.0",
 		"daisyui": "^5.1.27",
 		"dompurify": "^3.2.7",
@@ -50,6 +52,7 @@
 		"tmi.js": "^1.8.5",
 		"typescript": "^5.9.3",
 		"unplugin-icons": "^22.4.2",
+		"validator": "^13.15.15",
 		"vite": "^7.1.9"
 	}
 }

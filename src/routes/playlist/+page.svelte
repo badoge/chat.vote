@@ -56,7 +56,9 @@
   import MdiVimeo from "~icons/mdi/vimeo";
   import IcBaselineTiktok from "~icons/ic/baseline-tiktok";
 
-  import { convertTwitchVODDuration, escapeString, formatViewCount, replacer, secondsToTimeString, timeStringToSeconds, timeToSeconds } from "$lib/functions";
+  import { escape } from "validator";
+
+  import { convertTwitchVODDuration, formatViewCount, replacer, reviver, secondsToTimeString, timeStringToSeconds, timeToSeconds } from "$lib/functions";
   import { animate } from "animejs";
   import { onMount } from "svelte";
   import localforage from "localforage";
@@ -189,12 +191,12 @@
       volumeSliderValue: document.getElementById("volumeSliderValue"),
     };
 
-    copyLinkButton = new bootstrap.Popover(elements.copyLinkButton);
-    togglePlaylistPopover = new bootstrap.Popover(elements.togglePlaylist);
+    // copyLinkButton = new bootstrap.Popover(elements.copyLinkButton);
+    // togglePlaylistPopover = new bootstrap.Popover(elements.togglePlaylist);
 
-    playlistTab = new bootstrap.Tab(elements.playlistTab);
-    approvalTab = new bootstrap.Tab(elements.approvalTab);
-    historyTab = new bootstrap.Tab(elements.historyTab);
+    // playlistTab = new bootstrap.Tab(elements.playlistTab);
+    // approvalTab = new bootstrap.Tab(elements.approvalTab);
+    // historyTab = new bootstrap.Tab(elements.historyTab);
 
     elements.approvalQueue.onchange = function () {
       saveSettings();
@@ -603,80 +605,12 @@
     }
   } //rebuildUsersArray
 
-  function resetSettings(logout = false) {
-    if (logout) {
-      logout();
-      localforage.setItem("PLAYLIST_REQUESTS", JSON.stringify(new Map(), replacer));
-      localforage.setItem("PLAYLIST_HISTORY", JSON.stringify([]));
-      localforage.setItem("PLAYLIST_FAVORITES", JSON.stringify([]));
-      localforage.setItem("PLAYLIST_BANNED_USERS", JSON.stringify(new Map(), replacer));
-      localforage.setItem("PLAYLIST_BANNED_ITEMS", JSON.stringify(new Map(), replacer));
-      localforage.setItem("PLAYLIST_BANNED_CHANNELS", JSON.stringify(new Map(), replacer));
-    }
-    localStorage.setItem(
-      "PLAYLIST",
-      JSON.stringify({
-        autoplay: true,
-        allowSpotifySongs: true,
-        allowStreamable: true,
-        allowTwitchClips: true,
-        allowTwitchStreams: true,
-        allowTwitchVODs: true,
-        allowTiktokVideos: true,
-        allowYTStreams: true,
-        allowYTShorts: true,
-        allowYTVideos: true,
-        allowVimeoVideos: true,
-        maxDuration: "",
-        maxDurationUnit: "m",
-        maxLength: "",
-        maxSize: "",
-        minViewCount: "",
-        minUploadAge: "",
-        minUploadAgeUnit: "h",
-        maxUploadAge: "",
-        maxUploadAgeUnit: "h",
-        uniqueOnly: false,
-        allowPlebs: true,
-        allowSubs: true,
-        allowMods: true,
-        allowVips: true,
-        allowFirstTimeChatters: true,
-        plebLimit: "",
-        subLimit: "",
-        modLimit: "",
-        vipLimit: "",
-        firstTimeChatterLimit: "",
-        noCommand: false,
-        requestCommand: "!request",
-        requestCommandAlias: "!r",
-        allowVoteSkip: false,
-        voteskipCommand: "!voteskip",
-        voteskipCommandAlias: "!vs",
-        voteskipCount: 100,
-        enableBot: false,
-        botCooldown: 1,
-        songCommand: "!song",
-        songCommandAlias: "!video",
-        playlistCommand: "!playlist",
-        playlistCommandAlias: "!pl",
-        approvalQueue: false,
-        openCommand: "!open",
-        closeCommand: "!close",
-        playCommand: "!play",
-        pauseCommand: "!pause",
-        autoplayCommand: "!autoplay",
-        skipCommand: "!skip",
-        rewindCommand: "!rewind",
-        deleteCommand: "!delete",
-        modCommands: true,
-        enableFavorites: false,
-      }),
-    );
-    location.reload();
-    return false;
-  } //resetSettings
-
+  /**
+   * @param {any} target
+   * @param {Object} context
+   * @param {string} msg
+   * @param {any} self
+   */
   async function handleMessage(target, context, msg, self) {
     if (context["first-msg"]) {
       firstTimeChatters.push(context.username);
@@ -830,6 +764,12 @@
     }
   } //handleMessage
 
+  /**
+   * @param {any} channel
+   * @param {any} username
+   * @param {any} deletedMessage
+   * @param {{ [x: string]: any; }} userstate
+   */
   async function handleMessageDeleted(channel, username, deletedMessage, userstate) {
     const requestKey = findRequestKey("msgid", userstate["target-msg-id"]);
     if (requestKey) {
@@ -918,6 +858,12 @@
     return null;
   } //findRequestKey
 
+  /**
+   * @param {Object} context
+   * @param {Object} link
+   * @param {number} msgid
+   * @param {boolean} search
+   */
   function addRequest(context, link, msgid, search) {
     if (bannedItems.get(link.name)) {
       let message = "";
@@ -1173,6 +1119,9 @@
     loadBanLists();
   } //unbanUser
 
+  /**
+   * @param {any} item
+   */
   function unbanItem(item) {
     //check if item is actually banned
     if (!bannedItems.get(item)) {
@@ -1184,6 +1133,9 @@
     loadBanLists();
   } //unbanItem
 
+  /**
+   * @param {any} channel
+   */
   function unbanChannel(channel) {
     //check if channel is actually banned
     if (!bannedChannels.get(channel)) {
@@ -1238,7 +1190,7 @@
         href="${getItemLink(value)}"
         target="_blank"
         rel="noopener noreferrer">
-        ${escapeString(value.title)}
+        ${escape(value.title)}
         </a>
         <i class="material-icons notranslate deletebtn float-end" onclick="unbanItem('${key}')" title="Unban">highlight_off</i>
       </li>`,
@@ -1318,6 +1270,10 @@
     elements.playlistLength.innerHTML = `${secondsToTimeString(Math.round(duration)) || "00:00"} (${count} ${count == 1 ? "request" : "requests"})`;
   } //updateLength
 
+  /**
+   * @param {{ type: any; name: any; }} request
+   * @param {boolean} historyButton
+   */
   function makeBanButtons(request, historyButton) {
     let banChannelButton = "";
     let banItemText = "";
@@ -1455,11 +1411,11 @@
                 href="${getItemLink(request)}" 
                 target="_blank" 
                 rel="noopener noreferrer"> 
-                ${escapeString(request.title)}
+                ${escape(request.title)}
                 </a>
               </div>
               <small class="request-info text-body-secondary">
-              ${escapeString(request.channel)} ${request.views !== null ? ` • ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}
+              ${escape(request.channel)} ${request.views !== null ? ` • ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}
               </small>
               <small class="requested-by text-body-secondary" title="Requested by @${request.by.map((u) => u.username).join(" & ")}">
               Requested by 
@@ -1503,7 +1459,7 @@
     href="${getItemLink(request)}"
     target="_blank"
     rel="noopener noreferrer">
-    ${escapeString(request.title)}
+    ${escape(request.title)}
     </a>`;
       let timestamp = "";
       if (request.timestamp > 0) {
@@ -1511,9 +1467,9 @@
       }
       document.getElementById(`id${request.name}_title`).title = request.title;
       document.getElementById(`id${request.name}_info`).innerHTML = `
-    ${escapeString(request.channel)} ${request.views !== null ? ` • ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}`;
+    ${escape(request.channel)} ${request.views !== null ? ` • ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}`;
       document.getElementById(`id${request.name}_info`).title = `
-    ${escapeString(request.channel)} ${request.views !== null ? ` • ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}`;
+    ${escape(request.channel)} ${request.views !== null ? ` • ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}`;
       document.getElementById(`id${request.name}_duration`).innerText = request.duration == -1 ? "🔴live" : secondsToTimeString(Math.round(request.duration)) + timestamp;
       document.getElementById(`id${request.name}_ban_user`).innerHTML = `<i class="material-icons notranslate">person_off</i> Ban ${request.by.length > 1 ? "Users" : "User"}</a>`;
       document.getElementById(`id${request.name}_by`).innerHTML = `
@@ -2335,7 +2291,7 @@
     href="${getItemLink(currentItem)}"
     target="_blank"
     rel="noopener noreferrer">
-      ${escapeString(currentItem.title)}
+      ${escape(currentItem.title)}
   </a>`;
     elements.nowPlaying.title = currentItem.title;
 
@@ -2353,7 +2309,7 @@
 
     elements.nowPlayingInfo.innerHTML = `
   <small class="now-playing-info" title="${currentItem.channel}">
-    <i class="material-icons notranslate">${currentItem.platform == "spotify" ? "music_note" : "live_tv"}</i> ${escapeString(currentItem.channel)}
+    <i class="material-icons notranslate">${currentItem.platform == "spotify" ? "music_note" : "live_tv"}</i> ${escape(currentItem.channel)}
   </small>
   <br />
   <small class="now-playing-info">
@@ -2407,7 +2363,7 @@
   } //favorite
 
   function toggleFavoriteButton(active) {
-    const tooltip = bootstrap.Tooltip.getInstance("#favoriteButton");
+    // const tooltip = bootstrap.Tooltip.getInstance("#favoriteButton");
 
     if (!active) {
       elements.favoriteButton.innerText = "favorite_border";
@@ -4099,17 +4055,7 @@
                   </div>
                 </div>
 
-                <a
-                  id="resetSettingsPopover"
-                  tabindex="0"
-                  class="btn btn-danger"
-                  role="button"
-                  data-bs-toggle="popover"
-                  data-bs-trigger="focus"
-                  data-bs-title="Are you sure?"
-                  data-bs-content="All settings will be reset and the page will reload<br><button type='button' class='btn btn-danger float-end my-3' onclick='resetSettings()'><i class='material-icons notranslate'>delete_forever</i>Reset settings</button>"
-                  ><IcBaselineDeleteForever />Reset all settings</a
-                >
+                <a id="resetSettingsPopover" tabindex="0" class="btn btn-danger" role="button"><IcBaselineDeleteForever />Reset all settings</a>
                 <br />
                 <small class="text-body-secondary">Resets all settings and reloads the page.</small>
               </div>
