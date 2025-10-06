@@ -56,7 +56,8 @@
   import MdiVimeo from "~icons/mdi/vimeo";
   import IcBaselineTiktok from "~icons/ic/baseline-tiktok";
 
-  import { escape } from "validator";
+  import pkg from "validator";
+  const { escape } = pkg;
 
   import { convertTwitchVODDuration, formatViewCount, replacer, reviver, secondsToTimeString, timeStringToSeconds, timeToSeconds } from "$lib/functions";
   import { animate } from "animejs";

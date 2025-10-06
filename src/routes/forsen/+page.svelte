@@ -3,8 +3,8 @@
   import IcBaselineRefresh from "~icons/ic/baseline-refresh";
 
   import IcBaselineCelebration from "~icons/ic/baseline-celebration";
-  import { escape } from "validator";
-
+  import pkg from "validator";
+  const { escape } = pkg;
   onDestroy(() => {
     return "Are you sure?";
   });

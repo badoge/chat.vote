@@ -1,7 +1,8 @@
 <script>
   import Navbar from "$lib/Navbar.svelte";
 
-  import { escape, unescape } from "validator";
+  import pkg from "validator";
+  const { escape, unescape } = pkg;
 
   import {
     addBadges,

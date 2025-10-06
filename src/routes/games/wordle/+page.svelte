@@ -1,8 +1,8 @@
 <script>
   import { onMount } from "svelte";
   import { showToast } from "../../+layout.svelte";
-  import { escape } from "validator";
-
+  import pkg from "validator";
+  const { escape } = pkg;
   import IcBaselinePlusOne from "~icons/ic/baseline-plus-one";
   import IcBaselineSpellcheck from "~icons/ic/baseline-spellcheck";
   onMount(async () => {

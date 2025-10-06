@@ -1,7 +1,7 @@
 <script>
   import Navbar from "$lib/Navbar.svelte";
-  import { escape } from "validator";
-
+  import pkg from "validator";
+  const { escape } = pkg;
   import { changeSiteLinkTarget } from "$lib/functions";
   import { onMount } from "svelte";
   import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";

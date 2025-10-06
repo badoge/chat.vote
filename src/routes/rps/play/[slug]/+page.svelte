@@ -2,9 +2,13 @@
   import { onMount } from "svelte";
 
   import { animate } from "animejs";
-  import { escape } from "validator";
-
+  import pkg from "validator";
+  import { donkStorage } from "$lib/donkStorage.svelte.js";
+  const { escape } = pkg;
   let elements;
+
+  let USER = donkStorage("USER", null);
+
   onMount(async () => {
     elements = {
       loginButton: document.getElementById("loginButton"),
@@ -24,101 +28,13 @@
       paper: document.getElementById("paper"),
       scissors: document.getElementById("scissors"),
     };
-
-    loadAndConnect();
   });
 
   let { data } = $props();
   let channel = $state(data.slug.toLowerCase().replace(/\s/g, ""));
 
-  let darkTheme = true;
   let streamer = "";
   let webSocket;
-
-  let USER = {
-    channel: "",
-    twitchLogin: false,
-    access_token: "",
-    userID: "",
-    platform: "",
-  };
-
-  function login() {
-    elements.topRight.innerHTML = `<div class="btn-group" role="group" aria-label="log in button group">
-      <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></button>
-      <div class="btn-group" role="group">
-          <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-        </button>
-          <ul class="dropdown-menu dropdown-menu-lg-end" aria-label="Log out">
-              <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
-          </ul>
-      </div>
-  </div>`;
-    window.open("/prompt.html", "loginWindow", "toolbar=0,status=0,scrollbars=0,width=500px,height=800px");
-    return false;
-  } //login
-
-  function logout() {
-    elements.topRight.innerHTML = `<a role="button" id="loginButton" onclick="login()" class="btn btn-twitch" tabindex="0"> <span class="twitch-icon"></span>Sign in with Twitch </a>`;
-    resetSettings(true);
-  } //logout
-
-  async function loadPFP() {
-    if (!USER.channel) {
-      elements.topRight.innerHTML = `<a role="button" id="loginButton" onclick="login()" class="btn btn-twitch" tabindex="0"> <span class="twitch-icon"></span>Sign in with Twitch </a>`;
-      return;
-    }
-    let profilepicurl = await get7TVPFP(USER.userID);
-    if (profilepicurl == "/pics/donk.png" && USER.access_token) {
-      profilepicurl = await getTwitchPFP(USER.channel, USER.access_token);
-    }
-    elements.topRight.innerHTML = `
-    <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
-    <button type="button" id="btnGroupDrop2" class="btn btn-${darkTheme ? "dark" : "secondary"}"><img src="${profilepicurl}" alt="profile pic" style="height:2em;"></button>
-    <div class="btn-group" role="group">
-    <button id="btnGroupDrop1" type="button" class="btn btn-${darkTheme ? "dark" : "secondary"} dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-    ${USER.channel}
-    </button>
-    <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="btnGroupDrop1">
-    <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
-    </ul>
-    </div>
-    </div>`;
-    elements.me.innerHTML = `<img src="${profilepicurl}" alt="profile pic" class="rounded-circle" style="height:2em;"> ${USER.channel}`;
-    elements.opponent.innerHTML = `<img src="/pics/donk.png" alt="profile pic" class="rounded-circle" style="height:2em;"> Your opponent`;
-  } //loadPFP
-
-  function resetSettings(logout = false) {
-    if (logout) {
-      localStorage.setItem(
-        "USER",
-        JSON.stringify({
-          channel: "",
-          twitchLogin: false,
-          access_token: "",
-          userID: "",
-          platform: "",
-        }),
-      );
-    }
-    location.reload();
-    return false;
-  } //resetSettings
-
-  async function refreshData() {} //refreshData
-
-  function saveSettings() {
-    refreshData();
-    localStorage.setItem("USER", JSON.stringify(USER));
-  } //saveSettings
-
-  function load_localStorage() {
-    if (!localStorage.getItem("USER")) {
-      console.log("localStorage user info not found");
-    } else {
-      USER = JSON.parse(localStorage.getItem("USER"));
-    }
-  } //load_localStorage
 
   function connect() {
     elements.topRight.innerHTML = `

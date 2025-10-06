@@ -18,8 +18,8 @@
   import IcBaselineBlock from "~icons/ic/baseline-block";
   import IcBaselineTimerOff from "~icons/ic/baseline-timer-off";
   import { Howl } from "howler";
-  import { escape } from "validator";
-
+  import pkg from "validator";
+  const { escape } = pkg;
   import {
     addBadges,
     changeSiteLinkTarget,

@@ -12,8 +12,8 @@
   import IcBaselineContentCopy from "~icons/ic/baseline-content-copy";
   import { donkStorage } from "$lib/donkStorage.svelte";
 
-  import { escape } from "validator";
-
+  import pkg from "validator";
+  const { escape } = pkg;
   let USER = donkStorage("USER", null);
 
   onMount(async () => {
@@ -220,61 +220,83 @@
 
 <Navbar loginEvent={() => USER.refresh()} />
 
-<div class="container-fluid text-center">
-  <div class="row">
-    <div class="col">
-      <div class="container-fluid text-center">
-        <div class="row">
-          <div class="col d-inline-flex">
-            <div class="p-2">
-              <img src="/pics/donk.png" alt="left donk" style="height: 100px; width: 100px" />
-              <img id="left_rock" src="/rps/left_rock.png" alt="left rock" class="left-hand-img" />
-              <img id="left_paper" src="/rps/left_paper.png" alt="left paper" style="display: none" class="left-hand-img" />
-              <img id="left_scissors" src="/rps/left_scissors.png" alt="left scissors" style="display: none" class="left-hand-img" />
-            </div>
-            <div class="p-2">
-              <img id="right_rock" src="/rps/right_rock.png" alt="right rock" class="right-hand-img" />
-              <img id="right_paper" src="/rps/right_paper.png" alt="right paper" style="display: none" class="right-hand-img" />
-              <img id="right_scissors" src="/rps/right_scissors.png" alt="right scissors" style="display: none" class="right-hand-img" />
-              <img src="/pics/donk.png" alt="right donk" style="height: 100px; width: 100px" class="mirror-img" />
-            </div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col" id="bracket"></div>
-        </div>
+<div class="flex flex-col w-fit mx-auto">
+  <h1 class="text-2xl font-extrabold text-center m-3"><img src="/pics/donk.png" alt="donk" class="w-8 inline align-text-bottom" /> chat.vote Rock Paper Scissors</h1>
+  <div class="card card-border bg-base-200 m-5">
+    <div class="card-body flex flex-row">
+      <div class="p-2 flex flex-row">
+        <img src="/pics/donk.png" alt="left donk" style="height: 100px; width: 100px" />
+        <img id="left_rock" src="/rps/left_rock.png" alt="left rock" class="left-hand-img" />
+        <img id="left_paper" src="/rps/left_paper.png" alt="left paper" style="display: none" class="left-hand-img" />
+        <img id="left_scissors" src="/rps/left_scissors.png" alt="left scissors" style="display: none" class="left-hand-img" />
+      </div>
+      <div class="p-2 flex flex-row">
+        <img id="right_rock" src="/rps/right_rock.png" alt="right rock" class="right-hand-img" />
+        <img id="right_paper" src="/rps/right_paper.png" alt="right paper" style="display: none" class="right-hand-img" />
+        <img id="right_scissors" src="/rps/right_scissors.png" alt="right scissors" style="display: none" class="right-hand-img" />
+        <img src="/pics/donk.png" alt="right donk" style="height: 100px; width: 100px" class="mirror-img" />
       </div>
     </div>
-    <div class="col-4">
-      <div class="card w-75 mb-5">
-        <div class="card-header"><IcBaselineTune /> Game controls</div>
-        <div class="card-body">
-          <button onclick={start} id="start" type="button" class="btn btn-primary mb-3"><IcBaselineRocketLaunch />Start new game</button>
-          <br />
-          <button onclick={next} id="next" type="button" class="btn btn-info mb-3"><IcBaselineArrowForwardIos />Next round</button>
-          <br />
-          <div class="input-group">
-            <span class="input-group-text">Game link</span>
-            <input disabled type="text" class="form-control" onclick={copyLink} value="https://chat.vote/rps/play/{USER?.value?.channel}" />
-            <button type="button" class="btn btn-outline-secondary" onclick={copyLink}>
-              <IcBaselineContentCopy />
-            </button>
-          </div>
-        </div>
-      </div>
+  </div>
 
-      <div class="card w-75">
-        <div class="card-header"><IcBaselineInfo />Info</div>
-        <div class="card-body text-start">
-          <span class="text-body-secondary">What is this?</span><br />
-          This is an interactive Rock Paper Scissors game that you can play with your Twitch chat.<br />
-          <span class="text-body-secondary">How to play?</span><br />
-          Start a new game then share the link above with your viewers. After your viewers log in start the first round by clicking next round, after everyone makes a move click next round again
-          to eliminate the losers and advance the winners to the next round. Game ends once the bracket is finished.
-          <br /><br />
-          Made for <a href="https://nympts.com/gamejam" target="_blank" rel="noopener noreferrer">NymN's Game Jam</a> &
-          <a href="https://twitchstreamertools.devpost.com/" target="_blank" rel="noopener noreferrer">Twitch Streamer Tools Hackathon 2024</a> :)
+  <div class="card card-border bg-base-200 m-5">
+    <div class="card-body flex-row">
+      <div id="bracket"></div>
+    </div>
+  </div>
+
+  <div class="card card-border w-120 bg-base-200 m-5">
+    <div class="card-body">
+      <h2 class="card-title"><IcBaselineTune /> Game controls</h2>
+      <button onclick={start} id="start" type="button" class="btn btn-primary mb-3"><IcBaselineRocketLaunch />Start new game</button>
+      <button onclick={next} id="next" type="button" class="btn btn-info mb-3"><IcBaselineArrowForwardIos />Next round</button>
+      <div class="join">
+        <button class="btn btn-warning join-item pointer-events-none">Game link</button>
+        <input type="text" class="input input-warning join-item pointer-events-none text-base-content" onclick={copyLink} value="https://chat.vote/rps/play/{USER?.value?.channel}" />
+        <button class="btn btn-warning join-item" onclick={copyLink}> <IcBaselineContentCopy /></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-border w-120 bg-base-200 m-5">
+    <div class="card-body">
+      <h2 class="card-title"><IcBaselineInfo />Info</h2>
+      <h4 class="text-lg font-bold">What is this?</h4>
+      <p>This is an interactive Rock Paper Scissors game that you can play with your Twitch chat</p>
+      <h4 class="text-lg font-bold">How to play?</h4>
+      <p>
+        Start a new game then share the link above with your viewers. After your viewers log in start the first round by clicking next round, after everyone makes a move click next round
+        again to eliminate the losers and advance the winners to the next round. Game ends once the bracket is finished
+      </p>
+      <div class="divider"></div>
+      <p>Made for <a href="https://nympts.com/gamejam" target="_blank" rel="noopener noreferrer" class="link">NymN's Game Jam</a></p>
+
+      <small>It was originally made for the 2024 game jam but I didn't feel like finishing it on time :) even though I had like an extra week to fix it</small>
+
+      <div tabindex="-1" class="collapse collapse-arrow border-base-300 border">
+        <div class="collapse-title font-semibold after:start-5 after:end-auto pe-4 ps-12">Wow! that was such a cool story, I want to read more about it!</div>
+        <div class="collapse-content text-sm">
+          <p>
+            So I first had the idea for this game when this <a href="https://www.youtube.com/watch?v=PmWQmZXYd74" target="_blank" rel="noopener noreferrer" class="link">CGP Grey video</a> came
+            out in late 2023. But I didn't do anything with the idea until nymn announced his first game jam a year after the video came out in 2024. He said the theme was Twitch interaction
+            or horror at first, but at some point it switched to horror only for some reason. I didn't care about the theme as usual and went ahead with the game.
+          </p>
+          <p>
+            I started working a couple days before the deadline, and I made the first version in like 2 days and then stopped working for like a week while nymn went on his monthly week long
+            ditches. And when he started playing the games I had the chance to fix my stuff but I didn't. So I just gave up and thought I'll just fix it later and add it to the chat.vote
+            games page. So here we are 1 year later and the game is still broken because it was never touched since the last game jam. And on top of that I'm submitting the game in a broken
+            state again so that I can fix it after the deadline :)
+          </p>
+          <p>
+            Also incase you didn't notice, this is the beta version of chat.vote that I started like 2 weeks before the game jam deadline. It was supposed to be just a port of the old site
+            to svelte, but it was starting to look like it would be very hard and donk to clone the site as is. So I decided to switch to a new UI library on top of porting everything to
+            svelte.
+          </p>
+          <p>
+            At the time of writing I still need to make this page connect to the server, make the viewer login/join page, make this page get the list of players and create the bracket for
+            them, send the matches to the players, make the server take the player inputs to advance the bracket, and show the game progress on this page.
+          </p>
+          <p>Surely I'll finish all of this on time. Surely the game will be fun to play. Surely the server won't crash. Surely someone will read all this stuff.</p>
         </div>
       </div>
     </div>

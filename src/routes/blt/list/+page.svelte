@@ -2,8 +2,8 @@
   import { onMount } from "svelte";
   import { showToast } from "../../+layout.svelte";
   import IcBaselineClose from "~icons/ic/baseline-close";
-  import { escape } from "validator";
-
+  import pkg from "validator";
+  const { escape } = pkg;
   let elements;
   onMount(async () => {
     elements = {

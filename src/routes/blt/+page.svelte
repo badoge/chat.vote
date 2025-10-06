@@ -2,7 +2,8 @@
   import Navbar from "$lib/Navbar.svelte";
 
   import { onMount } from "svelte";
-  import { escape } from "validator";
+  import pkg from "validator";
+  const { escape } = pkg;
   import { animate, createTimeline, utils, createDraggable } from "animejs";
   import IcBaselineRefresh from "~icons/ic/baseline-refresh";
   import IcBaselineVisibility from "~icons/ic/baseline-visibility";
