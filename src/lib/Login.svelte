@@ -8,6 +8,7 @@
   import { CLIENT_ID } from "$lib/consts";
 
   import tmi from "tmi.js";
+  import { showToast } from "../routes/+layout.svelte";
 
   let { messageHandler = null, timeoutHandler = null, messageDeletedHandler = null, loginEvent = null } = $props();
 
@@ -23,17 +24,6 @@
   let pfpURL = $state("");
 
   let channelInput = $state("");
-
-  // function checkLogin() {
-  //   if (!USER.value.channel) {
-  //     loginButtonPopover.show();
-  //     setTimeout(function () {
-  //       loginButtonPopover.hide();
-  //     }, 4000);
-  //     return false;
-  //   }
-  //   return true;
-  // } //checkLogin
 
   onMount(async () => {
     //listen to storage events from the login windows

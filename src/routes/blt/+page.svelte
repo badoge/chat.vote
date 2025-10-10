@@ -1402,6 +1402,14 @@
     startTriviaModal.showModal();
   } //showStartTriviaModal
 
+  function checkLogin() {
+    if (!USER.value.channel) {
+      showToast("You need to login first", "info", 2000);
+      return false;
+    }
+    return true;
+  } //checkLogin
+
   function startBracket() {
     if (!checkLogin()) {
       return;

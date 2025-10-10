@@ -4,6 +4,8 @@
   import { animate } from "animejs";
   import pkg from "validator";
   import { donkStorage } from "$lib/donkStorage.svelte.js";
+  import { showToast } from "../../../+layout.svelte";
+  import Navbar from "$lib/Navbar.svelte";
   const { escape } = pkg;
   let elements;
 
@@ -34,23 +36,17 @@
   let channel = $state(data.slug.toLowerCase().replace(/\s/g, ""));
 
   let streamer = "";
+  /**
+   * @type {WebSocket}
+   */
   let webSocket;
 
-  function connect() {
-    elements.topRight.innerHTML = `
-    <div class="btn-group" role="group" aria-label="log in button group">
-    <button type="button" class="btn btn-twitch"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></button>
-    <div class="btn-group" role="group">
-    <button id="btnGroupDropLogin" type="button" class="btn btn-twitch dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
-    <ul class="dropdown-menu dropdown-menu-lg-end" aria-label="Log out">
-    <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
-    </ul>
-    </div>
-    </div>`;
-    refreshData();
-    loadBadges(streamer);
-    loadPFP();
+  function refreshAndConnect() {
+    USER?.refresh();
+    connect();
+  }
 
+  function connect() {
     elements.game.style.display = "";
 
     //webSocket = new WebSocket("ws://localhost:9001");
@@ -58,7 +54,7 @@
 
     webSocket.onopen = function (event) {
       console.log(event);
-      webSocket.send(JSON.stringify({ command: "join", streamer: streamer, username: USER.channel, userid: USER.userID, access_token: USER.access_token }));
+      webSocket.send(JSON.stringify({ command: "join", streamer: streamer, username: USER?.value.channel, userid: USER?.value.userID, access_token: USER?.value.access_token }));
     };
 
     webSocket.onmessage = function (event) {
@@ -120,6 +116,9 @@
     elements.opponent.innerHTML = `<img src="/pics/donk.png" alt="profile pic" class="rounded-circle" style="height:2em;"> Your opponent`;
   } //resetGame
 
+  /**
+   * @param {string} opponent
+   */
   function startRound(opponent) {
     elements.rock.disabled = false;
     elements.paper.disabled = false;
@@ -127,11 +126,14 @@
     elements.opponent.innerHTML = `<img src="/pics/donk.png" alt="profile pic" class="rounded-circle" style="height:2em;"> ${escape(opponent)}`;
   } //startRound
 
+  /**
+   * @param {string} move
+   */
   function sendMove(move) {
     elements.rock.disabled = true;
     elements.paper.disabled = true;
     elements.scissors.disabled = true;
-    webSocket.send(JSON.stringify({ command: "move", streamer: streamer, userid: USER.userid, move: move }));
+    webSocket.send(JSON.stringify({ command: "move", streamer: streamer, userid: USER?.value.userid, move: move }));
   } //sendMove
 
   function showReset() {
@@ -140,6 +142,10 @@
     elements.scissors.disabled = true;
   } //showReset
 
+  /**
+   * @param {string} hand
+   * @param {any} move
+   */
   function animateHand(hand, move) {
     elements[`${hand}_rock`].style.display = "";
     elements[`${hand}_paper`].style.display = "none";
@@ -168,6 +174,8 @@
   <meta property="og:image" content="https://chat.vote/pics/ogimage.png" />
   <meta property="og:description" content="Interactive Rock Paper Scissors game that you can play with your twitch chat :)" />
 </svelte:head>
+
+<Navbar loginEvent={refreshAndConnect} />
 
 <div class="container-fluid text-center" id="game" style="display: none">
   <div class="row">

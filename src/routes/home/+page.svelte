@@ -6,39 +6,39 @@
       link: "/",
       name: "chat.vote",
       description: "chat.vote allows you to make polls that you vote on by typing in chat, it can also be used to collect suggestions from viewers",
-      thumbnail: "https://screenshot.donk.workers.dev/?url=https://chat.vote",
+      thumbnail: "https://screenshot.donk.workers.dev/?url=https://beta.chat.vote",
     },
     {
       link: "/poll",
       name: "chat.vote Polls",
       description: "Shareable polls. Anyone can vote by visiting a link instead of typing in chat",
-      thumbnail: "https://screenshot.donk.workers.dev/?url=https://chat.vote/poll",
+      thumbnail: "https://screenshot.donk.workers.dev/?url=https://beta.chat.vote/poll",
     },
 
     {
       link: "/games",
       name: "chat.vote Games",
       description: "A collection of mini games with Twitch chat interaction",
-      thumbnail: "https://screenshot.donk.workers.dev/?url=https://chat.vote/games",
+      thumbnail: "https://screenshot.donk.workers.dev/?url=https://beta.chat.vote/games",
     },
     {
       link: "/raffles",
       name: "chat.vote Raffles",
       description: "A raffles tool for Twitch chat",
-      thumbnail: "https://screenshot.donk.workers.dev/?url=https://chat.vote/raffles",
+      thumbnail: "https://screenshot.donk.workers.dev/?url=https://beta.chat.vote/raffles",
     },
     {
       link: "/blt",
       name: "chat.vote Brackets, (tier)Lists & trivia",
       description:
         "Brackets, tier lists, and trivia maker with Twitch chat integration. Can generate brackets and tier lists automatically from Spotify playlists, TierMaker.com tier lists, A Twitch channel's clips or emotes, YouTube channels or playlists",
-      thumbnail: "https://screenshot.donk.workers.dev/?url=https://chat.vote/blt",
+      thumbnail: "https://screenshot.donk.workers.dev/?url=https://beta.chat.vote/blt",
     },
     {
       link: "/playlist",
       name: "chat.vote Playlist",
       description: "Allows viewers to send song & video requests. Supports YouTube, Twitch, Spotify, Vimeo, TikTok, and Streamable",
-      thumbnail: "https://screenshot.donk.workers.dev/?url=https://chat.vote/playlist",
+      thumbnail: "https://screenshot.donk.workers.dev/?url=https://beta.chat.vote/playlist",
     },
   ];
 </script>

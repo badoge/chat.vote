@@ -523,6 +523,14 @@
     updateYesNo();
   } //resetYesno
 
+  function checkLogin() {
+    if (!USER.value.channel) {
+      showToast("You need to login first", "info", 2000);
+      return false;
+    }
+    return true;
+  } //checkLogin
+
   async function removeAndRestart() {
     if (!checkLogin() || !checkEmpty()) {
       return;
