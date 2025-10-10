@@ -5,35 +5,35 @@
    * @param {any} timeout
    */
   export function showToast(msg, type, timeout) {
-    // let id = Date.now();
-    // let toast = `
-    // <div id="${id}" class="toast align-items-center text-bg-${type}" role="alert" data-bs-delay="${timeout}" aria-live="assertive" aria-atomic="true">
-    //   <div class="d-flex">
-    //     <div class="toast-body" style="font-size:1.5em">${msg}</div>
-    //     <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-    //   </div>
-    // </div>`;
-    // document.getElementById("toastContainer")?.insertAdjacentHTML("beforeend", toast);
-    // const toastBootstrap = bootstrap.Toast.getOrCreateInstance(document.getElementById(id.toString()));
-    // toastBootstrap.show();
+    let id = Date.now().toString();
+    let toast = `
+    <div id="${id}" class="alert alert-${type} text-lg font-bold">
+      <span>${msg}</span>
+    </div>`;
+    document.getElementById("toastContainer")?.insertAdjacentHTML("beforeend", toast);
+
+    setTimeout(() => {
+      document.getElementById(id).style.transition = "opacity 0.3s ease";
+      document.getElementById(id).style.opacity = 0;
+      setTimeout(() => {
+        document.getElementById(id)?.remove();
+      }, timeout + 1000);
+    }, timeout);
   } //showToast
 </script>
 
 <script>
   import "../app.css";
-
   let { children } = $props();
 </script>
 
-<div aria-live="polite" aria-atomic="true" class="position-relative">
-  <div id="toastContainer" class="toast-container top-0 end-0 p-3"></div>
-</div>
+<div id="toastContainer" class="toast toast-top toast-end"></div>
 
 {@render children?.()}
 
 <style>
   #toastContainer {
-    position: fixed;
+    margin-top: 55px;
     z-index: 1056;
     font-weight: bold;
   }

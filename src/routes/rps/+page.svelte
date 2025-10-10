@@ -13,6 +13,7 @@
   import { donkStorage } from "$lib/donkStorage.svelte";
 
   import pkg from "validator";
+  import { showToast } from "../+layout.svelte";
   const { escape } = pkg;
   let USER = donkStorage("USER", null);
 
@@ -27,16 +28,21 @@
    */
   let webSocket;
 
+  function refreshAndConnect() {
+    USER?.refresh();
+    connect();
+  }
+
   function connect() {
     //sendUsername(`chat.vote/rps`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
 
-    //webSocket = new WebSocket("ws://localhost:9001");
-    webSocket = new WebSocket("wss://rps.chat.vote");
+    webSocket = new WebSocket("ws://localhost:9001");
+    //webSocket = new WebSocket("wss://rps.chat.vote");
 
     webSocket.onopen = function (event) {
       console.log(event);
       if (event.type == "open") {
-        //showToast("Connected to server", "success", 1000);
+        showToast("Connected to server", "info", 1000);
       }
     };
 
@@ -45,11 +51,11 @@
 
       switch (data.id) {
         case "toast":
-          //showToast(data.message, data.type, 2000);
+          showToast(data.message, data.type, 2000);
           break;
         case "start":
           //sent when the game starts/resets after clicking the start new game button
-          //showToast(data.message, data.type, 2000);
+          showToast(data.message, data.type, 2000);
           resetBracket();
           break;
 
@@ -65,17 +71,17 @@
 
         case "first_round":
           //sent after clicking next round for the first time after clicking start new game
-          //showToast(data.message, data.type, 2000);
+          showToast(data.message, data.type, 2000);
           createBracket(data.bracket);
           break;
 
         case "next_round":
-          //showToast(data.message, data.type, 2000);
+          showToast(data.message, data.type, 2000);
 
           break;
 
         case "game_over":
-          //showToast(data.message, data.type, 2000);
+          showToast(data.message, data.type, 2000);
 
           break;
 
@@ -88,7 +94,7 @@
 
     webSocket.onclose = function (event) {
       if (event.type == "close") {
-        //showToast("disconnected from server", "danger", 2000);
+        showToast("disconnected from server", "danger", 2000);
       }
       console.log(event);
     };
@@ -218,7 +224,7 @@
   <meta property="og:description" content="Interactive Rock Paper Scissors game that you can play with your twitch chat :)" />
 </svelte:head>
 
-<Navbar loginEvent={() => USER.refresh()} />
+<Navbar loginEvent={refreshAndConnect} />
 
 <div class="flex flex-col w-fit mx-auto">
   <h1 class="text-2xl font-extrabold text-center m-3"><img src="/pics/donk.png" alt="donk" class="w-8 inline align-text-bottom" /> chat.vote Rock Paper Scissors</h1>
