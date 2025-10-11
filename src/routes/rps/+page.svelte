@@ -36,8 +36,8 @@
   function connect() {
     //sendUsername(`chat.vote/rps`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
 
-    webSocket = new WebSocket("ws://localhost:9001");
-    //webSocket = new WebSocket("wss://rps.chat.vote");
+    //webSocket = new WebSocket("ws://localhost:9001");
+    webSocket = new WebSocket("wss://rps.chat.vote");
 
     webSocket.onopen = function (event) {
       console.log(event);
@@ -228,6 +228,7 @@
 
 <div class="flex flex-col w-fit mx-auto">
   <h1 class="text-2xl font-extrabold text-center m-3"><img src="/pics/donk.png" alt="donk" class="w-8 inline align-text-bottom" /> chat.vote Rock Paper Scissors</h1>
+  <small class="text-error text-center">not working yet :)</small>
   <div class="card card-border bg-base-200 m-5">
     <div class="card-body flex flex-row">
       <div class="p-2 flex flex-row">
