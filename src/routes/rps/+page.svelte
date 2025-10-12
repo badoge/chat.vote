@@ -8,7 +8,7 @@
   import IcBaselineRocketLaunch from "~icons/ic/baseline-rocket-launch";
   import IcBaselineArrowForwardIos from "~icons/ic/baseline-arrow-forward-ios";
   import IcBaselineInfo from "~icons/ic/baseline-info";
-  import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
+  import IcBaselineStar from "~icons/ic/baseline-star";
   import IcBaselineInsertLink from "~icons/ic/baseline-insert-link";
   import IcBaselineContentCopy from "~icons/ic/baseline-content-copy";
   import IcRoundGroups from "~icons/ic/round-groups";
@@ -65,6 +65,7 @@
     }
 
     sendUsername(`beta.chat.vote/rps`, USER?.value.channel, USER?.value.platform == "twitch" ? `twitch - ${USER?.value.twitchLogin}` : "youtube");
+
     webSocket = new WebSocket("ws://localhost:9001");
     //webSocket = new WebSocket("wss://rps.chat.vote");
 
@@ -85,25 +86,21 @@
           break;
 
         case "reset":
-          //sent after clicking the reset game button
-          document.getElementById("reset").disabled = false;
+          //sent after clicking the create a new room button
           gameStatus = "open";
           showToast(data.message, data.type, 2000);
-          resetBracket();
           break;
 
         case "start":
-          //sent after clicking the start new game button
-          document.getElementById("start").disabled = false;
-
+          //sent after clicking the start game button
           gameStatus = "active";
-          showToast(data.message, data.type, 2000);
-          resetBracket();
+          showToast(data.message, data.type, 3000);
+          createBracket(data.bracket);
           break;
 
         case "join":
           //sent when a viewer joins
-          players.set(data.username, {});
+          players.set(data.username, { userid: data.userid });
           console.log(players);
           break;
 
@@ -112,14 +109,8 @@
           updateUser(data.username);
           break;
 
-        case "first_round":
-          //sent after clicking next round for the first time after clicking start new game
-          showToast(data.message, data.type, 2000);
-          createBracket(data.bracket);
-          break;
-
         case "next_round":
-          document.getElementById("nest").disabled = false;
+          document.getElementById("next").disabled = false;
           showToast(data.message, data.type, 2000);
           break;
 
@@ -173,14 +164,6 @@
     document.getElementById("next").disabled = true;
     webSocket.send(JSON.stringify({ command: "next", username: USER?.value.channel, userid: USER?.value.userID, access_token: USER?.value.access_token }));
   } //next
-
-  function resetBracket() {
-    document.getElementById("brackets").innerHTML = `
-  <div class="card">
-    <div class="card-header">Players</div>
-    <div class="card-body" id="players"></div>
-  </div>`;
-  } //resetBracket
 
   /**
    * @param {any} username
@@ -280,32 +263,59 @@
 
   <div class="card card-border bg-base-200 m-5">
     <div class="card-body flex-row">
-      <div class="card card-border border-accent bg-base-100 w-full">
-        <div class="card-body">
-          <div class="card-title w-full">
-            <IcRoundGroups class="text-2xl" />Players <span class="opacity-70">({players.size})</span>
-          </div>
-          <div class="w-[90vw] h-[70vh] overflow-auto">
-            <div class="flex flex-wrap justify-between gap-1" id="players">
-              {#each players.entries() as [key, value]}
-                <div class="join w-fit">
-                  <button class="btn btn-outline btn-accent join-item pointer-events-none pfp-container">
-                    {#if value.pfp}
-                      <img src={value.pfp} alt="profile pic" class="rounded-s pfp" />
-                    {:else}
-                      <img src="/pics/donk.png" alt="profile pic" class="rounded-s pfp" />
-                    {/if}
-                  </button>
-
-                  <button class="btn btn-outline btn-accent join-item pointer-events-none text-lg font-bold">{key} </button>
-                </div>
-              {/each}
+      {#if gameStatus == "open"}
+        <div class="card card-border border-accent bg-base-100 w-full">
+          <div class="card-body">
+            <div class="card-title w-full">
+              <IcRoundGroups class="text-2xl" />Players <span class="opacity-70">({players.size})</span>
             </div>
+            <div class="w-[90vw] h-[70vh] overflow-auto">
+              <div class="flex flex-wrap justify-between gap-1">
+                {#each players.entries() as [key, value]}
+                  <div class="join w-fit">
+                    <button class="btn btn-outline btn-accent join-item pointer-events-none pfp-container">
+                      {#if value.pfp}
+                        <img src={value.pfp} alt="profile pic" class="rounded-s pfp" />
+                      {:else}
+                        <img src="/pics/donk.png" alt="profile pic" class="rounded-s pfp" />
+                      {/if}
+                    </button>
 
-            <div id="bracket"></div>
+                    <button class="btn btn-outline btn-accent join-item pointer-events-none text-lg font-bold">{key} </button>
+                  </div>
+                {/each}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      {:else if gameStatus == "active"}
+        <div class="card card-border border-accent bg-base-100 w-full">
+          <div class="card-body">
+            <div class="card-title w-full">
+              <IcRoundGroups class="text-2xl" />Players <span class="opacity-70">({players.size})</span>
+            </div>
+            <div class="w-[90vw] h-[70vh] overflow-auto">
+              <div class="flex flex-wrap justify-between gap-1">
+                {#each players.entries() as [key, value]}
+                  <div class="join w-fit">
+                    <button class="btn btn-outline btn-accent join-item pointer-events-none pfp-container">
+                      {#if value.pfp}
+                        <img src={value.pfp} alt="profile pic" class="rounded-s pfp" />
+                      {:else}
+                        <img src="/pics/donk.png" alt="profile pic" class="rounded-s pfp" />
+                      {/if}
+                    </button>
+
+                    <button class="btn btn-outline btn-accent join-item pointer-events-none text-lg font-bold">{key} </button>
+                  </div>
+                {/each}
+              </div>
+            </div>
+          </div>
+        </div>
+      {:else}
+        <span class="text-2xl opacity-70 font-thin">Create a new room to start</span>
+      {/if}
     </div>
   </div>
 
@@ -313,11 +323,11 @@
     <div class="card-body">
       <h2 class="card-title"><IcBaselineTune /> Game controls</h2>
       <div class="flex flex-row justify-between mb-10">
-        <div class="tooltip tooltip-error" data-tip="Removes everyone from the room">
-          <button onclick={reset} id="reset" type="button" class="btn btn-error" disabled={gameStatus == "disconnected"}><IcBaselineDeleteForever />Reset game</button>
+        <div class="tooltip tooltip-error" data-tip="Creates a new empty room to let players join">
+          <button onclick={reset} id="reset" type="button" class="btn btn-error" disabled={gameStatus == "disconnected"}><IcBaselineStar />Create a new room</button>
         </div>
         <div class="tooltip tooltip-accent" data-tip="Closes the room and creates matchups for the joined players">
-          <button onclick={start} id="start" type="button" class="btn btn-accent" disabled={gameStatus !== ""}><IcBaselineRocketLaunch />Start game</button>
+          <button onclick={start} id="start" type="button" class="btn btn-accent" disabled={gameStatus !== "open"}><IcBaselineRocketLaunch />Start game</button>
         </div>
         <div class="tooltip tooltip-info" data-tip="Make sure all matches are done before moving to the next round">
           <button onclick={next} id="next" type="button" class="btn btn-info" disabled={gameStatus !== "active"}><IcBaselineArrowForwardIos />Next round</button>

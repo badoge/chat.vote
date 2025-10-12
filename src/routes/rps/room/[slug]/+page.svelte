@@ -33,9 +33,12 @@
   let { data } = $props();
   let streamer = $state(data.slug.toLowerCase().replace(/\s/g, ""));
 
+  let opponent = $state("Opponent");
+
   //disconnected - not connected to the server
   //connected - connected to the server
-
+  //waiting
+  //active
   let status = $state("disconnected");
 
   /**
@@ -68,29 +71,50 @@
         case "starting":
           //sent when the game starts/resets after the streamer clicks the start new game button
           showToast(data.message, data.type, 2000);
+          status = "waiting";
           resetGame();
           break;
 
         case "round":
-          //sent when the a new round starts
+          //sent just before a new round starts
           showToast(data.message, data.type, 2000);
-          startRound(data.opponent);
+          opponent = data.opponent;
+          status = "waiting";
+          break;
+
+        case "start":
+          //sent after the round info is sent and its ok to start sending moves
+          showToast(data.message, data.type, 2000);
+          status = "active";
           break;
 
         case "moved":
           //sent if the move was accepted
           showToast(data.message, data.type, 2000);
+          status = "waiting";
+
           break;
 
-        case "won":
         case "lost":
           //sent if the move was accepted
           showToast(data.message, data.type, 2000);
+          status = "waiting";
+          opponent = "Waiting for next round";
+          showReset();
+          break;
+
+        case "lost":
+          //sent if the move was accepted
+          showToast(data.message, data.type, 2000);
+          status = "waiting";
+          opponent = "Waiting for next round";
           showReset();
           break;
 
         case "game_ended":
           showToast(data.message, data.type, 2000);
+          status = "waiting";
+          11;
           resetGame();
           break;
 
@@ -201,7 +225,7 @@
           <img id="right_scissors" src="/rps/right_scissors.png" alt="right scissors" style="display: none" class="right-hand-img" />
           <img src="/pics/donk.png" alt="right donk" style="height: 100px; width: 100px" class="mirror-img" />
         </div>
-        <div class="text-center">Opponent</div>
+        <div class="text-center">{() => escape(opponent)}</div>
       </div>
     </div>
   </div>
