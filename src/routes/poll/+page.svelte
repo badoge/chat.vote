@@ -348,7 +348,7 @@
 
   async function createPoll() {
     if (checkEmpty()) {
-      showToast("No poll options added", "warning", 3000);
+      showToast("No poll options added", "alert-warning", 3000);
       return;
     }
 
@@ -357,7 +357,7 @@
     }
 
     if (checkSize()) {
-      showToast("Too many poll options", "danger", 3000);
+      showToast("Too many poll options", "alert-error", 3000);
       return;
     }
 
@@ -415,7 +415,7 @@
     }
 
     if (pollOptionsArray.length < 2) {
-      showToast("You can't create a poll with less than 2 options", "warning", 3000);
+      showToast("You can't create a poll with less than 2 options", "alert-warning", 3000);
       return;
     }
 
@@ -653,7 +653,7 @@
       if (optionCards.length > 2) {
         optionCards[index].remove();
       } else {
-        showToast("You can't have less than 2 options", "danger", 3000);
+        showToast("You can't have less than 2 options", "alert-error", 3000);
       }
     }
   } //deleteInput

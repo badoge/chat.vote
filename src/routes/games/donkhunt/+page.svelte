@@ -150,7 +150,7 @@
                 if (ableToMoveCount < 1)
                   setTimeout(() => {
                     //wrap into arrow func to render new DOM
-                    showToast("Hunters have no valid moves! Skipping turn.", "warning", 3000);
+                    showToast("Hunters have no valid moves! Skipping turn.", "alert-warning", 3000);
                     DONKHUNT.functions.turn(1);
                   }, 50);
                 break;
@@ -244,7 +244,7 @@
                 }
               } else {
                 console.warn("Bot: Hunters cannot move!");
-                showToast("Hunters have no valid moves - they skip their turn.", "warning", 3000);
+                showToast("Hunters have no valid moves - they skip their turn.", "alert-warning", 3000);
               }
               break;
             case "target":
@@ -338,7 +338,7 @@
               if (movableCount < 1) {
                 setTimeout(() => {
                   //wrap into arrow func to render new DOM
-                  showToast("Hunters have no valid moves! Skipping turn.", "warning", 3000);
+                  showToast("Hunters have no valid moves! Skipping turn.", "alert-warning", 3000);
                   DONKHUNT.functions.turn(1);
                 }, 50);
               }

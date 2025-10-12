@@ -9,7 +9,7 @@
    */
   function copyCommand(command) {
     navigator.clipboard.writeText(command);
-    showToast("Command copied :)", "info", 1000);
+    showToast("Command copied :)", "alert-info", 1000);
   } //copyLink
 
   /**

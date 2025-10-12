@@ -7,7 +7,7 @@
   export function showToast(msg, type, timeout) {
     let id = Date.now().toString();
     let toast = `
-    <div id="${id}" class="alert alert-${type} text-lg font-bold">
+    <div id="${id}" class="alert ${type} text-lg font-bold">
       <span>${msg}</span>
     </div>`;
     document.getElementById("toastContainer")?.insertAdjacentHTML("beforeend", toast);

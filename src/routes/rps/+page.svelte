@@ -8,20 +8,27 @@
   import IcBaselineRocketLaunch from "~icons/ic/baseline-rocket-launch";
   import IcBaselineArrowForwardIos from "~icons/ic/baseline-arrow-forward-ios";
   import IcBaselineInfo from "~icons/ic/baseline-info";
-
+  import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
+  import IcBaselineInsertLink from "~icons/ic/baseline-insert-link";
   import IcBaselineContentCopy from "~icons/ic/baseline-content-copy";
   import { donkStorage } from "$lib/donkStorage.svelte";
 
   import pkg from "validator";
   import { showToast } from "../+layout.svelte";
+  import { sendUsername } from "$lib/functions";
   const { escape } = pkg;
   let USER = donkStorage("USER", null);
+
+  //inactive - not connected to the server
+  //open - connected to the server but didnt start
+  //active - connected and started
+  let gameStatus = $state("inactive");
 
   onMount(async () => {
     let randomAnimationsInterval = setInterval(() => {
       randomAnimations();
     }, 4500);
-  });
+  }); //onMount
 
   /**
    * @type {WebSocket}
@@ -31,18 +38,22 @@
   function refreshAndConnect() {
     USER?.refresh();
     connect();
-  }
+  } //refreshAndConnect
 
   function connect() {
-    //sendUsername(`chat.vote/rps`, USER.channel, USER.platform == "twitch" ? `twitch - ${USER.twitchLogin}` : "youtube");
+    if (USER?.value.channel && USER?.value.access_token) {
+      showToast("You need to login to play", "alert-error", 40000);
+      return;
+    }
 
-    //webSocket = new WebSocket("ws://localhost:9001");
-    webSocket = new WebSocket("wss://rps.chat.vote");
+    sendUsername(`beta.chat.vote/rps`, USER?.value.channel, USER?.value.platform == "twitch" ? `twitch - ${USER?.value.twitchLogin}` : "youtube");
+    webSocket = new WebSocket("ws://localhost:9001");
+    //webSocket = new WebSocket("wss://rps.chat.vote");
 
     webSocket.onopen = function (event) {
       console.log(event);
       if (event.type == "open") {
-        showToast("Connected to server", "info", 1000);
+        showToast("Connected to server", "alert-info", 1000);
       }
     };
 
@@ -94,7 +105,7 @@
 
     webSocket.onclose = function (event) {
       if (event.type == "close") {
-        showToast("disconnected from server", "danger", 2000);
+        showToast("disconnected from server", "alert-error", 2000);
       }
       console.log(event);
     };
@@ -103,6 +114,14 @@
       console.log(error);
     };
   } //connect
+
+  function reset() {
+    document.getElementById("start").disabled = true;
+    setTimeout(() => {
+      document.getElementById("start").disabled = false;
+    }, 2000);
+    webSocket.send(JSON.stringify({ command: "reset", username: USER?.value.channel, userid: USER?.value.userID, access_token: USER?.value.access_token }));
+  } //reset
 
   function start() {
     document.getElementById("start").disabled = true;
@@ -211,6 +230,7 @@
 
   function copyLink() {
     navigator.clipboard.writeText(`https://chat.vote/rps/play/${USER?.value.channel || ""}`);
+    showToast("Link copied", "info", 1000);
   } //copyLink
 </script>
 
@@ -255,10 +275,22 @@
   <div class="card card-border w-120 bg-base-200 m-5">
     <div class="card-body">
       <h2 class="card-title"><IcBaselineTune /> Game controls</h2>
-      <button onclick={start} id="start" type="button" class="btn btn-primary mb-3"><IcBaselineRocketLaunch />Start new game</button>
-      <button onclick={next} id="next" type="button" class="btn btn-info mb-3"><IcBaselineArrowForwardIos />Next round</button>
+      <div class="flex flex-row justify-between mb-10">
+        <div class="tooltip tooltip-error" data-tip="Removes everyone from the room">
+          <button onclick={reset} id="start" type="button" class="btn btn-error"><IcBaselineDeleteForever />Reset game</button>
+        </div>
+        <div class="tooltip tooltip-accent" data-tip="Closes the room and creates matchups for the joined players">
+          <button onclick={start} id="start" type="button" class="btn btn-accent"><IcBaselineRocketLaunch />Start game</button>
+        </div>
+        <div class="tooltip tooltip-info" data-tip="Make sure all matches are done before moving to the next round">
+          <button onclick={next} id="next" type="button" class="btn btn-info"><IcBaselineArrowForwardIos />Next round</button>
+        </div>
+      </div>
+
+      <div class="mb-10 text-lg font-bold"><IcBaselineInfo class="inline align-text-bottom" /> Game status: {gameStatus}</div>
+
       <div class="join">
-        <button class="btn btn-warning join-item pointer-events-none">Game link</button>
+        <button class="btn btn-warning join-item pointer-events-none"><IcBaselineInsertLink />Game link</button>
         <input type="text" class="input input-warning join-item pointer-events-none text-base-content" onclick={copyLink} value="https://chat.vote/rps/play/{USER?.value?.channel}" />
         <button class="btn btn-warning join-item" onclick={copyLink}> <IcBaselineContentCopy /></button>
       </div>

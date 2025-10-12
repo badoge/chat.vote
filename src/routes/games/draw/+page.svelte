@@ -286,7 +286,7 @@
       selectedemotes = selectedemotes.filter((list) => list.name !== element);
     });
     if (selectedemotes.length < 2) {
-      showToast(`Not enough emotes selected`, "warning", 3000);
+      showToast(`Not enough emotes selected`, "alert-warning", 3000);
       document.getElementById("settingsDrawer").checked = true;
       return;
     }
@@ -316,7 +316,7 @@
 
   function correct(user) {
     if (DRAW.correctUsers >= DRAW.points) {
-      showToast(`No more points left; starting new round`, "warning", 3000);
+      showToast(`No more points left; starting new round`, "alert-warning", 3000);
       start();
       return;
     }

@@ -221,7 +221,7 @@
         updateGraph();
         SHAPES.shapesGame.lives -= 1;
         SHAPES.shapesGame.choices[selected].isKnownToBeIncorrect(true);
-        showToast("Incorrect choice!", "danger", 3000);
+        showToast("Incorrect choice!", "alert-error", 3000);
 
         if (SHAPES.shapesGame.lives < 1) {
           endGame(false);

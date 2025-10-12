@@ -542,7 +542,7 @@
 
   async function drawRaffleWinner() {
     if (raffle_users.length < 1) {
-      showToast("No one has joined the raffle", "warning", 2500);
+      showToast("No one has joined the raffle", "alert-warning", 2500);
       return;
     }
     if (RAFFLES.value.animateDrawing) {
@@ -962,7 +962,7 @@
         elements.confirmJoin.checked = false;
         saveSettings();
         let text = await response.text();
-        showToast(`Bot unable to send messages "${text}"... Disabling bot settings`, "danger", 4000);
+        showToast(`Bot unable to send messages "${text}"... Disabling bot settings`, "alert-error", 4000);
         console.log(`botSay response: 418 ${text}`);
         return;
       }
@@ -1013,7 +1013,7 @@
 
   function checkLogin() {
     if (!USER.value.channel) {
-      showToast("You need to login first", "info", 2000);
+      showToast("You need to login first", "alert-info", 2000);
       return false;
     }
     return true;
@@ -1035,7 +1035,7 @@
       !RAFFLES.value.allowVips &&
       !RAFFLES.value.allowFirstTimeChatters
     ) {
-      showToast("No one will be able to join the raffle", "danger", 3000);
+      showToast("No one will be able to join the raffle", "alert-error", 3000);
       document.getElementById("settingsDrawer").checked = true;
       elements.whoCanJoinCard.scrollIntoView();
       let flashBorder = setInterval(() => {

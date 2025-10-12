@@ -87,10 +87,10 @@
 
   function startnw() {
     if (WORDLE.wordList.length < 2) {
-      showToast(`Chat needs to submit at least 2 words before you can start.`, "warning", 6000);
+      showToast(`Chat needs to submit at least 2 words before you can start.`, "alert-warning", 6000);
       return;
     } else {
-      showToast(`A random word has been picked from chat's suggestions. Start guessing :)`, "success", 6000);
+      showToast(`A random word has been picked from chat's suggestions. Start guessing :)`, "alert-success", 6000);
     }
     document.getElementById("nwoutput2").innerHTML = "";
     shownw();
@@ -164,7 +164,7 @@
         return;
       }
       if (WORDLE.verifywords && !WORDLE.words.includes(guess.join(""))) {
-        showToast(`"${guess.join("")}" is not a word <img src="/pics/donk.png" alt="donk" style="height:24px; width:24px;">`, "danger", 3000);
+        showToast(`"${guess.join("")}" is not a word <img src="/pics/donk.png" alt="donk" style="height:24px; width:24px;">`, "alert-error", 3000);
         return;
       }
       for (let index = 0; index < WORDLE.wordlength; index++) {

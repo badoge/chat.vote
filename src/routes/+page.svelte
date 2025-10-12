@@ -64,7 +64,6 @@
   import { createGrid, themeQuartz, ModuleRegistry, AllCommunityModule } from "ag-grid-community";
   import { donkStorage, resetSettings } from "$lib/donkStorage.svelte";
   import { showToast } from "./+layout.svelte";
-  import { form } from "$app/server";
 
   let elements;
   /**
@@ -487,7 +486,7 @@
   function resetPoll() {
     if (yesNoMode) {
       restartPoll();
-      showToast("YEA/NAY mode options can't be removed", "warning", 2000);
+      showToast("YEA/NAY mode options can't be removed", "alert-warning", 2000);
       return;
     }
 
@@ -525,7 +524,7 @@
 
   function checkLogin() {
     if (!USER.value.channel) {
-      showToast("You need to login first", "info", 2000);
+      showToast("You need to login first", "alert-info", 2000);
       return false;
     }
     return true;
@@ -536,7 +535,7 @@
       return;
     }
     if (yesNoMode) {
-      showToast(`This feature is unavailable while <img src="/pics/yeanay.webp" alt="yea nay" style="height:1.5em;" />Mode is on`, "primary", 5000);
+      showToast(`This feature is unavailable while <img src="/pics/yeanay.webp" alt="yea nay" style="height:1.5em;" />Mode is on`, "alert-primary", 5000);
       return;
     }
     // sendData("chat.vote", USER.value.channel, USER.value.platform == "twitch" ? `twitch - ${USER.value.twitchLogin}` : "youtube", {
@@ -605,7 +604,7 @@
       return;
     }
     if (yesNoMode) {
-      showToast(`This feature is unavailable while <img src="/pics/yeanay.webp" alt="yea nay" style="height:1.5em;" />Mode is on`, "primary", 5000);
+      showToast(`This feature is unavailable while <img src="/pics/yeanay.webp" alt="yea nay" style="height:1.5em;" />Mode is on`, "alert-primary", 5000);
       return;
     }
     // sendData("chat.vote", USER.value.channel, USER.value.platform == "twitch" ? `twitch - ${USER.value.twitchLogin}` : "youtube", {
@@ -930,7 +929,7 @@
       }
 
       if (suggestionLimitReached) {
-        showToast("Viewer suggestion limit reached", "warning", 5000);
+        showToast("Viewer suggestion limit reached", "alert-warning", 5000);
         disableSuggestButton();
         return;
       }
@@ -1032,7 +1031,7 @@
     //       .draw();
     //     vote_results.splice(i, 1);
     //     updateChart();
-    //     showToast(bootstrap,`Removed ${username}'s suggestions because they got timed out`, "warning", 2000);
+    //     showToast(bootstrap,`Removed ${username}'s suggestions because they got timed out`, "alert-warning", 2000);
     //     numberOfSuggestions--;
     //   }
     // }
@@ -1110,7 +1109,7 @@
       return true;
     }
     if (!vote_results[0]) {
-      showToast("Poll is empty", "warning", 2000);
+      showToast("Poll is empty", "alert-warning", 2000);
       return false;
     }
 
@@ -1143,7 +1142,7 @@
       updateChart();
       elements.pollOption.value = "";
     } else {
-      showToast("Duplicate/invalid input", "warning", 5000);
+      showToast("Duplicate/invalid input", "alert-warning", 5000);
       elements.pollOption.value = "";
     }
   } //addOption
@@ -1154,7 +1153,7 @@
     }
 
     if (yesNoMode) {
-      showToast(`This feature is unavailable while <img src="/pics/yeanay.webp" alt="yeanay" style="height:1.5em;" />Mode is on`, "primary", 5000);
+      showToast(`This feature is unavailable while <img src="/pics/yeanay.webp" alt="yeanay" style="height:1.5em;" />Mode is on`, "alert-primary", 5000);
       return;
     }
     let og = elements.optionList.value.split(/\r?\n/);
@@ -1183,7 +1182,7 @@
         pushVoteResults(oid, f2[i], replaceEmotes(f2[i], thirdPartyEmotes), USER.value.channel, 0, null);
         updateChart();
       } else {
-        showToast("Some of the entered options were duplicate/invalid", "warning", 5000);
+        showToast("Some of the entered options were duplicate/invalid", "alert-warning", 5000);
       }
     }
   } //addOptionBulk
@@ -1300,7 +1299,7 @@
 
   function download(type, format) {
     if (yesNoMode) {
-      showToast("Export Data does not support Yea/Nay mode for now :(", "danger", 2000);
+      showToast("Export Data does not support Yea/Nay mode for now :(", "alert-error", 2000);
       return;
     }
     if (!checkLogin() || !checkEmpty()) {
@@ -1534,7 +1533,7 @@
 
   //     if (cellid[4] > 0) {
   //       restartPoll();
-  //       showToast(`Poll restarted`, "warning", 3000);
+  //       showToast(`Poll restarted`, "alert-warning", 3000);
   //     }
 
   //     updateChart();
@@ -1775,7 +1774,7 @@
       let response = await fetch(`https://overlay.chat.vote/generate`, requestOptions);
       let result = await response.json();
       console.log(result);
-      showToast(result.message, "info", 3000);
+      showToast(result.message, "alert-info", 3000);
       overlayID = result.data.id;
       elements.overlayLink.value = `https://chat.vote/overlay#${result.data.id}`;
       localStorage.setItem("OVERLAY", result.data.id);
@@ -1789,14 +1788,14 @@
   async function copyOverlayLink() {
     let link = elements.overlayLink.value;
     if (!link) {
-      showToast("Generate an overlay link first", "warning", 2000);
+      showToast("Generate an overlay link first", "alert-warning", 2000);
       return;
     }
     try {
       await navigator.clipboard.writeText(link);
-      showToast("Link copied :)", "success", 1000);
+      showToast("Link copied :)", "alert-success", 1000);
     } catch (error) {
-      showToast("Could not copy link :(", "danger", 1000);
+      showToast("Could not copy link :(", "alert-error", 1000);
     }
   } //copyOverlayLink
 
@@ -1845,7 +1844,7 @@
 
         dataChannel.onopen = (event) => {
           console.log("datachannel open");
-          showToast("Overlay connected", "success", 1000);
+          showToast("Overlay connected", "alert-success", 1000);
           elements.connectOverlayButton.innerHTML = `<i class="material-icons notranslate">done</i>Overlay connected`;
           elements.connectOverlayButton.disabled = true;
           document.getElementById("overlayX").disabled = false;

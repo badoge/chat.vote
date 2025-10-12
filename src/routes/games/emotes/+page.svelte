@@ -259,7 +259,7 @@
       clearInterval(EMOTEBENCHMARK.interval);
       EMOTEBENCHMARK.interval = null;
       EMOTEBENCHMARK.turn = 0;
-      showToast("Not enough emotes remaining.", "warning", 5000);
+      showToast("Not enough emotes remaining.", "alert-warning", 5000);
       document.getElementById("settingsDrawer").checked = true;
       elements.start.disabled = false;
       return;
