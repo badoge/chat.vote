@@ -11,23 +11,41 @@
   import IcBaselineDeleteForever from "~icons/ic/baseline-delete-forever";
   import IcBaselineInsertLink from "~icons/ic/baseline-insert-link";
   import IcBaselineContentCopy from "~icons/ic/baseline-content-copy";
+  import IcRoundGroups from "~icons/ic/round-groups";
   import { donkStorage } from "$lib/donkStorage.svelte";
 
   import pkg from "validator";
   import { showToast } from "../+layout.svelte";
-  import { sendUsername } from "$lib/functions";
+  import { addBadges, sendUsername } from "$lib/functions";
+  import { SvelteMap } from "svelte/reactivity";
   const { escape } = pkg;
   let USER = donkStorage("USER", null);
 
-  //inactive - not connected to the server
-  //open - connected to the server but didnt start
+  //disconnected - not connected to the server
+  //connected - connected to the server
+  //open - connected to the server and started a room but didnt start the game
   //active - connected and started
-  let gameStatus = $state("inactive");
+  let gameStatus = $state("disconnected");
+
+  let players = $state(new SvelteMap());
+
+  let chatters = new Map();
 
   onMount(async () => {
     let randomAnimationsInterval = setInterval(() => {
-      randomAnimations();
-    }, 4500);
+      let moves = ["rock", "paper", "scissors"];
+
+      document.getElementById("left_rock").style.display = "";
+      document.getElementById("left_paper").style.display = "none";
+      document.getElementById("left_scissors").style.display = "none";
+
+      document.getElementById("right_rock").style.display = "";
+      document.getElementById("right_paper").style.display = "none";
+      document.getElementById("right_scissors").style.display = "none";
+
+      animateHand("left", moves[Math.floor(Math.random() * moves.length)]);
+      animateHand("right", moves[Math.floor(Math.random() * moves.length)]);
+    }, 6000);
   }); //onMount
 
   /**
@@ -41,8 +59,8 @@
   } //refreshAndConnect
 
   function connect() {
-    if (USER?.value.channel && USER?.value.access_token) {
-      showToast("You need to login to play", "alert-error", 40000);
+    if (!USER?.value.channel || !USER?.value.access_token) {
+      showToast("You need to login to play", "alert-error", 4000);
       return;
     }
 
@@ -54,6 +72,7 @@
       console.log(event);
       if (event.type == "open") {
         showToast("Connected to server", "alert-info", 1000);
+        gameStatus = "connected";
       }
     };
 
@@ -64,15 +83,28 @@
         case "toast":
           showToast(data.message, data.type, 2000);
           break;
-        case "start":
-          //sent when the game starts/resets after clicking the start new game button
+
+        case "reset":
+          //sent after clicking the reset game button
+          document.getElementById("reset").disabled = false;
+          gameStatus = "open";
           showToast(data.message, data.type, 2000);
           resetBracket();
           break;
 
-        case "update":
+        case "start":
+          //sent after clicking the start new game button
+          document.getElementById("start").disabled = false;
+
+          gameStatus = "active";
+          showToast(data.message, data.type, 2000);
+          resetBracket();
+          break;
+
+        case "join":
           //sent when a viewer joins
-          addUser(data.username);
+          players.set(data.username, {});
+          console.log(players);
           break;
 
         case "update_move":
@@ -87,8 +119,8 @@
           break;
 
         case "next_round":
+          document.getElementById("nest").disabled = false;
           showToast(data.message, data.type, 2000);
-
           break;
 
         case "game_over":
@@ -115,27 +147,30 @@
     };
   } //connect
 
+  /**
+   * @param {any} target
+   * @param {{ [x: string]: any; username: any; color: any; badges: any; }} context
+   * @param {any} msg
+   * @param {any} self
+   */
+  async function handleMessage(target, context, msg, self) {
+    if (!chatters.get(context.username)) {
+      chatters.set(context.username, { userid: context["user-id"], color: context.color, badges: context.badges });
+    }
+  } //handleMessage
+
   function reset() {
-    document.getElementById("start").disabled = true;
-    setTimeout(() => {
-      document.getElementById("start").disabled = false;
-    }, 2000);
+    document.getElementById("reset").disabled = true;
     webSocket.send(JSON.stringify({ command: "reset", username: USER?.value.channel, userid: USER?.value.userID, access_token: USER?.value.access_token }));
   } //reset
 
   function start() {
     document.getElementById("start").disabled = true;
-    setTimeout(() => {
-      document.getElementById("start").disabled = false;
-    }, 2000);
     webSocket.send(JSON.stringify({ command: "start", username: USER?.value.channel, userid: USER?.value.userID, access_token: USER?.value.access_token }));
   } //start
 
   function next() {
     document.getElementById("next").disabled = true;
-    setTimeout(() => {
-      document.getElementById("next").disabled = false;
-    }, 2000);
     webSocket.send(JSON.stringify({ command: "next", username: USER?.value.channel, userid: USER?.value.userID, access_token: USER?.value.access_token }));
   } //next
 
@@ -146,13 +181,6 @@
     <div class="card-body" id="players"></div>
   </div>`;
   } //resetBracket
-
-  /**
-   * @param {any} username
-   */
-  function addUser(username) {
-    document.getElementById("players")?.insertAdjacentHTML("afterbegin", `<span class="badge text-bg-secondary m-2" id="${username}_badge">⏳${escape(username)}</span>`);
-  } //addUser
 
   /**
    * @param {any} username
@@ -213,23 +241,8 @@
     });
   } //animateHand
 
-  function randomAnimations() {
-    let moves = ["rock", "paper", "scissors"];
-
-    document.getElementById("left_rock").style.display = "";
-    document.getElementById("left_paper").style.display = "none";
-    document.getElementById("left_scissors").style.display = "none";
-
-    document.getElementById("right_rock").style.display = "";
-    document.getElementById("right_paper").style.display = "none";
-    document.getElementById("right_scissors").style.display = "none";
-
-    animateHand("left", moves[Math.floor(Math.random() * moves.length)]);
-    animateHand("right", moves[Math.floor(Math.random() * moves.length)]);
-  } //randomAnimations
-
   function copyLink() {
-    navigator.clipboard.writeText(`https://chat.vote/rps/play/${USER?.value.channel || ""}`);
+    navigator.clipboard.writeText(`https://beta.chat.vote/rps/room/${USER?.value.channel || ""}`);
     showToast("Link copied", "info", 1000);
   } //copyLink
 </script>
@@ -244,12 +257,11 @@
   <meta property="og:description" content="Interactive Rock Paper Scissors game that you can play with your twitch chat :)" />
 </svelte:head>
 
-<Navbar loginEvent={refreshAndConnect} />
+<Navbar messageHandler={handleMessage} loginEvent={refreshAndConnect} />
 
-<div class="flex flex-col w-fit mx-auto">
+<div class="flex flex-col items-center">
   <h1 class="text-2xl font-extrabold text-center m-3"><img src="/pics/donk.png" alt="donk" class="w-8 inline align-text-bottom" /> chat.vote Rock Paper Scissors</h1>
-  <small class="text-error text-center">not working yet :)</small>
-  <div class="card card-border bg-base-200 m-5">
+  <div class="card card-border w-fit bg-base-200 m-5">
     <div class="card-body flex flex-row">
       <div class="p-2 flex flex-row">
         <img src="/pics/donk.png" alt="left donk" style="height: 100px; width: 100px" />
@@ -268,36 +280,59 @@
 
   <div class="card card-border bg-base-200 m-5">
     <div class="card-body flex-row">
-      <div id="bracket"></div>
+      <div class="card card-border border-accent bg-base-100 w-full">
+        <div class="card-body">
+          <div class="card-title w-full">
+            <IcRoundGroups class="text-2xl" />Players <span class="opacity-70">({players.size})</span>
+          </div>
+          <div class="w-[90vw] h-[70vh] overflow-auto">
+            <div class="flex flex-wrap justify-between gap-1" id="players">
+              {#each players.entries() as [key, value]}
+                <div class="join w-fit">
+                  <button class="btn btn-outline btn-accent join-item pointer-events-none pfp-container">
+                    {#if value.pfp}
+                      <img src={value.pfp} alt="profile pic" class="rounded-s pfp" />
+                    {:else}
+                      <img src="/pics/donk.png" alt="profile pic" class="rounded-s pfp" />
+                    {/if}
+                  </button>
+
+                  <button class="btn btn-outline btn-accent join-item pointer-events-none text-lg font-bold">{key} </button>
+                </div>
+              {/each}
+            </div>
+
+            <div id="bracket"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="card card-border w-120 bg-base-200 m-5">
+  <div class="card card-border w-150 bg-base-200 m-5">
     <div class="card-body">
       <h2 class="card-title"><IcBaselineTune /> Game controls</h2>
       <div class="flex flex-row justify-between mb-10">
         <div class="tooltip tooltip-error" data-tip="Removes everyone from the room">
-          <button onclick={reset} id="start" type="button" class="btn btn-error"><IcBaselineDeleteForever />Reset game</button>
+          <button onclick={reset} id="reset" type="button" class="btn btn-error" disabled={gameStatus == "disconnected"}><IcBaselineDeleteForever />Reset game</button>
         </div>
         <div class="tooltip tooltip-accent" data-tip="Closes the room and creates matchups for the joined players">
-          <button onclick={start} id="start" type="button" class="btn btn-accent"><IcBaselineRocketLaunch />Start game</button>
+          <button onclick={start} id="start" type="button" class="btn btn-accent" disabled={gameStatus !== ""}><IcBaselineRocketLaunch />Start game</button>
         </div>
         <div class="tooltip tooltip-info" data-tip="Make sure all matches are done before moving to the next round">
-          <button onclick={next} id="next" type="button" class="btn btn-info"><IcBaselineArrowForwardIos />Next round</button>
+          <button onclick={next} id="next" type="button" class="btn btn-info" disabled={gameStatus !== "active"}><IcBaselineArrowForwardIos />Next round</button>
         </div>
       </div>
 
-      <div class="mb-10 text-lg font-bold"><IcBaselineInfo class="inline align-text-bottom" /> Game status: {gameStatus}</div>
-
       <div class="join">
         <button class="btn btn-warning join-item pointer-events-none"><IcBaselineInsertLink />Game link</button>
-        <input type="text" class="input input-warning join-item pointer-events-none text-base-content" onclick={copyLink} value="https://chat.vote/rps/play/{USER?.value?.channel}" />
+        <input type="text" class="input input-warning join-item pointer-events-none text-base-content" onclick={copyLink} value="https://beta.chat.vote/rps/room/{USER?.value?.channel}" />
         <button class="btn btn-warning join-item" onclick={copyLink}> <IcBaselineContentCopy /></button>
       </div>
     </div>
   </div>
 
-  <div class="card card-border w-120 bg-base-200 m-5">
+  <div class="card card-border w-150 bg-base-200 m-5">
     <div class="card-body">
       <h2 class="card-title"><IcBaselineInfo />Info</h2>
       <h4 class="text-lg font-bold">What is this?</h4>
@@ -343,6 +378,19 @@
 </div>
 
 <style>
+  .pfp-container {
+    padding: 0;
+    height: 40px;
+    width: 40px;
+  }
+  .pfp {
+    object-fit: contain;
+    max-width: 100%;
+    max-height: 100%;
+    height: auto;
+    display: block;
+  }
+
   .mirror-img {
     -moz-transform: scale(-1, 1);
     -o-transform: scale(-1, 1);

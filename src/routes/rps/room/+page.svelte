@@ -4,6 +4,6 @@
     <br />
     <img src="/pics/donk.png" alt="donk" class="w-50 mx-auto" />
     <br />
-    <p class="font-bold text-2xl">Game link should have a username like this: <kbd class="kbd">https://beta.chat.vote/rps/play/<span class="text-error">username</span></kbd></p>
+    <p class="font-bold text-2xl">Game link should have a username like this: <kbd class="kbd">https://beta.chat.vote/rps/room/<span class="text-error">username</span></kbd></p>
   </div>
 </div>

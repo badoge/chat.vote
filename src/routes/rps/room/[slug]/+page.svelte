@@ -13,7 +13,6 @@
 
   onMount(async () => {
     elements = {
-      loginButton: document.getElementById("loginButton"),
       me: document.getElementById("me"),
       opponent: document.getElementById("opponent"),
       topRight: document.getElementById("topRight"),
@@ -25,7 +24,6 @@
       right_scissors: document.getElementById("right_scissors"),
 
       info: document.getElementById("info"),
-      game: document.getElementById("game"),
       rock: document.getElementById("rock"),
       paper: document.getElementById("paper"),
       scissors: document.getElementById("scissors"),
@@ -33,9 +31,13 @@
   });
 
   let { data } = $props();
-  let channel = $state(data.slug.toLowerCase().replace(/\s/g, ""));
+  let streamer = $state(data.slug.toLowerCase().replace(/\s/g, ""));
 
-  let streamer = "";
+  //disconnected - not connected to the server
+  //connected - connected to the server
+
+  let status = $state("disconnected");
+
   /**
    * @type {WebSocket}
    */
@@ -47,14 +49,13 @@
   }
 
   function connect() {
-    elements.game.style.display = "";
-
-    //webSocket = new WebSocket("ws://localhost:9001");
-    webSocket = new WebSocket("wss://ws.chat.vote");
+    webSocket = new WebSocket("ws://localhost:9001");
+    //webSocket = new WebSocket("wss://ws.chat.vote");
 
     webSocket.onopen = function (event) {
       console.log(event);
       webSocket.send(JSON.stringify({ command: "join", streamer: streamer, username: USER?.value.channel, userid: USER?.value.userID, access_token: USER?.value.access_token }));
+      status = "connected";
     };
 
     webSocket.onmessage = function (event) {
@@ -144,12 +145,12 @@
 
   /**
    * @param {string} hand
-   * @param {any} move
+   * @param {string} move
    */
   function animateHand(hand, move) {
-    elements[`${hand}_rock`].style.display = "";
-    elements[`${hand}_paper`].style.display = "none";
-    elements[`${hand}_scissors`].style.display = "none";
+    document.getElementById(`${hand}_rock`).style.display = "";
+    document.getElementById(`${hand}_paper`).style.display = "none";
+    document.getElementById(`${hand}_scissors`).style.display = "none";
 
     animate(`#${hand}_rock`, {
       rotate: hand == "left" ? -30 : 30,
@@ -158,8 +159,8 @@
       ease: "outElastic(1, .8)",
       loop: 7,
       onComplete: function (anim) {
-        elements[`${hand}_rock`].style.display = "none";
-        elements[`${hand}_${move}`].style.display = "";
+        document.getElementById(`${hand}_rock`).style.display = "none";
+        document.getElementById(`${hand}_${move}`).style.display = "";
       },
     });
   } //animateHand
@@ -177,46 +178,51 @@
 
 <Navbar loginEvent={refreshAndConnect} />
 
-<div class="container-fluid text-center" id="game" style="display: none">
-  <div class="row">
-    <div class="col"></div>
-    <div class="col-auto d-inline-flex">
-      <div class="vstack gap-3">
-        <div class="p-2">
-          <img src="/pics/donk.png" alt="left donk " style="height: 100px; width: 100px" />
+<div class="flex flex-col items-center">
+  <h1 class="text-2xl font-extrabold text-center m-3"><img src="/pics/donk.png" alt="donk" class="w-8 inline align-text-bottom" /> chat.vote Rock Paper Scissors</h1>
+  <h2 class="text-md font-thin text-center">Room hosted by <a href="https://twitch.tv/{streamer}" target="_blank" rel="noopener noreferrer" class="link"> {streamer}</a></h2>
+
+  <div class="card card-border w-fit bg-base-200 m-5">
+    <div class="card-body flex flex-row">
+      <div class="flex flex-col">
+        <div class="p-2 flex flex-row">
+          <img src="/pics/donk.png" alt="left donk" style="height: 100px; width: 100px" />
           <img id="left_rock" src="/rps/left_rock.png" alt="left rock" class="left-hand-img" />
           <img id="left_paper" src="/rps/left_paper.png" alt="left paper" style="display: none" class="left-hand-img" />
           <img id="left_scissors" src="/rps/left_scissors.png" alt="left scissors" style="display: none" class="left-hand-img" />
         </div>
-
-        <div class="p-2" id="me"></div>
-        <div class="p-2">
-          Make your move<br />
-          <div class="btn-group" role="group" aria-label="move">
-            <button disabled type="button" onclick={() => sendMove("rock")} id="rock" class="btn btn-secondary"><span style="font-size: 2.5rem">✊</span><br />Rock</button>
-            <button disabled type="button" onclick={() => sendMove("paper")} id="paper" class="btn btn-light"><span style="font-size: 2.5rem">✋</span><br />Paper</button>
-            <button disabled type="button" onclick={() => sendMove("scissors")} id="scissors" class="btn btn-danger"><span style="font-size: 2.5rem">✌</span><br />Scissors</button>
-          </div>
-        </div>
+        <div class="text-center">You</div>
       </div>
 
-      <div class="vstack gap-3">
-        <div class="p-2">
+      <div class="flex flex-col">
+        <div class="p-2 flex flex-row">
           <img id="right_rock" src="/rps/right_rock.png" alt="right rock" class="right-hand-img" />
           <img id="right_paper" src="/rps/right_paper.png" alt="right paper" style="display: none" class="right-hand-img" />
           <img id="right_scissors" src="/rps/right_scissors.png" alt="right scissors" style="display: none" class="right-hand-img" />
           <img src="/pics/donk.png" alt="right donk" style="height: 100px; width: 100px" class="mirror-img" />
         </div>
-
-        <div class="p-2 text-body-secondary" id="opponent"></div>
-        <div class="p-2"></div>
+        <div class="text-center">Opponent</div>
       </div>
     </div>
-    <div class="col"></div>
+  </div>
+
+  <div class="card card-border border-error bg-base-200">
+    <div class="card-body">
+      <h2 class="card-title justify-center">Make your move</h2>
+      <div class="join">
+        <button onclick={() => sendMove("rock")} id="rock" class="btn join-item btn-primary block h-fit">
+          <span style="font-size: 2.5rem">✊</span><br /><span class="text-2xl font-bold">Rock</span>
+        </button>
+        <button onclick={() => sendMove("paper")} id="paper" class="btn join-item btn-secondary block h-fit">
+          <span style="font-size: 2.5rem">✋</span><br /><span class="text-2xl font-bold">Paper</span>
+        </button>
+        <button onclick={() => sendMove("scissors")} id="scissors" class="btn join-item btn-accent block h-fit">
+          <span style="font-size: 2.5rem">✌</span><br /><span class="text-2xl font-bold">Scissors</span>
+        </button>
+      </div>
+    </div>
   </div>
 </div>
-
-<div class="text-center m-5" id="info" style="display: none"></div>
 
 <style>
   .mirror-img {

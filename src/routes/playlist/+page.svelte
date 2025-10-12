@@ -59,7 +59,7 @@
   import pkg from "validator";
   const { escape } = pkg;
 
-  import { convertTwitchVODDuration, formatViewCount, replacer, reviver, secondsToTimeString, timeStringToSeconds, timeToSeconds } from "$lib/functions";
+  import { addBadges, convertTwitchVODDuration, formatViewCount, replacer, reviver, secondsToTimeString, timeStringToSeconds, timeToSeconds } from "$lib/functions";
   import { animate } from "animejs";
   import { onMount } from "svelte";
   import localforage from "localforage";
