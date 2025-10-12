@@ -66,8 +66,8 @@
 
     sendUsername(`beta.chat.vote/rps`, USER?.value.channel, USER?.value.platform == "twitch" ? `twitch - ${USER?.value.twitchLogin}` : "youtube");
 
-    webSocket = new WebSocket("ws://localhost:9001");
-    //webSocket = new WebSocket("wss://rps.chat.vote");
+    //webSocket = new WebSocket("ws://localhost:9001");
+    webSocket = new WebSocket("wss://rps.chat.vote");
 
     webSocket.onopen = function (event) {
       console.log(event);
@@ -101,7 +101,6 @@
         case "join":
           //sent when a viewer joins
           players.set(data.username, { userid: data.userid });
-          console.log(players);
           break;
 
         case "update_move":

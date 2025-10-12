@@ -52,8 +52,8 @@
   }
 
   function connect() {
-    webSocket = new WebSocket("ws://localhost:9001");
-    //webSocket = new WebSocket("wss://ws.chat.vote");
+    //webSocket = new WebSocket("ws://localhost:9001");
+    webSocket = new WebSocket("wss://ws.chat.vote");
 
     webSocket.onopen = function (event) {
       console.log(event);
