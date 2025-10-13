@@ -1,9 +1,11 @@
 <script>
-  import Navbar from "$lib/Navbar.svelte";
-
   import { onMount } from "svelte";
+  import Navbar from "$lib/Navbar.svelte";
+  import { SvelteMap } from "svelte/reactivity";
+  import { showToast } from "../+layout.svelte";
+  import { donkStorage } from "$lib/donkStorage.svelte";
+  import { sendUsername } from "$lib/functions";
   import { animate } from "animejs";
-
   import IcBaselineTune from "~icons/ic/baseline-tune";
   import IcBaselineRocketLaunch from "~icons/ic/baseline-rocket-launch";
   import IcBaselineArrowForwardIos from "~icons/ic/baseline-arrow-forward-ios";
@@ -12,13 +14,9 @@
   import IcBaselineInsertLink from "~icons/ic/baseline-insert-link";
   import IcBaselineContentCopy from "~icons/ic/baseline-content-copy";
   import IcRoundGroups from "~icons/ic/round-groups";
-  import { donkStorage } from "$lib/donkStorage.svelte";
-
   import pkg from "validator";
-  import { showToast } from "../+layout.svelte";
-  import { addBadges, sendUsername } from "$lib/functions";
-  import { SvelteMap } from "svelte/reactivity";
   const { escape } = pkg;
+
   let USER = donkStorage("USER", null);
 
   //disconnected - not connected to the server
@@ -26,12 +24,17 @@
   //open - connected to the server and started a room but didnt start the game
   //active - connected and started
   let gameStatus = $state("disconnected");
-
   let players = $state(new SvelteMap());
-
   let chatters = new Map();
 
+  /**
+   * @type {WebSocket}
+   */
+  let webSocket;
+
   onMount(async () => {
+    showToast("Connecting...", "alert-info", 1000);
+
     let randomAnimationsInterval = setInterval(() => {
       let moves = ["rock", "paper", "scissors"];
 
@@ -47,11 +50,6 @@
       animateHand("right", moves[Math.floor(Math.random() * moves.length)]);
     }, 6000);
   }); //onMount
-
-  /**
-   * @type {WebSocket}
-   */
-  let webSocket;
 
   function refreshAndConnect() {
     USER?.refresh();
@@ -72,7 +70,7 @@
     webSocket.onopen = function (event) {
       console.log(event);
       if (event.type == "open") {
-        showToast("Connected to server", "alert-info", 1000);
+        showToast("Connected to server", "alert-success", 1000);
         gameStatus = "connected";
       }
     };
@@ -83,6 +81,9 @@
       switch (data.id) {
         case "toast":
           showToast(data.message, data.type, 2000);
+          if (data.message == "You need at least 2 players to start") {
+            document.getElementById("start").disabled = false;
+          }
           break;
 
         case "reset":
@@ -95,6 +96,7 @@
           //sent after clicking the start game button
           gameStatus = "active";
           showToast(data.message, data.type, 3000);
+          console.log(data.bracket);
           createBracket(data.bracket);
           break;
 
@@ -144,9 +146,9 @@
    * @param {any} self
    */
   async function handleMessage(target, context, msg, self) {
-    if (!chatters.get(context.username)) {
-      chatters.set(context.username, { userid: context["user-id"], color: context.color, badges: context.badges });
-    }
+    // if (!chatters.get(context.username)) {
+    //   chatters.set(context.username, { userid: context["user-id"], color: context.color, badges: context.badges });
+    // }
   } //handleMessage
 
   function reset() {
@@ -177,7 +179,7 @@
   function createBracket(bracket) {
     for (let index = 0; index < Object.keys(bracket).length; index++) {
       let roundName = "";
-      switch (bracket[`round${index}`].length) {
+      switch (bracket[`round${index + 1}`].length) {
         case 2:
           roundName = `Finals`;
           break;
@@ -188,7 +190,7 @@
           roundName = `Quarterfinals`;
           break;
         default:
-          roundName = `Round of ${currentBracket[`round${currentRound}`].length}`;
+          roundName = `Round of ${bracket[`round${index + 1}`].length}`;
           break;
       }
       document.getElementById("bracket").insertAdjacentHTML(
@@ -243,6 +245,7 @@
 
 <div class="flex flex-col items-center">
   <h1 class="text-2xl font-extrabold text-center m-3"><img src="/pics/donk.png" alt="donk" class="w-8 inline align-text-bottom" /> chat.vote Rock Paper Scissors</h1>
+  <span class="text-sm text-error">still not working :) almost done, ready tommorrow for sure :)</span>
   <div class="card card-border w-fit bg-base-200 m-5">
     <div class="card-body flex flex-row">
       <div class="p-2 flex flex-row">
@@ -305,7 +308,7 @@
                       {/if}
                     </button>
 
-                    <button class="btn btn-outline btn-accent join-item pointer-events-none text-lg font-bold">{key} </button>
+                    <button class="btn btn-outline btn-accent join-item pointer-events-none text-lg font-bold">{escape(key)} </button>
                   </div>
                 {/each}
               </div>
@@ -348,8 +351,8 @@
       <p>This is an interactive Rock Paper Scissors game that you can play with your Twitch chat</p>
       <h4 class="text-lg font-bold">How to play?</h4>
       <p>
-        Start a new game then share the link above with your viewers. After your viewers log in start the first round by clicking next round, after everyone makes a move click next round
-        again to eliminate the losers and advance the winners to the next round. Game ends once the bracket is finished
+        Create a new room then share the link above with your viewers. After your viewers log in and join, start the game. After everyone makes a move click next round to eliminate the
+        losers and advance the winners to the next round. Game ends once the bracket is finished
       </p>
       <div class="divider"></div>
       <p>Made for <a href="https://nympts.com/gamejam" target="_blank" rel="noopener noreferrer" class="link">NymN's Game Jam</a></p>

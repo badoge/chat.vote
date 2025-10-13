@@ -1,55 +1,36 @@
 <script>
   import { onMount } from "svelte";
-
+  import Navbar from "$lib/Navbar.svelte";
+  import { showToast } from "../../../+layout.svelte";
+  import { donkStorage } from "$lib/donkStorage.svelte.js";
   import { animate } from "animejs";
   import pkg from "validator";
-  import { donkStorage } from "$lib/donkStorage.svelte.js";
-  import { showToast } from "../../../+layout.svelte";
-  import Navbar from "$lib/Navbar.svelte";
   const { escape } = pkg;
-  let elements;
 
   let USER = donkStorage("USER", null);
-
-  onMount(async () => {
-    elements = {
-      me: document.getElementById("me"),
-      opponent: document.getElementById("opponent"),
-      topRight: document.getElementById("topRight"),
-      left_rock: document.getElementById("left_rock"),
-      left_paper: document.getElementById("left_paper"),
-      left_scissors: document.getElementById("left_scissors"),
-      right_rock: document.getElementById("right_rock"),
-      right_paper: document.getElementById("right_paper"),
-      right_scissors: document.getElementById("right_scissors"),
-
-      info: document.getElementById("info"),
-      rock: document.getElementById("rock"),
-      paper: document.getElementById("paper"),
-      scissors: document.getElementById("scissors"),
-    };
-  });
-
   let { data } = $props();
   let streamer = $state(data.slug.toLowerCase().replace(/\s/g, ""));
-
-  let opponent = $state("Opponent");
 
   //disconnected - not connected to the server
   //connected - connected to the server
   //waiting
   //active
   let status = $state("disconnected");
+  let opponent = $state("Opponent");
 
   /**
    * @type {WebSocket}
    */
   let webSocket;
 
+  onMount(async () => {
+    showToast("Connecting...", "alert-info", 1000);
+  });
+
   function refreshAndConnect() {
     USER?.refresh();
     connect();
-  }
+  } //refreshAndConnect
 
   function connect() {
     //webSocket = new WebSocket("ws://localhost:9001");
@@ -57,65 +38,72 @@
 
     webSocket.onopen = function (event) {
       console.log(event);
-      webSocket.send(JSON.stringify({ command: "join", streamer: streamer, username: USER?.value.channel, userid: USER?.value.userID, access_token: USER?.value.access_token }));
-      status = "connected";
+      if (event.type == "open") {
+        showToast("Connected to server", "alert-success", 1000);
+        webSocket.send(JSON.stringify({ command: "join", streamer: streamer, username: USER?.value.channel, userid: USER?.value.userID, access_token: USER?.value.access_token }));
+        status = "connected";
+      }
     };
 
     webSocket.onmessage = function (event) {
       let data = JSON.parse(event.data);
 
       switch (data.id) {
-        case "toast":
-          showToast(data.message, data.type, 2000);
-          break;
-        case "starting":
-          //sent when the game starts/resets after the streamer clicks the start new game button
-          showToast(data.message, data.type, 2000);
+        ////broadcasts
+        case "reset":
+          //sent after streamer clicks the create a new room button
+          showToast(data.message, data.type, 3000);
           status = "waiting";
-          resetGame();
-          break;
+          opponent = "Waiting for game to start";
 
-        case "round":
-          //sent just before a new round starts
-          showToast(data.message, data.type, 2000);
-          opponent = data.opponent;
-          status = "waiting";
+          //try to rejoin after some time
+          setTimeout(() => {
+            webSocket.send(JSON.stringify({ command: "join", streamer: streamer, username: USER?.value.channel, userid: USER?.value.userID, access_token: USER?.value.access_token }));
+          }, Math.random() * 10000);
           break;
 
         case "start":
           //sent after the round info is sent and its ok to start sending moves
-          showToast(data.message, data.type, 2000);
+          showToast(data.message, data.type, 3000);
           status = "active";
+          break;
+
+        case "game_ended":
+          showToast(data.message, data.type, 3000);
+          status = "waiting";
+          break;
+
+        ////direct messages
+        case "toast":
+          showToast(data.message, data.type, 3000);
+          break;
+
+        case "round":
+          //sent just before a new round starts
+          //wait for the "start" broadcast to enable the buttons
+          showToast(data.message, data.type, 3000);
+          opponent = data.opponent;
+          status = "waiting";
           break;
 
         case "moved":
           //sent if the move was accepted
-          showToast(data.message, data.type, 2000);
+          showToast(data.message, data.type, 3000);
           status = "waiting";
-
           break;
 
         case "lost":
           //sent if the move was accepted
-          showToast(data.message, data.type, 2000);
+          showToast(data.message, data.type, 3000);
           status = "waiting";
           opponent = "Waiting for next round";
-          showReset();
           break;
 
         case "lost":
           //sent if the move was accepted
-          showToast(data.message, data.type, 2000);
+          showToast(data.message, data.type, 3000);
           status = "waiting";
           opponent = "Waiting for next round";
-          showReset();
-          break;
-
-        case "game_ended":
-          showToast(data.message, data.type, 2000);
-          status = "waiting";
-          11;
-          resetGame();
           break;
 
         default:
@@ -134,38 +122,13 @@
     };
   } //connect
 
-  function resetGame() {
-    elements.rock.disabled = true;
-    elements.paper.disabled = true;
-    elements.scissors.disabled = true;
-    elements.opponent.innerHTML = `<img src="/pics/donk.png" alt="profile pic" class="rounded-circle" style="height:2em;"> Your opponent`;
-  } //resetGame
-
-  /**
-   * @param {string} opponent
-   */
-  function startRound(opponent) {
-    elements.rock.disabled = false;
-    elements.paper.disabled = false;
-    elements.scissors.disabled = false;
-    elements.opponent.innerHTML = `<img src="/pics/donk.png" alt="profile pic" class="rounded-circle" style="height:2em;"> ${escape(opponent)}`;
-  } //startRound
-
   /**
    * @param {string} move
    */
   function sendMove(move) {
-    elements.rock.disabled = true;
-    elements.paper.disabled = true;
-    elements.scissors.disabled = true;
+    status = "waiting";
     webSocket.send(JSON.stringify({ command: "move", streamer: streamer, userid: USER?.value.userid, move: move }));
   } //sendMove
-
-  function showReset() {
-    elements.rock.disabled = true;
-    elements.paper.disabled = true;
-    elements.scissors.disabled = true;
-  } //showReset
 
   /**
    * @param {string} hand
@@ -225,7 +188,7 @@
           <img id="right_scissors" src="/rps/right_scissors.png" alt="right scissors" style="display: none" class="right-hand-img" />
           <img src="/pics/donk.png" alt="right donk" style="height: 100px; width: 100px" class="mirror-img" />
         </div>
-        <div class="text-center">{() => escape(opponent)}</div>
+        <div class="text-center">{escape(opponent)}</div>
       </div>
     </div>
   </div>
@@ -234,13 +197,13 @@
     <div class="card-body">
       <h2 class="card-title justify-center">Make your move</h2>
       <div class="join">
-        <button onclick={() => sendMove("rock")} id="rock" class="btn join-item btn-primary block h-fit">
+        <button disabled={status !== "active"} onclick={() => sendMove("rock")} id="rock" class="btn join-item btn-primary block h-fit">
           <span style="font-size: 2.5rem">✊</span><br /><span class="text-2xl font-bold">Rock</span>
         </button>
-        <button onclick={() => sendMove("paper")} id="paper" class="btn join-item btn-secondary block h-fit">
+        <button disabled={status !== "active"} onclick={() => sendMove("paper")} id="paper" class="btn join-item btn-secondary block h-fit">
           <span style="font-size: 2.5rem">✋</span><br /><span class="text-2xl font-bold">Paper</span>
         </button>
-        <button onclick={() => sendMove("scissors")} id="scissors" class="btn join-item btn-accent block h-fit">
+        <button disabled={status !== "active"} onclick={() => sendMove("scissors")} id="scissors" class="btn join-item btn-accent block h-fit">
           <span style="font-size: 2.5rem">✌</span><br /><span class="text-2xl font-bold">Scissors</span>
         </button>
       </div>
