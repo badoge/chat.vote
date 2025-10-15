@@ -770,117 +770,109 @@
 
 <Navbar />
 
-<div class="container-fluid">
-  <div class="row" id="mainrow">
-    <div class="col-xl-3"></div>
-
-    <div class="col-xl-6">
-      <div class="card bg-body-tertiary" id="titleCard">
-        <div class="card-body">
-          <div class="input-group input-group-lg">
-            <input type="text" id="pollTitle" class="form-control" placeholder="Poll title" aria-label="Poll title" />
-          </div>
-        </div>
-      </div>
-
-      <div id="optionsDiv">
-        <p class="placeholder-wave">
-          <span class="placeholder col-12 rounded" style="height: 48px"></span>
-        </p>
-        <p class="placeholder-wave">
-          <span class="placeholder col-12 rounded" style="height: 48px"></span>
-        </p>
-      </div>
-
-      <div id="underOptions">
-        <div class="btn-group dropdown-center">
-          <button type="button" id="createpollbtn" class="btn btn-success btn-lg" onclick={createPoll}>
-            <IcBaselineCreate style="vertical-align: text-bottom" />Create Poll
-          </button>
-          <button type="button" class="btn btn-success btn-lg dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-            <IcBaselineSettings style="vertical-align: text-bottom" /><span class="visually-hidden">Poll settings</span>
-          </button>
-          <form class="container-fluid dropdown-menu p-4 bg-body-tertiary" style="width: 35vw">
-            <div class="row">
-              <div class="col">
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" id="multipleAnswersAllowed" onchange={saveSettings} />
-                  <label class="form-check-label" for="multipleAnswersAllowed"><IcBaselinePlusOne />Allow multiple answers</label>
-                  <br /><small class="form-text text-body-secondary">Lets users vote for more than 1 option from the poll.</small>
-                </div>
-                <hr />
-                <h4>Poll timer</h4>
-                <div class="mb-3">
-                  <div class="input-group flex-nowrap timer">
-                    <input type="number" aria-label="poll timer value" id="pollTimerValue" placeholder="0" min="0" class="form-control" />
-                    <select class="form-select timer" id="pollTimerUnit" onchange={saveSettings}>
-                      <option selected value="m">Minutes</option>
-                      <option value="h">Hours</option>
-                      <option value="d">Days</option>
-                    </select>
-                  </div>
-                  <small class="form-text text-body-secondary">Poll will close after the timer runs out.</small>
-                </div>
-              </div>
-              <div class="col">
-                <h4>Results visibility</h4>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="resultsVisibility" value="everyone" id="results_anyone" onchange={saveSettings} checked />
-                  <label class="form-check-label" for="results_anyone"><IcBaselineVisibility />Visible to anyone</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="resultsVisibility" value="voters" id="results_voters" onchange={saveSettings} />
-                  <label class="form-check-label" for="results_voters"><IcBaselineHowToVote />Visible after voting</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="resultsVisibility" value="timer" id="results_timer" onchange={saveSettings} disabled />
-                  <label class="form-check-label" for="results_timer"><IcBaselineTimer />Reveal after timer runs out</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="resultsVisibility" value="creator" id="results_creator" onchange={saveSettings} />
-                  <label class="form-check-label" for="results_creator"><IcBaselinePerson />Visible to me only</label>
-                </div>
-                <hr />
-                <button type="button" class="btn btn-primary" onclick={() => bulkModal.showModal()}>Add multiple options</button>
-              </div>
-              <div class="col" style="display: none">
-                <h4>Duplicate detection level</h4>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="duplicateDetectionLevel" value="low" id="detect_low" />
-                  <label class="form-check-label" for="detect_low"><IcBaselineRemoveModerator />Low</label>
-                  <br /><small class="form-text text-body-secondary">Low protection against duplicate votes, only very obvious bots will be blocked.</small>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="duplicateDetectionLevel" value="high" id="detect_high" checked />
-                  <label class="form-check-label" for="detect_high"><IcBaselineSecurity />High</label>
-                  <br /><small class="form-text text-body-secondary">Users on the same network might not be able to vote.</small>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
-
-        <div class="float-end">
-          <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove all options from the poll">
-            <a
-              id="deleteAllButton"
-              tabindex="0"
-              class="btn btn-outline-danger html-popover"
-              role="button"
-              data-bs-toggle="popover"
-              data-bs-placement="top"
-              data-bs-trigger="focus"
-              data-bs-title="Are you sure?"
-              data-bs-content="All poll options will be deleted<br><button type='button' class='btn btn-danger float-end my-3' onclick='{reset}'><i class='material-icons notranslate'>delete_forever</i>Delete all</button>"
-            >
-              <IcBaselineDeleteForever />All
-            </a>
-          </span>
-        </div>
+<div class="flex flex-col mx-auto w-[50vw]">
+  <div class="card bg-body-tertiary" id="titleCard">
+    <div class="card-body">
+      <div class="input-group input-group-lg">
+        <input type="text" id="pollTitle" class="form-control" placeholder="Poll title" aria-label="Poll title" />
       </div>
     </div>
+  </div>
 
-    <div class="col-xl-3"></div>
+  <div id="optionsDiv">
+    <p class="placeholder-wave">
+      <span class="placeholder col-12 rounded" style="height: 48px"></span>
+    </p>
+    <p class="placeholder-wave">
+      <span class="placeholder col-12 rounded" style="height: 48px"></span>
+    </p>
+  </div>
+
+  <div id="underOptions">
+    <div class="btn-group dropdown-center">
+      <button type="button" id="createpollbtn" class="btn btn-success btn-lg" onclick={createPoll}>
+        <IcBaselineCreate style="vertical-align: text-bottom" />Create Poll
+      </button>
+      <button type="button" class="btn btn-success btn-lg dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+        <IcBaselineSettings style="vertical-align: text-bottom" /><span class="visually-hidden">Poll settings</span>
+      </button>
+      <form class="container-fluid dropdown-menu p-4 bg-body-tertiary" style="width: 35vw">
+        <div class="row">
+          <div class="col">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="multipleAnswersAllowed" onchange={saveSettings} />
+              <label class="form-check-label" for="multipleAnswersAllowed"><IcBaselinePlusOne />Allow multiple answers</label>
+              <br /><small class="form-text text-body-secondary">Lets users vote for more than 1 option from the poll.</small>
+            </div>
+            <hr />
+            <h4>Poll timer</h4>
+            <div class="mb-3">
+              <div class="input-group flex-nowrap timer">
+                <input type="number" aria-label="poll timer value" id="pollTimerValue" placeholder="0" min="0" class="form-control" />
+                <select class="form-select timer" id="pollTimerUnit" onchange={saveSettings}>
+                  <option selected value="m">Minutes</option>
+                  <option value="h">Hours</option>
+                  <option value="d">Days</option>
+                </select>
+              </div>
+              <small class="form-text text-body-secondary">Poll will close after the timer runs out.</small>
+            </div>
+          </div>
+          <div class="col">
+            <h4>Results visibility</h4>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="resultsVisibility" value="everyone" id="results_anyone" onchange={saveSettings} checked />
+              <label class="form-check-label" for="results_anyone"><IcBaselineVisibility />Visible to anyone</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="resultsVisibility" value="voters" id="results_voters" onchange={saveSettings} />
+              <label class="form-check-label" for="results_voters"><IcBaselineHowToVote />Visible after voting</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="resultsVisibility" value="timer" id="results_timer" onchange={saveSettings} disabled />
+              <label class="form-check-label" for="results_timer"><IcBaselineTimer />Reveal after timer runs out</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="resultsVisibility" value="creator" id="results_creator" onchange={saveSettings} />
+              <label class="form-check-label" for="results_creator"><IcBaselinePerson />Visible to me only</label>
+            </div>
+            <hr />
+            <button type="button" class="btn btn-primary" onclick={() => bulkModal.showModal()}>Add multiple options</button>
+          </div>
+          <div class="col" style="display: none">
+            <h4>Duplicate detection level</h4>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="duplicateDetectionLevel" value="low" id="detect_low" />
+              <label class="form-check-label" for="detect_low"><IcBaselineRemoveModerator />Low</label>
+              <br /><small class="form-text text-body-secondary">Low protection against duplicate votes, only very obvious bots will be blocked.</small>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="duplicateDetectionLevel" value="high" id="detect_high" checked />
+              <label class="form-check-label" for="detect_high"><IcBaselineSecurity />High</label>
+              <br /><small class="form-text text-body-secondary">Users on the same network might not be able to vote.</small>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="float-end">
+      <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove all options from the poll">
+        <a
+          id="deleteAllButton"
+          tabindex="0"
+          class="btn btn-outline-danger html-popover"
+          role="button"
+          data-bs-toggle="popover"
+          data-bs-placement="top"
+          data-bs-trigger="focus"
+          data-bs-title="Are you sure?"
+          data-bs-content="All poll options will be deleted<br><button type='button' class='btn btn-danger float-end my-3' onclick='{reset}'><i class='material-icons notranslate'>delete_forever</i>Delete all</button>"
+        >
+          <IcBaselineDeleteForever />All
+        </a>
+      </span>
+    </div>
   </div>
 </div>
 
