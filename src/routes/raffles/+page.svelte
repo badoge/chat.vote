@@ -18,6 +18,7 @@
   import IcBaselineBlock from "~icons/ic/baseline-block";
   import IcBaselineTimerOff from "~icons/ic/baseline-timer-off";
   import { Howl } from "howler";
+  import Timer from "easytimer.js";
   import pkg from "validator";
   const { escape } = pkg;
   import {
@@ -236,7 +237,14 @@
   let raffle_users = [];
   let raffle_tickets = [];
   let raffle_open;
+
+  /**
+   * @type {Timer}
+   */
   let extraTimer;
+  /**
+   * @type {Timer}
+   */
   let timer_raffle;
   let currentTime = 0;
   let currentRaffleWinner = "";
@@ -376,6 +384,12 @@
     elements.entrants.innerHTML = "Entrants: 0";
   } //restartRaffle
 
+  /**
+   * @param {any} target
+   * @param {{ [x: string]: any; username: any; badges: any; subscriber?: any; mod?: any; vip?: any; color: any; emotes: any; "user-id"?: any; "display-name"?: any; time?: any; }} context
+   * @param {string} msg
+   * @param {any} self
+   */
   async function handleMessage(target, context, msg, self) {
     if (context.username == currentRaffleWinner) {
       if (RAFFLES.value.autoRerollEnabled && timer_raffle.isRunning()) {
@@ -990,7 +1004,7 @@
     <div class="values" style="font-size: 3em;"></div>
     </div>
     </div>`;
-    timer_raffle = new easytimer.Timer();
+    timer_raffle = new Timer();
     timer_raffle.addEventListener("secondTenthsUpdated", function (e) {
       document.querySelector("#countdown_raffle .values").innerHTML = "Rerolling in " + timer_raffle.getTimeValues().toString(["minutes", "seconds", "secondTenths"]);
     });
@@ -1095,7 +1109,7 @@
       return;
     }
 
-    extraTimer = new easytimer.Timer();
+    extraTimer = new Timer();
     extraTimer.addEventListener("secondTenthsUpdated", function (e) {
       document.querySelector("#extraCountdown .values").innerHTML = extraTimer.getTimeValues().toString(["minutes", "seconds", "secondTenths"]);
     });
