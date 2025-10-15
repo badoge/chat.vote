@@ -14,7 +14,7 @@
 
     setTimeout(() => {
       document.getElementById(id).style.transition = "opacity 0.3s ease";
-      document.getElementById(id).style.opacity = 0;
+      document.getElementById(id).style.opacity = "0";
       setTimeout(() => {
         document.getElementById(id)?.remove();
       }, timeout + 1000);
@@ -29,7 +29,7 @@
 
 <div id="toastContainer" class="toast toast-top toast-end"></div>
 
-{@render children?.()}
+{@render children()}
 
 <style>
   #toastContainer {
