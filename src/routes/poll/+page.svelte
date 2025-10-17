@@ -17,6 +17,7 @@
   import IcBaselineCreate from "~icons/ic/baseline-create";
   import { showToast } from "../+layout.svelte";
   import IcBaselineClose from "~icons/ic/baseline-close";
+  import IcBaselineFormatListBulleted from "~icons/ic/baseline-format-list-bulleted";
 
   let elements;
   onMount(async () => {
@@ -42,7 +43,7 @@
       results_creator: document.getElementById("results_creator"),
       detect_low: document.getElementById("detect_low"),
       detect_high: document.getElementById("detect_high"),
-      bulkOptions: document.getElementById("bulkOptions"),
+      optionList: document.getElementById("optionList"),
     };
 
     //redirect old poll links to new site
@@ -232,14 +233,14 @@
 
   async function addOptionBulk() {
     resetPollModal();
-    let og = elements.bulkOptions.value.split(/\r?\n/);
+    let og = elements.optionList.value.split(/\r?\n/);
     let options = [];
     for (let index = 0; index < og.length; index++) {
       if (!options.includes(og[index]) && og[index].replace(/\s+/g, "")) {
         options.push(og[index].trim());
       }
     }
-    elements.bulkOptions.value = "";
+    elements.optionList.value = "";
     for (let i = 0, j = options.length; i < j; i++) {
       addInput();
     }
@@ -750,16 +751,21 @@
 </dialog>
 
 <dialog id="bulkModal" class="modal">
-  <div class="modal-box">
+  <div class="modal-box max-w-5xl w-fit">
     <form method="dialog">
       <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
     </form>
-    <h3 class="text-lg font-bold">Add poll options in bulk</h3>
-    <textarea class="form-control" placeholder="1 option per line" id="bulkOptions" style="white-space: pre-wrap" rows="9"></textarea>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend text-lg font-bold"><IcBaselineFormatListBulleted class="text-align-bottom" />Add multiple options</legend>
+      <textarea class="textarea w-100" placeholder="Type your options here" id="optionList" style="white-space: pre-wrap;" rows="9"></textarea>
+      <div class="label">1 option per line</div>
+    </fieldset>
+
     <div class="modal-action">
       <form method="dialog">
-        <button type="submit" class="btn btn-secondary">Close</button>
-        <button type="submit" class="btn btn-success" onclick={addOptionBulk}><IcBaselineAdd />Add</button>
+        <button type="submit" class="btn btn-secondary">Cancel</button>
+        <button type="submit" class="btn btn-success" onclick={addOptionBulk}><IcBaselineAdd /> Add</button>
       </form>
     </div>
   </div>
@@ -768,7 +774,7 @@
   </form>
 </dialog>
 
-<Navbar />
+<Navbar hideLogin="true" />
 
 <div class="flex flex-col mx-auto w-[50vw]">
   <div class="card bg-body-tertiary" id="titleCard">
@@ -788,108 +794,99 @@
     </p>
   </div>
 
-  <div id="underOptions">
-    <div class="btn-group dropdown-center">
-      <button type="button" id="createpollbtn" class="btn btn-success btn-lg" onclick={createPoll}>
+  <div class="flex justify-between">
+    <div class="join flex-none">
+      <button class="btn btn-lg btn-success join-item" onclick={createPoll}>
         <IcBaselineCreate style="vertical-align: text-bottom" />Create Poll
       </button>
-      <button type="button" class="btn btn-success btn-lg dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-        <IcBaselineSettings style="vertical-align: text-bottom" /><span class="visually-hidden">Poll settings</span>
+      <button class="btn btn-lg btn-success join-item p-1" popovertarget="pollSettingsDropdown" style="anchor-name:--pollSettingsDropdownAnchor">
+        <IcBaselineSettings />
       </button>
-      <form class="container-fluid dropdown-menu p-4 bg-body-tertiary" style="width: 35vw">
-        <div class="row">
-          <div class="col">
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" id="multipleAnswersAllowed" onchange={saveSettings} />
-              <label class="form-check-label" for="multipleAnswersAllowed"><IcBaselinePlusOne />Allow multiple answers</label>
-              <br /><small class="form-text text-body-secondary">Lets users vote for more than 1 option from the poll.</small>
+    </div>
+    <div
+      class="dropdown dropdown-top dropdown-center menu w-150 overflow-visible rounded-box bg-base-200 shadow-sm"
+      popover
+      id="pollSettingsDropdown"
+      style="position-anchor:--votingSettingsDropdownAnchor"
+    >
+      <div class="p-4">
+        <div class="flex flex-row">
+          <div class="flex flex-col">
+            <label class="label">
+              <input type="checkbox" id="multipleAnswersAllowed" class="toggle toggle-success" onchange={saveSettings} />
+              <IcBaselinePlusOne /> <span class="font-bold">Allow multiple answers</span>
+            </label>
+            <small class="opacity-70"> Lets users vote for more than 1 option from the poll </small>
+
+            <div class="divider"></div>
+
+            <span class="text-xl font-bold"><IcBaselineTimer class="inline align-text-bottom" />Poll timer</span>
+            <div class="join">
+              <input class="input join-item" type="number" id="pollTimerValue" placeholder="0" min="0" onchange={saveSettings} />
+              <select class="select join-item timer" id="pollTimerUnit" onchange={saveSettings}>
+                <option selected value="m">Minutes</option>
+                <option value="h">Hours</option>
+                <option value="d">Days</option>
+              </select>
             </div>
-            <hr />
-            <h4>Poll timer</h4>
-            <div class="mb-3">
-              <div class="input-group flex-nowrap timer">
-                <input type="number" aria-label="poll timer value" id="pollTimerValue" placeholder="0" min="0" class="form-control" />
-                <select class="form-select timer" id="pollTimerUnit" onchange={saveSettings}>
-                  <option selected value="m">Minutes</option>
-                  <option value="h">Hours</option>
-                  <option value="d">Days</option>
-                </select>
+            <small class="opacity-70">Poll will close after the timer runs out</small>
+          </div>
+          <div class="divider divider-horizontal"></div>
+          <div class="flex flex-col">
+            <span class="text-xl font-bold">Results visibility</span>
+            <div class="grid grid-cols-1 gap-4">
+              <div>
+                <input class="radio radio-accent" type="radio" name="resultsVisibility" id="results_anyone" onchange={saveSettings} checked />
+                <label for="results_anyone"><IcBaselineVisibility class="inline text-lg" />Visible to anyone</label>
               </div>
-              <small class="form-text text-body-secondary">Poll will close after the timer runs out.</small>
-            </div>
-          </div>
-          <div class="col">
-            <h4>Results visibility</h4>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="resultsVisibility" value="everyone" id="results_anyone" onchange={saveSettings} checked />
-              <label class="form-check-label" for="results_anyone"><IcBaselineVisibility />Visible to anyone</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="resultsVisibility" value="voters" id="results_voters" onchange={saveSettings} />
-              <label class="form-check-label" for="results_voters"><IcBaselineHowToVote />Visible after voting</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="resultsVisibility" value="timer" id="results_timer" onchange={saveSettings} disabled />
-              <label class="form-check-label" for="results_timer"><IcBaselineTimer />Reveal after timer runs out</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="resultsVisibility" value="creator" id="results_creator" onchange={saveSettings} />
-              <label class="form-check-label" for="results_creator"><IcBaselinePerson />Visible to me only</label>
-            </div>
-            <hr />
-            <button type="button" class="btn btn-primary" onclick={() => bulkModal.showModal()}>Add multiple options</button>
-          </div>
-          <div class="col" style="display: none">
-            <h4>Duplicate detection level</h4>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="duplicateDetectionLevel" value="low" id="detect_low" />
-              <label class="form-check-label" for="detect_low"><IcBaselineRemoveModerator />Low</label>
-              <br /><small class="form-text text-body-secondary">Low protection against duplicate votes, only very obvious bots will be blocked.</small>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="duplicateDetectionLevel" value="high" id="detect_high" checked />
-              <label class="form-check-label" for="detect_high"><IcBaselineSecurity />High</label>
-              <br /><small class="form-text text-body-secondary">Users on the same network might not be able to vote.</small>
+
+              <div>
+                <input class="radio radio-accent" type="radio" name="resultsVisibility" id="results_voters" onchange={saveSettings} />
+                <label for="results_voters"><IcBaselineHowToVote class="inline text-lg" />Visible after voting</label>
+              </div>
+              <div>
+                <input class="radio radio-accent" type="radio" name="resultsVisibility" id="results_timer" onchange={saveSettings} disabled />
+                <label for="results_timer"><IcBaselineTimer class="inline text-lg" />Reveal after timer runs out</label>
+              </div>
+              <div>
+                <input class="radio radio-accent" type="radio" name="resultsVisibility" id="results_creator" onchange={saveSettings} />
+                <label for="results_creator"><IcBaselinePerson class="inline text-lg" />Visible to me only</label>
+              </div>
             </div>
           </div>
         </div>
-      </form>
+
+        <div class="divider"></div>
+        <div class="flex flex-row">
+          <button class="btn btn-primary" onclick={() => bulkModal.showModal()}><IcBaselineFormatListBulleted />Add multiple options</button>
+        </div>
+
+        <!-- <div class="col" style="display: none">
+          <h4>Duplicate detection level</h4>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="duplicateDetectionLevel" value="low" id="detect_low" />
+            <label class="form-check-label" for="detect_low"><IcBaselineRemoveModerator />Low</label>
+            <br /><small class="form-text text-body-secondary">Low protection against duplicate votes, only very obvious bots will be blocked.</small>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="duplicateDetectionLevel" value="high" id="detect_high" checked />
+            <label class="form-check-label" for="detect_high"><IcBaselineSecurity />High</label>
+            <br /><small class="form-text text-body-secondary">Users on the same network might not be able to vote.</small>
+          </div>
+        </div> -->
+      </div>
     </div>
 
-    <div class="float-end">
-      <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove all options from the poll">
-        <a
-          id="deleteAllButton"
-          tabindex="0"
-          class="btn btn-outline-danger html-popover"
-          role="button"
-          data-bs-toggle="popover"
-          data-bs-placement="top"
-          data-bs-trigger="focus"
-          data-bs-title="Are you sure?"
-          data-bs-content="All poll options will be deleted<br><button type='button' class='btn btn-danger float-end my-3' onclick='{reset}'><i class='material-icons notranslate'>delete_forever</i>Delete all</button>"
-        >
-          <IcBaselineDeleteForever />All
-        </a>
-      </span>
+    <button class="btn btn-soft btn-error" popovertarget="deleteAllPopover" style="anchor-name:--deleteAllPopoverAnchor"><IcBaselineDeleteForever /> All </button>
+    <div class="dropdown dropdown-right menu w-52 rounded-box bg-base-200 border border-red-200 shadow-sm p-3" popover id="deleteAllPopover" style="position-anchor:--deleteAllPopoverAnchor">
+      <span class="text-lg font-bold">Are you sure?</span><br />
+      All poll options will be deleted<br />
+      <button class="btn btn-error float-end my-3" onclick={reset}> <IcBaselineDeleteForever />Delete all options</button>
     </div>
   </div>
 </div>
 
 <style>
-  .blur {
-    -webkit-filter: blur(10px) grayscale(100%);
-    -moz-filter: blur(10px) grayscale(100%);
-    -o-filter: blur(10px) grayscale(100%);
-    -ms-filter: blur(10px) grayscale(100%);
-    filter: blur(10px) grayscale(100%);
-  }
-
-  .navbar {
-    padding-top: 0;
-    padding-bottom: 0;
-  }
-
   .remove-input,
   .remove-image {
     width: fit-content;
@@ -900,33 +897,8 @@
     max-width: 100%;
   }
 
-  .report {
-    background-color: transparent;
-    border: 0px;
-  }
-
-  #underOptions {
-    position: relative;
-  }
-
   #vote {
     margin-right: 5px;
-  }
-
-  .card-header,
-  .questionLabel:hover,
-  .list-group-item {
-    cursor: pointer;
-  }
-
-  .card-body {
-    height: 100%;
-  }
-
-  #optionList {
-    resize: both;
-    white-space: nowrap;
-    overflow: auto;
   }
 
   #pollLink > i,
@@ -1013,44 +985,10 @@
     max-height: 200px;
   }
 
-  .accordion-button,
-  .accordion-button i {
-    padding: 5px;
-    font-size: 2rem;
-  }
-
-  .tooltip.show {
-    opacity: 1;
-  }
-
-  #chartdiv {
-    position: relative;
-    height: 75vh;
-    width: 100%;
-  }
-
-  .chartStatDiv {
-    height: 40px;
-    box-sizing: border-box;
-    display: inline-block;
-    border-width: 1px;
-    border: 1px solid var(--bs-secondary-color);
-    border-radius: 6px;
-    padding: 6px 12px 12px 6px;
-    vertical-align: middle;
-    color: var(--bs-secondary-color);
-  }
-
-  #backToPoll {
-    margin-right: 5px;
-  }
-
-  #createpollbtn {
-    font-weight: 700;
-  }
-
-  #mainrow {
-    margin-top: 24px;
-    margin-bottom: 50px;
+  #optionList {
+    resize: both;
+    white-space: nowrap;
+    overflow: auto;
+    margin-bottom: 10px;
   }
 </style>

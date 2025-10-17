@@ -3,7 +3,7 @@
   import Login from "./Login.svelte";
   import NavbarLinks from "./NavbarLinks.svelte";
 
-  let { messageHandler = null, timeoutHandler = null, messageDeletedHandler = null, loginEvent = null } = $props();
+  let { messageHandler = null, timeoutHandler = null, messageDeletedHandler = null, loginEvent = null, hideLogin = "false" } = $props();
 </script>
 
 <div class="navbar bg-base-200 shadow-md py-0">
@@ -30,7 +30,9 @@
     </ul>
   </div>
   <div class="navbar-end gap-2">
-    <Login {messageHandler} {timeoutHandler} {messageDeletedHandler} {loginEvent} />
+    {#if hideLogin !== "true"}
+      <Login {messageHandler} {timeoutHandler} {messageDeletedHandler} {loginEvent} />
+    {/if}
     <ThemeSwitcher />
   </div>
 </div>

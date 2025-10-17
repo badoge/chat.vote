@@ -19,6 +19,7 @@
     replaceEmotes,
     roundToTwo,
     sendData,
+    showConfetti,
   } from "$lib/functions";
   import { onMount } from "svelte";
   import IcBaselineChat from "~icons/ic/baseline-chat";
@@ -2063,7 +2064,7 @@
         </div>
         <div class="dropdown dropdown-end menu w-52 rounded-box bg-base-100 shadow-sm" popover id="bulkAddDropdown" style="position-anchor:--bulkAddDropdownAnchor">
           <ul class="p-1">
-            <li><a onclick={() => bulkAddModal.showModal()} role="button">Add multiple options</a></li>
+            <li><a onclick={() => bulkAddModal.showModal()} role="button"><IcBaselineFormatListBulleted />Add multiple options</a></li>
           </ul>
         </div>
       </div>
@@ -2347,7 +2348,7 @@
                     <IcBaselinePlusOne /> <span class="font-bold">Allow multiple choices</span>
                   </label>
                   <br />
-                  <small id="multiChoiceDesc" class="opacity-70">
+                  <small class="opacity-70">
                     Viewers will be able to vote for multiple options at once.<br />
                     <span id="multiChoiceExample">Example: <span class="notranslate">1 2 3</span></span>
                   </small>
