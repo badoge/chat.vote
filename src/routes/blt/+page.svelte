@@ -38,6 +38,9 @@
 
   import { donkStorage } from "$lib/donkStorage.svelte";
 
+  /**
+   * @type {{ [x: string]: { innerHTML: string; }; previewModal: any; previewModalBody: any; generateModal: any; generateBracketType: any; formatSelect: any; bracketSettings: any; changeCommand: any; changeCommandCopy: any; averageScore: any; averageScoreCopy: any; keepVotingEnabled: any; keepVotingEnabledCopy: any; disableAnimations: any; disableAnimationsCopy: any; triviaPoints: any; questionTimer: any; questionTimerValue: any; triviaScoring: any; questionTimerDiv: any; oneChance: any; hideScore: any; hideScoreTierlist: any; importBracket: any; addBracketOption: any; addTriviaQuestion: any; tierlistItem: any; myBrackets: any; myTrivia: any; triviaUsers: any; bracketOptionsContainer: any; triviaQuestionsContainer: any; bracketTitle: any; triviaTitle: any; bracketDescription: any; triviaDescription: any; spotifyWarning: any; optionLimit: any; editor: any; bracket: any; title: any; winner: any; pickWinner: any; restart: any; enableVoting: any; left_card_header: any; right_card_header: any; left_title: any; right_title: any; centerTitle: any; winnerTitle: any; right_card: any; left_card: any; tierlistContainer: any; upcoming_thumbnails: any; tierlist: any; upcoming: any; triviaTitleCard: any; triviaDescriptionCard: any; trivia: any; triviaSettingsWarning: any; startTriviaButton: any; dismissTriviaSettingsButton: any; questionNumber: any; question: any; triviaAnswer: any; triviaChoices: any; triviaTimerDiv: any; showHint: any; choice1A: any; choice2A: any; choice3A: any; choice4A: any; choice1B: any; choice2B: any; choice3B: any; choice4B: any; round: any; left_command: any; right_command: any; currentTierlistItemName: any; text_image_tierlist: any; youtubeEmbedContainer_tierlist: any; twitchClipsEmbed_tierlist: any; spotifyEmbedContainer_tierlist: any; videoEmbed_tierlist: any; currentTierlistItem: any; triviaMedia: any; image_trivia: any; youtubeEmbedContainer_trivia: any; twitchClipsEmbed_trivia: any; spotifyEmbedContainer_trivia: any; videoEmbed_trivia: any; left_score: any; right_score: any; enableVotingTierlist: any; triviaEditor: any; bracketEditor: any; bracketEditorHeader: any; triviaEditorHeader: any; spotifyPlaylistLink: any; spotifyPlaylistPreview: any; tiermakerLink: any; tiermakerPreview: any; clipsChannel: any; clipsPreview: any; emotesChannel: any; emotesPreview: any; uwufufuLink: any; uwufufuPreview: any; ytchannelLink: any; ytchannelPreview: any; ytplaylistLink: any; ytplaylistPreview: any; bracketCode: any; bracketLink: any; importModalBody: any; shareCode: any; playlist: any; left_card_zoom_icon: any; right_card_zoom_icon: any; hideScoreIcon: any; hideScoreTierlistIcon: any; tierlistEditor: any; text_image_left: any; youtubeEmbedContainer_left: any; spotifyEmbedContainer_left: any; twitchClipsEmbed_left: any; videoEmbed_left: any; text_image_right: any; youtubeEmbedContainer_right: any; spotifyEmbedContainer_right: any; twitchClipsEmbed_right: any; videoEmbed_right: any; left_value: any; right_value: any; spotifyplaylistSettings?: HTMLElement | null; tiermakerSettings?: HTMLElement | null; clipsSettings?: HTMLElement | null; emotesSettings?: HTMLElement | null; uwufufuSettings?: HTMLElement | null; ytchannelSettings?: HTMLElement | null; ytplaylistSettings?: HTMLElement | null; communityModalBody?: HTMLElement | null; myBracketsModalBody?: HTMLElement | null; tierlistSettings?: NodeListOf<Element>; importTrivia?: HTMLElement | null; left_container?: HTMLElement | null; right_container?: HTMLElement | null; left_name?: HTMLElement | null; right_name?: HTMLElement | null; youtubeEmbed_left?: HTMLElement | null; spotifyEmbed_left?: HTMLElement | null; youtubeEmbed_right?: HTMLElement | null; spotifyEmbed_right?: HTMLElement | null; left_info?: HTMLElement | null; right_info?: HTMLElement | null; tierlistItemDrag?: HTMLElement | null; tierlistLabel0?: HTMLElement | null; tierlistLabel1?: HTMLElement | null; tierlistLabel2?: HTMLElement | null; tierlistLabel3?: HTMLElement | null; tierlistLabel4?: HTMLElement | null; tierlistLabel5?: HTMLElement | null; tierlistScore0?: HTMLElement | null; tierlistScore1?: HTMLElement | null; tierlistScore2?: HTMLElement | null; tierlistScore3?: HTMLElement | null; tierlistScore4?: HTMLElement | null; tierlistScore5?: HTMLElement ; pickWinnerTierlist?: HTMLElement | null; youtubeEmbed_tierlist?: HTMLElement | null; spotifyEmbed_tierlist?: HTMLElement ; triviaTimer?: HTMLElement | null; triviaUsersDiv?: HTMLElement | null; youtubeEmbed_trivia?: HTMLElement | null; spotifyEmbed_trivia?: HTMLElement | null; }}
+   */
   let elements;
 
   let USER = donkStorage("USER", null);
@@ -434,7 +437,13 @@
   let votePopover, votePopoverTierlist;
   let currentBracket = {};
   let currentTierlist = {};
+  /**
+   * @type {string}
+   */
   let currentFormat;
+  /**
+   * @type {any[]}
+   */
   let voters = [];
   let voting_enabled = false;
   let currentTime = 0;
@@ -507,7 +516,7 @@
         return;
       }
 
-      //skip user if there arent any points left to give
+      //skip user if there aren't any points left to give
       if (triviaPoints < 1) {
         return;
       }
@@ -787,13 +796,13 @@
   } //addTriviaQuestion
 
   /**
-   * @param {string | number} id
+   * @param {string} id
    */
   function deleteBracketOption(id) {
-    id = parseInt(id, 10);
+    let idInt = parseInt(id, 10);
     let bracketID = parseInt(elements.bracketTitle.dataset.bracketId, 10);
     let bracketIndex = BRACKETS.brackets.findIndex((e) => e.id === bracketID);
-    BRACKETS.brackets[bracketIndex].options.splice(id - 1, 1);
+    BRACKETS.brackets[bracketIndex].options.splice(idInt - 1, 1);
 
     editBracket(bracketID);
     saveBracket(true);
@@ -817,7 +826,7 @@
    * @param {{ innerHTML: string; }} button
    */
   async function previewOption(id, button) {
-    button.innerHTML = spinner;
+    //button.innerHTML = spinner;
     id = parseInt(id, 10);
     let optionValues = document.querySelectorAll(".option-value");
     let optionTypes = document.querySelectorAll(".option-type");
@@ -831,7 +840,7 @@
 
     let link = parseLink(option?.value?.replace(/\s+/g, ""));
 
-    //parseLink doesnt parse image links
+    //parseLink doesn't parse image links
     if (!link && type.value != "image") {
       type.value = "text";
     }
@@ -945,8 +954,12 @@
     saveBracket();
   } //previewOption
 
+  /**
+   * @param {string | number} id
+   * @param {{ innerHTML: string; }} button
+   */
   async function previewQuestion(id, button) {
-    button.innerHTML = spinner;
+    //button.innerHTML = spinner;
     id = parseInt(id, 10);
 
     let questionTypes = document.querySelectorAll(".question-type");
@@ -961,7 +974,7 @@
 
     let link = parseLink(questionMedia?.value?.replace(/\s+/g, ""));
 
-    //parseLink doesnt parse image links
+    //parseLink doesn't parse image links
     if (!link && questionType.value != "image") {
       questionType.value = "text";
     }
@@ -1106,6 +1119,9 @@
     return null;
   } //parseLink
 
+  /**
+   * @param {Object} link
+   */
   async function getRequestInfo(link) {
     if (link.type == "twitch") {
       try {
@@ -1378,7 +1394,7 @@
       showToast("Bracket must have 2 options at least", "alert-warning", 3000);
       return;
     }
-    if (bracket.options.flatMap((e) => e.type).includes("spotify")) {
+    if (bracket.options.flatMap((/** @type {{ type: any; }} */ e) => e.type).includes("spotify")) {
       elements.spotifyWarning.style.display = "";
     } else {
       elements.spotifyWarning.style.display = "none";
@@ -1394,7 +1410,7 @@
     let triviaID = parseInt(startID, 10);
     let trivia = TRIVIA.trivia.find((x) => x.id === triviaID);
 
-    if (trivia.questions.flatMap((e) => e.type).includes("spotify")) {
+    if (trivia.questions.flatMap((/** @type {{ type: any; }} */ e) => e.type).includes("spotify")) {
       elements.spotifyWarning.style.display = "";
     } else {
       elements.spotifyWarning.style.display = "none";
@@ -1511,7 +1527,7 @@
   } //startSingleElimination
 
   /**
-   * @param {{ options: string | any[]; } | undefined} bracket
+   * @param {{ options: any[]; } | undefined} bracket
    */
   function startTierlist(bracket) {
     console.log(bracket);
@@ -1729,7 +1745,7 @@
     elements.choice4B.classList = "btn btn-outline-info text-light-emphasis";
 
     let shuffled = shuffle(structuredClone(triviaAnswer));
-    correctChoiceIndex = shuffled.findIndex((element) => element === triviaAnswer[0]);
+    correctChoiceIndex = shuffled.findIndex((/** @type {any} */ element) => element === triviaAnswer[0]);
     correctChoice = triviaChoices[correctChoiceIndex];
 
     elements.choice1B.innerText = shuffled[0];
@@ -1792,7 +1808,7 @@
   } //showAnswer
 
   /**
-   * @param {string | any[]} array
+   * @param {any[]} array
    */
   function shuffle(array) {
     let currentIndex = array.length;
@@ -2052,7 +2068,7 @@
     //check if bracket is done
     if (Object.keys(currentBracket).length == currentRound + 1) {
       //promote the winner and skip promoteOption() to use the winner animation in nextMatch() instead
-      let index = currentBracket[`round${currentRound + 1}`].findIndex((e) => e === undefined);
+      let index = currentBracket[`round${currentRound + 1}`].findIndex((/** @type {undefined} */ e) => e === undefined);
       currentBracket[`round${currentRound + 1}`][index] = winner;
       nextMatch();
       return;
@@ -2100,8 +2116,11 @@
    * @type {import("animejs").Timeline}
    */
   let promoteOptionAnimation;
+  /**
+   * @param {null} option
+   */
   function promoteOption(option, position = null) {
-    let index = currentBracket[`round${currentRound + 1}`].findIndex((e) => e === undefined);
+    let index = currentBracket[`round${currentRound + 1}`].findIndex((/** @type {undefined} */ e) => e === undefined);
     currentBracket[`round${currentRound + 1}`][index] = option;
 
     if (position && !elements.disableAnimations.checked) {
@@ -2147,6 +2166,9 @@
     }
   } //promoteOption
 
+  /**
+   * @param {{ name: string; command: string; score: number; weight: number; } | { name: string; command: string; score: number; weight?: undefined; }} tier
+   */
   function placeTierlistItem(tier) {
     let id = `item${Date.now()}`;
     let link = currentTierlistItem.thumbnail ? `https://proxy.donk.workers.dev/?url=${encodeURI(currentTierlistItem.thumbnail)}` : "/pics/nothumbnail.png";
@@ -2180,6 +2202,10 @@
     nextTierlistItem();
   } //placeTierlistItem
 
+  /**
+   * @param {string} position
+   * @param {{ id: any; type: string; value: string; name: string; video: any; }} option
+   */
   async function showOption(position, option) {
     if (!option?.id && (option.type == "youtube" || option.type == "twitch" || option.type == "spotify")) {
       let info = parseLink(option.value?.replace(/\s+/g, ""));
@@ -2256,6 +2282,9 @@
     } //streamable
   } //showOption
 
+  /**
+   * @param {string} mediaLink
+   */
   async function showTriviaMedia(mediaLink) {
     if (!mediaLink) {
       elements.triviaMedia.style.display = "none";
@@ -2377,6 +2406,10 @@
    * @type {import("animejs").Timeline}
    */
   let showWinnerAnimation3;
+  /**
+   * @param {{ value: any; }[]} first
+   * @param {{ value: any; }[]} firstAndSecond
+   */
   function showWinner(first, firstAndSecond) {
     elements.winner.innerHTML += `<strong>${escape(first[0].name)}</strong>`;
 
@@ -2483,6 +2516,9 @@
     elements.dismissTriviaSettingsButton.style.display = "none";
   } //quit
 
+  /**
+   * @param {string | number} id
+   */
   function editBracket(id) {
     elements.triviaEditor.style.display = "none";
     elements.bracketEditor.style.display = "";
@@ -2502,6 +2538,9 @@
     }
   } //editBracket
 
+  /**
+   * @param {string | number} id
+   */
   function editTrivia(id) {
     elements.bracketEditor.style.display = "none";
     elements.triviaEditor.style.display = "";
@@ -2528,6 +2567,9 @@
     }
   } //editTrivia
 
+  /**
+   * @param {string | number} id
+   */
   function deleteBracket(id) {
     id = parseInt(id, 10);
     BRACKETS.brackets.splice(
@@ -2539,6 +2581,9 @@
     elements.bracketEditor.style.display = "none";
   } //deleteBracket
 
+  /**
+   * @param {string | number} id
+   */
   function deleteTrivia(id) {
     id = parseInt(id, 10);
     TRIVIA.trivia.splice(
@@ -2559,10 +2604,10 @@
     let html = ``;
 
     for (let index = BRACKETS.brackets.length - 1; index >= 0; index--) {
-      let warning = BRACKETS.brackets[index].options.some((e) => !e.value)
+      let warning = BRACKETS.brackets[index].options.some((/** @type {{ value: any; }} */ e) => !e.value)
         ? `<i class="material-icons notranslate text-danger cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Some of the options have no value">warning</i>`
         : "";
-      warning += BRACKETS.brackets[index].options.some((e) => !e.thumbnail)
+      warning += BRACKETS.brackets[index].options.some((/** @type {{ thumbnail: any; }} */ e) => !e.thumbnail)
         ? `<i class="material-icons notranslate text-warning cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Some of the options have no thumbnail">warning</i>`
         : "";
       html += `<div class="card mb-3">
@@ -2597,7 +2642,7 @@
     </div>
     <div class="card-body my-bracket-body">
       <h5 class="card-title">${BRACKETS.brackets[index].description || "No description"}</h5>
-      <p class="card-text">${BRACKETS.brackets[index].options.map((e) => `${icons[e.type]} ${escape(e.name)}`).join(" • ") || "No options"}</p>
+      <p class="card-text">${BRACKETS.brackets[index].options.map((/** @type {{ type: string | number; name: string; }} */ e) => `${icons[e.type]} ${escape(e.name)}`).join(" • ") || "No options"}</p>
     </div>
   </div>`;
     }
@@ -2614,7 +2659,7 @@
 
     for (let index = TRIVIA.trivia.length - 1; index >= 0; index--) {
       let warning = "";
-      if (!TRIVIA.trivia[index]?.questions || TRIVIA.trivia[index]?.questions.some((e) => !e.answer)) {
+      if (!TRIVIA.trivia[index]?.questions || TRIVIA.trivia[index]?.questions.some((/** @type {{ answer: any; }} */ e) => !e.answer)) {
         warning = `<i class="material-icons notranslate text-danger cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Some of the questions have no answer">warning</i>`;
       }
 
@@ -2650,7 +2695,7 @@
     </div>
     <div class="card-body my-trivia-body">
       <h5 class="card-title">${TRIVIA.trivia[index].description || "No description"}</h5>
-      <p class="card-text">${TRIVIA.trivia[index]?.questions?.map((e) => `${icons[e.type]} ${escape(e.question)}`).join(" • ") || "No questions"}</p>
+      <p class="card-text">${TRIVIA.trivia[index]?.questions?.map((/** @type {{ type: string | number; question: string; }} */ e) => `${icons[e.type]} ${escape(e.question)}`).join(" • ") || "No questions"}</p>
     </div>
   </div>`;
     }
@@ -2667,6 +2712,9 @@
     elements.triviaEditor.style.display = "none";
   } //closeTriviaEditor
 
+  /**
+   * @param {string | any[]} array
+   */
   function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -2674,6 +2722,9 @@
     }
   } //shuffleArray
 
+  /**
+   * @type {{ video: string | undefined; }[] | { name: any; type: string; id?: any; value: any; thumbnail: any; }[]}
+   */
   let previewedBracket = [];
   let previewedBracketTitle = "";
   let previewedBracketDescription = "";
@@ -2684,7 +2735,7 @@
       return;
     }
     try {
-      elements.spotifyPlaylistPreview.innerHTML = spinner;
+      //elements.spotifyPlaylistPreview.innerHTML = spinner;
       let requestOptions = {
         headers: {
           Accept: "application/json",
@@ -2707,7 +2758,7 @@
           continue;
         }
         previewedBracket.push({
-          name: `${tracks[index].track.name} - ${tracks[index].track.artists.map((a) => a.name).join(", ")}`,
+          name: `${tracks[index].track.name} - ${tracks[index].track.artists.map((/** @type {{ name: any; }} */ a) => a.name).join(", ")}`,
           type: "spotify",
           id: tracks[index].track.id,
           value: tracks[index].track.external_urls.spotify,
@@ -2716,7 +2767,7 @@
         html += `
       <li class="list-group-item">
       <a target="_blank" rel="noopener noreferrer" href="${tracks[index].track.preview_url}">${escape(tracks[index].track.name)} - ${tracks[index].track.artists
-        .map((a) => a.name)
+        .map((/** @type {{ name: any; }} */ a) => a.name)
         .join(", ")}</a>
       </li>`;
       }
@@ -2742,7 +2793,7 @@
     }
     let images = 0;
     try {
-      elements.tiermakerPreview.innerHTML = spinner;
+      //elements.tiermakerPreview.innerHTML = spinner;
       let requestOptions = {
         headers: {
           Accept: "application/json",
@@ -2801,7 +2852,7 @@
     }
     let id = await getUserID(channel);
     try {
-      elements.clipsPreview.innerHTML = spinner;
+      //elements.clipsPreview.innerHTML = spinner;
       let requestOptions = {
         headers: {
           Accept: "application/json",
@@ -2851,7 +2902,7 @@
       return;
     }
     try {
-      elements.emotesPreview.innerHTML = spinner;
+      //elements.emotesPreview.innerHTML = spinner;
       let emotes = await getChannelTwitchEmotes(channel, true);
       previewedBracketTitle = `Best ${channel} emote`;
       previewedBracketDescription = `Bracket with ${emotes.length} ${channel} emotes`;
@@ -2894,7 +2945,7 @@
         showToast("Could not find the provided bracket", "alert-warning", 3000);
         return;
       }
-      elements.uwufufuPreview.innerHTML = spinner;
+      //elements.uwufufuPreview.innerHTML = spinner;
       let requestOptions = {
         headers: {
           Accept: "application/json",
@@ -2962,9 +3013,9 @@
     }
     id = id.items[0].id.channelId;
     try {
-      elements.ytchannelPreview.innerHTML = spinner;
+      //elements.ytchannelPreview.innerHTML = spinner;
       let videos = await getYTChannelVideos(id);
-      videos = videos.flatMap((e) => e.items);
+      videos = videos.flatMap((/** @type {{ items: any; }} */ e) => e.items);
       previewedBracketTitle = `Top ${channel} videos`;
       let numberOfVideos = 0;
       previewedBracket = [];
@@ -3011,10 +3062,10 @@
       return;
     }
     try {
-      elements.ytplaylistPreview.innerHTML = spinner;
+      //elements.ytplaylistPreview.innerHTML = spinner;
       let videos = await getYTPlaylist(id[2]);
       let info = await getYTPlaylistInfo(id[2]);
-      videos = videos.flatMap((e) => e.items);
+      videos = videos.flatMap((/** @type {{ items: any; }} */ e) => e.items);
       previewedBracketTitle = info?.items[0]?.snippet?.title || "YouTube playlist generated bracket";
       previewedBracketDescription = `Generated from YouTube playlist ${link}`;
       previewedBracket = [];
@@ -3066,6 +3117,10 @@
     generateModal.close();
   } //generateBracket
 
+  /**
+   * @param {string | number} id
+   * @param {{ innerHTML: string; }} e
+   */
   async function publishBracket(id, e) {
     e.innerHTML = `<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Loading...</span></div>`;
     //const tooltip = bootstrap.Tooltip.getInstance(e);
@@ -3114,9 +3169,12 @@
     }
   } //publishBracket
 
+  /**
+   * @type {{ bracket: { title: any; description: any; options: string | any[]; }; username: any; id: any; }}
+   */
   let importPreviewedBracket;
   async function importCode(hashCode = "") {
-    elements.importModalBody.innerHTML = spinner;
+    //elements.importModalBody.innerHTML = spinner;
     let code = elements.shareCode.value?.trim();
 
     if (hashCode) {
@@ -3187,8 +3245,11 @@
     importModal.close();
   } //importPreviewed
 
+  /**
+   * @param {any} id
+   */
   async function importApproved(id) {
-    let bracket = approvedBrackets.find((e) => e.id === id);
+    let bracket = approvedBrackets.find((/** @type {{ id: any; }} */ e) => e.id === id);
     createBracket(true);
     elements.bracketTitle.value = bracket.bracket.title;
     elements.bracketDescription.value = `${bracket.bracket.description} - Bracket by @${bracket.username} - bracket ID: ${bracket.id}`;
@@ -3205,6 +3266,9 @@
     communityModal.close();
   } //importApproved
 
+  /**
+   * @type {{ video: string | undefined; }[] | { name: any; id: any; type: any; value: string; thumbnail: any; video: any; }[]}
+   */
   let chatBracket = [];
   async function loadPlaylist() {
     let playlistLocalforage = localforage.createInstance({
@@ -3303,6 +3367,9 @@
     generateChatModal.close();
   } //generateChatBracket
 
+  /**
+   * @param {string} id
+   */
   function zoomCard(id) {
     // elements[id].classList.toggle(`zoomed`);
     // elements[`${id}_zoom_icon`].innerHTML = elements[id].classList.contains(`zoomed`) ? "zoom_out" : "zoom_in";
@@ -3321,6 +3388,9 @@
     // }
   } //zoomCard
 
+  /**
+   * @param {PointerEvent} event
+   */
   function zoomOut(event) {
     if (!elements.left_card.contains(event.target) && elements.left_card.classList.contains(`zoomed`)) {
       elements.left_card.classList.remove("zoomed");
@@ -3391,6 +3461,11 @@
     elements.tierlistEditor.innerHTML = html;
   } //loadTierlistEditor
 
+  /**
+   * @param {string} name
+   * @param {string} command
+   * @param {string} color
+   */
   function addTier(name, command, color) {
     let labels = document.querySelectorAll(".tierlist-label");
     if (name == "name") {
@@ -3413,13 +3488,16 @@
 
   function updateTierlist() {} //updateTierlist
 
-  const rgba2hex = (rgba) =>
+  const rgba2hex = (/** @type {{ match: (arg0: RegExp) => any[]; }} */ rgba) =>
     `#${rgba
       .match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)$/)
       .slice(1)
-      .map((n, i) => (i === 3 ? Math.round(parseFloat(n) * 255) : parseFloat(n)).toString(16).padStart(2, "0").replace("NaN", ""))
+      .map((/** @type {string} */ n, /** @type {number} */ i) => (i === 3 ? Math.round(parseFloat(n) * 255) : parseFloat(n)).toString(16).padStart(2, "0").replace("NaN", ""))
       .join("")}`;
 
+  /**
+   * @param {string | number | boolean} id
+   */
   async function getYTPlaylist(id) {
     try {
       let response = await fetch(`https://helper.donk.workers.dev/youtube/playlist?id=${encodeURIComponent(id)}`);
@@ -3431,6 +3509,9 @@
     }
   } //getYTPlaylist
 
+  /**
+   * @param {string | number | boolean} id
+   */
   async function getYTChannelVideos(id, length = 1) {
     try {
       let response = await fetch(`https://helper.donk.workers.dev/youtube/channelvideos?id=${encodeURIComponent(id)}&length=${length}`);
@@ -3442,6 +3523,9 @@
     }
   } //getYTChannelVideos
 
+  /**
+   * @param {string | number | boolean} id
+   */
   async function getYTPlaylistInfo(id) {
     try {
       let response = await fetch(`https://helper.donk.workers.dev/youtube/playlistinfo?id=${encodeURIComponent(id)}`);
@@ -3453,6 +3537,9 @@
     }
   } //getYTPlaylistInfo
 
+  /**
+   * @param {string | number | boolean} handle
+   */
   async function getYTChannelID(handle) {
     try {
       let response = await fetch(`https://helper.donk.workers.dev/youtube/id?handle=${encodeURIComponent(handle)}`);
@@ -3464,6 +3551,10 @@
     }
   } //getYTChannelID
 
+  /**
+   * @param {string} url
+   * @param {number} format
+   */
   async function testImage(url, format) {
     try {
       const res = await fetch(`https://helper.donk.workers.dev/cors/?${url}`);
@@ -3522,6 +3613,10 @@
     elements.videoEmbed_trivia.src = "";
   } //resetPlayers
 
+  /**
+   * @param {any} type
+   * @param {any} id
+   */
   function getItemLink(type, id) {
     switch (type) {
       case "youtube":
@@ -3537,12 +3632,21 @@
     }
   } //getItemLink
 
+  /**
+   * @type {{ loadVideoById: (arg0: string) => void; getPlayerState: () => number; unMute: () => void; mute: () => void; }}
+   */
   let youtubePlayer_left;
+  /**
+   * @type {{ cueVideoById: (arg0: any) => void; loadVideoById: (arg0: string) => void; getPlayerState: () => number; mute: () => void; unMute: () => void; }}
+   */
   let youtubePlayer_right;
   /**
    * @type {{ loadVideoById: (arg0: string) => void; }}
    */
   let youtubePlayer_tierlist;
+  /**
+   * @type {{ loadVideoById: (arg0: string) => void; }}
+   */
   let youtubePlayer_trivia;
 
   function onYouTubeIframeAPIReady() {
@@ -3559,7 +3663,7 @@
     // Sets the volume. Accepts an integer between 0 and 100.
     // player.getVolume():Number
 
-    elements.left_value.addEventListener("mouseover", (event) => {
+    elements.left_value.addEventListener("mouseover", (/** @type {any} */ event) => {
       try {
         if (youtubePlayer_left.getPlayerState() >= 1 && youtubePlayer_right.getPlayerState() >= 1) {
           youtubePlayer_right.mute();
@@ -3567,7 +3671,7 @@
         }
       } catch (error) {}
     });
-    elements.right_value.addEventListener("mouseover", (event) => {
+    elements.right_value.addEventListener("mouseover", (/** @type {any} */ event) => {
       try {
         if (youtubePlayer_left.getPlayerState() >= 1 && youtubePlayer_right.getPlayerState() >= 1) {
           youtubePlayer_left.mute();
@@ -3640,10 +3744,16 @@
     });
   } //onYouTubeIframeAPIReady
 
+  /**
+   * @param {any} event
+   */
   function youtubePlayerOnError(event) {
     console.log(event);
   } //youtubePlayerOnError
 
+  /**
+   * @param {any} event
+   */
   function youtubePlayerOnAutoplayBlocked(event) {
     console.log(event);
   } //youtubePlayerOnAutoplayBlocked
@@ -4107,11 +4217,11 @@
     </form>
     <h3 class="text-lg font-bold">Bracket published</h3>
     Share your bracket with other users using the code
-    <h2><kbd id="bracketCode"></kbd></h2>
+    <h2><kbd id="bracketCode">loading...</kbd></h2>
     <small class="text-body-secondary">To use the code click on <IcBaselineAddCircleOutline /> Create new bracket → <IcBaselineSearch /> Import bracket</small>
     <hr />
     You can also share the bracket using this link
-    <h3><kbd id="bracketLink"></kbd></h3>
+    <h3><kbd id="bracketLink">loading...</kbd></h3>
     <small class="text-body-secondary">Bracket will be automatically downloaded when a user opens the link</small>
     <div class="modal-action">
       <form method="dialog">
@@ -4237,7 +4347,7 @@
       <strong>First answer only:</strong> first viewer to answer correctly gets the full points<br />
       <strong>Points decay:</strong> first viewer to answer correctly gets the full points, 2nd viewer gets 1 point less 3rd viewer gets 2 points less...<br />
       <strong>Everyone:</strong> anyone that answers correctly will get the full points<br />
-      <strong>Speed based reward/punishment:</strong> point value decreases as the timer goes down, correct asnwers gain points while wrong answers lose points. Works better with high question
+      <strong>Speed based reward/punishment:</strong> point value decreases as the timer goes down, correct answers gain points while wrong answers lose points. Works better with high question
       points values (1000+)
     </small>
 
@@ -4247,7 +4357,7 @@
     </div>
     <small class="text-body-secondary">
       The first message each viewer types will be considered as their answer and they won't be able to answer again till next round. Prevents viewers from spamming answers till they get the
-      corrent one
+      correct one
     </small>
 
     <div class="form-check form-switch mt-3">
@@ -4772,7 +4882,7 @@
   }
 
   #myBrackets,
-  #mytrivia {
+  #myTrivia {
     max-height: 50vh;
     overflow: auto;
   }

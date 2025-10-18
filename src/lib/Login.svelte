@@ -255,9 +255,9 @@
       <button class="btn btn-outline btn-accent join-item p-0 pointer-events-none">{chatStatus.emoji}</button>
     </div>
 
-    <button class="btn btn-accent join-item p-1" popovertarget="logoutnDropdown" style="anchor-name:--logoutnDropdownAnchor"><IcBaselineArrowDropDown /></button>
+    <button class="btn btn-accent join-item p-1" popovertarget="logoutDropdown" style="anchor-name:--logoutDropdownAnchor"><IcBaselineArrowDropDown /></button>
   </div>
-  <ul class="dropdown dropdown-end border border-accent menu rounded-box bg-base-300 shadow-sm p-1" popover id="logoutnDropdown" style="position-anchor:--logoutnDropdownAnchor">
+  <ul class="dropdown dropdown-end border border-accent menu rounded-box bg-base-300 shadow-sm p-1" popover id="logoutDropdown" style="position-anchor:--logoutDropdownAnchor">
     <li><button onclick={logout}><IcBaselineLogout />Log out</button></li>
   </ul>
 {:else}

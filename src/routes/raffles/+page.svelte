@@ -305,7 +305,7 @@
     RAFFLES.value.refreshWarningEnabled = elements.refreshWarningEnabled.checked ?? false;
     elements.raffleCommandButton.innerHTML = RAFFLES.value.raffleCommand || "!join";
     elements.raffleCommandText.innerHTML = RAFFLES.value.raffleCommand || "!join";
-  } //refreshdata
+  } //refreshData
 
   function saveSettings() {
     refreshData();

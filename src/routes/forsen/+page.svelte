@@ -950,10 +950,6 @@
 </div>
 
 <style>
-  .widemodal {
-    min-width: 95%;
-  }
-
   #raffleUsers,
   #winner,
   #timerOverWinner {

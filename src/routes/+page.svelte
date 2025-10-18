@@ -431,7 +431,7 @@
     CHATVOTE.value.refreshWarningEnabled = elements.refreshWarningEnabled.checked;
     CHATVOTE.value.linkPreviewThumbnailsEnabled = elements.linkPreviewThumbnailsEnabled.checked;
     elements.suggestionsCommand.innerHTML = CHATVOTE.value.suggestion_prefix;
-  } //refreshdata
+  } //refreshData
 
   function saveSettings() {
     refreshData();

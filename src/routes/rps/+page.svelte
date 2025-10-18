@@ -245,7 +245,7 @@
 
 <div class="flex flex-col items-center">
   <h1 class="text-2xl font-extrabold text-center m-3"><img src="/pics/donk.png" alt="donk" class="w-8 inline align-text-bottom" /> chat.vote Rock Paper Scissors</h1>
-  <span class="text-sm text-error">still not working :) almost done, ready tommorrow for sure :)</span>
+  <span class="text-sm text-error">still not working :) almost done, ready tomorrow for sure :)</span>
   <div class="card card-border w-fit bg-base-200 m-5">
     <div class="card-body flex flex-row">
       <div class="p-2 flex flex-row">

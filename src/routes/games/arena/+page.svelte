@@ -637,7 +637,7 @@
                   <br />
                   <h5>Add a bot</h5>
                   <div class="input-group mb-3">
-                    <input type="text" id="sBotName" class="form-control" placeholder="Name" aria-label="bot bame" />
+                    <input type="text" id="sBotName" class="form-control" placeholder="Name" aria-label="bot name" />
                     <select class="form-select" id="sBotClass">
                       <option selected>Random class</option>
                       <option value="Rogue">Rogue</option>

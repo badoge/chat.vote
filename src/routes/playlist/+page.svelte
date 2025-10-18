@@ -66,6 +66,9 @@
   import { donkStorage } from "$lib/donkStorage.svelte";
   import { showToast } from "../+layout.svelte";
 
+  /**
+   * @type {{ approvalQueue: any; approvalTab: any; selectAll: any; unselectAll: any; link: any; autoplay: any; allowSpotifySongs: any; allowStreamable: any; allowTwitchClips: any; allowTwitchStreams: any; allowTwitchVODs: any; allowTiktokVideos: any; allowYTStreams: any; allowYTShorts: any; allowYTVideos: any; allowVimeoVideos: any; maxDuration: any; maxDurationUnit: any; maxLength: any; maxSize: any; minViewCount: any; minUploadAge: any; minUploadAgeUnit: any; maxUploadAge: any; maxUploadAgeUnit: any; uniqueOnly: any; allowPlebs: any; allowSubs: any; allowMods: any; allowVips: any; allowFirstTimeChatters: any; plebLimit: any; subLimit: any; modLimit: any; vipLimit: any; firstTimeChatterLimit: any; noCommand: any; requestCommand: any; requestCommandAlias: any; allowVoteSkip: any; voteskipCommand: any; voteskipCommandAlias: any; voteskipCount: any; enableBot: any; botCooldown: any; songCommand: any; songCommandAlias: any; playlistCommand: any; playlistCommandAlias: any; openCommand: any; closeCommand: any; playCommand: any; pauseCommand: any; autoplayCommand: any; skipCommand: any; rewindCommand: any; deleteCommand: any; modCommands: any; enableFavorites: any; approvalTabButton: any; voteSkipHint: any; commandHint: any; commandHint2: any; uploadAgeDesc: any; favoriteButtonDiv: any; favoriteCount: any; bannedUsersList: any; bannedItemsList: any; bannedChannelsList: any; bannedUserCount: any; bannedItemCount: any; bannedChannelCount: any; mainList: any; placeholder: any; nowPlaying: any; nowPlayingRequester: any; nowPlayingInfo: any; nowPlayingBanButtons: any; historyList: any; historyCount: any; showFavorites: any; playlistLength: any; youtubeEmbedContainer: any; vimeoEmbedContainer: any; spotifyEmbedContainer: any; twitchEmbed: any; videoEmbed: any; twitchClipsEmbed: any; tiktokEmbed: any; favoriteButton: any; voteSkipDiv: any; voteSkipVotes: any; whoCanRequest: any; volumeSliderIcon: any; volumeSlider: any; volumeSliderValue: any; togglePlaylist: any; vimeoEmbed: any; playersCard?: HTMLElement | null; youtubeEmbed?: HTMLElement | null; spotifyEmbed?: HTMLElement | null; playlistTab?: HTMLElement | null; approvalList?: HTMLElement | null; historyTab?: HTMLElement | null; profileLink?: HTMLElement | null; copyLinkButton?: HTMLElement | null; }}
+   */
   let elements;
 
   let USER = donkStorage("USER", null);
@@ -250,14 +253,29 @@
   let togglePlaylistPopover;
   let streamerColor = "";
 
+  /**
+   * @type {{ requests: any[]; }[]}
+   */
   let users = [];
   let requests = new Map();
+  /**
+   * @type {any[]}
+   */
   let history = [];
+  /**
+   * @type {any[]}
+   */
   let favorites = [];
   let bannedUsers = new Map();
   let bannedItems = new Map();
   let bannedChannels = new Map();
+  /**
+   * @type {never[]}
+   */
   let firstTimeChatters = [];
+  /**
+   * @type {any[]}
+   */
   let skippers = [];
 
   async function refreshData() {
@@ -386,7 +404,7 @@
 
     updateWhoCanRequest();
     checkCommands();
-  } //refreshdata
+  } //refreshData
 
   function saveSettings() {
     refreshData();
@@ -908,7 +926,7 @@
     }
 
     //check if user already requested this link id
-    if (users[userIndex].requests.some((id) => id === link.name)) {
+    if (users[userIndex].requests.some((/** @type {any} */ id) => id === link.name)) {
       botReply("⚠ You already requested this", context.id, false);
       return;
     }
@@ -952,6 +970,9 @@
     updateSite();
   } //addRequest
 
+  /**
+   * @param {any} id
+   */
   function deleteRequest(id, refund = true) {
     const request = requests.get(id);
     if (refund) {
@@ -959,7 +980,7 @@
         const userIndex = users.findIndex((u) => u.username === request.by[index].username);
         if (userIndex != -1) {
           users[userIndex].requests.splice(
-            users[userIndex].requests.findIndex(function (r) {
+            users[userIndex].requests.findIndex(function (/** @type {{ value: any; }} */ r) {
               return r.value === id;
             }),
             1,
@@ -973,6 +994,10 @@
     saveSettings();
   } //deleteRequest
 
+  /**
+   * @param {any} requestName
+   * @param {any} bannedFromHistory
+   */
   function banUser(requestName, bannedFromHistory) {
     let request;
     if (bannedFromHistory) {
@@ -1021,6 +1046,10 @@
     }
   } //banUser
 
+  /**
+   * @param {any} requestName
+   * @param {any} bannedFromHistory
+   */
   function banItem(requestName, bannedFromHistory) {
     let request;
     if (bannedFromHistory) {
@@ -1053,6 +1082,10 @@
     }
   } //banItem
 
+  /**
+   * @param {any} requestName
+   * @param {any} bannedFromHistory
+   */
   function banChannel(requestName, bannedFromHistory) {
     let channelid;
     if (bannedFromHistory) {
@@ -1109,6 +1142,9 @@
     }
   } //banChannel
 
+  /**
+   * @param {any} userid
+   */
   function unbanUser(userid) {
     //check if user is actually banned
     if (!bannedUsers.get(userid)) {
@@ -1334,6 +1370,9 @@
   ${banChannelButton}`;
   } //makeBanButtons
 
+  /**
+   * @param {{ id?: any; name: any; msgid?: number; type?: any; platform?: any; approved?: boolean; title?: string; channel?: string; uri?: string; url?: any; duration?: null; timestamp?: any; views?: null; age?: null; thumbnail?: string; search?: boolean; time?: number; by?: any; }} request
+   */
   function addToPlaylist(request, position = "beforeend") {
     let banButtons = makeBanButtons(request, false);
     elements.mainList.insertAdjacentHTML(
@@ -1366,7 +1405,7 @@
               <small class="requested-by text-body-secondary" id="id${request.name}_by" >
               Requested by: 
               ${request.by[0].badges}
-              <span style="color: ${request.by[0].color}">${request.by.map((u) => u.username).join(" & ")}</span>
+              <span style="color: ${request.by[0].color}">${request.by.map((/** @type {{ username: any; }} */ u) => u.username).join(" & ")}</span>
               </small>
             </div>
           </div>
@@ -1384,6 +1423,9 @@
     );
   } //addToPlaylist
 
+  /**
+   * @param {{ timestamp?: any; thumbnail?: any; duration?: any; title?: any; channel?: any; views?: any; by?: any; type?: any; name?: any; }} request
+   */
   function addToHistory(request, localStorageLoad = false) {
     if (!localStorageLoad) {
       history.unshift(request);
@@ -1418,7 +1460,7 @@
               <small class="request-info text-body-secondary">
               ${escape(request.channel)} ${request.views !== null ? ` • ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}
               </small>
-              <small class="requested-by text-body-secondary" title="Requested by @${request.by.map((u) => u.username).join(" & ")}">
+              <small class="requested-by text-body-secondary" title="Requested by @${request.by.map((/** @type {{ username: any; }} */ u) => u.username).join(" & ")}">
               Requested by 
               ${request.by[0].badges}
               <a 
@@ -1445,6 +1487,9 @@
     );
   } //addToHistory
 
+  /**
+   * @param {{ id?: any; name: any; msgid?: number; type?: any; platform?: any; approved?: boolean; title: any; channel: any; uri?: string; url?: any; duration: any; timestamp: any; views: any; age?: null; thumbnail: any; search?: boolean; time?: number; by: any; }} request
+   */
   function updatePlaylist(request, localStorageLoad = false) {
     //check if request info has been fetched
     if (request.thumbnail && request.title) {
@@ -1484,7 +1529,7 @@
     <span style="color: ${request.by[0].color}">${request.by[0].username}</span>
     </a>
      ${request.by.length > 1 ? `and ${request.by.length - 1} other ${request.by.length - 1 == 1 ? "user" : "users"}` : ""}`;
-      document.getElementById(`id${request.name}_by`).title = `Requested by @${request.by.map((u) => u.username).join(" & ")}`;
+      document.getElementById(`id${request.name}_by`).title = `Requested by @${request.by.map((/** @type {{ username: any; }} */ u) => u.username).join(" & ")}`;
 
       if (!playlist_playing && PLAYLIST.value.autoplay && !localStorageLoad) {
         nextItem();
@@ -1503,6 +1548,10 @@
   } //updatePlaylist
 
   let vimeoCooldown = 0;
+  /**
+   * @param {{ id: any; name: any; msgid?: number; type: any; platform: any; approved?: boolean; title: any; channel: any; uri: any; url: any; duration: any; timestamp: any; views: any; age: any; thumbnail: any; search: any; time?: number; by?: any[]; channelid?: any; mp4?: any; video?: any; }} request
+   * @param {any} msgid
+   */
   async function getRequestInfo(request, msgid) {
     //skip if request already has info
     if (request.title) {
@@ -2021,6 +2070,9 @@
     return null;
   } //parseLink
 
+  /**
+   * @param {any} id
+   */
   async function updateClipMP4(id) {
     try {
       let response = await fetch(`https://helper.donk.workers.dev/twitch/clipsxd?id=${id}`);
@@ -2032,6 +2084,9 @@
     }
   } //updateClipMP4
 
+  /**
+   * @param {string} type
+   */
   function linkTypeAllowed(type) {
     if (type == "twitch clip" && !PLAYLIST.value.allowTwitchClips) {
       return false;
@@ -2063,6 +2118,9 @@
     return true;
   } //linkTypeAllowed
 
+  /**
+   * @param {{ type: any; id: any; url: any; }} request
+   */
   function getItemLink(request) {
     switch (request.type) {
       case "youtube":
@@ -2088,6 +2146,10 @@
     }
   } //getItemLink
 
+  /**
+   * @param {{ button: number; }} event
+   * @param {string | URL | undefined} link
+   */
   function openLink(event, link) {
     if (event.button < 2) {
       window.open(link, "_blank").focus();
@@ -2149,6 +2211,9 @@
   } //addLink
 
   let historyIndex = -1;
+  /**
+   * @param {undefined} [reply]
+   */
   function previousItem(reply) {
     if (history.length == 0) {
       return;
@@ -2183,6 +2248,10 @@
     saveSettings();
   } //previousItem
 
+  /**
+   * @param {string} id
+   * @param {any} reply
+   */
   function deleteItem(id, reply) {
     let request = requests.get(id);
 
@@ -2198,7 +2267,13 @@
     saveSettings();
   } //deleteItem
 
+  /**
+   * @type {{ by?: any; duration?: any; name: any; timestamp?: any; title?: any; channel?: any; platform?: any; views?: any; thumbnail?: any; type: any; mp4?: any; time?: any; }}
+   */
   let currentItem;
+  /**
+   * @param {undefined} [reply]
+   */
   function nextItem(reply) {
     resetPlayers();
     resetVoteSkip();
@@ -2239,6 +2314,9 @@
     saveSettings();
   } //nextItem
 
+  /**
+   * @param {{ type: any; id: any; timestamp: any; uri: any; mp4: any; time: number; video: any; }} item
+   */
   async function playItem(item) {
     switch (item.type) {
       case "youtube":
@@ -2314,7 +2392,7 @@
       <span style="color: ${currentItem.by[0].color}">${currentItem.by[0].username}</span>
   </a>
   ${currentItem.by.length > 1 ? `and ${currentItem.by.length - 1} other ${currentItem.by.length - 1 == 1 ? "user" : "users"}` : ""}`;
-    elements.nowPlayingRequester.title = currentItem.by.map((u) => u.username).join(" & ");
+    elements.nowPlayingRequester.title = currentItem.by.map((/** @type {{ username: any; }} */ u) => u.username).join(" & ");
 
     elements.nowPlayingInfo.innerHTML = `
   <small class="now-playing-info" title="${currentItem.channel}">
@@ -2342,7 +2420,7 @@
       navigator.mediaSession.metadata = new MediaMetadata({
         title: currentItem.title,
         artist: currentItem.channel,
-        album: `Requested By: ${currentItem.by.map((u) => u.username).join(" & ")}`,
+        album: `Requested By: ${currentItem.by.map((/** @type {{ username: any; }} */ u) => u.username).join(" & ")}`,
         artwork: [
           {
             src: currentItem.thumbnail,
@@ -2371,6 +2449,9 @@
     saveSettings();
   } //favorite
 
+  /**
+   * @param {boolean} active
+   */
   function toggleFavoriteButton(active) {
     // const tooltip = bootstrap.Tooltip.getInstance("#favoriteButton");
 
@@ -2385,6 +2466,9 @@
     }
   } //toggleFavoriteButton
 
+  /**
+   * @param {string} format
+   */
   function downloadFavorites(format) {
     if (history.length == 0) {
       showToast("Favorite downloading disabled because history was cleared", "alert-error", 3000);
@@ -2411,7 +2495,7 @@
           views: history[index].views,
           upload_date: new Date(history[index].age).toISOString(),
           request_date: new Date(history[index].time).toISOString(),
-          requesters: history[index].by.map((requester) => requester.username),
+          requesters: history[index].by.map((/** @type {{ username: any; }} */ requester) => requester.username),
           url: getItemLink(history[index]),
         });
       }
@@ -2447,7 +2531,7 @@
           views: history[index].views,
           upload_date: new Date(history[index].age).toISOString(),
           request_date: new Date(history[index].time).toISOString(),
-          requesters: history[index].by.map((requester) => requester.username),
+          requesters: history[index].by.map((/** @type {{ username: any; }} */ requester) => requester.username),
           url: getItemLink(history[index]),
         });
       }
@@ -2476,6 +2560,9 @@
     }
   } //downloadFavorites
 
+  /**
+   * @param {string} format
+   */
   function downloadHistory(format) {
     if (history.length == 0) {
       showToast("There is nothing to download", "alert-error", 3000);
@@ -2494,7 +2581,7 @@
           views: history[index].views,
           upload_date: new Date(history[index].age).toISOString(),
           request_date: new Date(history[index].time).toISOString(),
-          requesters: history[index].by.map((requester) => requester.username),
+          requesters: history[index].by.map((/** @type {{ username: any; }} */ requester) => requester.username),
           url: getItemLink(history[index]),
         });
       }
@@ -2522,7 +2609,7 @@
           views: history[index].views,
           upload_date: new Date(history[index].age).toISOString(),
           request_date: new Date(history[index].time).toISOString(),
-          requesters: history[index].by.map((requester) => requester.username),
+          requesters: history[index].by.map((/** @type {{ username: any; }} */ requester) => requester.username),
           url: getItemLink(history[index]),
         });
       }
@@ -2567,7 +2654,13 @@
     elements.videoEmbed.src = "";
   } //resetPlayers
 
+  /**
+   * @type {number | undefined}
+   */
   let voteskipTimeout;
+  /**
+   * @param {any} userid
+   */
   function voteSkip(userid) {
     if (!playlist_playing || !PLAYLIST.value.allowVoteSkip) {
       return;
@@ -2620,6 +2713,11 @@
   } //resetVoteSkip
 
   let botCooldown = Date.now();
+  /**
+   * @param {string} msg
+   * @param {string} id
+   * @param {boolean} followCooldown
+   */
   async function botReply(msg, id, followCooldown) {
     if (id == "toast") {
       showToast(msg, "alert-info", 2000);
@@ -2665,6 +2763,9 @@
     }
   } //botReply
 
+  /**
+   * @type {number | undefined}
+   */
   let updateCooldown;
   async function updateSite() {
     clearTimeout(updateCooldown);
@@ -2716,6 +2817,9 @@
     }, 1000);
   } //copyLink
 
+  /**
+   * @param {boolean} allow
+   */
   function toggleEveryone(allow) {
     elements.allowPlebs.checked = allow;
     elements.allowSubs.checked = allow;
@@ -2807,6 +2911,9 @@
     }, 500);
   } //editRequestCommand
 
+  /**
+   * @type {number}
+   */
   let oldSliderValue;
   function toggleMute() {
     if (elements.volumeSliderIcon.innerHTML == "volume_off") {
@@ -2995,6 +3102,9 @@
     saveSettings();
   } //toggleAutoplay
 
+  /**
+   * @type {{ loadVideoById: (arg0: string, arg1: undefined) => void; playVideo: () => void; pauseVideo: () => void; }}
+   */
   let youtubePlayer;
   function onYouTubeIframeAPIReady() {
     //youtubePlayer.loadVideoById("id")
@@ -3030,6 +3140,9 @@
     });
   } //onYouTubeIframeAPIReady
 
+  /**
+   * @param {{ data: any; }} event
+   */
   function youtubePlayerOnStateChange(event) {
     console.log(event);
     if (event.data == YT.PlayerState.ENDED && PLAYLIST.value.autoplay) {
@@ -3037,14 +3150,23 @@
     }
   } //youtubePlayerOnStateChange
 
+  /**
+   * @param {any} event
+   */
   function youtubePlayerOnError(event) {
     console.log(event);
   } //youtubePlayerOnError
 
+  /**
+   * @param {any} event
+   */
   function youtubePlayerOnAutoplayBlocked(event) {
     console.log(event);
   } //youtubePlayerOnAutoplayBlocked
 
+  /**
+   * @type {{ destroy: () => void; resume: () => void; pause: () => void; loadUri: (arg0: any, arg1: boolean, arg2: any) => void; play: () => void; }}
+   */
   let spotifyPlayer, spotifyIFrameAPI;
   // window.onSpotifyIframeApiReady = (IFrameAPI) => {
   //   spotifyIFrameAPI = IFrameAPI;
@@ -3060,10 +3182,14 @@
   //   spotifyIFrameAPI.createController(elements.spotifyEmbed, {}, callback);
   // }; //onSpotifyIframeApiReady
 
+  /**
+   * @param {any} uri
+   * @param {any} timestamp
+   */
   function spotifyPlay(uri, timestamp) {
-    const callback = (EmbedController) => {
+    const callback = (/** @type {{ addListener: (arg0: string, arg1: (event: any) => void) => void; }} */ EmbedController) => {
       spotifyPlayer = EmbedController;
-      EmbedController.addListener("playback_update", (event) => {
+      EmbedController.addListener("playback_update", (/** @type {{ data: { position: any; duration: number; }; }} */ event) => {
         if (event.data.position == event.data.duration && event.data.duration > 0 && PLAYLIST.value.autoplay) {
           nextItem();
         }
@@ -3075,6 +3201,9 @@
     spotifyPlayer.play();
   } //spotifyPlay
 
+  /**
+   * @type {{ setChannel: (arg0: string) => void; setVideo: (arg0: any) => void; play: () => void; pause: () => void; addEventListener: (arg0: any, arg1: { (event: any): void; (event: any): void; }) => void; seek: (arg0: any) => void; }}
+   */
   let twitchPlayer;
   let seekTwitchPlayer = true;
   function enableTwitchEmbed() {
@@ -3096,12 +3225,18 @@
     twitchPlayer.addEventListener(Twitch.Player.ENDED, twitchPlayerEnded);
     twitchPlayer.addEventListener(Twitch.Player.PLAYING, twitchPlayerPlaying);
 
+    /**
+     * @param {any} event
+     */
     function twitchPlayerEnded(event) {
       if (PLAYLIST.value.autoplay) {
         nextItem();
       }
     }
 
+    /**
+     * @param {any} event
+     */
     function twitchPlayerPlaying(event) {
       if (seekTwitchPlayer) {
         twitchPlayer.seek(currentItem.timestamp);
@@ -3111,12 +3246,12 @@
   } //enableTwitchEmbed
 
   function videoEmbedEventListeners() {
-    elements.videoEmbed.addEventListener("ended", (event) => {
+    elements.videoEmbed.addEventListener("ended", (/** @type {any} */ event) => {
       if (PLAYLIST.value.autoplay) {
         nextItem();
       }
     });
-    elements.videoEmbed.addEventListener("loadstart", (event) => {
+    elements.videoEmbed.addEventListener("loadstart", (/** @type {any} */ event) => {
       elements.videoEmbed.currentTime = currentItem?.timestamp || 0;
     });
   } //videoEmbedEventListeners
@@ -3137,12 +3272,19 @@
     });
   } //tiktokEmbedEventListeners
 
+  /**
+   * @type {{ unload: () => void; play: () => void; pause: () => void; on: (arg0: string, arg1: (event: any) => void) => void; loadVideo: (arg0: any) => void; setCurrentTime: (arg0: any) => void; }}
+   */
   let vimeoPlayer;
+  /**
+   * @param {any} id
+   * @param {any} timestamp
+   */
   function playVimeoVideo(id, timestamp) {
     //check if embed was created
     if (!vimeoPlayer) {
       vimeoPlayer = new Vimeo.Player(elements.vimeoEmbed, { id: id, responsive: true, speed: true, autoplay: true, start_time: timestamp });
-      vimeoPlayer.on("ended", (event) => {
+      vimeoPlayer.on("ended", (/** @type {any} */ event) => {
         if (PLAYLIST.value.autoplay) {
           nextItem();
         }
@@ -3150,7 +3292,7 @@
     } else {
       vimeoPlayer.loadVideo(id);
       setTimeout(() => {
-        //scuffed embed doesnt seek for some reason :) forsen build
+        //scuffed embed doesn't seek for some reason :) forsen build
         vimeoPlayer.setCurrentTime(timestamp);
       }, 1000);
     }
@@ -3166,6 +3308,7 @@
   <meta property="og:url" content="https://chat.vote/playlist/" />
   <meta property="og:image" content="https://screenshot.donk.workers.dev/?url=https://chat.vote/playlist" />
   <meta property="og:description" content="chat.vote Playlist" />
+  <script src="https://embed.twitch.tv/embed/v1.js" async></script>
 </svelte:head>
 
 <dialog id="clearHistoryModal" class="modal">
@@ -3969,7 +4112,7 @@
 
             <small class="text-body-secondary">
               <IcBaselineLightbulb /> Tip: Mods can delete a request by
-              <a class="link-body-emphasis" href="https://twitter.com/TwitchSupport/status/1070135668980871168" target="_blank" rel="noopener noreferrer"> deleteing the message in chat </a>
+              <a class="link-body-emphasis" href="https://twitter.com/TwitchSupport/status/1070135668980871168" target="_blank" rel="noopener noreferrer"> deleting the message in chat </a>
             </small>
           </div>
         </div>

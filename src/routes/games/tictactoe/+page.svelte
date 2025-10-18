@@ -356,7 +356,7 @@
             </main>
           </div>
         </div>
-        <div class="col-xl-5 centertext">
+        <div class="col-xl-5 text-center">
           <button type="button" onclick={playTurn} class="btn btn-lg btn-success">Play chat's turn</button>
           <div id="tttoutput"></div>
           <div id="tttchartdiv" class="chart-container">
@@ -412,10 +412,6 @@
     width: 100%;
     height: 100%;
     position: absolute;
-  }
-
-  .centertext {
-    text-align: center;
   }
 
   .blur {
