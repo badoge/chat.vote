@@ -15,10 +15,10 @@
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.4.0",
-		"@eslint/js": "^9.37.0",
-		"@iconify/json": "^2.2.394",
+		"@eslint/js": "^9.38.0",
+		"@iconify/json": "^2.2.397",
 		"@sveltejs/adapter-cloudflare": "^7.2.4",
-		"@sveltejs/kit": "^2.46.4",
+		"@sveltejs/kit": "^2.47.1",
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"@tailwindcss/typography": "^0.5.19",
 		"@tailwindcss/vite": "^4.1.14",
@@ -29,11 +29,11 @@
 		"@types/validator": "^13.15.3",
 		"ag-grid-community": "^34.2.0",
 		"animejs": "^4.2.2",
-		"chart.js": "^4.5.0",
-		"daisyui": "^5.1.31",
-		"dompurify": "^3.2.7",
+		"chart.js": "^4.5.1",
+		"daisyui": "^5.3.7",
+		"dompurify": "^3.3.0",
 		"easytimer.js": "^4.6.0",
-		"eslint": "^9.37.0",
+		"eslint": "^9.38.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.12.4",
 		"globals": "^16.4.0",
@@ -45,7 +45,7 @@
 		"localforage": "^1.10.0",
 		"prettier": "^3.6.2",
 		"prettier-plugin-svelte": "^3.4.0",
-		"svelte": "^5.39.11",
+		"svelte": "^5.41.0",
 		"svelte-check": "^4.3.3",
 		"tailwindcss": "^4.1.14",
 		"theme-change": "^2.5.0",
@@ -53,6 +53,6 @@
 		"typescript": "^5.9.3",
 		"unplugin-icons": "^22.4.2",
 		"validator": "^13.15.15",
-		"vite": "^7.1.9"
+		"vite": "^7.1.10"
 	}
 }
