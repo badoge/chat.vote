@@ -12,24 +12,12 @@
 </script>
 
 <li>
-  <a
-    class={route === "/" ? "bg-accent text-accent-content" : ""}
-    data-bs-title="Polls that you vote on by typing in Twitch chat"
-    aria-current={route === "/" ? "page" : "false"}
-    target="_self"
-    href="/"
-  >
+  <a class={route === "/" ? "bg-accent text-accent-content" : ""} data-bs-title="Polls that you vote on by typing in Twitch chat" aria-current={route === "/" ? "page" : "false"} href="/">
     <MdiTwitch /> Twitch chat polls
   </a>
 </li>
 <li>
-  <a
-    class={route === "/poll" ? "bg-accent text-accent-content" : ""}
-    data-bs-title="Straw polls with shareable links"
-    aria-current={route === "/poll" ? "page" : "false"}
-    target="_self"
-    href="/poll"
-  >
+  <a class={route === "/poll" ? "bg-accent text-accent-content" : ""} data-bs-title="Straw polls with shareable links" aria-current={route === "/poll" ? "page" : "false"} href="/poll">
     <IcRoundHowToVote /> Polls
   </a>
 </li>
@@ -38,42 +26,23 @@
     class={route?.startsWith("/games") ? "bg-accent text-accent-content" : ""}
     data-bs-title="Mini games with chat interaction"
     aria-current={route?.startsWith("/games") ? "page" : "false"}
-    target="_self"
     href="/games"
   >
     <IcBaselineVideogameAsset /> Games
   </a>
 </li>
 <li>
-  <a
-    class={route === "/raffles" ? "bg-accent text-accent-content" : ""}
-    data-bs-title="Twitch chat raffles"
-    aria-current={route === "/raffles" ? "page" : "false"}
-    target="_self"
-    href="/raffles"
-  >
+  <a class={route === "/raffles" ? "bg-accent text-accent-content" : ""} data-bs-title="Twitch chat raffles" aria-current={route === "/raffles" ? "page" : "false"} href="/raffles">
     <IcBaselineLocalActivity /> Raffles
   </a>
 </li>
 <li>
-  <a
-    class={route === "/blt" ? "bg-accent text-accent-content" : ""}
-    data-bs-title="Brackets, (tier)Lists & Trivia"
-    aria-current={route === "/blt" ? "page" : "false"}
-    target="_self"
-    href="/blt"
-  >
+  <a class={route === "/blt" ? "bg-accent text-accent-content" : ""} data-bs-title="Brackets, (tier)Lists & Trivia" aria-current={route === "/blt" ? "page" : "false"} href="/blt">
     <StreamlineToastSolid /> BLT
   </a>
 </li>
 <li>
-  <a
-    class={route === "/playlist" ? "bg-accent text-accent-content" : ""}
-    data-bs-title="Song & video requests"
-    aria-current={route === "/playlist" ? "page" : "false"}
-    target="_self"
-    href="/playlist"
-  >
+  <a class={route === "/playlist" ? "bg-accent text-accent-content" : ""} data-bs-title="Song & video requests" aria-current={route === "/playlist" ? "page" : "false"} href="/playlist">
     <IcBaselineQueueMusic /> Playlist
   </a>
 </li>

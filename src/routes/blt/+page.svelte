@@ -1456,7 +1456,7 @@
         showToast("Unknown format", "alert-warning", 3000);
         return;
     }
-    changeSiteLinkTarget("_blank");
+    //changeSiteLinkTarget("_blank");
   } //startBracket
 
   /**
@@ -1653,7 +1653,7 @@
     elements.triviaDescriptionCard.innerText = selectedTrivia.description || "";
     elements.editor.style.display = "none";
     elements.trivia.style.display = "";
-    changeSiteLinkTarget("_blank");
+    //changeSiteLinkTarget("_blank");
 
     nextQuestion();
 
@@ -2510,7 +2510,7 @@
     elements.editor.style.display = "";
     resetPlayers();
     disableVoteButton();
-    changeSiteLinkTarget("_self");
+    //changeSiteLinkTarget("_self");
     elements.triviaSettingsWarning.style.display = "none";
     elements.startTriviaButton.style.display = "";
     elements.dismissTriviaSettingsButton.style.display = "none";

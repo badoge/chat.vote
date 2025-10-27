@@ -507,7 +507,7 @@
     loadChart();
     disableVoteButton();
     disableSuggestButton();
-    changeSiteLinkTarget("_self");
+    //changeSiteLinkTarget("_self");
     checkNumbers();
   } //resetPoll
 
@@ -1232,7 +1232,7 @@
     });
 
     linkifyElementID("table", CHATVOTE?.value.linkPreviewThumbnailsEnabled);
-    changeSiteLinkTarget("_blank");
+    //changeSiteLinkTarget("_blank");
   }
 
   let startingHue = Math.random() * 360;

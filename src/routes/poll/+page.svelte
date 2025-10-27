@@ -175,7 +175,7 @@
     elements.optionsDiv.innerHTML = "";
     addInput();
     addInput();
-    changeSiteLinkTarget("_self");
+    //changeSiteLinkTarget("_self");
   } //reset
 
   function noDuplicates() {
@@ -641,7 +641,7 @@
     if (move) {
       selectNextInput(numberOfOptions - 1);
     }
-    changeSiteLinkTarget("_blank");
+    //changeSiteLinkTarget("_blank");
   } //addInput
 
   /**

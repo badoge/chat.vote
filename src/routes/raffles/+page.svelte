@@ -139,7 +139,7 @@
         disableRaffleButton();
       } else {
         enableRaffleButton();
-        changeSiteLinkTarget("_blank");
+        //changeSiteLinkTarget("_blank");
       }
     });
 
