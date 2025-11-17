@@ -556,7 +556,7 @@
       //show the answer if no one got it
       if (!DRAW.winner) {
         elements.drawoutput.innerHTML = `
-      <div class="card border-danger">
+      <div class="card border-error">
       <div class="card-body">
       <h4>No one got the emote</h4><br>
       ${DRAW.answerURL == "emoji" ? DRAW.answer : `<img src="${DRAW.answerURL}" alt="${DRAW.answer}" title="${DRAW.answer}" class="draw-emote">`}<br>
@@ -684,7 +684,7 @@
 
         <input type="color" value="#22b14c" id="color" /><br />
         <button type="button" id="eraser" class="btn btn-warning colorpreset" value="#666666"><IcBaselineEditOff />Eraser</button>
-        <button type="button" id="clearCanvas" class="btn btn-danger"><IcBaselineDelete />Clear</button>
+        <button type="button" id="clearCanvas" class="btn btn-error"><IcBaselineDelete />Clear</button>
         <br />
 
         <div class="btn-group" role="group" id="undoredo" aria-label="undo redo">
@@ -692,7 +692,7 @@
           <button type="button" title="redo" id="redo" class="btn btn-primary"><IcBaselineRedo /></button>
         </div>
         <br />
-        <div class="card border-danger mt-3" id="countdown" style="display: none">
+        <div class="card border-error mt-3" id="countdown" style="display: none">
           <div class="card-body">
             <div id="countdownValue"></div>
           </div>
@@ -705,7 +705,7 @@
           <div class="btn-group" role="group" aria-label="Basic example">
             <button type="button" onclick={start} class="btn btn-success"><IcBaselinePlayArrow />Start</button>
             <button type="button" onclick={start} class="btn btn-warning"><IcBaselineSkipNext />Skip emote</button>
-            <button type="button" onclick={() => reset()} class="btn btn-danger"><IcBaselineClear />Reset</button>
+            <button type="button" onclick={() => reset()} class="btn btn-error"><IcBaselineClear />Reset</button>
 
             <div class="drawer">
               <input id="settingsDrawer" type="checkbox" class="drawer-toggle" />
@@ -822,7 +822,7 @@
               <ul class="list-group" id="drawlblist"></ul>
             </div>
 
-            <div class="card border-danger" id="drawemotecard">
+            <div class="card border-error" id="drawemotecard">
               <div class="card-body" id="drawemotecardbody">
                 <span style="font-size: 4vh">Place your facecam here<br /><IcBaselinePhotoCamera style="font-size: 6vh" /></span>
               </div>

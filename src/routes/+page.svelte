@@ -62,7 +62,7 @@
   import MdiTwitch from "~icons/mdi/twitch";
 
   import Chart from "chart.js/auto";
-  import { createGrid, themeQuartz, ModuleRegistry, AllCommunityModule } from "ag-grid-community";
+  import { createGrid, themeQuartz, ModuleRegistry, AllCommunityModule, iconSetMaterial } from "ag-grid-community";
   import { donkStorage, resetSettings } from "$lib/donkStorage.svelte";
   import { showToast } from "./+layout.svelte";
 
@@ -109,7 +109,7 @@
           cellRenderer: (params) => {
             const button = document.createElement("button");
             button.innerText = "Delete";
-            button.classList = "btn btn-danger";
+            button.classList = "btn btn-error";
             button.addEventListener("click", () => {
               table.applyTransaction({ remove: [params.node.data] });
             });
@@ -118,13 +118,25 @@
         },
       ],
       suppressMovableColumns: true,
-      theme: themeQuartz.withParams(
+      theme: themeQuartz.withPart(iconSetMaterial).withParams(
         {
-          backgroundColor: "#1a1d20",
-          foregroundColor: "#ffffff",
-          browserColorScheme: "dark",
+          accentColor: "var(--color-accent)",
+          backgroundColor: "#00000000",
+          foregroundColor: "var(--color-base-content)",
+          browserColorScheme: "inherit",
+          borderRadius: "1rem",
+          fontFamily: "inherit",
+          fontSize: "1.1rem",
+          columnBorder: true,
+          headerFontSize: "1.1rem",
+          headerFontWeight: 700,
+          headerRowBorder: true,
+          iconSize: "1.5rem",
+          rowBorder: true,
+          wrapperBorder: true,
+          wrapperBorderRadius: "1rem",
         },
-        "bs-dark",
+        "table-theme",
       ),
       rowData: [],
     };
@@ -475,13 +487,13 @@
       showChat();
     }
 
-    if (!localStorage.getItem("OVERLAY")) {
-      console.log("localStorage overlay not found");
-    } else {
-      overlayID = localStorage.getItem("OVERLAY");
-      elements.overlayLink.value = `https://chat.vote/overlay#${overlayID}`;
-      elements.connectOverlayButton.disabled = false;
-    }
+    // if (!localStorage.getItem("OVERLAY")) {
+    //   console.log("localStorage overlay not found");
+    // } else {
+    //   overlayID = localStorage.getItem("OVERLAY");
+    //   elements.overlayLink.value = `https://chat.vote/overlay#${overlayID}`;
+    //   elements.connectOverlayButton.disabled = false;
+    // }
   } //applySettings
 
   function resetPoll() {
@@ -1225,7 +1237,7 @@
         {
           Command: command,
           Option: suggestion,
-          By: `<p class="cursor-pointer" data-username="${by}" style="color:${color};" onclick='window.open("https://www.twitch.tv/popout/${USER.value.channel}/viewercard/${by}?popout=","_blank","width=340,height=800")'>${badgesHTML}${username}</p>`,
+          By: `<p class="cursor-pointer inline-flex items-center" data-username="${by}" style="color:${color};" onclick='window.open("https://www.twitch.tv/popout/${USER.value.channel}/viewercard/${by}?popout=","_blank","width=340,height=800")'>${badgesHTML}${username}</p>`,
           Score: score,
         },
       ],
@@ -1734,17 +1746,17 @@
     }
     suggestions_enabled = true;
     elements.enableSuggestions.classList.remove("btn-success");
-    elements.enableSuggestions.classList.add("btn-danger");
+    elements.enableSuggestions.classList.add("btn-error");
     elements.enableSuggestionsDropdown.classList.remove("btn-success");
-    elements.enableSuggestionsDropdown.classList.add("btn-danger");
+    elements.enableSuggestionsDropdown.classList.add("btn-error");
     elements.enableSuggestionsText.innerText = "Disable viewer suggestions";
   } //enableSuggestButton
 
   function disableSuggestButton() {
     suggestions_enabled = false;
-    elements.enableSuggestions.classList.remove("btn-danger");
+    elements.enableSuggestions.classList.remove("btn-error");
     elements.enableSuggestions.classList.add("btn-success");
-    elements.enableSuggestionsDropdown.classList.remove("btn-danger");
+    elements.enableSuggestionsDropdown.classList.remove("btn-error");
     elements.enableSuggestionsDropdown.classList.add("btn-success");
     elements.enableSuggestionsText.innerText = "Enable viewer suggestions";
   } //disableSuggestButton
@@ -2082,7 +2094,7 @@
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 
-    <div class="card border-danger text-center my-3" id="countdown" style="display: none">
+    <div class="card border-error text-center my-3" id="countdown" style="display: none">
       <div class="card-body">
         <div class="values d-inline-flex" style="font-size: 3em"></div>
         <div class="btn-group float-end h-100" role="group" aria-label="Timer controls" id="timerControls">
@@ -2104,15 +2116,15 @@
         <input type="radio" name="mainTabs" checked />
         <IcBaselineToc /> Table view
       </label>
-      <div class="tab-content bg-base-200 border-base-300 p-6">
-        <div id="table" data-ag-theme-mode="bs-dark" style="height:50vh;"></div>
+      <div class="tab-content bg-base-200 border-base-300 p-2">
+        <div id="table" data-ag-theme-mode="table-theme" style="height:50vh;"></div>
       </div>
 
       <label class="tab [--tab-bg:theme(colors.base-200)]">
         <input type="radio" name="mainTabs" />
         <IcBaselineStackedBarChart style="transform: rotateZ(90deg)" /> Chart view
       </label>
-      <div class="tab-content bg-base-200 border-base-300 p-6">
+      <div class="tab-content bg-base-200 border-base-300 p-2">
         <div id="chartDiv" class="row">
           <small id="voteHint" style="height: 0px" class="text-center"></small>
           <canvas id="chartCanvas"></canvas>
@@ -2137,7 +2149,7 @@
         <input type="radio" name="mainTabs" />
         <img src="/pics/yeanay.webp" alt="yeanay" style="height: 20px" />Mode
       </label>
-      <div class="tab-content bg-base-200 border-base-300 p-6">
+      <div class="tab-content bg-base-200 border-base-300 p-2">
         <div class="row">
           <div class="col">
             Type <img src="/pics/yea.webp" alt="yea" style="height: 24px; width: 24px" />|yes or <img src="/pics/nay.webp" alt="nay" style="height: 24px; width: 24px" />|no in chat to vote
@@ -2179,7 +2191,7 @@
           <button class="btn btn-success" type="button" id="connectOverlayButton" onclick={connectOverlay} disabled>
             <IcBaselineConnectWithoutContact /> Connect overlay
           </button>
-          <button class="btn btn-danger" type="button" id="generateOverlayButton" onclick={generateOverlay}>
+          <button class="btn btn-error" type="button" id="generateOverlayButton" onclick={generateOverlay}>
             <IcBaselineRestartAlt /> Generate new overlay link
           </button>
           <button class="btn btn-info" type="button" data-bs-toggle="modal" onclick={() => overlayModal.showModal()}><IcBaselineHelp /></button>

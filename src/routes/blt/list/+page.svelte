@@ -152,7 +152,7 @@
       <li class="list-group-item">
       ${bracket.id} - ${escape(bracket.username)} - 
       ${escape(bracket.bracket.title)} - ${escape(bracket.bracket.description)} - ${bracket.bracket.options.length} options 
-      <br><button type="button" class="btn btn-danger float-end me-2" onclick="blacklist('${bracket.id}')">Blacklist</button>
+      <br><button type="button" class="btn btn-error float-end me-2" onclick="blacklist('${bracket.id}')">Blacklist</button>
       <button type="button" class="btn btn-info float-end me-2" onclick="showOptions('${bracket.id}')">Options</button>
       </li>`;
       }
@@ -174,7 +174,7 @@
     <li class="list-group-item">
     ${bracket.reason || "no reason"} - ${bracket.id} - ${escape(bracket.username)} - 
     ${escape(bracket.bracket.title)} - ${escape(bracket.bracket.description)} - ${bracket.bracket.options.length} options 
-    <br><button type="button" class="btn btn-danger float-end me-2" onclick="unblacklist('${bracket.id}')">Unblacklist</button>
+    <br><button type="button" class="btn btn-error float-end me-2" onclick="unblacklist('${bracket.id}')">Unblacklist</button>
     <button type="button" class="btn btn-info float-end me-2" onclick="showOptions('${bracket.id}')">Options</button>
     </li>`;
       }
@@ -223,7 +223,7 @@
     <div class="modal-action">
       <form method="dialog">
         <button type="submit" class="btn btn-secondary">Close</button>
-        <button type="button" class="btn btn-danger" onclick={blacklistSubmit}>Blacklist</button>
+        <button type="button" class="btn btn-error" onclick={blacklistSubmit}>Blacklist</button>
       </form>
     </div>
   </div>

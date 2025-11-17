@@ -1736,11 +1736,11 @@
 
     //reset the button colors
     elements.choice1A.classList = "btn btn-primary";
-    elements.choice2A.classList = "btn btn-danger";
+    elements.choice2A.classList = "btn btn-error";
     elements.choice3A.classList = "btn btn-warning";
     elements.choice4A.classList = "btn btn-info";
     elements.choice1B.classList = "btn btn-outline-primary text-light-emphasis";
-    elements.choice2B.classList = "btn btn-outline-danger text-light-emphasis";
+    elements.choice2B.classList = "btn btn-outline-error text-light-emphasis";
     elements.choice3B.classList = "btn btn-outline-warning text-light-emphasis";
     elements.choice4B.classList = "btn btn-outline-info text-light-emphasis";
 
@@ -2485,19 +2485,19 @@
 
   function enableVoteButton() {
     elements.enableVoting.classList.remove("btn-success");
-    elements.enableVoting.classList.add("btn-danger");
+    elements.enableVoting.classList.add("btn-error");
     elements.enableVoting.innerText = "Stop Voting";
     elements.enableVotingTierlist.classList.remove("btn-success");
-    elements.enableVotingTierlist.classList.add("btn-danger");
+    elements.enableVotingTierlist.classList.add("btn-error");
     elements.enableVotingTierlist.innerText = "Stop Voting";
     voting_enabled = true;
   } //enableVoteButton
 
   function disableVoteButton() {
-    elements.enableVoting.classList.remove("btn-danger");
+    elements.enableVoting.classList.remove("btn-error");
     elements.enableVoting.classList.add("btn-success");
     elements.enableVoting.innerText = "Start Voting";
-    elements.enableVotingTierlist.classList.remove("btn-danger");
+    elements.enableVotingTierlist.classList.remove("btn-error");
     elements.enableVotingTierlist.classList.add("btn-success");
     elements.enableVotingTierlist.innerText = "Start Voting";
     voting_enabled = false;
@@ -2605,7 +2605,7 @@
 
     for (let index = BRACKETS.brackets.length - 1; index >= 0; index--) {
       let warning = BRACKETS.brackets[index].options.some((/** @type {{ value: any; }} */ e) => !e.value)
-        ? `<i class="material-icons notranslate text-danger cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Some of the options have no value">warning</i>`
+        ? `<i class="material-icons notranslate text-error cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Some of the options have no value">warning</i>`
         : "";
       warning += BRACKETS.brackets[index].options.some((/** @type {{ thumbnail: any; }} */ e) => !e.thumbnail)
         ? `<i class="material-icons notranslate text-warning cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Some of the options have no thumbnail">warning</i>`
@@ -2627,13 +2627,13 @@
         </button>
         <a
           tabindex="0"
-          class="btn btn btn-danger html-popover"
+          class="btn btn btn-error html-popover"
           role="button"
           data-bs-toggle="popover"
           data-bs-trigger="focus"
           data-bs-placement="top"
           data-bs-title="Delete bracket?"
-          data-bs-content='<button type="button" class="btn btn-danger" onclick="deleteBracket(${BRACKETS.brackets[index].id})">
+          data-bs-content='<button type="button" class="btn btn-error" onclick="deleteBracket(${BRACKETS.brackets[index].id})">
                             <i class="material-icons notranslate">delete_forever</i>Delete "${escape(BRACKETS.brackets[index].title)}"</button>'
         >
           <i class="material-icons notranslate">delete_forever</i>
@@ -2660,7 +2660,7 @@
     for (let index = TRIVIA.trivia.length - 1; index >= 0; index--) {
       let warning = "";
       if (!TRIVIA.trivia[index]?.questions || TRIVIA.trivia[index]?.questions.some((/** @type {{ answer: any; }} */ e) => !e.answer)) {
-        warning = `<i class="material-icons notranslate text-danger cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Some of the questions have no answer">warning</i>`;
+        warning = `<i class="material-icons notranslate text-error cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Some of the questions have no answer">warning</i>`;
       }
 
       html += `<div class="card mb-3">
@@ -2680,13 +2680,13 @@
         </button>
         <a
           tabindex="0"
-          class="btn btn btn-danger html-popover"
+          class="btn btn btn-error html-popover"
           role="button"
           data-bs-toggle="popover"
           data-bs-trigger="focus"
           data-bs-placement="top"
           data-bs-title="Delete trivia?"
-          data-bs-content='<button type="button" class="btn btn-danger" onclick="deleteTrivia(${TRIVIA.trivia[index].id})">
+          data-bs-content='<button type="button" class="btn btn-error" onclick="deleteTrivia(${TRIVIA.trivia[index].id})">
                             <i class="material-icons notranslate">delete_forever</i>Delete "${escape(TRIVIA.trivia[index].title)}"</button>'
         >
           <i class="material-icons notranslate">delete_forever</i>
@@ -3199,7 +3199,7 @@
       importPreviewedBracket = result;
 
       if (result.blacklisted) {
-        elements.importModalBody.innerHTML = `<span class="text-danger">This bracket is blacklisted (${result.reason})</span>`;
+        elements.importModalBody.innerHTML = `<span class="text-error">This bracket is blacklisted (${result.reason})</span>`;
         return;
       }
 
@@ -3218,7 +3218,7 @@
     </div>
     </div>
     <span class="text-warning">Import brackets from users you trust only</span><br>
-    <button type="button" class="btn btn-danger mt-3" data-bs-dismiss="modal" onclick="importPreviewed()">
+    <button type="button" class="btn btn-error mt-3" data-bs-dismiss="modal" onclick="importPreviewed()">
     <i class="material-icons notranslate">cloud_download</i> Import
     </button>`;
       elements.importModalBody.innerHTML = html;
@@ -4299,7 +4299,7 @@
     </div>
 
     <div id="spotifyWarning" class="mt-5" style="display: none">
-      <div class="alert alert-danger" role="alert">
+      <div class="alert alert-error" role="alert">
         <IcBaselineWarning /><IcBaselineVolumeUp /> Spotify embeds don't have a volume slider; make sure to lower your volume before starting
       </div>
       <div class="alert alert-warning mt-1" role="alert">
@@ -4532,13 +4532,13 @@
       <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Quit bracket">
         <a
           tabindex="0"
-          class="btn btn-danger html-popover"
+          class="btn btn-error html-popover"
           role="button"
           data-bs-toggle="popover"
           data-bs-placement="top"
           data-bs-trigger="focus"
           data-bs-title="Are you sure?"
-          data-bs-content="Results will be lost if you quit<br> <button type='button' class='btn btn-danger float-end my-3' onclick='quit()'><i class='material-icons notranslate'>delete_forever</i>Quit</button>"
+          data-bs-content="Results will be lost if you quit<br> <button type='button' class='btn btn-error float-end my-3' onclick='quit()'><i class='material-icons notranslate'>delete_forever</i>Quit</button>"
         >
           <IcBaselineClose />
         </a>
@@ -4644,14 +4644,14 @@
         <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Quit tier list">
           <a
             tabindex="0"
-            class="btn btn-danger html-popover"
+            class="btn btn-error html-popover"
             role="button"
             data-bs-toggle="popover"
             data-bs-placement="top"
             data-bs-trigger="focus"
             data-bs-container="#tierlist"
             data-bs-title="Are you sure?"
-            data-bs-content="Results will be lost if you quit<br> <button type='button' class='btn btn-danger float-end my-3' onclick='quit()'><i class='material-icons notranslate'>delete_forever</i>Quit</button>"
+            data-bs-content="Results will be lost if you quit<br> <button type='button' class='btn btn-error float-end my-3' onclick='quit()'><i class='material-icons notranslate'>delete_forever</i>Quit</button>"
           >
             <IcBaselineClose />
           </a>
@@ -4734,8 +4734,8 @@
             <button id="choice1B" type="button" class="btn btn-outline-primary text-light-emphasis"></button>
           </div>
           <div class="btn-group btn-group-lg mb-2" role="group">
-            <button id="choice2A" type="button" class="btn btn-danger">2</button>
-            <button id="choice2B" type="button" class="btn btn-outline-danger text-light-emphasis"></button>
+            <button id="choice2A" type="button" class="btn btn-error">2</button>
+            <button id="choice2B" type="button" class="btn btn-outline-error text-light-emphasis"></button>
           </div>
           <div class="btn-group btn-group-lg mb-2" role="group">
             <button id="choice3A" type="button" class="btn btn-warning">3</button>
@@ -4772,13 +4772,13 @@
       <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Quit trivia">
         <a
           tabindex="0"
-          class="btn btn-danger html-popover"
+          class="btn btn-error html-popover"
           role="button"
           data-bs-toggle="popover"
           data-bs-trigger="focus"
           data-bs-placement="top"
           data-bs-title="Are you sure?"
-          data-bs-content="Results will be lost if you quit<br> <button type='button' class='btn btn-danger float-end my-3' onclick='quit()'><i class='material-icons notranslate'>delete_forever</i>Quit</button>"
+          data-bs-content="Results will be lost if you quit<br> <button type='button' class='btn btn-error float-end my-3' onclick='quit()'><i class='material-icons notranslate'>delete_forever</i>Quit</button>"
         >
           <IcBaselineClose />
         </a>
@@ -4856,8 +4856,8 @@
           <p>
             If multiple choice is checked you have to write the answer like this:<br />
             <strong>
-              <span class="text-success">correct answer</span> | <span class="text-danger">choice 2</span> | <span class="text-danger">choice 3</span> |
-              <span class="text-danger">choice 4</span>
+              <span class="text-success">correct answer</span> | <span class="text-error">choice 2</span> | <span class="text-error">choice 3</span> |
+              <span class="text-error">choice 4</span>
             </strong>
             <br />
             If multiple choice is unchecked you can add an alias for the answer:<br />

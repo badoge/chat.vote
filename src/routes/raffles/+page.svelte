@@ -217,15 +217,6 @@
       src: ["/reveal.mp3"],
     });
 
-    const placeholders = ["Wife giveaway 💿", "Winner gets VIP", "Sub emote raffle", "Steam key giveaway", "Gifted sub giveaway", "eg giveaway 🥚"];
-    setInterval(() => {
-      elements.raffleTitle.classList.add("active");
-      setTimeout(() => {
-        elements.raffleTitle.setAttribute("data-placeholder", placeholders[Math.floor(Math.random() * placeholders.length)]);
-        elements.raffleTitle.classList.remove("active");
-      }, 200);
-    }, 3000);
-
     window.onbeforeunload = function () {
       if (RAFFLES.value.refreshWarningEnabled && raffle_users.length > 0) {
         return "Close/refresh warning enabled. You can turn it off in the settings";
@@ -999,7 +990,7 @@
     if (RAFFLES.value.rerollTimerValueMinutes == 0) {
       return;
     }
-    elements.raffleOutput.innerHTML += `<div class="card border-danger" id="countdown_raffle" style="text-align: center; margin: 10px; display: none;">
+    elements.raffleOutput.innerHTML += `<div class="card border-error" id="countdown_raffle" style="text-align: center; margin: 10px; display: none;">
     <div class="card-body">
     <div class="values" style="font-size: 3em;"></div>
     </div>
@@ -1065,13 +1056,13 @@
     fpsBenchmark();
     raffle_open = true;
     elements.enableRaffle.classList.remove("btn-success");
-    elements.enableRaffle.classList.add("btn-danger");
+    elements.enableRaffle.classList.add("btn-error");
     elements.enableRaffleText.innerText = "Close Raffle";
   } //enableRaffleButton
 
   function disableRaffleButton() {
     raffle_open = false;
-    elements.enableRaffle.classList.remove("btn-danger");
+    elements.enableRaffle.classList.remove("btn-error");
     elements.enableRaffle.classList.add("btn-success");
     elements.enableRaffleText.innerText = "Open Raffle";
   } //disableRaffleButton
@@ -1240,7 +1231,7 @@
     }
 
     if (allowed.length == 0) {
-      elements.whoCanJoin.innerHTML = `<span class="text-danger">No one will be able to join the raffle</span>`;
+      elements.whoCanJoin.innerHTML = `<span class="text-error">No one will be able to join the raffle</span>`;
       return;
     }
     elements.whoCanJoin.innerHTML = `${allowed.length == 1 ? "Only" : ""} ${numberOfRoles == allowed.length ? "Everyone" : allowed.join(", ")} will be able to join the raffle.<br>
@@ -1288,7 +1279,18 @@
   <div class="grow">
     <div class="card mb-2">
       <div class="card-body" id="titleCard">
-        <label contenteditable="true" spellcheck="false" class="pull-left" id="raffleTitle" data-placeholder="Raffle mode"></label>
+        <div contenteditable="true" spellcheck="false" class="pull-left" id="raffleTitle" data-placeholder="Raffle mode">
+          <span class="text-rotate">
+            <span>
+              <span>Sub emote raffle</span>
+              <span>Winner gets VIP</span>
+              <span>Steam key giveaway</span>
+              <span>Gifted sub giveaway</span>
+              <span>eg giveaway 🥚</span>
+              <span>Wife giveaway 💿</span>
+            </span>
+          </span>
+        </div>
         <small id="titleHint" class="text-body-secondary">Click to edit</small>
       </div>
     </div>
@@ -1590,7 +1592,7 @@
                   </table>
                   <div class="btn-group mb-3" role="group" aria-label="Check all/Uncheck all">
                     <button type="button" id="selectAll" class="btn btn-sm btn-success">Select all</button>
-                    <button type="button" id="unselectAll" class="btn btn-sm btn-danger">Unselect all</button>
+                    <button type="button" id="unselectAll" class="btn btn-sm btn-error">Unselect all</button>
                   </div>
                   <div class="form-check form-switch mb-3">
                     <input type="checkbox" class="form-check-input" id="splitTiers" aria-describedby="splitTiersDesc" />
@@ -1639,7 +1641,7 @@
                     <input type="checkbox" class="form-check-input" id="useTwitchPFP" onchange={saveSettings} aria-describedby="useTwitchPFPDesc" />
                     <label class="form-check-label" for="useTwitchPFP"><IcBaselineAccountCircle /> Use Twitch profile pictures</label>
                     <small id="useTwitchPFPDesc" class="text-body-secondary"><br />Replaces the placeholder avatars with the viewers' Twitch avatars </small><br />
-                    <small class="text-danger">Use with caution; Some viewers might have avatars that break Twitch's TOS.</small> <br />
+                    <small class="text-error">Use with caution; Some viewers might have avatars that break Twitch's TOS.</small> <br />
                   </div>
                 </div>
               </div>
@@ -1681,7 +1683,7 @@
                   <div class="form-check form-switch mb-3">
                     <input class="form-check-input" type="checkbox" id="linkPreviewThumbnailsEnabled" />
                     <label class="form-check-label" for="linkPreviewThumbnailsEnabled"> <IcBaselinePreview />Show thumbnails in link preview </label>
-                    <br /><small class="text-body-secondary"><b class="text-danger">Use with caution; viewers might link images that break Twitch's TOS</b></small>
+                    <br /><small class="text-body-secondary"><b class="text-error">Use with caution; viewers might link images that break Twitch's TOS</b></small>
                   </div>
                   <div class="form-check form-switch mb-3">
                     <input class="form-check-input" type="checkbox" id="refreshWarningEnabled" onchange={saveSettings} />
@@ -1699,7 +1701,7 @@
                     | 7TV: <span id="seventvGlobalEmotes">0</span>/<span id="seventvChannelEmotes">0</span>
                   </div>
 
-                  <a id="resetSettingsPopover" tabindex="0" class="btn btn-danger" role="button"><IcBaselineDeleteForever />Reset all settings</a>
+                  <a id="resetSettingsPopover" tabindex="0" class="btn btn-error" role="button"><IcBaselineDeleteForever />Reset all settings</a>
                   <br />
                   <small class="text-body-secondary">Resets all settings and reloads the page.</small>
                 </div>
@@ -1723,7 +1725,7 @@
             </button>
             <button class="btn btn-outline-secondary" type="button" id="startExtraTimer" onclick={startExtraTimer}>Start <IcBaselineTimer /></button>
           </div>
-          <div class="card border-danger" id="extraCountdown" style="display: none; font-size: 3em">
+          <div class="card border-error" id="extraCountdown" style="display: none; font-size: 3em">
             <div class="card-body">
               <div class="values"></div>
             </div>

@@ -418,7 +418,7 @@
     <div class="row">
       <div class="col-xl-2"></div>
       <div class="col-xl-8">
-        <div class="card border-danger text-center mb-3" id="timer" style="visibility: hidden">
+        <div class="card border-error text-center mb-3" id="timer" style="visibility: hidden">
           <div class="card-body p-0">
             <div id="timerValue" style="font-size: 3em">:)</div>
           </div>

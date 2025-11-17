@@ -72,23 +72,6 @@
       }
     });
 
-    elements.pollTimerValue.onchange = function () {
-      updateTimer(this);
-      saveSettings();
-    };
-    elements.detect_low.onchange = function () {
-      if (this.checked) {
-        security = "low";
-      }
-      saveSettings();
-    };
-    elements.detect_high.onchange = function () {
-      if (this.checked) {
-        security = "high";
-      }
-      saveSettings();
-    };
-
     elements.pollTitle.focus();
     elements.pollTitle.select();
   });
@@ -160,7 +143,7 @@
     POLL.pollTimerValue = parseFloat(elements.pollTimerValue.value);
     POLL.pollTimerUnit = elements.pollTimerUnit.value;
     POLL.resultsVisibility = document.querySelector('input[name="resultsVisibility"]:checked').value;
-    POLL.security = document.querySelector('input[name="duplicateDetectionLevel"]:checked').value;
+    //POLL.security = document.querySelector('input[name="duplicateDetectionLevel"]:checked').value;
   } //refreshData
 
   function saveSettings() {
@@ -631,7 +614,7 @@
           <button type="button" class="remove-image btn btn-warning" onclick="deleteImage(event)" data-option-id="${numberOfOptions}" style="display: none">
             <i data-option-id="${numberOfOptions}" class="material-icons notranslate">hide_image</i>
           </button>
-          <button type="button" class="remove-input btn btn-danger" onclick="deleteInput(event)" data-option-id="${numberOfOptions}">
+          <button type="button" class="remove-input btn btn-error" onclick="deleteInput(event)" data-option-id="${numberOfOptions}">
            <i class="material-icons notranslate" data-option-id="${numberOfOptions}">delete_forever</i>
          </button>
         </div>
@@ -694,7 +677,7 @@
       <button class="btn btn-circle btn-ghost absolute right-1 top-1"><IcBaselineClose /></button>
     </form>
     <h3 class="text-lg font-bold">Poll info</h3>
-    <div class="text-danger" id="errorDiv"></div>
+    <div class="text-error" id="errorDiv"></div>
     <h4>Poll link:</h4>
     <div id="pollLinkDiv">
       <p class="placeholder-glow">

@@ -20,7 +20,7 @@
     </div>
     <div class="tooltip tooltip-bottom" data-tip="Home page">
       <a class="btn btn-ghost text-xl" href="/home">
-        <img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" />chat.vote beta - not ready for public use :)
+        <img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" />chat.vote beta - very broken - do not use or you will be banned
       </a>
     </div>
   </div>

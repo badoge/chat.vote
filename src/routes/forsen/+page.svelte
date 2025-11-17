@@ -192,11 +192,11 @@
     }); //connected
 
     client.on("disconnected", (reason) => {
-      elements.status.innerHTML = `<h4><span class="badge bg-danger">Disconnected: ${reason}</span></h4>`;
+      elements.status.innerHTML = `<h4><span class="badge bg-error">Disconnected: ${reason}</span></h4>`;
     }); //disconnected
 
     client.on("notice", (channel, msgid, message) => {
-      elements.status.innerHTML = `<h4><span class="badge bg-danger">Disconnected: ${message}</span></h4>`;
+      elements.status.innerHTML = `<h4><span class="badge bg-error">Disconnected: ${message}</span></h4>`;
     }); //notice
 
     client.connect().catch(console.error);
@@ -818,7 +818,7 @@
       }
     } catch (error) {
       console.log(error);
-      elements.emotes.innerHTML = `<span class="text-danger">Could not load emotes</span>`;
+      elements.emotes.innerHTML = `<span class="text-error">Could not load emotes</span>`;
     }
   }
 </script>

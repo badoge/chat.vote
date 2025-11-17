@@ -239,7 +239,7 @@
       });
     }
 
-    enableTwitchEmbed();
+    //enableTwitchEmbed();
     videoEmbedEventListeners();
     tiktokEmbedEventListeners();
   }); //onMount
@@ -2457,11 +2457,11 @@
 
     if (!active) {
       elements.favoriteButton.innerText = "favorite_border";
-      elements.favoriteButton.classList.remove("text-danger");
+      elements.favoriteButton.classList.remove("text-error");
       tooltip.setContent({ ".tooltip-inner": "Add to favorites" });
     } else {
       elements.favoriteButton.innerText = "favorite";
-      elements.favoriteButton.classList.add("text-danger");
+      elements.favoriteButton.classList.add("text-error");
       tooltip.setContent({ ".tooltip-inner": "Remove from favorites" });
     }
   } //toggleFavoriteButton
@@ -2850,7 +2850,7 @@
     }
 
     if (allowed.length == 0) {
-      elements.whoCanRequest.innerHTML = `<span class="text-danger">No one will be able to request</span>`;
+      elements.whoCanRequest.innerHTML = `<span class="text-error">No one will be able to request</span>`;
       return;
     }
     elements.whoCanRequest.innerHTML = `${allowed.length == 1 ? "Only" : ""} ${allowed.length == 5 ? "Everyone" : allowed.join(", ")} will be able to request.<br>
@@ -2959,7 +2959,7 @@
     }
     playlist_open = !playlist_open;
     if (playlist_open) {
-      elements.togglePlaylist.classList = "btn btn-danger";
+      elements.togglePlaylist.classList = "btn btn-error";
       elements.togglePlaylist.innerHTML = `<i class="material-icons notranslate">playlist_remove</i> Close Playlist`;
     } else {
       elements.togglePlaylist.classList = "btn btn-success";
@@ -2973,7 +2973,7 @@
   function openPlaylist(reply) {
     if (!playlist_open) {
       playlist_open = true;
-      elements.togglePlaylist.classList = "btn btn-danger";
+      elements.togglePlaylist.classList = "btn btn-error";
       elements.togglePlaylist.innerHTML = "Close Playlist";
       botReply(`✅ The playlist is now open`, reply, false);
     } else {
@@ -3322,7 +3322,7 @@
     <div class="modal-action">
       <form method="dialog">
         <button type="submit" class="btn btn-secondary">Cancel</button>
-        <button type="submit" class="btn btn-danger" onclick={clearHistory}><IcBaselineDeleteForever />Clear</button>
+        <button type="submit" class="btn btn-error" onclick={clearHistory}><IcBaselineDeleteForever />Clear</button>
       </form>
     </div>
   </div>
@@ -3341,7 +3341,7 @@
     <div class="modal-action">
       <form method="dialog">
         <button type="submit" class="btn btn-secondary">Cancel</button>
-        <button type="submit" class="btn btn-danger" onclick={clearFavorites}><IcBaselineHeartBroken />Clear</button>
+        <button type="submit" class="btn btn-error" onclick={clearFavorites}><IcBaselineHeartBroken />Clear</button>
       </form>
     </div>
   </div>
@@ -3982,7 +3982,7 @@
             </table>
             <div class="btn-group" role="group" aria-label="Check all/Uncheck all">
               <button type="button" id="selectAll" class="btn btn-sm btn-success">Select all</button>
-              <button type="button" id="unselectAll" class="btn btn-sm btn-danger">Unselect all</button>
+              <button type="button" id="unselectAll" class="btn btn-sm btn-error">Unselect all</button>
             </div>
           </div>
         </div>
@@ -4117,7 +4117,7 @@
           </div>
         </div>
 
-        <a id="resetSettingsPopover" tabindex="0" class="btn btn-danger" role="button"><IcBaselineDeleteForever />Reset all settings</a>
+        <a id="resetSettingsPopover" tabindex="0" class="btn btn-error" role="button"><IcBaselineDeleteForever />Reset all settings</a>
         <br />
         <small class="text-body-secondary">Resets all settings and reloads the page.</small>
       </div>
@@ -4183,7 +4183,7 @@
     data-bs-placement="top"
     data-bs-title="Are you sure?"
     data-bs-content="All videos/songs will be removed from the playlist including the current playing video <br>
-                <button type='button' class='btn btn-danger float-end mb-3' onclick='clearPlaylist()'><i class='material-icons notranslate'>delete_sweep</i>Clear</button>"
+                <button type='button' class='btn btn-error float-end mb-3' onclick='clearPlaylist()'><i class='material-icons notranslate'>delete_sweep</i>Clear</button>"
   >
     <IcBaselineDeleteSweep />Clear playlist
   </a>
