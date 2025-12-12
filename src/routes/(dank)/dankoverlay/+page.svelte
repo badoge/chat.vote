@@ -17,7 +17,12 @@
     <p><kbd class="kbd">!stop</kbd> Stop the poll</p>
     <p>Bar needs to be visible to start/stop</p>
     <div class="divider"></div>
+    <p><kbd class="kbd">!spawn</kbd> !reset + !show + !start - must be hidden before</p>
+    <p><kbd class="kbd">!kill</kbd> !stop + !reset + !hide - must be shown before</p>
+    <div class="divider"></div>
     <p><kbd class="kbd">!restart</kbd> Clear the results and voters and start the poll again</p>
     <p><kbd class="kbd">!reset</kbd> Clear the results and voters and stop the poll</p>
+    <div class="divider"></div>
+    <p><kbd class="kbd">!refresh</kbd> Refresh the page</p>
   </div>
 </div>

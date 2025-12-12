@@ -6,7 +6,6 @@
   import { fade } from "svelte/transition";
 
   let username = $state(page.params.username || "");
-  let channels = [];
 
   /**
    * @type {import("@tmi.js/chat").Client}
@@ -20,6 +19,11 @@
   let percent = $state(100);
   let previousPercent = 100;
   let hintVisible = $state(false);
+
+  /**
+   * @type {any[]}
+   */
+  let costreamers = $state([]);
 
   let voters = new Set();
 
@@ -40,6 +44,15 @@
   };
 
   onMount(async () => {
+    try {
+      let response = await fetch(`https://helper.donk.workers.dev/twitch/donk?channel=${username}`);
+      let result = await response.json();
+      if (typeof result?.[0] == "string" && result?.length) {
+        costreamers = result;
+      }
+    } catch (error) {
+      console.log(error);
+    }
     connectChat();
   }); //onMount
 
@@ -48,9 +61,7 @@
   } //disconnectChat
 
   function connectChat() {
-    channels = [];
-    channels.push(username);
-    client = new tmi.Client({ channels: channels });
+    client = new tmi.Client({ channels: [username, ...costreamers] });
 
     client.connect();
 
@@ -61,6 +72,57 @@
         //overlay channel streamer or overlay channel mods
         if (user.login == username || (channel.login == username && user.isMod)) {
           switch (message.text?.toLowerCase()) {
+            case "!spawn":
+              if (!hidden) {
+                return;
+              }
+              hidden = false;
+              voteCounts = {
+                1: 0,
+                2: 0,
+                3: 0,
+                4: 0,
+                5: 0,
+                6: 0,
+                7: 0,
+                8: 0,
+                9: 0,
+                10: 0,
+              };
+              score = 0;
+              votes = 0;
+              percent = 100;
+              previousPercent = 100;
+              voters = new Set();
+              active = true;
+              startInterval();
+              showHint();
+              break;
+            case "!kill":
+              if (hidden) {
+                return;
+              }
+              active = false;
+              stopInterval();
+              voteCounts = {
+                1: 0,
+                2: 0,
+                3: 0,
+                4: 0,
+                5: 0,
+                6: 0,
+                7: 0,
+                8: 0,
+                9: 0,
+                10: 0,
+              };
+              score = 0;
+              votes = 0;
+              percent = 100;
+              previousPercent = 100;
+              voters = new Set();
+              hidden = true;
+              break;
             case "!start":
               if (hidden) {
                 return;
@@ -138,6 +200,9 @@
               break;
             case "!show":
               hidden = false;
+              break;
+            case "!refresh":
+              location.reload();
               break;
             default:
               break;
@@ -220,6 +285,23 @@
 
 {#if !hidden}
   <div class="flex flex-col items-center place-content-center h-[100vh] gap-2" transition:fade>
+    {#if costreamers.length}
+      <div id="channels" class="flex flex-col rounded-md text-neutral font-bold text-center dm-serif-display-regular w-18">
+        <div class="flex flex-col">
+          <div class="text-md">POLLING</div>
+          <div class="text-xl">
+            <div class="scrolling_text">
+              <div class="text">
+                {#each costreamers as channel}
+                  <span>{channel}</span>
+                {/each}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {/if}
+
     <div id="glass" class="relative bg-gray-300 rounded-md overflow-hidden w-18 h-[70vh]">
       <div id="filler" class="absolute bottom-0 w-full"></div>
       <div class="absolute inset-0 flex flex-col mb-[57px] mt-[4px] ms-[4px]">
@@ -278,6 +360,12 @@
     background: linear-gradient(130deg, #66100e, #260a08);
     color: #f9c844;
   }
+  #channels {
+    border-color: #484643;
+    border-width: 2px;
+    background: linear-gradient(90deg, #66100e, #260a08);
+    color: #f9c844;
+  }
   :global(html) {
     background-color: transparent !important;
     width: 100vw !important;
@@ -288,5 +376,30 @@
     font-family: "DM Serif Display", serif;
     font-weight: 400;
     font-style: normal;
+  }
+
+  .scrolling_text {
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    white-space: nowrap;
+  }
+
+  .text span {
+    margin: 0 40px;
+  }
+
+  @keyframes animate_text {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-100%, 0, 0);
+    }
+  }
+
+  .text {
+    text-transform: uppercase;
+    animation: animate_text 4s linear infinite;
   }
 </style>
