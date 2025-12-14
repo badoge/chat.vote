@@ -36,11 +36,6 @@
     3: 0,
     4: 0,
     5: 0,
-    6: 0,
-    7: 0,
-    8: 0,
-    9: 0,
-    10: 0,
   };
 
   onMount(async () => {
@@ -83,11 +78,6 @@
                 3: 0,
                 4: 0,
                 5: 0,
-                6: 0,
-                7: 0,
-                8: 0,
-                9: 0,
-                10: 0,
               };
               score = 0;
               votes = 0;
@@ -110,11 +100,6 @@
                 3: 0,
                 4: 0,
                 5: 0,
-                6: 0,
-                7: 0,
-                8: 0,
-                9: 0,
-                10: 0,
               };
               score = 0;
               votes = 0;
@@ -150,11 +135,6 @@
                 3: 0,
                 4: 0,
                 5: 0,
-                6: 0,
-                7: 0,
-                8: 0,
-                9: 0,
-                10: 0,
               };
               score = 0;
               votes = 0;
@@ -179,11 +159,6 @@
                 3: 0,
                 4: 0,
                 5: 0,
-                6: 0,
-                7: 0,
-                8: 0,
-                9: 0,
-                10: 0,
               };
               score = 0;
               votes = 0;
@@ -219,7 +194,7 @@
 
         let input = message.text.split(" ").filter(Boolean)[0];
         let vote = parseInt(input, 10);
-        if (!vote || vote > 10 || vote < 1) {
+        if (!vote || vote > 5 || vote < 1) {
           return;
         }
 
@@ -242,7 +217,7 @@
       intervalId = setInterval(() => {
         let sum = 0;
         let total = 0;
-        for (let index = 1; index <= 10; index++) {
+        for (let index = 1; index <= 5; index++) {
           const count = voteCounts[index] || 0;
           sum += index * count;
           total += count;
@@ -250,11 +225,11 @@
 
         score = sum / total || 0;
         votes = total || 0;
-        percent = (score * 100) / 10;
+        percent = (score * 100) / 5;
         if (previousPercent != percent) {
           previousPercent = percent;
           animate("#filler", {
-            y: 100 - percent + "%",
+            y: 100 - percent + 1.8 + "%",
             duration: 200,
           });
         }
@@ -302,15 +277,10 @@
       </div>
     {/if}
 
-    <div id="glass" class="relative bg-gray-300 rounded-md overflow-hidden w-18 h-[70vh]">
+    <div id="glass" class="relative bg-gray-300 rounded-md overflow-hidden w-18 h-[60vh]">
       <div id="filler" class="absolute bottom-0 w-full"></div>
-      <div class="absolute inset-0 flex flex-col mb-[57px] mt-[4px] ms-[4px]">
+      <div class="absolute inset-0 flex flex-col mb-[96px] mt-[3px] ms-[4px]">
         <div id="labels" class="flex flex-col items-end justify-between h-full dm-serif-display-regular">
-          <div class="divider divider-start divider-neutral m-0">10</div>
-          <div class="divider divider-start divider-neutral m-0">9</div>
-          <div class="divider divider-start divider-neutral m-0">8</div>
-          <div class="divider divider-start divider-neutral m-0">7</div>
-          <div class="divider divider-start divider-neutral m-0">6</div>
           <div class="divider divider-start divider-neutral m-0">5</div>
           <div class="divider divider-start divider-neutral m-0">4</div>
           <div class="divider divider-start divider-neutral m-0">3</div>
