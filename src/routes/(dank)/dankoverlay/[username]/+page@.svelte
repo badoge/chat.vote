@@ -370,6 +370,6 @@
 
   .text {
     text-transform: uppercase;
-    animation: animate_text 4s linear infinite;
+    animation: animate_text 9s linear infinite;
   }
 </style>
