@@ -13,8 +13,8 @@
     }; //onbeforeunload
   });
 
-  //let redirect_uri = "http://localhost:5173/super_long_url_to_hide_access_token__if_you_see_this_on_stream_then_the_streamer_you_are_watching_is_very_stupid";
-  let redirect_uri = "https://beta.chat.vote/super_long_url_to_hide_access_token__if_you_see_this_on_stream_then_the_streamer_you_are_watching_is_very_stupid";
+  let redirect_uri = "http://localhost:5173/super_long_url_to_hide_access_token__if_you_see_this_on_stream_then_the_streamer_you_are_watching_is_very_stupid";
+  //let redirect_uri = "https://beta.chat.vote/super_long_url_to_hide_access_token__if_you_see_this_on_stream_then_the_streamer_you_are_watching_is_very_stupid";
 
   let scopes = "";
 </script>
