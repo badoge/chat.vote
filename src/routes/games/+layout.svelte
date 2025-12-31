@@ -83,7 +83,12 @@
 <Navbar />
 
 <div class="desktop">
-  <Window />
+  <Window name="asd" location={{ x: 100, y: 100 }} size={{ width: 500, height: 300 }}>asd</Window>
+  <Window name="asdasd" location={{ x: 300, y: 300 }} size={{ width: 400, height: 200 }}>
+    <img src="/pics/donk.png" alt="donk" style="width: 100px;" />
+    asd
+  </Window>
+
   <footer class="taskbar">
     <button class="px-2 flex rounded-e-lg bg-gradient-to-b from-[#4cc552] to-[#2e8b33] border border-[#1f6f28] shadow-inner text-white font-bold">
       <span class="text-xl flex gap-1 items-center italic"><img class="h-5" src="/pics/donk.png" alt="donk" />Start</span>
