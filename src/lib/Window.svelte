@@ -46,8 +46,7 @@
     const dx = e.clientX - resizing.startX;
     const dy = e.clientY - resizing.startY;
 
-    let { width, height, x, y } = resizing.startBox;
-
+    let { width, height, x, y, z } = resizing.startBox;
     if (resizing.dir.includes("e")) {
       width = Math.max(minWidth, width + dx);
     }
@@ -67,9 +66,9 @@
       y += height - newHeight;
       height = newHeight;
     }
+    z++;
 
-    box = { ...box, width, height, x, y };
-    console.log($state.snapshot(box));
+    box = { ...box, width, height, x, y, z };
   }
 
   function stopResize() {
@@ -80,10 +79,10 @@
 
   let dragWindow = $state();
   let dragHeader = $state();
-
+  let draggableInstance = $state();
   onMount(() => {
     if (dragWindow && dragHeader) {
-      createDraggable(dragWindow, {
+      draggableInstance = createDraggable(dragWindow, {
         trigger: dragHeader,
         container: "body",
         containerPadding: [64, 0, 32, 0],
@@ -95,21 +94,16 @@
           let z = parseInt(style.zIndex, 10);
           box = { ...box, x, y, z };
         },
+        onAfterResize: (self) => {
+          draggableInstance.setX(box.x);
+          draggableInstance.setY(box.y);
+        },
       });
     }
   });
 </script>
 
-<div
-  bind:this={dragWindow}
-  class="window"
-  style="
-    width: {box.width}px;
-    height: {box.height}px;
-    transform: translateX({box.x}px) translateY({box.y}px);
-    z-index: {box.z}
-  "
->
+<div bind:this={dragWindow} class="window" style="width: {box.width}px; height: {box.height}px; transform: translateX({box.x}px) translateY({box.y}px); z-index: {box.z};">
   <div class="window-header-bg"></div>
   <header class="window-header" bind:this={dragHeader}>
     <img
