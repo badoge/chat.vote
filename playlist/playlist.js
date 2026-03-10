@@ -2098,6 +2098,8 @@ function getItemLink(request) {
       return `https://youtube.com/shorts/${request.id}`;
     case "vimeo":
       return `https://vimeo.com/${request.id}`;
+    case "spotify":
+      return `https://open.spotify.com/track/${request.id}`;
     case "tiktok video":
       return request.url;
     case "twitch stream":
