@@ -11,11 +11,9 @@ let elements = {
   playlist: document.getElementById("playlist"),
   generateModal: document.getElementById("generateModal"),
   generateBracketType: document.getElementById("generateBracketType"),
-  spotifyplaylistSettings: document.getElementById("spotifyplaylistSettings"),
   tiermakerSettings: document.getElementById("tiermakerSettings"),
   clipsSettings: document.getElementById("clipsSettings"),
   emotesSettings: document.getElementById("emotesSettings"),
-  uwufufuSettings: document.getElementById("uwufufuSettings"),
   ytchannelSettings: document.getElementById("ytchannelSettings"),
   ytplaylistSettings: document.getElementById("ytplaylistSettings"),
 
@@ -23,16 +21,12 @@ let elements = {
   bracketCode: document.getElementById("bracketCode"),
   bracketLink: document.getElementById("bracketLink"),
 
-  spotifyPlaylistLink: document.getElementById("spotifyPlaylistLink"),
-  spotifyPlaylistPreview: document.getElementById("spotifyPlaylistPreview"),
   tiermakerLink: document.getElementById("tiermakerLink"),
   tiermakerPreview: document.getElementById("tiermakerPreview"),
   clipsChannel: document.getElementById("clipsChannel"),
   clipsPreview: document.getElementById("clipsPreview"),
   emotesChannel: document.getElementById("emotesChannel"),
   emotesPreview: document.getElementById("emotesPreview"),
-  uwufufuLink: document.getElementById("uwufufuLink"),
-  uwufufuPreview: document.getElementById("uwufufuPreview"),
   ytchannelLink: document.getElementById("ytchannelLink"),
   ytchannelPreview: document.getElementById("ytchannelPreview"),
   ytplaylistLink: document.getElementById("ytplaylistLink"),
@@ -124,16 +118,12 @@ let elements = {
   text_image_left: document.getElementById("text_image_left"),
   youtubeEmbedContainer_left: document.getElementById("youtubeEmbedContainer_left"),
   youtubeEmbed_left: document.getElementById("youtubeEmbed_left"),
-  spotifyEmbedContainer_left: document.getElementById("spotifyEmbedContainer_left"),
-  spotifyEmbed_left: document.getElementById("spotifyEmbed_left"),
   twitchClipsEmbed_left: document.getElementById("twitchClipsEmbed_left"),
   videoEmbed_left: document.getElementById("videoEmbed_left"),
   right_value: document.getElementById("right_value"),
   text_image_right: document.getElementById("text_image_right"),
   youtubeEmbedContainer_right: document.getElementById("youtubeEmbedContainer_right"),
   youtubeEmbed_right: document.getElementById("youtubeEmbed_right"),
-  spotifyEmbedContainer_right: document.getElementById("spotifyEmbedContainer_right"),
-  spotifyEmbed_right: document.getElementById("spotifyEmbed_right"),
   twitchClipsEmbed_right: document.getElementById("twitchClipsEmbed_right"),
   videoEmbed_right: document.getElementById("videoEmbed_right"),
   left_info: document.getElementById("left_info"),
@@ -176,8 +166,6 @@ let elements = {
   text_image_tierlist: document.getElementById("text_image_tierlist"),
   youtubeEmbedContainer_tierlist: document.getElementById("youtubeEmbedContainer_tierlist"),
   youtubeEmbed_tierlist: document.getElementById("youtubeEmbed_tierlist"),
-  spotifyEmbedContainer_tierlist: document.getElementById("spotifyEmbedContainer_tierlist"),
-  spotifyEmbed_tierlist: document.getElementById("spotifyEmbed_tierlist"),
   twitchClipsEmbed_tierlist: document.getElementById("twitchClipsEmbed_tierlist"),
   videoEmbed_tierlist: document.getElementById("videoEmbed_tierlist"),
 
@@ -217,8 +205,6 @@ let elements = {
   image_trivia: document.getElementById("image_trivia"),
   youtubeEmbedContainer_trivia: document.getElementById("youtubeEmbedContainer_trivia"),
   youtubeEmbed_trivia: document.getElementById("youtubeEmbed_trivia"),
-  spotifyEmbedContainer_trivia: document.getElementById("spotifyEmbedContainer_trivia"),
-  spotifyEmbed_trivia: document.getElementById("spotifyEmbed_trivia"),
   twitchClipsEmbed_trivia: document.getElementById("twitchClipsEmbed_trivia"),
   videoEmbed_trivia: document.getElementById("videoEmbed_trivia"),
 };
@@ -230,10 +216,9 @@ const icons = {
   image: `<i class="material-icons notranslate">image</i>`,
   youtube: `<i class="material-icons notranslate">play_arrow</i>`,
   twitch: `<i class="material-icons notranslate">movie_creation</i>`,
-  spotify: `<i class="material-icons notranslate">audiotrack</i>`,
+  spotify: `<i class="material-icons notranslate">warning</i>`,
   streamable: `<i class="material-icons notranslate">play_arrow</i>`,
 };
-const spotifyURLRegex = /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:(album|track|playlist|episode)\/|\?uri=spotify:track:)((\w|-){22})/;
 
 let darkTheme = true;
 
@@ -275,7 +260,7 @@ function resetSettings() {
       access_token: "",
       userID: "",
       platform: "",
-    })
+    }),
   );
   localforage.setItem("BRACKETS_TIERLISTS", JSON.stringify([]));
   localforage.setItem("TRIVIA", JSON.stringify([]));
@@ -294,7 +279,7 @@ async function refreshData() {
   if (!USER.userID && USER.channel) {
     USER.userID = await getUserID(USER.channel);
   }
-} //refreshdata
+} //refreshData
 
 function saveSettings() {
   refreshData();
@@ -543,7 +528,7 @@ function connect() {
         return;
       }
 
-      //skip user if there arent any points left to give
+      //skip user if there aren't any points left to give
       if (triviaPoints < 1) {
         return;
       }
@@ -747,8 +732,8 @@ function addBracketOption(name = "", type = "", value = "", thumbnail = "", vide
         <div class="input-group mb-3">
           <span class="input-group-text">Value/Link</span>
           <input type="text" class="form-control option-value" data-option-id="${optionNumber}" onchange="saveBracket(true)" value="${value}" ${
-      optionType == "streamable" ? `data-video="${video}"` : ""
-    } placeholder="Option Value/Link" aria-label="Option Value" />
+            optionType == "streamable" ? `data-video="${video}"` : ""
+          } placeholder="Option Value/Link" aria-label="Option Value" />
           <button class="btn btn-outline-secondary" onclick="previewOption(${optionNumber},this)" type="button"><i class="material-icons notranslate">preview</i>Preview</button>
         </div>
 
@@ -759,7 +744,6 @@ function addBracketOption(name = "", type = "", value = "", thumbnail = "", vide
             <option value="image" ${optionType == "image" ? "selected" : ""}>Image</option>
             <option value="youtube" ${optionType == "youtube" ? "selected" : ""}>YouTube video</option>
             <option value="twitch" ${optionType == "twitch" ? "selected" : ""}>Twitch clip</option>
-            <option value="spotify" ${optionType == "spotify" ? "selected" : ""}>Spotify song</option>
             <option value="streamable" ${optionType == "streamable" ? "selected" : ""}>Streamable video</option>
           </select>
         </div>
@@ -774,7 +758,7 @@ function addBracketOption(name = "", type = "", value = "", thumbnail = "", vide
           <input type="text" class="form-control option-thumbnail" data-option-id="${optionNumber}" onchange="saveBracket(true)" value="${thumbnail}" placeholder="Thumbnail" aria-label="Thumbnail" />
         </div>
       </div>
-    </div>`
+    </div>`,
   );
 } //addBracketOption
 
@@ -810,8 +794,8 @@ function addTriviaQuestion(multipleChoice = null, type = "", question = "", answ
 
           <div class="form-check form-switch">
             <input class="form-check-input multiple-choice" onchange="saveTrivia(true)" data-question-id="${questionNumber}" type="checkbox" role="switch" id="multipleChoice${questionNumber}" ${
-      checkMultipleChoice ? "checked" : ""
-    }/>
+              checkMultipleChoice ? "checked" : ""
+            }/>
             <label class="form-check-label" for="multipleChoice${questionNumber}">Multiple choice question</label>
           </div>
 
@@ -823,7 +807,6 @@ function addTriviaQuestion(multipleChoice = null, type = "", question = "", answ
             <option value="image" ${questionType == "image" ? "selected" : ""}>Image</option>
             <option value="youtube" ${questionType == "youtube" ? "selected" : ""}>YouTube video</option>
             <option value="twitch" ${questionType == "twitch" ? "selected" : ""}>Twitch clip</option>
-            <option value="spotify" ${questionType == "spotify" ? "selected" : ""}>Spotify song</option>
             <option value="streamable" ${questionType == "streamable" ? "selected" : ""}>Streamable video</option>
           </select>
         </div>
@@ -841,13 +824,13 @@ function addTriviaQuestion(multipleChoice = null, type = "", question = "", answ
         <div class="input-group mb-3">
           <span class="input-group-text">Media</span>
           <input type="text" class="form-control trivia-media" data-question-id="${questionNumber}" onchange="saveTrivia(true)" value="${url}" ${
-      questionType == "streamable" ? `data-video="${url}"` : ""
-    } placeholder="Question media URL" aria-label="Question media URL" />
+            questionType == "streamable" ? `data-video="${url}"` : ""
+          } placeholder="Question media URL" aria-label="Question media URL" />
           <button class="btn btn-outline-secondary" onclick="previewQuestion(${questionNumber},this)" type="button"><i class="material-icons notranslate">preview</i>Preview</button>
         </div>
 
       </div>
-    </div>`
+    </div>`,
   );
 } //addTriviaQuestion
 
@@ -886,7 +869,7 @@ async function previewOption(id, button) {
 
   let link = parseLink(option?.value?.replace(/\s+/g, ""));
 
-  //parseLink doesnt parse image links
+  //parseLink doesn't parse image links
   if (!link && type.value != "image") {
     type.value = "text";
   }
@@ -960,25 +943,6 @@ async function previewOption(id, button) {
     previewModal.show();
   } //twitch
 
-  if (link?.type == "spotify") {
-    if (!name.value && !thumbnail.value) {
-      link = await getRequestInfo(link);
-      name.value = link.title;
-      thumbnail.value = link.thumbnail;
-    }
-    type.value = "spotify";
-    elements.previewModalBody.innerHTML = `
-      <div class="card">
-      <div class="card-body">
-      <iframe 
-      style="border-radius:12px" src="https://open.spotify.com/embed/track/${link.id}${darkTheme ? "?theme=0" : ""}" 
-      width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture">
-      </iframe>
-      </div>
-      </div>`;
-    previewModal.show();
-  } //spotify
-
   if (link?.type == "streamable") {
     link = await getRequestInfo(link);
     name.value = link.title;
@@ -1016,7 +980,7 @@ async function previewQuestion(id, button) {
 
   let link = parseLink(questionMedia?.value?.replace(/\s+/g, ""));
 
-  //parseLink doesnt parse image links
+  //parseLink doesn't parse image links
   if (!link && questionType.value != "image") {
     questionType.value = "text";
   }
@@ -1080,20 +1044,6 @@ async function previewQuestion(id, button) {
     previewModal.show();
   } //twitch
 
-  if (link?.type == "spotify") {
-    questionType.value = "spotify";
-    elements.previewModalBody.innerHTML = `
-      <div class="card">
-      <div class="card-body">
-      <iframe 
-      style="border-radius:12px" src="https://open.spotify.com/embed/track/${link.id}${darkTheme ? "?theme=0" : ""}" 
-      width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture">
-      </iframe>
-      </div>
-      </div>`;
-    previewModal.show();
-  } //spotify
-
   if (link?.type == "streamable") {
     link = await getRequestInfo(link);
     questionType.value = "streamable";
@@ -1142,14 +1092,6 @@ function parseLink(link) {
     return { type: "youtube", id: videoID[3] };
   } //youtube
 
-  if (link.includes("spotify.com")) {
-    let id = link.match(spotifyURLRegex);
-    if (!id[2] || (id[1] !== "track" && id[1] !== "episode")) {
-      return null;
-    }
-    return { type: "spotify", id: id[2] };
-  } //spotify
-
   if (link.includes("streamable.com")) {
     const match = link.match(/streamable\.com\/([a-zA-Z0-9]+)/);
     if (!match[1]) {
@@ -1175,26 +1117,6 @@ async function getRequestInfo(link) {
     } catch (error) {
       showToast("Could not get clip info", "warning", 3000);
       console.log("getRequestInfo twitch clip error", error);
-      return;
-    }
-  }
-
-  if (link.type == "spotify") {
-    try {
-      let response = await fetch(`https://helper.donk.workers.dev/spotify/tracks?ids=${link.id}`);
-      let result = await response.json();
-      console.log(result);
-      link.title = result.tracks[0].name || "(untitled)";
-      link.channel = result.tracks[0].artists[0].name || "(unknown)";
-      link.thumbnail = result.tracks[0].album.images[0].url;
-      link.duration = result.tracks[0].duration_ms / 1000;
-      if (!result.tracks[0].is_playable) {
-        showToast("This song is not playable", "warning", 3000);
-        return;
-      }
-    } catch (error) {
-      showToast("Could not get song info", "warning", 3000);
-      console.log("getRequestInfo spotify error", error);
       return;
     }
   }
@@ -1304,7 +1226,6 @@ function saveBracket(edited = false) {
     switch (link?.type) {
       case "youtube":
       case "twitch":
-      case "spotify":
         bracket.options.push({
           value: optionValues[index].value,
           type: optionTypes[index].value,
@@ -1364,7 +1285,6 @@ function saveTrivia(edited = false) {
     switch (link?.type) {
       case "youtube":
       case "twitch":
-      case "spotify":
         trivia.questions.push({
           multipleChoice: choiceTypes[index].checked,
           type: questionTypes[index].value,
@@ -1561,7 +1481,7 @@ function startTierlist(bracket) {
       target="_blank"
       rel="noopener noreferrer"><img draggable="false" class="border rounded tierlist-item me-1" alt="${bracket.options[index].name}" title="${
         bracket.options[index].name
-      }" loading="lazy" src="${link}" /></a>`
+      }" loading="lazy" src="${link}" /></a>`,
     );
   }
   addTier("S", "s", "#de0b0b");
@@ -1930,7 +1850,7 @@ async function nextTierlistItem() {
 
   elements.currentTierlistItemName.innerText = item.name || "Untitled item";
 
-  if (!item?.id && (item.type == "youtube" || item.type == "twitch" || item.type == "spotify")) {
+  if (!item?.id && (item.type == "youtube" || item.type == "twitch")) {
     let info = parseLink(item.value?.replace(/\s+/g, ""));
     if (info) {
       item.id = info.id;
@@ -1963,12 +1883,6 @@ async function nextTierlistItem() {
     elements.twitchClipsEmbed_tierlist.style.display = "";
     elements.twitchClipsEmbed_tierlist.innerHTML = `<iframe src="https://clips.twitch.tv/embed?clip=${item.id}&parent=${window.location.hostname}&autoplay=true&muted=false" preload="auto" height="100%" width="100%" allowfullscreen></iframe>`;
   } //twitch
-
-  if (item.type == "spotify") {
-    elements.spotifyEmbedContainer_tierlist.style.display = "";
-    spotifyPlayer_tierlist.loadUri(`spotify:track:${item.id}`);
-    spotifyPlayer_tierlist.play();
-  } //spotify
 
   if (item.type == "streamable") {
     let video = item?.video;
@@ -2103,7 +2017,7 @@ function promoteOption(option, position = null) {
           ],
           scale: "1.2",
         },
-        0
+        0,
       )
       .add(
         `#${position}_card`,
@@ -2115,7 +2029,7 @@ function promoteOption(option, position = null) {
           ],
           scale: "1.2",
         },
-        0
+        0,
       );
   } else {
     nextMatch();
@@ -2135,8 +2049,8 @@ function placeTierlistItem(tier) {
       href="${getItemLink(currentTierlistItem.type, currentTierlistItem.id)}"
       target="_blank"
       rel="noopener noreferrer"><img draggable="false" class="border rounded tierlist-item me-1" alt="${elements.currentTierlistItemName.innerHTML}" title="${
-      elements.currentTierlistItemName.innerHTML
-    }" src="${link}" /></a>`
+        elements.currentTierlistItemName.innerHTML
+      }" src="${link}" /></a>`,
   );
 
   let start = elements.currentTierlistItem.getBoundingClientRect();
@@ -2156,7 +2070,7 @@ function placeTierlistItem(tier) {
 } //placeTierlistItem
 
 async function showOption(position, option) {
-  if (!option?.id && (option.type == "youtube" || option.type == "twitch" || option.type == "spotify")) {
+  if (!option?.id && (option.type == "youtube" || option.type == "twitch")) {
     let info = parseLink(option.value?.replace(/\s+/g, ""));
     if (info) {
       option.id = info.id;
@@ -2199,17 +2113,6 @@ async function showOption(position, option) {
       position == "left" ? "true" : "false"
     }&muted=false" preload="auto" height="100%" width="100%" allowfullscreen></iframe>`;
   } //twitch
-
-  if (option.type == "spotify") {
-    elements[`spotifyEmbedContainer_${position}`].style.display = "";
-
-    if (position == "left") {
-      spotifyPlayer_left.loadUri(`spotify:track:${option.id}`);
-      spotifyPlayer_left.play();
-    } else {
-      spotifyPlayer_right.loadUri(`spotify:track:${option.id}`);
-    }
-  } //spotify
 
   if (option.type == "streamable") {
     let video = option?.video;
@@ -2261,12 +2164,6 @@ async function showTriviaMedia(mediaLink) {
     src="https://clips.twitch.tv/embed?clip=${option.id}&parent=${window.location.hostname}&autoplay=true&muted=false" preload="auto" height="100%" width="100%" allowfullscreen>
     </iframe>`;
   } //twitch
-
-  if (option.type == "spotify") {
-    elements.spotifyEmbedContainer_trivia.style.display = "";
-    spotifyPlayer_trivia.loadUri(`spotify:track:${option.id}`);
-    spotifyPlayer_trivia.play();
-  } //spotify
 
   if (option.type == "streamable") {
     let video = option?.video;
@@ -2487,7 +2384,7 @@ function editTrivia(id) {
       trivia.questions[index].question,
       trivia.questions[index].answer,
       trivia.questions[index].media,
-      trivia.questions[index]?.video
+      trivia.questions[index]?.video,
     );
   }
 } //editTrivia
@@ -2496,7 +2393,7 @@ function deleteBracket(id) {
   id = parseInt(id, 10);
   BRACKETS.brackets.splice(
     BRACKETS.brackets.findIndex((e) => e.id === id),
-    1
+    1,
   );
   loadBrackets();
   saveSettings();
@@ -2508,7 +2405,7 @@ function deleteTrivia(id) {
   id = parseInt(id, 10);
   TRIVIA.trivia.splice(
     TRIVIA.trivia.findIndex((e) => e.id === id),
-    1
+    1,
   );
   loadTrivia();
   saveSettings();
@@ -2647,59 +2544,6 @@ function shuffleArray(array) {
 let previewedBracket = [];
 let previewedBracketTitle = "";
 let previewedBracketDescription = "";
-async function previewSpotifyPlaylist() {
-  let playlist = elements.spotifyPlaylistLink.value?.replace(/\s+/g, "").match(spotifyURLRegex);
-  if (!playlist[2]) {
-    showToast("Invalid playlist URL provided", "warning", 3000);
-    return;
-  }
-  try {
-    elements.spotifyPlaylistPreview.innerHTML = spinner;
-    let requestOptions = {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    };
-    let response = await fetch(`https://helper.donk.workers.dev/spotify/playlist?id=${playlist[2]}`, requestOptions);
-    let result = await response.json();
-    let tracks = [...result[0].tracks.items];
-    for (let index = 1; index < result.length; index++) {
-      tracks.push(...result[index].items);
-    }
-    previewedBracketTitle = result[0].name || "Untitled playlist";
-    previewedBracketDescription = `${result[0].description || "No description"} - Generated from ${elements.spotifyPlaylistLink.value}`;
-    previewedBracket = [];
-    let html = `<ul class="list-group">`;
-    console.log(tracks);
-    for (let index = 0; index < tracks.length; index++) {
-      if (!tracks[index].track.is_playable) {
-        continue;
-      }
-      previewedBracket.push({
-        name: `${tracks[index].track.name} - ${tracks[index].track.artists.map((a) => a.name).join(", ")}`,
-        type: "spotify",
-        id: tracks[index].track.id,
-        value: tracks[index].track.external_urls.spotify,
-        thumbnail: tracks[index].track.album.images[0].url,
-      });
-      html += `
-      <li class="list-group-item">
-      <a target="_blank" rel="noopener noreferrer" href="${tracks[index].track.preview_url}">${escapeString(tracks[index].track.name)} - ${tracks[index].track.artists
-        .map((a) => a.name)
-        .join(", ")}</a>
-      </li>`;
-    }
-    html += `</ul>`;
-    elements.spotifyPlaylistPreview.innerHTML = `<p>${escapeString(result[0].name) || "Untitled playlist"} - ${escapeString(result[0].description) || "No description"} - ${
-      previewedBracket.length == 0 ? "Playlist has no tracks" : `${previewedBracket.length} ${previewedBracket.length == 1 ? "track" : "tracks"}`
-    } </p>${html}`;
-  } catch (error) {
-    console.log(error);
-    showToast("Could not load playlist", "warning", 3000);
-    return;
-  }
-} //previewSpotifyPlaylist
 
 async function previewTiermaker() {
   let link = elements.tiermakerLink.value?.replace(/\s+/g, "")?.toLowerCase() || null;
@@ -2848,75 +2692,6 @@ async function previewEmotes() {
     return;
   }
 } //previewEmotes
-
-async function previewUwufufu() {
-  let link = elements.uwufufuLink.value?.replace(/\s+/g, "")?.toLowerCase() || null;
-
-  if (!link) {
-    showToast("No link provided", "warning", 3000);
-    return;
-  }
-  let videos = 0;
-  let images = 0;
-  try {
-    let id = link.match(/\/quiz\/worldcup\/(.+?)(\/rank)?(\?.*)?$/)[1];
-    if (id.length !== 24) {
-      showToast("Could not find the provided bracket", "warning", 3000);
-      return;
-    }
-    elements.uwufufuPreview.innerHTML = spinner;
-    let requestOptions = {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    };
-    let response = await fetch(`https://helper.donk.workers.dev/uwufufu?id=${id}`, requestOptions);
-    let result = await response.json();
-    previewedBracketTitle = result.title || `Generated UwUFUFU bracket`;
-    previewedBracketDescription = `Generated from ${link}`;
-    previewedBracket = [];
-    for (let index = 0; index < result.list.length; index++) {
-      if (result.list[index].isVideo && !result.list[index].videoUrl) {
-        continue;
-      }
-      if (!result.list[index].isVideo && !result.list[index].resourceUrl) {
-        continue;
-      }
-      previewedBracket.push({
-        name: result.list[index].name,
-        type: result.list[index].isVideo ? "youtube" : "image",
-        value: result.list[index].isVideo ? result.list[index].videoUrl : result.list[index].resourceUrl,
-        thumbnail: result.list[index].thumbnailUrl,
-      });
-    }
-
-    let html = `<ul class="list-group">`;
-    for (let index = 0; index < previewedBracket.length; index++) {
-      if (previewedBracket[index].type == "youtube") {
-        html += `
-        <li class="list-group-item">
-        <a target="_blank" rel="noopener noreferrer" href="${previewedBracket[index].value}">${previewedBracket[index].name || "Untitled option"}</a>
-        </li>`;
-        videos++;
-      } else {
-        html += `
-        <li class="list-group-item">
-        <a target="_blank" rel="noopener noreferrer" href="https://proxy.donk.workers.dev/?url=${encodeURI(previewedBracket[index].value)}">
-        ${escapeString(previewedBracket[index].name) || "Untitled option"}
-        </a>
-        </li>`;
-        images++;
-      }
-    }
-    html += `</ul>`;
-    elements.uwufufuPreview.innerHTML = `<p>${videos > 0 ? `${videos} videos` : ""} ${images > 0 ? `${images} images` : ""}</p>${html}`;
-  } catch (error) {
-    console.log(error);
-    showToast("Could not find the provided bracket", "warning", 3000);
-    return;
-  }
-} //previewUwufufu
 
 async function previewYTChannel() {
   let channel = elements.ytchannelLink.value?.replace(/\s+/g, "");
@@ -3150,7 +2925,7 @@ function importPreviewed() {
       importPreviewedBracket.bracket.options[index].type,
       importPreviewedBracket.bracket.options[index].value,
       importPreviewedBracket.bracket.options[index].thumbnail,
-      importPreviewedBracket.bracket.options[index]?.video
+      importPreviewedBracket.bracket.options[index]?.video,
     );
   }
   saveBracket();
@@ -3168,7 +2943,7 @@ async function importApproved(id) {
       bracket.bracket.options[index].type,
       bracket.bracket.options[index].value,
       bracket.bracket.options[index].thumbnail,
-      bracket.bracket.options[index]?.video
+      bracket.bracket.options[index]?.video,
     );
   }
   saveBracket();
@@ -3376,7 +3151,7 @@ function addTier(name, command, color) {
     <div class="card-body p-1" data-tier="${command}"></div>
     </div>
     </div>
-    </div>`
+    </div>`,
   );
   loadTierlistEditor();
 } //addTier
@@ -3450,11 +3225,9 @@ function resetPlayers(left = true, right = true) {
   if (left) {
     elements.text_image_left.style.display = "none";
     elements.youtubeEmbedContainer_left.style.display = "none";
-    elements.spotifyEmbedContainer_left.style.display = "none";
     elements.twitchClipsEmbed_left.style.display = "none";
     elements.videoEmbed_left.style.display = "none";
     youtubePlayer_left.loadVideoById("");
-    spotifyPlayer_left.pause();
     elements.twitchClipsEmbed_left.innerHTML = "";
     elements.videoEmbed_left.src = "";
   }
@@ -3462,32 +3235,26 @@ function resetPlayers(left = true, right = true) {
   if (right) {
     elements.text_image_right.style.display = "none";
     elements.youtubeEmbedContainer_right.style.display = "none";
-    elements.spotifyEmbedContainer_right.style.display = "none";
     elements.twitchClipsEmbed_right.style.display = "none";
     elements.videoEmbed_right.style.display = "none";
     youtubePlayer_right.loadVideoById("");
-    spotifyPlayer_right.pause();
     elements.twitchClipsEmbed_right.innerHTML = "";
     elements.videoEmbed_right.src = "";
   }
 
   elements.text_image_tierlist.style.display = "none";
   elements.youtubeEmbedContainer_tierlist.style.display = "none";
-  elements.spotifyEmbedContainer_tierlist.style.display = "none";
   elements.twitchClipsEmbed_tierlist.style.display = "none";
   elements.videoEmbed_tierlist.style.display = "none";
   youtubePlayer_tierlist.loadVideoById("");
-  spotifyPlayer_tierlist.pause();
   elements.twitchClipsEmbed_tierlist.innerHTML = "";
   elements.videoEmbed_tierlist.src = "";
 
   elements.image_trivia.style.display = "none";
   elements.youtubeEmbedContainer_trivia.style.display = "none";
-  elements.spotifyEmbedContainer_trivia.style.display = "none";
   elements.twitchClipsEmbed_trivia.style.display = "none";
   elements.videoEmbed_trivia.style.display = "none";
   youtubePlayer_trivia.loadVideoById("");
-  spotifyPlayer_trivia.pause();
   elements.twitchClipsEmbed_trivia.innerHTML = "";
   elements.videoEmbed_trivia.src = "";
 } //resetPlayers
@@ -3496,8 +3263,6 @@ function getItemLink(type, id) {
   switch (type) {
     case "youtube":
       return `https://youtu.be/${id}`;
-    case "spotify":
-      return `https://open.spotify.com/track/${id}`;
     case "twitch":
       return `https://clips.twitch.tv/${id}`;
     case "streamable":
@@ -3821,32 +3586,3 @@ function youtubePlayerOnError(event) {
 function youtubePlayerOnAutoplayBlocked(event) {
   console.log(event);
 } //youtubePlayerOnAutoplayBlocked
-
-let spotifyPlayer_left;
-let spotifyPlayer_right;
-let spotifyPlayer_tierlist;
-let spotifyPlayer_trivia;
-window.onSpotifyIframeApiReady = (IFrameAPI) => {
-  console.log("onSpotifyIframeApiReady");
-
-  //spotifyPlayer.loadUri('spotify:episode:7makk4oTQel546B0PZlDM5');
-  //spotifyPlayer.play()
-  //spotifyPlayer.pause();
-
-  const callback_left = (EmbedController) => {
-    spotifyPlayer_left = EmbedController;
-  };
-  const callback_right = (EmbedController) => {
-    spotifyPlayer_right = EmbedController;
-  };
-  const callback_tierlist = (EmbedController) => {
-    spotifyPlayer_tierlist = EmbedController;
-  };
-  const callback_trivia = (EmbedController) => {
-    spotifyPlayer_trivia = EmbedController;
-  };
-  IFrameAPI.createController(elements.spotifyEmbed_left, {}, callback_left);
-  IFrameAPI.createController(elements.spotifyEmbed_right, {}, callback_right);
-  IFrameAPI.createController(elements.spotifyEmbed_tierlist, {}, callback_tierlist);
-  IFrameAPI.createController(elements.spotifyEmbed_trivia, {}, callback_trivia);
-}; //onSpotifyIframeApiReady

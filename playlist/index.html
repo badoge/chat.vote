@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" prefix="og: https://ogp.me/ns#" data-bs-theme="dark">
   <head>
     <meta charset="utf-8" />
@@ -178,17 +178,6 @@
                   <td>✔</td>
                 </tr>
                 <tr>
-                  <th scope="row">Spotify<sup>[5]</sup></th>
-                  <td>✔</td>
-                  <td>✔</td>
-                  <td>✔</td>
-                  <td>❌</td>
-                  <td>✔</td>
-                  <td>✔</td>
-                  <td>✔</td>
-                  <td>❌</td>
-                </tr>
-                <tr>
                   <th scope="row">Streamable</th>
                   <td>✔</td>
                   <td>✔</td>
@@ -217,9 +206,8 @@
               <kbd>!request [link] start=1:30</kbd> will make the video start from 1 minute 30 seconds<br />
               [2]: Platforms that are marked as moderated might have some automated filters to remove unsafe content. Platforms like Streamable don't require an account, so anyone can upload
               unsafe videos quickly then request them. This however does not mean that the other platforms will always have safe content.<br />
-              [3]: You can search some platforms directly using the request command. Example: <kbd>!request spotify camellia ghost</kbd> <br />
+              [3]: You can search some platforms directly using the request command. Example: <kbd>!request youtube camellia ghost</kbd> <br />
               [4]: Twitch clips autoplay and timestamps might break sometimes, especially if you keep the clips in the playlist for more than a day.<br />
-              [5]: You need to login to Spotify on this browser to listen to full songs instead of previews. You might also need to enable 3rd party cookies.
             </div>
           </div>
           <div class="modal-footer">
@@ -334,12 +322,6 @@
             <div class="container-fluid">
               <div class="row">
                 <div class="col-xl-4">
-                  <h6>Spotify</h6>
-                  <div class="form-check form-switch mb-3">
-                    <input class="form-check-input" type="checkbox" role="switch" id="allowSpotifySongs" onchange="saveSettings()" checked />
-                    <label class="form-check-label" for="allowSpotifySongs">Songs</label>
-                  </div>
-
                   <h6>Streamable</h6>
                   <div class="form-check form-switch mb-3">
                     <input class="form-check-input" type="checkbox" role="switch" id="allowStreamable" onchange="saveSettings()" checked />
@@ -350,6 +332,12 @@
                   <div class="form-check form-switch mb-3">
                     <input class="form-check-input" type="checkbox" role="switch" id="allowTiktokVideos" onchange="saveSettings()" checked />
                     <label class="form-check-label" for="allowTiktokVideos">Videos</label>
+                  </div>
+
+                  <h6>Vimeo</h6>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="allowVimeoVideos" onchange="saveSettings()" checked />
+                    <label class="form-check-label" for="allowVimeoVideos">Videos</label>
                   </div>
                 </div>
                 <div class="col-xl-4">
@@ -365,12 +353,6 @@
                   <div class="form-check form-switch mb-3">
                     <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchVODs" onchange="saveSettings()" checked />
                     <label class="form-check-label" for="allowTwitchVODs">VODs</label>
-                  </div>
-
-                  <h6>Vimeo</h6>
-                  <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" role="switch" id="allowVimeoVideos" onchange="saveSettings()" checked />
-                    <label class="form-check-label" for="allowVimeoVideos">Videos</label>
                   </div>
                 </div>
                 <div class="col-xl-4">
@@ -809,7 +791,7 @@
 
             <small class="text-body-secondary">
               <i class="material-icons notranslate">lightbulb</i> Tip: Mods can delete a request by
-              <a class="link-body-emphasis" href="https://twitter.com/TwitchSupport/status/1070135668980871168" target="_blank" rel="noopener noreferrer"> deleteing the message in chat </a>
+              <a class="link-body-emphasis" href="https://twitter.com/TwitchSupport/status/1070135668980871168" target="_blank" rel="noopener noreferrer"> deleting the message in chat </a>
             </small>
           </div>
         </div>
@@ -827,6 +809,19 @@
         >
         <br />
         <small class="text-body-secondary">Resets all settings and reloads the page.</small>
+
+        <div class="card my-3">
+          <div class="card-body">
+            <h5>Contact info</h5>
+            <p>
+              Site by <a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/badoge">badoge</a> :) <br />If you find any issues or if you have suggestions or questions, you
+              can contact me: <br /><a target="_blank" rel="noopener noreferrer" href="https://www.twitch.tv/popout/badoge/chat?popout=">in this chat</a> <br />or on
+              <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/FR8bgQdPUT">Discord</a> <br />
+              or by <a target="_blank" rel="noopener noreferrer" href="https://github.com/badoge/chat.vote/issues/new">opening an issue</a> <br />
+              or by <a href="mailto:contact@chat.vote">email</a>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1038,7 +1033,6 @@
               </h1>
               <div id="youtubeEmbedContainer" style="display: none"><div id="youtubeEmbed"></div></div>
               <div id="vimeoEmbedContainer" style="display: none"><div id="vimeoEmbed"></div></div>
-              <div id="spotifyEmbedContainer" style="display: none"><div id="spotifyEmbed"></div></div>
               <div id="twitchEmbed" style="display: none"></div>
               <div id="twitchClipsEmbed" style="display: none" height="100%" width="100%"></div>
               <div id="tiktokEmbed" style="display: none" height="100%" width="100%"></div>
@@ -1296,7 +1290,6 @@
     <script src="/playlist/playlist.js"></script>
     <script src="https://player.twitch.tv/js/embed/v1.js"></script>
     <script src="https://www.youtube.com/iframe_api"></script>
-    <script src="https://open.spotify.com/embed/iframe-api/v1"></script>
     <script src="https://player.vimeo.com/api/player.js"></script>
   </body>
 </html>

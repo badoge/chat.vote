@@ -217,7 +217,7 @@ async function refreshData() {
   RAFFLES.refreshWarningEnabled = elements.refreshWarningEnabled.checked ?? false;
   elements.raffleCommandButton.innerHTML = RAFFLES.raffleCommand || "!join";
   elements.raffleCommandText.innerHTML = RAFFLES.raffleCommand || "!join";
-} //refreshdata
+} //refreshData
 
 function saveSettings() {
   refreshData();
@@ -298,7 +298,7 @@ function resetSettings(logout = false) {
         access_token: "",
         userID: "",
         platform: "",
-      })
+      }),
     );
   }
 
@@ -341,7 +341,7 @@ function resetSettings(logout = false) {
       confirmJoin: false,
       linkPreviewThumbnailsEnabled: false,
       refreshWarningEnabled: false,
-    })
+    }),
   );
   location.reload();
   return false;
@@ -640,7 +640,7 @@ function addUserToRaffle(user) {
     <li id="${user.username}_raffle" class="list-group-item">
     ${badges}<span style="color:${color};"> ${name}</span>: ${user.tickets} ${user.tickets == 1 ? "ticket" : "tickets"} 
     <i class="material-icons notranslate deletebtn float-end" onclick="removeFromRaffle('${user.username}')">highlight_off</i>
-    </li>`
+    </li>`,
   );
   elements.entrants.innerHTML = `Entrants: ${raffle_users.length}`;
   joinedUsers.push(user.username);
@@ -680,7 +680,7 @@ async function drawRaffleWinner() {
     raffleWinnerChat(
       { "user-id": winner.id, username: winner.username, "display-name": winner.displayname, color: winner.color, badges: winner.badges, emotes: winner.emotes, time: winner.time },
       winner.msg,
-      true
+      true,
     );
   }
 } //drawRaffleWinner
@@ -782,7 +782,7 @@ const detectWinner = function () {
           raffle_users.reduce(function (sum, obj) {
             return sum + obj.tickets;
           }, 0)) *
-          100
+          100,
       );
       botSay(`PogChamp @${currentRaffleWinner} won the raffle with a ${chance}% chance to win :) 🎊`);
     }
@@ -792,7 +792,7 @@ const detectWinner = function () {
     raffleWinnerChat(
       { username: winner.username, "display-name": winner.displayname, color: winner.color, badges: winner.badges, emotes: winner.emotes, time: winner.time },
       winner.msg,
-      true
+      true,
     );
     setTimeout(() => {
       fancyRaffleModal.hide();
@@ -912,11 +912,14 @@ async function drawRaffleWinnerFancy() {
   const targetFPS = 60;
   const correction = targetFPS / app.animation.projectedFPS;
   app.animation.speed *= correction;
-  setTimeout(() => {
-    // slow down
-    app.animation.acceleration = app.animation.constants.SLOW_DOWN;
-    app.animation.acceleration *= correction * correction;
-  }, Math.round(1500 + Math.random() * 1000));
+  setTimeout(
+    () => {
+      // slow down
+      app.animation.acceleration = app.animation.constants.SLOW_DOWN;
+      app.animation.acceleration *= correction * correction;
+    },
+    Math.round(1500 + Math.random() * 1000),
+  );
   animateRoll();
 } //drawRaffleWinnerFancy
 

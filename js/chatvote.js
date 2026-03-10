@@ -206,7 +206,7 @@ async function refreshData() {
   CHATVOTE.refreshWarningEnabled = elements.refreshWarningEnabled.checked;
   CHATVOTE.linkPreviewThumbnailsEnabled = elements.linkPreviewThumbnailsEnabled.checked;
   elements.suggestionsCommand.innerHTML = CHATVOTE.suggestion_prefix;
-} //refreshdata
+} //refreshData
 
 function saveSettings() {
   refreshData();
@@ -299,7 +299,7 @@ function resetSettings(logout = false) {
         access_token: "",
         userID: "",
         platform: "",
-      })
+      }),
     );
   }
   localStorage.setItem(
@@ -320,7 +320,7 @@ function resetSettings(logout = false) {
       timerValueMinutes: 0,
       refreshWarningEnabled: false,
       linkPreviewThumbnailsEnabled: false,
-    })
+    }),
   );
   location.reload();
   return false;

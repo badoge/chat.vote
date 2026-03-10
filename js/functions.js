@@ -686,7 +686,7 @@ function linkifyElementID(id, allowThumbnails) {
         mention: (href) => "https://twitch.tv" + href,
       },
     },
-    document
+    document,
   );
 
   const tooltipTriggerList = document.querySelectorAll("a.linktooltip");
@@ -715,7 +715,7 @@ function enableTooltips() {
     (tooltipTriggerEl) =>
       new bootstrap.Tooltip(tooltipTriggerEl, {
         trigger: "hover",
-      })
+      }),
   );
 } //enableTooltips
 
@@ -756,30 +756,6 @@ function numberAndUnitToSeconds(number, unit) {
       return 0;
   }
 } //numberAndUnitToSeconds
-
-/**
- * @description convert the release date and release date precision from the spotify api to a timestamp
- * @param {string} releaseDate
- * @param {string} releaseDatePrecision
- * @returns {number}
- */
-function spotifyReleaseDateToTimestamp(releaseDate, releaseDatePrecision) {
-  let date;
-  switch (releaseDatePrecision) {
-    case "year":
-      date = `${releaseDate}-01-01`;
-      break;
-    case "month":
-      date = `${releaseDate}-01`;
-      break;
-    case "day":
-      date = releaseDate;
-      break;
-    default:
-      return 0;
-  }
-  return new Date(date).getTime();
-} //spotifyReleaseDateToTimestamp
 
 async function checkToken(access_token) {
   let requestOptions = {

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" prefix="og: https://ogp.me/ns#" data-bs-theme="dark">
   <head>
     <meta charset="utf-8" />
@@ -75,12 +75,29 @@
       </div>
     </nav>
 
-    <h1 class="display-4 text-center">chat.vote pages</h1>
-
     <div class="container-fluid">
       <div class="row mt-5">
         <div class="col-2"></div>
         <div class="col-8">
+          <div class="card mb-5 border-info">
+            <div class="row g-0">
+              <div class="col-md-4">
+                <a target="_blank" href="https://beta.chat.vote">
+                  <img src="https://screenshot.donk.workers.dev/?url=https://beta.chat.vote/" class="img-fluid rounded-start" alt="chat.vote" />
+                </a>
+              </div>
+              <div class="col-md-8">
+                <div class="card-body">
+                  <h3 class="card-title"><span class="badge text-bg-success">NEW!</span> <a target="_blank" href="https://beta.chat.vote">beta.chat.vote</a></h3>
+                  <p>I'm currently remaking the whole site :) You can check out the new version <a target="_blank" href="https://beta.chat.vote">here</a></p>
+                  <p>It's still very broken so don't actually use it :) just check it out and provide feedback if you want</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h1 class="display-4 text-center">chat.vote pages</h1>
+
           <div class="card mb-5">
             <div class="row g-0">
               <div class="col-md-4">
@@ -156,8 +173,8 @@
                 <div class="card-body">
                   <h3 class="card-title"><a target="_blank" rel="noopener noreferrer" href="/blt/">chat.vote/blt</a></h3>
                   <p>
-                    Brackets, tier lists, and trivia maker with Twitch chat integration. Can generate brackets and tier lists automatically from Spotify playlists, TierMaker.com tier lists,
-                    A Twitch channel's clips or emotes, uwufufu.com brackets, YouTube channels or playlists.
+                    Brackets, tier lists, and trivia maker with Twitch chat integration. Can generate brackets and tier lists automatically from TierMaker.com tier lists, A Twitch channel's
+                    clips or emotes, YouTube channels or playlists.
                   </p>
                 </div>
               </div>
@@ -174,7 +191,7 @@
               <div class="col-md-8">
                 <div class="card-body">
                   <h3 class="card-title"><a target="_blank" rel="noopener noreferrer" href="/playlist/">chat.vote/playlist</a></h3>
-                  <p>Allows viewers to send song & video requests. Supports YouTube, Twitch, Spotify, Vimeo, TikTok, and Streamable.</p>
+                  <p>Allows viewers to send song & video requests. Supports YouTube, Twitch, Vimeo, TikTok, and Streamable.</p>
                 </div>
               </div>
             </div>
@@ -222,7 +239,7 @@
           (tooltipTriggerEl) =>
             new bootstrap.Tooltip(tooltipTriggerEl, {
               trigger: "hover",
-            })
+            }),
         );
       };
     </script>

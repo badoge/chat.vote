@@ -5,7 +5,7 @@ let elements = {
 
 async function refreshData() {
   darkTheme = elements.darkTheme.checked ?? true;
-} //refreshdata
+} //refreshData
 
 function saveSettings() {
   refreshData();

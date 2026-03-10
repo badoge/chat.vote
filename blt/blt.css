@@ -197,15 +197,6 @@ body {
   width: 100%;
 }
 
-#spotifyEmbedContainer_trivia {
-  width: 100%;
-}
-
-#spotifyEmbedContainer_trivia > *,
-#spotifyEmbedContainer_tierlist > * {
-  border-radius: 13px;
-}
-
 #hideScore {
   height: 38px;
 }
@@ -238,7 +229,12 @@ body {
   font-size: 1.5rem;
   font-weight: 600;
   color: #ffffff;
-  text-shadow: 1px 1px 0 #000000, -1px -1px 0 #000000, 1px -1px 0 #000000, -1px 1px 0 #000000, 1px 1px 0 #000000;
+  text-shadow:
+    1px 1px 0 #000000,
+    -1px -1px 0 #000000,
+    1px -1px 0 #000000,
+    -1px 1px 0 #000000,
+    1px 1px 0 #000000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -294,7 +290,6 @@ body {
 
 #text_image_tierlist,
 #youtubeEmbedContainer_tierlist,
-#spotifyEmbedContainer_tierlist,
 #twitchClipsEmbed_tierlist,
 #videoEmbed_tierlist {
   height: 100%;

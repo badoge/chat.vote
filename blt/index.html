@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" prefix="og: https://ogp.me/ns#" data-bs-theme="dark">
   <head>
     <meta charset="utf-8" />
@@ -74,7 +74,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <button type="button" class="btn btn-success mb-3" onclick="addTier('name','command','#de0b0b')">Add tier</button>
+            <button type="button" class="btn btn-success mb-3" onclick="addTier('name', 'command', '#de0b0b')">Add tier</button>
 
             <div id="tierlistEditor"></div>
           </div>
@@ -117,7 +117,7 @@
                 class="material-icons notranslate cursor-pointer"
                 data-bs-toggle="tooltip"
                 data-bs-placement="top"
-                data-bs-title="Sources include: Spotify playlists, TierMaker.com tier list, Twitch clips & emotes, UwUFUFU.com brackets, YouTube channels & playlists"
+                data-bs-title="Sources include: TierMaker.com tier list, Twitch clips & emotes, YouTube channels & playlists"
                 >help
               </i>
             </div>
@@ -138,7 +138,7 @@
                 class="material-icons notranslate cursor-pointer"
                 data-bs-toggle="tooltip"
                 data-bs-placement="top"
-                data-bs-title="Viewers will be able to add YouTube videos, Twitch clips, Spotify songs, Streamable videos"
+                data-bs-title="Viewers will be able to add YouTube videos, Twitch clips, Streamable videos"
                 >help
               </i>
             </div>
@@ -249,31 +249,12 @@
               <label class="input-group-text" for="generateBracketType">Bracket type</label>
               <select class="form-select generate-value" id="generateBracketType">
                 <option value="" selected>Choose...</option>
-                <option value="spotifyplaylist">Spotify playlist</option>
                 <option value="tiermaker">TierMaker.com tier list</option>
                 <option value="clips">Twitch clips</option>
                 <option value="emotes">Twitch emotes</option>
-                <option disabled value="uwufufu">UwUFUFU.com bracket - uwufufu shutdown at the start of 2025. An archived version might be coming soon here :)</option>
                 <option value="ytchannel">YouTube channel</option>
                 <option value="ytplaylist">YouTube playlist</option>
               </select>
-            </div>
-
-            <div id="spotifyplaylistSettings" class="generate-type" style="display: none">
-              <p>Generate a bracket from a Spotify playlist</p>
-              <div class="input-group mb-3">
-                <span class="input-group-text" id="spotifyPlaylistLinkLabel">Spotify playlist link</span>
-                <input
-                  type="text"
-                  class="form-control generate-value"
-                  id="spotifyPlaylistLink"
-                  placeholder="https://open.spotify.com/playlist/XXXXXXXXXXXXXXXXXXXXXX"
-                  aria-label="Spotify Playlist link"
-                  aria-describedby="spotifyPlaylistLinkLabel"
-                />
-                <button type="button" class="btn btn-outline-info" onclick="previewSpotifyPlaylist()"><i class="material-icons notranslate">file_download</i> Load</button>
-              </div>
-              <div id="spotifyPlaylistPreview" class="generate-preview"></div>
             </div>
 
             <div id="tiermakerSettings" class="generate-type" style="display: none">
@@ -311,23 +292,6 @@
                 <button type="button" class="btn btn-outline-info" onclick="previewEmotes()"><i class="material-icons notranslate">file_download</i> Load</button>
               </div>
               <div id="emotesPreview" class="generate-preview"></div>
-            </div>
-
-            <div id="uwufufuSettings" class="generate-type" style="display: none">
-              <p>Generate a bracket from an UwUFUFU quiz</p>
-              <div class="input-group mb-3">
-                <span class="input-group-text" id="uwufufuLinkLabel">UwUFUFU.com link</span>
-                <input
-                  type="text"
-                  class="form-control generate-value"
-                  id="uwufufuLink"
-                  placeholder="https://uwufufu.com/quiz/worldcup/XXXXXXXXXXXXXXXXXXXXXXXX"
-                  aria-label="uwufufu URL"
-                  aria-describedby="uwufufuLinkLabel"
-                />
-                <button type="button" class="btn btn-outline-info" onclick="previewUwufufu()"><i class="material-icons notranslate">file_download</i> Load</button>
-              </div>
-              <div id="uwufufuPreview" class="generate-preview"></div>
             </div>
 
             <div id="ytchannelSettings" class="generate-type" style="display: none">
@@ -525,13 +489,7 @@
             </div>
 
             <div id="spotifyWarning" class="mt-5" style="display: none">
-              <div class="alert alert-danger" role="alert">
-                <i class="material-icons notranslate">warning</i><i class="material-icons notranslate">volume_up</i> Spotify embeds don't have a volume slider; make sure to lower your volume
-                before starting
-              </div>
-              <div class="alert alert-warning mt-1" role="alert">
-                <i class="material-icons notranslate">login</i> You must be logged in to Spotify on this browser to listen to the full songs; you will be given a 30s preview otherwise
-              </div>
+              <div class="alert alert-danger" role="alert"><i class="material-icons notranslate">warning</i> Selected item contains some Spotify songs which are no longer supported</div>
             </div>
           </div>
           <div class="modal-footer">
@@ -573,7 +531,7 @@
               <strong>First answer only:</strong> first viewer to answer correctly gets the full points<br />
               <strong>Points decay:</strong> first viewer to answer correctly gets the full points, 2nd viewer gets 1 point less 3rd viewer gets 2 points less...<br />
               <strong>Everyone:</strong> anyone that answers correctly will get the full points<br />
-              <strong>Speed based reward/punishment:</strong> point value decreases as the timer goes down, correct asnwers gain points while wrong answers lose points. Works better with
+              <strong>Speed based reward/punishment:</strong> point value decreases as the timer goes down, correct answers gain points while wrong answers lose points. Works better with
               high question points values (1000+)
             </small>
 
@@ -894,7 +852,6 @@
             <div class="card-body p-0" id="left_value">
               <div id="text_image_left" style="display: none"></div>
               <div id="youtubeEmbedContainer_left" style="display: none"><div id="youtubeEmbed_left"></div></div>
-              <div id="spotifyEmbedContainer_left" style="display: none"><div id="spotifyEmbed_left"></div></div>
               <div id="twitchClipsEmbed_left" style="display: none" height="100%" width="100%"></div>
               <video id="videoEmbed_left" style="display: none" controls autoplay></video>
             </div>
@@ -920,7 +877,6 @@
             <div class="card-body p-0" id="right_value">
               <div id="text_image_right" style="display: none"></div>
               <div id="youtubeEmbedContainer_right" style="display: none"><div id="youtubeEmbed_right"></div></div>
-              <div id="spotifyEmbedContainer_right" style="display: none"><div id="spotifyEmbed_right"></div></div>
               <div id="twitchClipsEmbed_right" style="display: none" height="100%" width="100%"></div>
               <video id="videoEmbed_right" style="display: none" controls></video>
             </div>
@@ -1019,7 +975,6 @@
             <div id="currentTierlistItem">
               <div id="text_image_tierlist" style="display: none"></div>
               <div id="youtubeEmbedContainer_tierlist" style="display: none"><div id="youtubeEmbed_tierlist"></div></div>
-              <div id="spotifyEmbedContainer_tierlist" style="display: none"><div id="spotifyEmbed_tierlist"></div></div>
               <div id="twitchClipsEmbed_tierlist" style="display: none" height="100%" width="100%"></div>
               <video id="videoEmbed_tierlist" style="display: none" controls autoplay></video>
             </div>
@@ -1136,7 +1091,6 @@
             <div class="card-body" id="triviaMedia">
               <div id="image_trivia" style="display: none"></div>
               <div id="youtubeEmbedContainer_trivia" style="display: none"><div id="youtubeEmbed_trivia"></div></div>
-              <div id="spotifyEmbedContainer_trivia" style="display: none"><div id="spotifyEmbed_trivia"></div></div>
               <div id="twitchClipsEmbed_trivia" style="display: none" height="100%" width="100%"></div>
               <video id="videoEmbed_trivia" style="display: none" controls autoplay></video>
             </div>
@@ -1297,6 +1251,5 @@
     <script src="/js/functions.min.js"></script>
     <script src="/blt/blt.js"></script>
     <script src="https://www.youtube.com/iframe_api"></script>
-    <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
   </body>
 </html>

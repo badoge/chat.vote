@@ -23,7 +23,6 @@ let elements = {
 
   //settings
   settingsOffcanvas: document.getElementById("settingsOffcanvas"),
-  allowSpotifySongs: document.getElementById("allowSpotifySongs"),
   allowStreamable: document.getElementById("allowStreamable"),
   allowTwitchClips: document.getElementById("allowTwitchClips"),
   allowTwitchStreams: document.getElementById("allowTwitchStreams"),
@@ -90,8 +89,6 @@ let elements = {
   youtubeEmbed: document.getElementById("youtubeEmbed"),
   vimeoEmbedContainer: document.getElementById("vimeoEmbedContainer"),
   vimeoEmbed: document.getElementById("vimeoEmbed"),
-  spotifyEmbedContainer: document.getElementById("spotifyEmbedContainer"),
-  spotifyEmbed: document.getElementById("spotifyEmbed"),
   twitchEmbed: document.getElementById("twitchEmbed"),
   twitchClipsEmbed: document.getElementById("twitchClipsEmbed"),
   tiktokEmbed: document.getElementById("tiktokEmbed"),
@@ -165,7 +162,6 @@ let USER = {
 
 let PLAYLIST = {
   autoplay: true,
-  allowSpotifySongs: true,
   allowStreamable: true,
   allowTwitchClips: true,
   allowTwitchStreams: true,
@@ -232,7 +228,6 @@ async function refreshData() {
   }
 
   PLAYLIST.autoplay = elements.autoplay.checked;
-  PLAYLIST.allowSpotifySongs = elements.allowSpotifySongs.checked;
   PLAYLIST.allowStreamable = elements.allowStreamable.checked;
   PLAYLIST.allowTwitchClips = elements.allowTwitchClips.checked;
   PLAYLIST.allowTwitchStreams = elements.allowTwitchStreams.checked;
@@ -356,7 +351,7 @@ async function refreshData() {
 
   updateWhoCanRequest();
   checkCommands();
-} //refreshdata
+} //refreshData
 
 function saveSettings() {
   refreshData();
@@ -386,7 +381,6 @@ async function load_localStorage() {
     PLAYLIST = JSON.parse(localStorage.getItem("PLAYLIST"));
 
     elements.autoplay.checked = PLAYLIST.autoplay ?? true;
-    elements.allowSpotifySongs.checked = PLAYLIST.allowSpotifySongs ?? true;
     elements.allowStreamable.checked = PLAYLIST.allowStreamable ?? true;
     elements.allowTwitchClips.checked = PLAYLIST.allowTwitchClips ?? true;
     elements.allowTwitchStreams.checked = PLAYLIST.allowTwitchStreams ?? true;
@@ -601,7 +595,7 @@ function resetSettings(logout = false) {
         access_token: "",
         userID: "",
         platform: "",
-      })
+      }),
     );
     localforage.setItem("PLAYLIST_REQUESTS", JSON.stringify(new Map(), replacer));
     localforage.setItem("PLAYLIST_HISTORY", JSON.stringify([]));
@@ -614,7 +608,6 @@ function resetSettings(logout = false) {
     "PLAYLIST",
     JSON.stringify({
       autoplay: true,
-      allowSpotifySongs: true,
       allowStreamable: true,
       allowTwitchClips: true,
       allowTwitchStreams: true,
@@ -668,7 +661,7 @@ function resetSettings(logout = false) {
       deleteCommand: "!delete",
       modCommands: true,
       enableFavorites: false,
-    })
+    }),
   );
   location.reload();
   return false;
@@ -731,13 +724,13 @@ function connect() {
 
     if (PLAYLIST.noCommand && playlist_open) {
       if (bannedUsers.get(context["user-id"])) {
-        botReply(`🚫 You are banned`, context.id, false);
+        botReply(`🚫 You are banned chatvoDonk`, context.id, false);
         return;
       }
 
       let request = input[0];
       let search = false;
-      if (input[0].toLowerCase() == "youtube" || input[0].toLowerCase() == "spotify" || input[0].toLowerCase() == "vimeo") {
+      if (input[0].toLowerCase() == "youtube" || input[0].toLowerCase() == "vimeo") {
         request = input.join(" ");
         search = true;
       }
@@ -752,7 +745,7 @@ function connect() {
         return;
       }
       if (link && !linkTypeAllowed(link.type)) {
-        botReply(`🚫 ${link.type} links are not enabled`, context.id, false);
+        botReply(`🚫 ${link.type} links are not enabled chatvoDonk`, context.id, false);
         return;
       }
     } //no command request
@@ -778,13 +771,13 @@ function connect() {
         }
 
         if (bannedUsers.get(context["user-id"])) {
-          botReply(`🚫 You are banned`, context.id, false);
+          botReply(`🚫 You are banned chatvoDonk`, context.id, false);
           return;
         }
 
         let request = input[1];
         let search = false;
-        if (input[1].toLowerCase() == "youtube" || input[1].toLowerCase() == "spotify" || input[1].toLowerCase() == "vimeo") {
+        if (input[1].toLowerCase() == "youtube" || input[1].toLowerCase() == "vimeo") {
           request = input.slice(1).join(" ");
           search = true;
         }
@@ -794,7 +787,7 @@ function connect() {
           return;
         }
         if (!linkTypeAllowed(link.type)) {
-          botReply(`🚫 ${link.type} links are not enabled`, context.id, false);
+          botReply(`🚫 ${link.type} links are not enabled chatvoDonk`, context.id, false);
           return;
         }
         if (input[input.length - 1]?.toLowerCase().startsWith("start=")) {
@@ -814,7 +807,7 @@ function connect() {
       case PLAYLIST.songCommandAlias:
         if (currentItem) {
           if (bannedUsers.get(context["user-id"])) {
-            botReply(`🚫 You are banned`, context.id, false);
+            botReply(`🚫 You are banned chatvoDonk`, context.id, false);
             return;
           }
 
@@ -823,7 +816,7 @@ function connect() {
               currentItem.by.length > 1 ? `and ${currentItem.by.length - 1} other ${currentItem.by.length - 1 == 1 ? "user" : "users"}` : ""
             }`,
             context.id,
-            true
+            true,
           );
         }
         break;
@@ -831,7 +824,7 @@ function connect() {
       case PLAYLIST.playlistCommandAlias:
         if (USER.access_token) {
           if (bannedUsers.get(context["user-id"])) {
-            botReply(`🚫 You are banned`, context.id, false);
+            botReply(`🚫 You are banned chatvoDonk`, context.id, false);
             return;
           }
 
@@ -990,22 +983,19 @@ function addRequest(context, link, msgid, search) {
     let message = "";
     switch (link.type) {
       case "twitch clip":
-        message = "🚫 This clip is banned";
+        message = "🚫 This clip is banned chatvoDonk";
         break;
       case "twitch vod":
-        message = "🚫 This VOD is banned";
+        message = "🚫 This VOD is banned chatvoDonk";
         break;
       case "twitch stream":
-        message = "🚫 This stream is banned";
+        message = "🚫 This stream is banned chatvoDonk";
         break;
       case "youtube short":
-        message = "🚫 This short is banned";
-        break;
-      case "spotify":
-        message = "🚫 This song is banned";
+        message = "🚫 This short is banned chatvoDonk";
         break;
       default:
-        message = `🚫 This video is banned`;
+        message = `🚫 This video is banned chatvoDonk`;
         break;
     }
     botReply(message, context.id, false);
@@ -1017,19 +1007,19 @@ function addRequest(context, link, msgid, search) {
 
   //if limit is 0 then the user's roles are not allowed to request
   if (limit === 0) {
-    botReply("🚫 You are not allowed to send requests", context.id, false);
+    botReply("🚫 You are not allowed to send requests chatvoDonk", context.id, false);
     return;
   }
 
   //if limit is -1 then the user is allowed to make unlimited requests
   if (limit !== -1 && users[userIndex].requests.length >= limit) {
-    botReply("⚠ You used up all your requests", context.id, false);
+    botReply("⚠ You used up all your requests chatvoDonk", context.id, false);
     return;
   }
 
   //check if user already requested this link id
   if (users[userIndex].requests.some((id) => id === link.name)) {
-    botReply("⚠ You already requested this", context.id, false);
+    botReply("⚠ You already requested this chatvoDonk", context.id, false);
     return;
   }
 
@@ -1041,7 +1031,7 @@ function addRequest(context, link, msgid, search) {
     request.by.push(users[userIndex]);
     requests.set(link.name, request);
     updatePlaylist(request);
-    botReply("⚠ Someone else already requested this", context.id, false);
+    botReply("⚠ Someone else already requested this chatvoDonk", context.id, false);
   } else {
     let newRequest = {
       id: link.id,
@@ -1082,7 +1072,7 @@ function deleteRequest(id, refund = true) {
           users[userIndex].requests.findIndex(function (r) {
             return r.value === id;
           }),
-          1
+          1,
         );
       }
     }
@@ -1159,9 +1149,9 @@ function banItem(requestName, bannedFromHistory) {
   //check if item is already banned before adding it to the list
   if (!bannedItems.get(requestName)) {
     bannedItems.set(requestName, request);
-    showToast(`${request.platform == "spotify" ? "Song" : "Video"} is now banned`, "success", 2000);
+    showToast(`This video is now banned`, "success", 2000);
   } else {
-    showToast(`${request.platform == "spotify" ? "Song" : "Video"} is already banned`, "warning", 2000);
+    showToast(`This video is already banned`, "warning", 2000);
   }
 
   if (bannedFromHistory) {
@@ -1291,7 +1281,7 @@ function loadBanLists() {
       `
       <li class="list-group-item">
       ${value} <i class="material-icons notranslate deletebtn float-end" onclick="unbanUser('${key}')" title="Unban">highlight_off</i>
-      </li>`
+      </li>`,
     );
   }
 
@@ -1308,7 +1298,7 @@ function loadBanLists() {
         ${escapeString(value.title)}
         </a>
         <i class="material-icons notranslate deletebtn float-end" onclick="unbanItem('${key}')" title="Unban">highlight_off</i>
-      </li>`
+      </li>`,
     );
   }
 
@@ -1318,7 +1308,7 @@ function loadBanLists() {
       `
       <li class="list-group-item">
       ${value.channel} <i class="material-icons notranslate deletebtn float-end" onclick="unbanChannel('${value.platform}:${value.channelid}')" title="Unban">highlight_off</i>
-      </li>`
+      </li>`,
     );
   }
   elements.bannedUserCount.innerHTML = `${bannedUsers.size} ${bannedUsers.size == 1 ? "User" : "Users"}`;
@@ -1398,14 +1388,6 @@ function makeBanButtons(request, historyButton) {
         </span>
       </li>`;
       break;
-    case "spotify":
-      banChannelButton = `
-      <li>
-        <a class="dropdown-item" onclick="banChannel('${request.name}', ${historyButton})" title="All requests from this artist will be removed also">
-          <i class="material-icons notranslate">person_off</i> Ban Artist
-        </a>
-      </li>`;
-      break;
     default:
       banChannelButton = `
       <li>
@@ -1429,9 +1411,6 @@ function makeBanButtons(request, historyButton) {
       break;
     case "twitch vod":
       banItemText = `<i class="material-icons notranslate">play_disabled</i> Ban VOD`;
-      break;
-    case "spotify":
-      banItemText = `<i class="material-icons notranslate">music_off</i> Ban Song`;
       break;
     default:
       banItemText = `<i class="material-icons notranslate">play_disabled</i> Ban Video`;
@@ -1490,7 +1469,7 @@ function addToPlaylist(request, position = "beforeend") {
             <i class="material-icons notranslate icon-button" onclick="deleteRequest('${request.name}',false)" title="Delete request">delete</i>
           </div>
         </div>
-      </div>`
+      </div>`,
   );
   enableTooltips(); //enable the streamable channel ban tooltip
 } //addToPlaylist
@@ -1552,7 +1531,7 @@ function addToHistory(request, localStorageLoad = false) {
               </div>
           </div>
         </div>
-      </div>`
+      </div>`,
   );
 } //addToHistory
 
@@ -1636,7 +1615,7 @@ async function getRequestInfo(request, msgid) {
       request.mp4 = `${result?.extra?.clip?.videoQualities[0]?.sourceURL}${result?.extra?.clipKey}`;
     } catch (error) {
       deleteRequest(request.name);
-      botReply("⛔ Could not find this clip's info", msgid, false);
+      botReply("⛔ Could not find this clip's info chatvoDonk", msgid, false);
       console.log("getRequestInfo twitch clip error", error);
       return;
     }
@@ -1656,7 +1635,7 @@ async function getRequestInfo(request, msgid) {
       request.age = new Date(result.data[0].created_at).getTime();
     } catch (error) {
       deleteRequest(request.name);
-      botReply("⛔ Could not find this video's info", msgid, false);
+      botReply("⛔ Could not find this video's info chatvoDonk", msgid, false);
       console.log("getRequestInfo twitch vod error", error);
       return;
     }
@@ -1676,38 +1655,11 @@ async function getRequestInfo(request, msgid) {
       request.age = new Date(result.data[0].started_at).getTime();
     } catch (error) {
       deleteRequest(request.name);
-      botReply("⛔ Could not find this stream's info", msgid, false);
+      botReply("⛔ Could not find this stream's info chatvoDonk", msgid, false);
       console.log("getRequestInfo twitch stream error", error);
       return;
     }
   } //twitch stream
-
-  if (request.type == "spotify") {
-    try {
-      let response = await fetch(`https://helper.donk.workers.dev/spotify/tracks?ids=${request.id}`);
-      let result = await response.json();
-      console.log(result);
-      if (!result.tracks[0].is_playable) {
-        deleteRequest(request.name);
-        botReply("⛔ Your song is not playable", msgid, false);
-        return;
-      }
-
-      request.title = result.tracks[0].name || "(untitled)";
-      request.channel = result.tracks[0]?.artists[0]?.name || "(unknown)";
-      request.channelid = result.tracks[0].artists[0].id;
-      request.thumbnail = result.tracks[0].album.images[0].url;
-      request.duration = result.tracks[0].duration_ms / 1000;
-      request.views = null;
-      request.age = spotifyReleaseDateToTimestamp(result.tracks[0].album.release_date, result.tracks[0].album.release_date_precision);
-      request.uri = result.tracks[0].uri;
-    } catch (error) {
-      deleteRequest(request.name);
-      botReply("⛔ Could not find this song's info", msgid, false);
-      console.log("getRequestInfo spotify error", error);
-      return;
-    }
-  } //spotify
 
   if (request.type == "tiktok video") {
     try {
@@ -1723,7 +1675,7 @@ async function getRequestInfo(request, msgid) {
       request.age = null;
     } catch (error) {
       deleteRequest(request.name);
-      botReply("⛔ Could not find this video's info", msgid, false);
+      botReply("⛔ Could not find this video's info chatvoDonk", msgid, false);
       console.log("getRequestInfo tiktok error", error);
       return;
     }
@@ -1745,7 +1697,7 @@ async function getRequestInfo(request, msgid) {
 
       if (result.items[0].contentDetails?.contentRating?.ytRating == "ytAgeRestricted" || !result.items[0].status?.embeddable) {
         deleteRequest(request.name);
-        botReply("⛔ Your video is age restricted or not embeddable", msgid, false);
+        botReply("⛔ Your video is age restricted or not embeddable chatvoDonk", msgid, false);
         return;
       }
 
@@ -1755,13 +1707,13 @@ async function getRequestInfo(request, msgid) {
         }
         if (!PLAYLIST.allowYTStreams) {
           deleteRequest(request.name);
-          botReply("🚫 YouTube streams are not allowed", msgid, false);
+          botReply("🚫 YouTube streams are not allowed chatvoDonk", msgid, false);
           return;
         }
       }
     } catch (error) {
       deleteRequest(request.name);
-      botReply("⛔ Could not find this video's info", msgid, false);
+      botReply("⛔ Could not find this video's info chatvoDonk", msgid, false);
       console.log("getRequestInfo youtube error", error);
       return;
     }
@@ -1771,7 +1723,7 @@ async function getRequestInfo(request, msgid) {
     try {
       if (Date.now() < vimeoCooldown) {
         deleteRequest(request.name);
-        botReply(`⚠ We reached the Vimeo API limit, ${Math.round((vimeoCooldown - Date.now()) / 1000)}s cooldown...`, msgid, false);
+        botReply(`⚠ We reached the Vimeo API limit, ${Math.round((vimeoCooldown - Date.now()) / 1000)}s cooldown... chatvoDonk`, msgid, false);
         return;
       }
 
@@ -1782,7 +1734,7 @@ async function getRequestInfo(request, msgid) {
       if (result?.error_code == 9000) {
         deleteRequest(request.name);
         vimeoCooldown = new Date(result["X-RateLimit-Reset"]).getTime();
-        botReply(`⚠ We reached the Vimeo API limit, ${Math.round((vimeoCooldown - Date.now()) / 1000)}s cooldown...`, msgid, false);
+        botReply(`⚠ We reached the Vimeo API limit, ${Math.round((vimeoCooldown - Date.now()) / 1000)}s cooldown... chatvoDonk`, msgid, false);
         return;
       }
 
@@ -1790,25 +1742,25 @@ async function getRequestInfo(request, msgid) {
 
       if (result.type !== "video") {
         deleteRequest(request.name);
-        botReply("⛔ Only Vimeo videos are supported", msgid, false);
+        botReply("⛔ Only Vimeo videos are supported chatvoDonk", msgid, false);
         return;
       }
 
       if (result.content_rating_class !== "safe") {
         deleteRequest(request.name);
-        botReply("⛔ Your video is not rated as safe", msgid, false);
+        botReply("⛔ Your video is not rated as safe chatvoDonk", msgid, false);
         return;
       }
 
       if (!result.is_playable || result.play.status !== "playable" || result.status !== "available") {
         deleteRequest(request.name);
-        botReply("⛔ Your video is not playable", msgid, false);
+        botReply("⛔ Your video is not playable chatvoDonk", msgid, false);
         return;
       }
 
       if (result.privacy.embed !== "public") {
         deleteRequest(request.name);
-        botReply("⛔ Your video is not embeddable", msgid, false);
+        botReply("⛔ Your video is not embeddable chatvoDonk", msgid, false);
         return;
       }
 
@@ -1821,7 +1773,7 @@ async function getRequestInfo(request, msgid) {
       request.age = new Date(result.created_time).getTime();
     } catch (error) {
       deleteRequest(request.name);
-      botReply("⛔ Could not find this video's info", msgid, false);
+      botReply("⛔ Could not find this video's info chatvoDonk", msgid, false);
       console.log("getRequestInfo vimeo error", error);
       return;
     }
@@ -1842,7 +1794,7 @@ async function getRequestInfo(request, msgid) {
       request.video = result.files.mp4.url;
     } catch (error) {
       deleteRequest(request.name);
-      botReply("⛔ Could not find this video's info", msgid, false);
+      botReply("⛔ Could not find this video's info chatvoDonk", msgid, false);
       console.log("getRequestInfo streamable error", error);
       return;
     }
@@ -1850,7 +1802,7 @@ async function getRequestInfo(request, msgid) {
 
   if (bannedChannels.get(`${request?.platform}:${request?.channelid}`)) {
     deleteRequest(request.name);
-    botReply(`🚫 This ${request.type == "spotify" ? "artist" : "channel"} is banned`, msgid, false);
+    botReply(`🚫 This channel is banned chatvoDonk`, msgid, false);
     return;
   } //banned channels check
 
@@ -1864,13 +1816,13 @@ async function getRequestInfo(request, msgid) {
       togglePlaylist();
     }
     deleteRequest(request.name);
-    botReply(`⛔ The playlist's duration limit was reached (${PLAYLIST.maxDuration}${PLAYLIST.maxDurationUnit})`, msgid, false);
+    botReply(`⛔ The playlist's duration limit was reached (${PLAYLIST.maxDuration}${PLAYLIST.maxDurationUnit}) chatvoDonk`, msgid, false);
     return;
   } //total duration limit check
 
   if (PLAYLIST.maxLength !== "" && request.duration !== -1 && request.duration !== null && request.duration - request.timestamp > PLAYLIST.maxLength * 60) {
     deleteRequest(request.name);
-    botReply(`⛔ Your request is too long (${PLAYLIST.maxLength}m max)`, msgid, false);
+    botReply(`⛔ Your request is too long (${PLAYLIST.maxLength}m max) chatvoDonk`, msgid, false);
     return;
   } //request length check
 
@@ -1879,13 +1831,13 @@ async function getRequestInfo(request, msgid) {
       togglePlaylist();
     }
     deleteRequest(request.name);
-    botReply(`⛔ The playlist's size limit was reached (${PLAYLIST.maxSize})`, msgid, false);
+    botReply(`⛔ The playlist's size limit was reached (${PLAYLIST.maxSize}) chatvoDonk`, msgid, false);
     return;
   } //playlist size check
 
   if (PLAYLIST.minViewCount !== "" && request.views !== null && request.views < PLAYLIST.minViewCount) {
     deleteRequest(request.name);
-    botReply(`⛔ Your request does not meet the minimum view count (${PLAYLIST.minViewCount.toLocaleString()})`, msgid, false);
+    botReply(`⛔ Your request does not meet the minimum view count (${PLAYLIST.minViewCount.toLocaleString()}) chatvoDonk`, msgid, false);
     return;
   } //view count check
 
@@ -1895,9 +1847,13 @@ async function getRequestInfo(request, msgid) {
     let max = numberAndUnitToSeconds(PLAYLIST.maxUploadAge, PLAYLIST.maxUploadAgeUnit) * 1000;
     let now = Date.now();
     if (PLAYLIST.maxUploadAge !== "") {
-      botReply(`⛔ Your request is too new (must be uploaded between ${new Date(now - max).toLocaleString("en-GB")} and ${new Date(now - min).toLocaleString("en-GB")})`, msgid, false);
+      botReply(
+        `⛔ Your request is too new (must be uploaded between ${new Date(now - max).toLocaleString("en-GB")} and ${new Date(now - min).toLocaleString("en-GB")}) chatvoDonk`,
+        msgid,
+        false,
+      );
     } else {
-      botReply(`⛔ Your request is too new (must be uploaded before ${new Date(now - min).toLocaleString("en-GB")})`, msgid, false);
+      botReply(`⛔ Your request is too new (must be uploaded before ${new Date(now - min).toLocaleString("en-GB")}) chatvoDonk`, msgid, false);
     }
     return;
   } //min upload age check
@@ -1908,22 +1864,26 @@ async function getRequestInfo(request, msgid) {
     let max = numberAndUnitToSeconds(PLAYLIST.maxUploadAge, PLAYLIST.maxUploadAgeUnit) * 1000;
     let now = Date.now();
     if (PLAYLIST.minUploadAge !== "") {
-      botReply(`⛔ Your request is too old (must be uploaded between ${new Date(now - max).toLocaleString("en-GB")} and ${new Date(now - min).toLocaleString("en-GB")})`, msgid, false);
+      botReply(
+        `⛔ Your request is too old (must be uploaded between ${new Date(now - max).toLocaleString("en-GB")} and ${new Date(now - min).toLocaleString("en-GB")}) chatvoDonk`,
+        msgid,
+        false,
+      );
     } else {
-      botReply(`⛔ Your request is too old (must be uploaded after ${new Date(now - max).toLocaleString("en-GB")})`, msgid, false);
+      botReply(`⛔ Your request is too old (must be uploaded after ${new Date(now - max).toLocaleString("en-GB")}) chatvoDonk`, msgid, false);
     }
     return;
   } //max upload age check
 
   if (PLAYLIST.uniqueOnly && history.some((e) => e.name === request.name)) {
     deleteRequest(request.name);
-    botReply(`⛔ Your request is not unique`, msgid, false);
+    botReply(`⛔ Your request is not unique chatvoDonk`, msgid, false);
     return;
   } //unique check
 
   if (request.timestamp > 0 && request.duration > 0 && request.timestamp > request.duration) {
     deleteRequest(request.name);
-    botReply(`⛔ Your time stamp is longer than the actual video`, msgid, false);
+    botReply(`⛔ Your time stamp is longer than the actual video chatvoDonk`, msgid, false);
     return;
   } //timestamp check
 
@@ -2071,39 +2031,6 @@ async function parseLink(link) {
     }
   } //vimeo search
 
-  if (link.includes("spotify.com")) {
-    const spotifyURLRegex = /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:(album|track|playlist|episode)\/|\?uri=spotify:track:)((\w|-){22})/;
-    let id = link.match(spotifyURLRegex);
-    console.log(id);
-    if (!id[2] || (id[1] !== "track" && id[1] !== "episode")) {
-      return null;
-    }
-    return { type: "spotify", id: id[2], name: `spotify:${id[2]}`, platform: "spotify", timestamp: 0 };
-  } //spotify
-
-  if (link.toLowerCase().startsWith("spotify")) {
-    link = link?.toLowerCase().replace("spotify", "").trim();
-    if (link?.includes("start=")) {
-      link = link.split("start=")[0];
-    }
-    if (!link) {
-      return null;
-    }
-
-    try {
-      let response = await fetch(`https://helper.donk.workers.dev/spotify/search?q=${encodeURIComponent(link.trim())}`);
-      let result = await response.json();
-      console.log(result);
-      if (result.tracks.items.length == 0) {
-        return null;
-      }
-
-      return { type: "spotify", id: result.tracks.items[0].id, name: `spotify:${result.tracks.items[0].id}`, platform: "spotify", timestamp: 0 };
-    } catch (error) {
-      return null;
-    }
-  } //spotify search
-
   if (link.includes("tiktok.com")) {
     const tiktokURLRegex = /^.*https:\/\/(?:m|www|vm)?\.?tiktok\.com\/((?:.*\b(?:(?:usr|v|embed|user|video)\/|\?shareId=|\&item_id=)(\d+))|\w+)/;
     let id = link.match(tiktokURLRegex);
@@ -2145,9 +2072,6 @@ function linkTypeAllowed(type) {
   if (type == "twitch stream" && !PLAYLIST.allowTwitchStreams) {
     return false;
   }
-  if (type == "spotify" && !PLAYLIST.allowSpotifySongs) {
-    return false;
-  }
   if (type == "streamable" && !PLAYLIST.allowStreamable) {
     return false;
   }
@@ -2174,8 +2098,6 @@ function getItemLink(request) {
       return `https://youtube.com/shorts/${request.id}`;
     case "vimeo":
       return `https://vimeo.com/${request.id}`;
-    case "spotify":
-      return `https://open.spotify.com/track/${request.id}`;
     case "tiktok video":
       return request.url;
     case "twitch stream":
@@ -2204,7 +2126,7 @@ async function addLink() {
   let input = elements.link.value?.split(" ").filter(Boolean);
   let request = input[0];
   let search = false;
-  if (input[0].toLowerCase() == "youtube" || input[0].toLowerCase() == "spotify" || input[0].toLowerCase() == "vimeo") {
+  if (input[0].toLowerCase() == "youtube" || input[0].toLowerCase() == "vimeo") {
     request = input.join(" ");
     search = true;
   }
@@ -2238,7 +2160,7 @@ async function addLink() {
     },
     link,
     0,
-    search
+    search,
   );
   elements.link.value = "";
 } //addLink
@@ -2282,7 +2204,7 @@ function deleteItem(id, reply) {
   let request = requests.get(id);
 
   if (!request) {
-    botReply(`⚠ Request not found`, reply, false);
+    botReply(`⚠ Request not found chatvoDonk`, reply, false);
     return;
   }
 
@@ -2344,10 +2266,6 @@ async function playItem(item) {
     case "vimeo":
       elements.vimeoEmbedContainer.style.display = "";
       playVimeoVideo(item.id, item.timestamp);
-      break;
-    case "spotify":
-      elements.spotifyEmbedContainer.style.display = "";
-      spotifyPlay(item.uri, item.timestamp);
       break;
     case "twitch stream":
       elements.twitchEmbed.style.display = "";
@@ -2413,7 +2331,7 @@ async function playItem(item) {
 
   elements.nowPlayingInfo.innerHTML = `
   <small class="now-playing-info" title="${currentItem.channel}">
-    <i class="material-icons notranslate">${currentItem.platform == "spotify" ? "music_note" : "live_tv"}</i> ${escapeString(currentItem.channel)}
+    <i class="material-icons notranslate">live_tv</i> ${escapeString(currentItem.channel)}
   </small>
   <br />
   <small class="now-playing-info">
@@ -2646,7 +2564,6 @@ function resetPlayers() {
   elements.placeholder.style.display = "none";
   elements.youtubeEmbedContainer.style.display = "none";
   elements.vimeoEmbedContainer.style.display = "none";
-  elements.spotifyEmbedContainer.style.display = "none";
   elements.twitchEmbed.style.display = "none";
   elements.twitchClipsEmbed.style.display = "none";
   elements.tiktokEmbed.style.display = "none";
@@ -2654,8 +2571,6 @@ function resetPlayers() {
 
   youtubePlayer?.loadVideoById("");
   vimeoPlayer?.unload();
-  spotifyPlayer?.destroy();
-  elements.spotifyEmbedContainer.innerHTML = `<div id="spotifyEmbed"></div>`;
   twitchPlayer?.setChannel("");
   elements.twitchClipsEmbed.innerHTML = "";
   elements.tiktokEmbed.innerHTML = "";
@@ -3136,9 +3051,6 @@ function playPlaylist(reply) {
     case "vimeo":
       vimeoPlayer.play();
       break;
-    case "spotify":
-      spotifyPlayer.resume();
-      break;
     case "twitch stream":
     case "twitch vod":
       twitchPlayer.play();
@@ -3181,9 +3093,6 @@ function pausePlaylist(reply) {
       break;
     case "vimeo":
       vimeoPlayer.pause();
-      break;
-    case "spotify":
-      spotifyPlayer.pause();
       break;
     case "twitch stream":
     case "twitch vod":
@@ -3354,36 +3263,6 @@ function youtubePlayerOnAutoplayBlocked(event) {
   console.log(event);
 } //youtubePlayerOnAutoplayBlocked
 
-let spotifyPlayer, spotifyIFrameAPI;
-window.onSpotifyIframeApiReady = (IFrameAPI) => {
-  spotifyIFrameAPI = IFrameAPI;
-  console.log("onSpotifyIframeApiReady");
-  const callback = (EmbedController) => {
-    spotifyPlayer = EmbedController;
-    EmbedController.addListener("playback_update", (event) => {
-      if (event.data.position == event.data.duration && event.data.duration > 0 && PLAYLIST.autoplay) {
-        nextItem();
-      }
-    });
-  };
-  spotifyIFrameAPI.createController(elements.spotifyEmbed, {}, callback);
-}; //onSpotifyIframeApiReady
-
-function spotifyPlay(uri, timestamp) {
-  const callback = (EmbedController) => {
-    spotifyPlayer = EmbedController;
-    EmbedController.addListener("playback_update", (event) => {
-      if (event.data.position == event.data.duration && event.data.duration > 0 && PLAYLIST.autoplay) {
-        nextItem();
-      }
-    });
-  };
-  spotifyIFrameAPI.createController(document.getElementById("spotifyEmbed"), {}, callback);
-
-  spotifyPlayer.loadUri(uri, true, timestamp);
-  spotifyPlayer.play();
-} //spotifyPlay
-
 let twitchPlayer;
 let seekTwitchPlayer = true;
 function enableTwitchEmbed() {
@@ -3459,7 +3338,7 @@ function playVimeoVideo(id, timestamp) {
   } else {
     vimeoPlayer.loadVideo(id);
     setTimeout(() => {
-      //scuffed embed doesnt seek for some reason :) forsen build
+      //scuffed embed doesn't seek for some reason :) forsen build
       vimeoPlayer.setCurrentTime(timestamp);
     }, 1000);
   }

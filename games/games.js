@@ -10,7 +10,7 @@ async function refreshData() {
   if (!USER.userID && USER.channel) {
     USER.userID = await getUserID(USER.channel);
   }
-} //refreshdata
+} //refreshData
 
 function saveSettings() {
   refreshData();
@@ -36,7 +36,7 @@ function resetSettings() {
       access_token: "",
       userID: "",
       platform: "",
-    })
+    }),
   );
 
   location.reload();
