@@ -2748,7 +2748,7 @@
       body: body,
     };
     try {
-      let response = await fetch(`https://api.chat.vote/reply`, requestOptions);
+      let response = await fetch(`https://bot.chat.vote/reply`, requestOptions);
       if (response.status == 418) {
         elements.enableBot.checked = false;
         saveSettings();
