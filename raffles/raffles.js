@@ -1095,7 +1095,7 @@ async function botSay(msg, joinMsg = false) {
     body: body,
   };
   try {
-    let response = await fetch(`https://api.chat.vote/say`, requestOptions);
+    let response = await fetch(`https://bot.chat.vote/say`, requestOptions);
     if (response.status == 418) {
       elements.announceWinner.checked = false;
       elements.confirmJoin.checked = false;
