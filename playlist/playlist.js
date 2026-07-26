@@ -1612,7 +1612,11 @@ async function getRequestInfo(request, msgid) {
       request.duration = result.data.data[0].duration;
       request.views = result.data.data[0].view_count;
       request.age = new Date(result.data.data[0].created_at).getTime();
-      request.mp4 = `${result?.extra?.clip?.videoQualities[0]?.sourceURL}${result?.extra?.clipKey}`;
+      if (result?.extra?.clip?.videoQualities[0]?.sourceURL && result?.extra?.clipKey) {
+        request.mp4 = `${result?.extra?.clip?.videoQualities[0]?.sourceURL}${result?.extra?.clipKey}`;
+      } else {
+        request.mp4 = null;
+      }
     } catch (error) {
       deleteRequest(request.name);
       botReply("⛔ Could not find this clip's info chatvoDonk", msgid, false);
@@ -2055,7 +2059,11 @@ async function updateClipMP4(id) {
   try {
     let response = await fetch(`https://helper.donk.workers.dev/twitch/clipsxd?id=${id}`);
     let result = await response.json();
-    return `${result?.extra?.clip?.videoQualities[0]?.sourceURL}${result?.extra?.clipKey}` || null;
+    if (result?.extra?.clip?.videoQualities[0]?.sourceURL && result?.extra?.clipKey) {
+      return `${result?.extra?.clip?.videoQualities[0]?.sourceURL}${result?.extra?.clipKey}`;
+    } else {
+      return null;
+    }
   } catch (error) {
     console.log("updateClipMP4 error", error);
     return null;
