@@ -121,6 +121,40 @@
       </div>
     </div>
 
+    <div class="modal fade" id="directMediaInfoModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Direct media links info</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Will allow viewers to request links of any video or audio file from some file hosting service</p>
+            <p>Disabled by default because of the higher risk of viewers requesting TOS breaking links easily</p>
+            <p>Enable it at your own risk</p>
+            Supported services:
+            <ul>
+              <li>Direct Discord media links</li>
+              <li>
+                <a href="https://kappa.lol" target="_blank" rel="noopener noreferrer">kappa.lol</a> and all of its aliases
+                <i
+                  class="material-icons notranslate"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  data-bs-title="segs.lol, gachi.gay, femboy.beauty, potat.gay, potat.irish, i.ringomar.com, i.spanix.team"
+                >
+                  info
+                </i>
+              </li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="modal modal-xl fade" id="platformsInfoModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -141,11 +175,13 @@
                   <th scope="col">Search Command<sup>[3]</sup></th>
                   <th scope="col">Content age filters</th>
                   <th scope="col">View count filters</th>
+                  <th scope="col">Thumbnails</th>
                 </tr>
               </thead>
               <tbody class="table-group-divider">
                 <tr>
                   <th scope="row">YouTube</th>
+                  <td>✔</td>
                   <td>✔</td>
                   <td>✔</td>
                   <td>✔</td>
@@ -165,6 +201,7 @@
                   <td>✔</td>
                   <td>✔</td>
                   <td>✔</td>
+                  <td>✔</td>
                 </tr>
                 <tr>
                   <th scope="row">Twitch</th>
@@ -174,6 +211,7 @@
                   <td>✔</td>
                   <td>✔</td>
                   <td>❌</td>
+                  <td>✔</td>
                   <td>✔</td>
                   <td>✔</td>
                 </tr>
@@ -187,6 +225,7 @@
                   <td>❌</td>
                   <td>❌</td>
                   <td>❌</td>
+                  <td>✔</td>
                 </tr>
                 <tr>
                   <th scope="row">TikTok</th>
@@ -198,6 +237,19 @@
                   <td>❌</td>
                   <td>❌</td>
                   <td>❌</td>
+                  <td>✔</td>
+                </tr>
+                <tr>
+                  <th scope="row">Direct media links</th>
+                  <td>✔</td>
+                  <td>✔</td>
+                  <td>❌</td>
+                  <td>✔</td>
+                  <td>❌</td>
+                  <td>❌</td>
+                  <td>❌</td>
+                  <td>❌</td>
+                  <td>❌<sup>[5]</sup></td>
                 </tr>
               </tbody>
             </table>
@@ -208,6 +260,7 @@
               unsafe videos quickly then request them. This however does not mean that the other platforms will always have safe content.<br />
               [3]: You can search some platforms directly using the request command. Example: <kbd>!request youtube camellia ghost</kbd> <br />
               [4]: Twitch clips autoplay and timestamps might break sometimes, especially if you keep the clips in the playlist for more than a day.<br />
+              [5]: Discord links don't support thumbnails for now.<br />
             </div>
           </div>
           <div class="modal-footer">
@@ -353,6 +406,18 @@
                   <div class="form-check form-switch mb-3">
                     <input class="form-check-input" type="checkbox" role="switch" id="allowTwitchVODs" onchange="saveSettings()" checked />
                     <label class="form-check-label" for="allowTwitchVODs">VODs</label>
+                  </div>
+                  <h6>
+                    Direct media links <i class="material-icons notranslate cursor-pointer d-inline text-warning" data-bs-toggle="modal" data-bs-target="#directMediaInfoModal">help</i>
+                  </h6>
+
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="allowDirectAudio" onchange="saveSettings()" />
+                    <label class="form-check-label" for="allowDirectAudio">Audio links</label>
+                  </div>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" role="switch" id="allowDirectVideo" onchange="saveSettings()" />
+                    <label class="form-check-label" for="allowDirectVideo">Video links</label>
                   </div>
                 </div>
                 <div class="col-xl-4">
@@ -578,13 +643,12 @@
         </div>
 
         <div class="card mb-3">
-          <div class="card-header"><i class="material-icons notranslate">group</i>Who can send requests</div>
+          <div class="card-header"><i class="material-icons notranslate">group</i>Request permissions and limits</div>
           <div class="card-body">
-            <p id="whoCanRequest">Everyone will be able to request.<br />Everyone will get 1 request.</p>
             <table class="table table-hover">
               <thead>
                 <tr>
-                  <th scope="col">Role</th>
+                  <th scope="col">Allowed to request</th>
                   <th scope="col">
                     Request limit
                     <i
@@ -601,67 +665,73 @@
               </thead>
               <tbody class="table-group-divider">
                 <tr>
-                  <th scope="row">
-                    <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" role="switch" id="allowPlebs" onchange="saveSettings()" checked />
+                  <th scope="row" style="vertical-align: middle">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="allowPlebs" onchange="saveSettings()" checked />
                       <label class="form-check-label" for="allowPlebs"><img src="/pics/pleb.png" class="role-badge" /> Non subscriber</label>
                     </div>
                   </th>
                   <td>
-                    <input type="number" class="form-control request-limit" id="plebLimit" onchange="saveSettings()" value="1" min="1" placeholder="Unlimited" />
+                    <input type="number" class="form-control request-limit" id="plebLimit" onchange="saveSettings()" value="1" min="0" placeholder="Unlimited" oninput="handleZero(this)" />
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row">
-                    <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" role="switch" id="allowSubs" onchange="saveSettings()" checked />
+                  <th scope="row" style="vertical-align: middle">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="allowSubs" onchange="saveSettings()" checked />
                       <label class="form-check-label" for="allowSubs"><img src="/pics/sub.png" class="role-badge" /> Subscriber</label>
                     </div>
                   </th>
                   <td>
-                    <input type="number" class="form-control request-limit" id="subLimit" onchange="saveSettings()" value="1" min="1" placeholder="Unlimited" />
+                    <input type="number" class="form-control request-limit" id="subLimit" onchange="saveSettings()" value="1" min="0" placeholder="Unlimited" oninput="handleZero(this)" />
                   </td>
                 </tr>
 
                 <tr>
-                  <th scope="row">
-                    <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" role="switch" id="allowMods" onchange="saveSettings()" checked />
+                  <th scope="row" style="vertical-align: middle">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="allowMods" onchange="saveSettings()" checked />
                       <label class="form-check-label" for="allowMods"><img src="/pics/mod.png" class="role-badge" /> Mod</label>
                     </div>
                   </th>
                   <td>
-                    <input type="number" class="form-control request-limit" id="modLimit" onchange="saveSettings()" value="1" min="1" placeholder="Unlimited" />
+                    <input type="number" class="form-control request-limit" id="modLimit" onchange="saveSettings()" value="1" min="0" placeholder="Unlimited" oninput="handleZero(this)" />
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row">
-                    <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" role="switch" id="allowVips" onchange="saveSettings()" checked />
+                  <th scope="row" style="vertical-align: middle">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="allowVips" onchange="saveSettings()" checked />
                       <label class="form-check-label" for="allowVips"><img src="/pics/vip.png" class="role-badge" /> VIP</label>
                     </div>
                   </th>
                   <td>
-                    <input type="number" class="form-control request-limit" id="vipLimit" onchange="saveSettings()" value="1" min="1" placeholder="Unlimited" />
+                    <input type="number" class="form-control request-limit" id="vipLimit" onchange="saveSettings()" value="1" min="0" placeholder="Unlimited" oninput="handleZero(this)" />
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row">
-                    <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" role="switch" id="allowFirstTimeChatters" onchange="saveSettings()" checked />
+                  <th scope="row" style="vertical-align: middle">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="allowFirstTimeChatters" onchange="saveSettings()" checked />
                       <label class="form-check-label" for="allowFirstTimeChatters"><img src="/pics/firstmsg.png" class="role-badge" /> First time chatter</label>
                     </div>
                   </th>
                   <td>
-                    <input type="number" class="form-control request-limit" id="firstTimeChatterLimit" onchange="saveSettings()" value="1" min="1" placeholder="Unlimited" />
+                    <input
+                      type="number"
+                      class="form-control request-limit"
+                      id="firstTimeChatterLimit"
+                      onchange="saveSettings()"
+                      value="1"
+                      min="0"
+                      placeholder="Unlimited"
+                      oninput="handleZero(this)"
+                    />
                   </td>
                 </tr>
               </tbody>
             </table>
-            <div class="btn-group" role="group" aria-label="Check all/Uncheck all">
-              <button type="button" id="selectAll" class="btn btn-sm btn-success">Select all</button>
-              <button type="button" id="unselectAll" class="btn btn-sm btn-danger">Unselect all</button>
-            </div>
+            <p id="whoCanRequest">Loading...</p>
           </div>
         </div>
 
@@ -808,7 +878,7 @@
           ><i class="material-icons notranslate">delete_forever</i>Reset all settings</a
         >
         <br />
-        <small class="text-body-secondary">Resets all settings and reloads the page.</small>
+        <small class="text-body-secondary">Resets all settings and reloads the page. Playlist and History and Ban list will not be deleted.</small>
 
         <div class="card my-3">
           <div class="card-body">
@@ -839,7 +909,7 @@
         >
           <img src="/pics/donk.png" alt="logo" style="height: 24px; width: 24px" class="d-inline-block align-top" />
         </a>
-        <a class="navbar-brand notranslate site-link" href="/playlist/" target="_self" rel="noopener noreferrer"> chat.vote Playlist <span class="text-danger">BETA</span></a>
+        <a class="navbar-brand notranslate site-link" href="/playlist/" target="_self" rel="noopener noreferrer"> chat.vote Playlist</a>
 
         <div class="collapse navbar-collapse">
           <ul class="navbar-nav">

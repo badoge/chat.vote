@@ -982,9 +982,10 @@ function raffleWinnerChat(context, msg, joinMessage = false) {
       }
     }
     for (let index = 0, j = emotes.length; index < j; index++) {
-      let emote = `<img src="https://static-cdn.jtvnw.net/emoticons/v2/${emotes[index].id}/default/dark/1.0" title="${emotes[index].emote}" alt="${emotes[index].emote}" class="emote">`;
-      let regex = new RegExp("\\b" + emotes[index].emote + "\\b", "g");
-      msg_s = msg_s.replace(regex, emote);
+      const escapedEmote = escapeString(emotes[index].emote);
+      const emote = `<img src="https://static-cdn.jtvnw.net/emoticons/v2/${emotes[index].id}/default/dark/1.0" title="${escapedEmote}" alt="${escapedEmote}" class="emote">`;
+      const regex = new RegExp("(?<!\\S)" + escapeRegex(escapedEmote) + "(?!\\S)", "g");
+      msg_s = msg_s.replace(regex, () => emote);
     }
   } //emotes
   msg_s = replaceEmotes(msg_s, thirdPartyEmotes);

@@ -202,7 +202,7 @@ async function addUserToRaffle(user) {
     `<li id="${user.username}_raffle" class="list-group-item">
     ${badges}<span style="color:${color};"> ${name}</span>: 1 ticket
     <i class="material-icons notranslate deletebtn float-end" onclick="removeFromRaffle('${user.username}')">highlight_off</i>
-    </li>`
+    </li>`,
   );
   elements.entrants.innerHTML = `Entrants: ${raffle_users.length}`;
 } //addUserToRaffle
@@ -217,7 +217,7 @@ async function addUserToRaffleTier3(user) {
     `<li id="${user.username}_raffle_tier3" class="list-group-item">
     ${badges}<span style="color:${color};"> ${name}</span>: 1 ticket
     <i class="material-icons notranslate deletebtn float-end" onclick="removeFromRaffleTier3('${user.username}')">highlight_off</i>
-    </li>`
+    </li>`,
   );
   elements.entrantsTier3.innerHTML = `Entrants: ${raffle_users_tier3.length}`;
 } //addUserToRaffleTier3
@@ -266,7 +266,7 @@ async function drawRaffleWinner() {
         time: winnerObject.time,
       },
       winnerObject.msg,
-      false
+      false,
     );
     paused = false;
   }
@@ -316,7 +316,7 @@ async function drawRaffleWinnerTier3() {
         time: winnerObject.time,
       },
       winnerObject.msg,
-      true
+      true,
     );
     paused = false;
   }
@@ -588,11 +588,14 @@ async function drawRaffleWinnerFancy() {
   const targetFPS = 60;
   const correction = targetFPS / app.animation.projectedFPS;
   app.animation.speed *= correction;
-  setTimeout(() => {
-    // slow down
-    app.animation.acceleration = app.animation.constants.SLOW_DOWN;
-    app.animation.acceleration *= correction * correction;
-  }, Math.round(1500 + Math.random() * 1000));
+  setTimeout(
+    () => {
+      // slow down
+      app.animation.acceleration = app.animation.constants.SLOW_DOWN;
+      app.animation.acceleration *= correction * correction;
+    },
+    Math.round(1500 + Math.random() * 1000),
+  );
   animateRoll();
 } //drawRaffleWinnerFancy
 
@@ -663,11 +666,14 @@ async function drawRaffleWinnerFancyTier3() {
   const targetFPS = 60;
   const correction = targetFPS / app.animation.projectedFPS;
   app.animation.speed *= correction;
-  setTimeout(() => {
-    // slow down
-    app.animation.acceleration = app.animation.constants.SLOW_DOWN;
-    app.animation.acceleration *= correction * correction;
-  }, Math.round(1500 + Math.random() * 1000));
+  setTimeout(
+    () => {
+      // slow down
+      app.animation.acceleration = app.animation.constants.SLOW_DOWN;
+      app.animation.acceleration *= correction * correction;
+    },
+    Math.round(1500 + Math.random() * 1000),
+  );
   animateRollTier3();
 } //drawRaffleWinnerFancy
 
@@ -722,9 +728,10 @@ function raffleWinnerChat(context, msg, tier3) {
       }
     }
     for (let index = 0, j = emotes.length; index < j; index++) {
-      let emote = `<img src="https://static-cdn.jtvnw.net/emoticons/v2/${emotes[index].id}/default/dark/1.0" title="${emotes[index].emote}" alt="${emotes[index].emote}" class="emote">`;
-      let regex = new RegExp("\\b" + emotes[index].emote + "\\b", "g");
-      msg_s = msg_s.replace(regex, emote);
+      const escapedEmote = escapeString(emotes[index].emote);
+      const emote = `<img src="https://static-cdn.jtvnw.net/emoticons/v2/${emotes[index].id}/default/dark/1.0" title="${escapedEmote}" alt="${escapedEmote}" class="emote">`;
+      const regex = new RegExp("(?<!\\S)" + escapeRegex(escapedEmote) + "(?!\\S)", "g");
+      msg_s = msg_s.replace(regex, () => emote);
     }
   } //emotes
   msg_s = replaceEmotes(msg_s, thirdPartyEmotes);
@@ -776,7 +783,7 @@ async function loadTier3Emotes() {
         tier3Emotes.push(result.data[index].id);
         elements.emotes.insertAdjacentHTML(
           "afterbegin",
-          `<img title="${result.data[index].name}" src="https://static-cdn.jtvnw.net/emoticons/v2/${result.data[index].id}/default/dark/1.0"> `
+          `<img title="${result.data[index].name}" src="https://static-cdn.jtvnw.net/emoticons/v2/${result.data[index].id}/default/dark/1.0"> `,
         );
       }
     }

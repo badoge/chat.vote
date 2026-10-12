@@ -798,9 +798,10 @@ function connect() {
           }
         }
         for (let index = 0, j = emotes.length; index < j; index++) {
-          let emote = `<img src="https://static-cdn.jtvnw.net/emoticons/v2/${emotes[index].id}/default/dark/1.0" title="${emotes[index].emote}" alt="${emotes[index].emote}" class="emote">`;
-          let regex = new RegExp("\\b" + emotes[index].emote + "\\b", "g");
-          suggestion_emotes = suggestion_emotes.replace(regex, emote);
+          const escapedEmote = escapeString(emotes[index].emote);
+          const emote = `<img src="https://static-cdn.jtvnw.net/emoticons/v2/${emotes[index].id}/default/dark/1.0" title="${escapedEmote}" alt="${escapedEmote}" class="emote">`;
+          const regex = new RegExp("(?<!\\S)" + escapeRegex(escapedEmote) + "(?!\\S)", "g");
+          suggestion_emotes = suggestion_emotes.replace(regex, () => emote);
         }
       } //emotes
 
@@ -1291,7 +1292,7 @@ function download() {
       }, 1000);
     }
     return;
-  }
+  } //json
 
   if (elements.txt_selected.checked) {
     if (elements.voters_selected.checked) {
@@ -1300,7 +1301,7 @@ function download() {
       for (const [key, value] of Object.entries(votersobj)) {
         string += `${key}\t${value}\n`;
       }
-      let url = URL.createObjectURL(new Blob([string], { type: "application/json" }));
+      let url = URL.createObjectURL(new Blob([string], { type: "text/plain" }));
       let el = document.createElement("a");
       el.setAttribute("href", url);
       let filename = !title ? "chatvote list of voters" : title + "-chatvote list of voters";
@@ -1324,7 +1325,7 @@ function download() {
         }
         string += "\n";
       }
-      let url = URL.createObjectURL(new Blob([string], { type: "application/json" }));
+      let url = URL.createObjectURL(new Blob([string], { type: "text/plain" }));
       let el = document.createElement("a");
       el.setAttribute("href", url);
       let filename = !title ? "chatvote poll options" : title + "-chatvote poll options";
@@ -1337,7 +1338,7 @@ function download() {
       }, 1000);
     }
     return;
-  }
+  } //txt
 } //download
 
 function loadChart() {
@@ -1469,7 +1470,13 @@ function updateChart() {
       data[i] = vote_results_copy[i].score;
     }
     colors[i] = vote_results_copy[i].color;
-    table.cell({ row: i, column: 4 }).data(vote_results_copy[i].score);
+    table.rows().every(function () {
+      let rowData = this.data();
+      let match = vote_results.find((item) => item.id == rowData[0]);
+      if (match) {
+        this.cell(this.index(), 4).data(match.score);
+      }
+    });
   }
 
   mainChart.data.labels = labels;
@@ -1486,20 +1493,20 @@ function updateChart() {
       return;
     }
 
-    let allNumbers = [];
+    let numbersList = [];
     for (let index = 0; index < vote_results_copy.length; index++) {
       for (let index2 = 0; index2 < vote_results_copy[index].score; index2++) {
-        allNumbers.push(parseInt(vote_results_copy[index].option, 10));
+        numbersList.push(parseInt(vote_results_copy[index].option, 10));
       }
     }
 
-    let allNumbersSorted = Float32Array.from(allNumbers).sort();
-    if (allNumbersSorted.length) {
-      let middle = Math.floor(allNumbersSorted.length / 2);
-      if (allNumbersSorted.length % 2 === 0) {
-        elements.medianNumber.innerHTML = (allNumbersSorted[middle - 1] + allNumbersSorted[middle]) / 2 || 0;
+    let numbersListSorted = Float32Array.from(numbersList).sort();
+    if (numbersListSorted.length) {
+      let middle = Math.floor(numbersListSorted.length / 2);
+      if (numbersListSorted.length % 2 === 0) {
+        elements.medianNumber.innerHTML = (numbersListSorted[middle - 1] + numbersListSorted[middle]) / 2 || 0;
       } else {
-        elements.medianNumber.innerHTML = allNumbersSorted[middle] || 0;
+        elements.medianNumber.innerHTML = numbersListSorted[middle] || 0;
       }
     } else {
       elements.medianNumber.innerHTML = "0";
@@ -1525,6 +1532,7 @@ $("#options").on("click", ".remove-option-button", function () {
   if (vote_results.length == 0) {
     oid = 0;
     changeSiteLinkTarget("_self");
+    stopTimer();
   }
 
   if (cellid[4] > 0) {
@@ -1653,7 +1661,7 @@ function startTimer() {
       vote_results_copy.sort(function (a, b) {
         return a.score > b.score ? -1 : a.score == b.score ? 0 : 1;
       });
-      if (vote_results_copy[0].score == vote_results_copy[1].score) {
+      if (vote_results_copy.length > 1 && vote_results_copy[0].score == vote_results_copy[1].score) {
         elements.tieModalText.innerHTML = "Winner and runner up are tied, unable to pick a winner";
         elements.removeRandomWinner.style.display = "none";
         tieModal.show();
@@ -1976,7 +1984,7 @@ window.onload = function () {
     responsive: true,
     retrieve: true,
     paging: false,
-    ordering: false,
+    ordering: true,
     searching: false,
     info: false,
     columns: [

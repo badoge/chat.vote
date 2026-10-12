@@ -27,6 +27,8 @@ let elements = {
   allowTwitchClips: document.getElementById("allowTwitchClips"),
   allowTwitchStreams: document.getElementById("allowTwitchStreams"),
   allowTwitchVODs: document.getElementById("allowTwitchVODs"),
+  allowDirectAudio: document.getElementById("allowDirectAudio"),
+  allowDirectVideo: document.getElementById("allowDirectVideo"),
   allowTiktokVideos: document.getElementById("allowTiktokVideos"),
   allowYTStreams: document.getElementById("allowYTStreams"),
   allowYTShorts: document.getElementById("allowYTShorts"),
@@ -54,8 +56,6 @@ let elements = {
   modLimit: document.getElementById("modLimit"),
   vipLimit: document.getElementById("vipLimit"),
   firstTimeChatterLimit: document.getElementById("firstTimeChatterLimit"),
-  selectAll: document.getElementById("selectAll"),
-  unselectAll: document.getElementById("unselectAll"),
   noCommand: document.getElementById("noCommand"),
   requestCommand: document.getElementById("requestCommand"),
   requestCommandAlias: document.getElementById("requestCommandAlias"),
@@ -138,9 +138,10 @@ let copyLinkButton;
 let playlistTab, approvalTab, historyTab;
 let playlist_open = false;
 let playlist_playing = false;
-let total_duration = 0;
+let playlistLength = 0;
 let togglePlaylistPopover;
 let streamerColor = "";
+let darkTheme = true;
 
 let users = [];
 let requests = new Map();
@@ -166,6 +167,8 @@ let PLAYLIST = {
   allowTwitchClips: true,
   allowTwitchStreams: true,
   allowTwitchVODs: true,
+  allowDirectAudio: false,
+  allowDirectVideo: false,
   allowTiktokVideos: true,
   allowYTStreams: true,
   allowYTShorts: true,
@@ -232,6 +235,8 @@ async function refreshData() {
   PLAYLIST.allowTwitchClips = elements.allowTwitchClips.checked;
   PLAYLIST.allowTwitchStreams = elements.allowTwitchStreams.checked;
   PLAYLIST.allowTwitchVODs = elements.allowTwitchVODs.checked;
+  PLAYLIST.allowDirectAudio = elements.allowDirectAudio.checked;
+  PLAYLIST.allowDirectVideo = elements.allowDirectVideo.checked;
   PLAYLIST.allowTiktokVideos = elements.allowTiktokVideos.checked;
   PLAYLIST.allowYTStreams = elements.allowYTStreams.checked;
   PLAYLIST.allowYTShorts = elements.allowYTShorts.checked;
@@ -385,6 +390,8 @@ async function load_localStorage() {
     elements.allowTwitchClips.checked = PLAYLIST.allowTwitchClips ?? true;
     elements.allowTwitchStreams.checked = PLAYLIST.allowTwitchStreams ?? true;
     elements.allowTwitchVODs.checked = PLAYLIST.allowTwitchVODs ?? true;
+    elements.allowDirectAudio.checked = PLAYLIST.allowDirectAudio ?? false;
+    elements.allowDirectVideo.checked = PLAYLIST.allowDirectVideo ?? false;
     elements.allowTiktokVideos.checked = PLAYLIST.allowTiktokVideos ?? true;
     elements.allowYTStreams.checked = PLAYLIST.allowYTStreams ?? true;
     elements.allowYTShorts.checked = PLAYLIST.allowYTShorts ?? true;
@@ -585,7 +592,7 @@ function rebuildUsersArray() {
   }
 } //rebuildUsersArray
 
-function resetSettings(logout = false) {
+async function resetSettings(logout = false) {
   if (logout) {
     localStorage.setItem(
       "USER",
@@ -597,12 +604,12 @@ function resetSettings(logout = false) {
         platform: "",
       }),
     );
-    localforage.setItem("PLAYLIST_REQUESTS", JSON.stringify(new Map(), replacer));
-    localforage.setItem("PLAYLIST_HISTORY", JSON.stringify([]));
-    localforage.setItem("PLAYLIST_FAVORITES", JSON.stringify([]));
-    localforage.setItem("PLAYLIST_BANNED_USERS", JSON.stringify(new Map(), replacer));
-    localforage.setItem("PLAYLIST_BANNED_ITEMS", JSON.stringify(new Map(), replacer));
-    localforage.setItem("PLAYLIST_BANNED_CHANNELS", JSON.stringify(new Map(), replacer));
+    await localforage.setItem("PLAYLIST_REQUESTS", JSON.stringify(new Map(), replacer));
+    await localforage.setItem("PLAYLIST_HISTORY", JSON.stringify([]));
+    await localforage.setItem("PLAYLIST_FAVORITES", JSON.stringify([]));
+    await localforage.setItem("PLAYLIST_BANNED_USERS", JSON.stringify(new Map(), replacer));
+    await localforage.setItem("PLAYLIST_BANNED_ITEMS", JSON.stringify(new Map(), replacer));
+    await localforage.setItem("PLAYLIST_BANNED_CHANNELS", JSON.stringify(new Map(), replacer));
   }
   localStorage.setItem(
     "PLAYLIST",
@@ -612,6 +619,8 @@ function resetSettings(logout = false) {
       allowTwitchClips: true,
       allowTwitchStreams: true,
       allowTwitchVODs: true,
+      allowDirectAudio: false,
+      allowDirectVideo: false,
       allowTiktokVideos: true,
       allowYTStreams: true,
       allowYTShorts: true,
@@ -735,7 +744,7 @@ function connect() {
         search = true;
       }
 
-      let link = await parseLink(request);
+      let link = await parseLink(request, search);
       if (link && input[input.length - 1]?.toLowerCase().startsWith("start=")) {
         link.timestamp = timeToSeconds(input[input.length - 1].split("=")[1]);
       }
@@ -782,7 +791,7 @@ function connect() {
           search = true;
         }
 
-        let link = await parseLink(request);
+        let link = await parseLink(request, search);
         if (!link) {
           return;
         }
@@ -793,6 +802,7 @@ function connect() {
         if (input[input.length - 1]?.toLowerCase().startsWith("start=")) {
           link.timestamp = timeToSeconds(input[input.length - 1].split("=")[1]);
         }
+
         addRequest(context, link, context.id, search);
         break;
 
@@ -978,7 +988,16 @@ function findRequestKey(requestProperty, lookupValue) {
   return null;
 } //findRequestKey
 
+/**
+ * @description adds a request to the requests map - third step of adding requests
+ * @param {Object} context msg context from chat
+ * @param {Object} link request link from parseLink()
+ * @param {String} msgid msgid of the request from chat
+ * @param {Boolean} search request is a search query that needs to be looked up using a platform api
+ * @returns {*}
+ */
 function addRequest(context, link, msgid, search) {
+  //check if link is banned
   if (bannedItems.get(link.name)) {
     let message = "";
     switch (link.type) {
@@ -993,6 +1012,10 @@ function addRequest(context, link, msgid, search) {
         break;
       case "youtube short":
         message = "🚫 This short is banned chatvoDonk";
+        break;
+      case "direct discord":
+      case "direct supa":
+        message = "🚫 This link is banned";
         break;
       default:
         message = `🚫 This video is banned chatvoDonk`;
@@ -1023,6 +1046,12 @@ function addRequest(context, link, msgid, search) {
     return;
   }
 
+  //check if discord link will expire by the time the request plays
+  if (link?.expiry && Date.now() + playlistLength * 1000 >= link.expiry) {
+    botReply("⚠ Your link is expired chatvoDonk", context.id, false);
+    return;
+  }
+
   users[userIndex].requests.push(link.name);
 
   //check if other users already requested this link id
@@ -1042,7 +1071,6 @@ function addRequest(context, link, msgid, search) {
       approved: PLAYLIST.approvalQueue ? false : true,
       title: "",
       channel: "",
-      uri: "",
       url: link?.url || "",
       duration: null,
       timestamp: link.timestamp,
@@ -1070,7 +1098,7 @@ function deleteRequest(id, refund = true) {
       if (userIndex != -1) {
         users[userIndex].requests.splice(
           users[userIndex].requests.findIndex(function (r) {
-            return r.value === id;
+            return r === id;
           }),
           1,
         );
@@ -1123,7 +1151,7 @@ function banUser(requestName, bannedFromHistory) {
     deleteRequest(requestName, false);
   }
 
-  //remove all other requests sent by this user
+  //remove all other requests sent by this user but ignore requests that were originally sent by someone else
   for (const [key, value] of requests.entries()) {
     if (value.by[0].id == request.by[0].id) {
       deleteRequest(key, false);
@@ -1142,16 +1170,16 @@ function banItem(requestName, bannedFromHistory) {
     request = requests.get(requestName);
   }
   if (!request) {
-    showToast("Could not ban video/song", "danger", 2000);
+    showToast("Could not ban link", "danger", 2000);
     return;
   }
 
   //check if item is already banned before adding it to the list
   if (!bannedItems.get(requestName)) {
     bannedItems.set(requestName, request);
-    showToast(`This video is now banned`, "success", 2000);
+    showToast(`This link is now banned`, "success", 2000);
   } else {
-    showToast(`This video is already banned`, "warning", 2000);
+    showToast(`This link is already banned`, "warning", 2000);
   }
 
   if (bannedFromHistory) {
@@ -1170,7 +1198,7 @@ function banChannel(requestName, bannedFromHistory) {
     if (i > -1) {
       //check if request has a channel listed
       if (!history[i].channelid) {
-        showToast("Item has no channel/artist", "danger", 2000);
+        showToast("Item has no channel", "danger", 2000);
         return;
       }
       channelid = history[i].channelid;
@@ -1182,7 +1210,7 @@ function banChannel(requestName, bannedFromHistory) {
         return;
       }
     } else {
-      showToast("Could not ban channel/artist", "danger", 2000);
+      showToast("Could not ban channel", "danger", 2000);
       return;
     }
     showToast(`${history[i].channel} is now banned`, "success", 2000);
@@ -1191,12 +1219,12 @@ function banChannel(requestName, bannedFromHistory) {
   } else {
     let request = requests.get(requestName);
     if (!request) {
-      showToast("Could not ban channel/artist", "danger", 2000);
+      showToast("Could not ban channel", "danger", 2000);
       return;
     }
     //check if request has a channel listed
     if (!request.channelid) {
-      showToast("Item has no channel/artist", "danger", 2000);
+      showToast("Item has no channel", "danger", 2000);
       return;
     }
     channelid = request.channelid;
@@ -1233,7 +1261,7 @@ function unbanUser(userid) {
 function unbanItem(item) {
   //check if item is actually banned
   if (!bannedItems.get(item)) {
-    showToast("That video/song is not banned", "warning", 2000);
+    showToast("That link is not banned", "warning", 2000);
     return;
   }
   bannedItems.delete(item);
@@ -1244,7 +1272,7 @@ function unbanItem(item) {
 function unbanChannel(channel) {
   //check if channel is actually banned
   if (!bannedChannels.get(channel)) {
-    showToast("That channel/artist is not banned", "warning", 2000);
+    showToast("That channel is not banned", "warning", 2000);
     return;
   }
   bannedChannels.delete(channel);
@@ -1313,12 +1341,12 @@ function loadBanLists() {
   }
   elements.bannedUserCount.innerHTML = `${bannedUsers.size} ${bannedUsers.size == 1 ? "User" : "Users"}`;
   elements.bannedItemCount.innerHTML = `${bannedItems.size} ${bannedItems.size == 1 ? "Video/Song" : "Videos/Songs"}`;
-  elements.bannedChannelCount.innerHTML = `${bannedChannels.size} ${bannedChannels.size == 1 ? "Channel/Artist" : "Channels/Artists"}`;
+  elements.bannedChannelCount.innerHTML = `${bannedChannels.size} ${bannedChannels.size == 1 ? "Channel" : "Channels"}`;
 } //loadBanLists
 
 function clearPlaylist() {
   playlist_playing = false;
-  total_duration = 0;
+  playlistLength = 0;
   users = [];
   requests = new Map();
   resetVoteSkip();
@@ -1361,18 +1389,11 @@ function loadHistory() {
   elements.historyCount.innerHTML = `${history.length.toLocaleString()} ${history.length == 1 ? "request" : "requests"}`;
 } //loadHistory
 
+/**
+ * @description update the total duration and size of the playlist in teh bottom bar
+ */
 function updateLength() {
-  const count = requests.size;
-  let duration = 0;
-
-  for (let request of requests.values()) {
-    if (request.duration == -1 || request.duration == null) {
-      continue;
-    }
-    duration += request.duration - request.timestamp;
-  }
-
-  elements.playlistLength.innerHTML = `${secondsToTimeString(Math.round(duration)) || "00:00"} (${count} ${count == 1 ? "request" : "requests"})`;
+  elements.playlistLength.innerHTML = `${secondsToTimeString(Math.round(playlistLength)) || "00:00"} (${requests.size} ${requests.size == 1 ? "request" : "requests"})`;
 } //updateLength
 
 function makeBanButtons(request, historyButton) {
@@ -1384,6 +1405,15 @@ function makeBanButtons(request, historyButton) {
       banChannelButton = `
       <li>
         <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Streamable videos are uploaded anonymously so there is no channel to ban">
+          <a class="dropdown-item disabled" aria-disabled="true"><i class="material-icons notranslate">tv_off</i> Ban Channel</a>
+        </span>
+      </li>`;
+      break;
+    case "direct discord":
+    case "direct supa":
+      banChannelButton = `
+      <li>
+        <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="This link was uploaded anonymously so there is no channel to ban">
           <a class="dropdown-item disabled" aria-disabled="true"><i class="material-icons notranslate">tv_off</i> Ban Channel</a>
         </span>
       </li>`;
@@ -1412,6 +1442,10 @@ function makeBanButtons(request, historyButton) {
     case "twitch vod":
       banItemText = `<i class="material-icons notranslate">play_disabled</i> Ban VOD`;
       break;
+    case "direct discord":
+    case "direct supa":
+      banItemText = `<i class="material-icons notranslate">play_disabled</i> Ban Link`;
+      break;
     default:
       banItemText = `<i class="material-icons notranslate">play_disabled</i> Ban Video`;
       break;
@@ -1423,6 +1457,11 @@ function makeBanButtons(request, historyButton) {
   ${banChannelButton}`;
 } //makeBanButtons
 
+/**
+ * @description adds a placeholder to the playlist so that users see something while the info loads - fourth step of adding requests
+ * @param {*} request
+ * @param {string} [position="beforeend"]
+ */
 function addToPlaylist(request, position = "beforeend") {
   let banButtons = makeBanButtons(request, false);
   elements.mainList.insertAdjacentHTML(
@@ -1471,7 +1510,7 @@ function addToPlaylist(request, position = "beforeend") {
         </div>
       </div>`,
   );
-  enableTooltips(); //enable the streamable channel ban tooltip
+  enableTooltips(); //enable the streamable/direct link channel ban tooltip
 } //addToPlaylist
 
 function addToHistory(request, localStorageLoad = false) {
@@ -1534,7 +1573,11 @@ function addToHistory(request, localStorageLoad = false) {
       </div>`,
   );
 } //addToHistory
-
+/**
+ * @description replace the placeholder in the playlist with the data that was fetched in getRequestInfo() - sixth step of adding requests
+ * @param {*} request
+ * @param {boolean} [localStorageLoad=false]
+ */
 function updatePlaylist(request, localStorageLoad = false) {
   //check if request info has been fetched
   if (request.thumbnail && request.title) {
@@ -1562,7 +1605,7 @@ function updatePlaylist(request, localStorageLoad = false) {
     document.getElementById(`id${request.name}_info`).title = `
     ${escapeString(request.channel)} ${request.views !== null ? ` • ${formatViewCount(request.views)} ${request.views == 1 ? "view" : "views"}` : ""}`;
     document.getElementById(`id${request.name}_duration`).innerText = request.duration == -1 ? "🔴live" : secondsToTimeString(Math.round(request.duration)) + timestamp;
-    document.getElementById(`id${request.name}_ban_user`).innerHTML = `<i class="material-icons notranslate">person_off</i> Ban ${request.by.length > 1 ? "Users" : "User"}</a>`;
+    document.getElementById(`id${request.name}_ban_user`).innerHTML = `<i class="material-icons notranslate">person_off</i> Ban ${request.by.length > 1 ? "Users" : "User"}`;
     document.getElementById(`id${request.name}_by`).innerHTML = `
     Requested by 
     ${request.by[0].badges}
@@ -1585,14 +1628,19 @@ function updatePlaylist(request, localStorageLoad = false) {
     }
   } else {
     //if request info is not ready yet then update requesters only
-    document.getElementById(`id${request.name}_ban_user`).innerHTML = `<i class="material-icons notranslate">person_off</i> Ban ${request.by.length > 1 ? "Users" : "User"}</a>`;
+    document.getElementById(`id${request.name}_ban_user`).innerHTML = `<i class="material-icons notranslate">person_off</i> Ban ${request.by.length > 1 ? "Users" : "User"}`;
     document.getElementById(`id${request.name}_by`).innerText = `Requested by @${request.by[0].username} ${
       request.by.length > 1 ? `and ${request.by.length - 1} other ${request.by.length - 1 == 1 ? "user" : "users"}` : ""
     }`;
   }
 } //updatePlaylist
 
-let vimeoCooldown = 0;
+/**
+ * @description gets request info from the helper then checks for filters and shit - fifth step of adding requests
+ * @param {*} request
+ * @param {*} msgid
+ * @returns {*}
+ */
 async function getRequestInfo(request, msgid) {
   //skip if request already has info
   if (request.title) {
@@ -1804,6 +1852,96 @@ async function getRequestInfo(request, msgid) {
     }
   } //streamable
 
+  if (request.type == "direct discord") {
+    try {
+      let response = await fetch(`https://helper.donk.workers.dev/cors/?${request.url}`);
+      let contentType = response.headers.get("content-type") || "";
+
+      request.title =
+        request.name
+          .split("/")
+          .pop()
+          .split("?")[0]
+          .replace(/\.[^.]+$/, "") || "(untitled)";
+      request.channel = "(unknown)";
+      request.channelid = null;
+      request.thumbnail = "https://chat.vote/pics/nothumbnail.png";
+      request.duration = 0;
+      request.views = null;
+      request.age = null;
+
+      if (contentType.startsWith("video/")) {
+        if (!PLAYLIST.allowDirectVideo) {
+          botReply(`🚫 Direct video links are not enabled`, msgid, false);
+          deleteRequest(request.name);
+          return;
+        }
+      }
+      if (contentType.startsWith("audio/")) {
+        if (!PLAYLIST.allowDirectAudio) {
+          botReply(`🚫 Direct audio links are not enabled`, msgid, false);
+          deleteRequest(request.name);
+          return;
+        }
+      }
+      if (!contentType.startsWith("audio/") && !contentType.startsWith("video/")) {
+        deleteRequest(request.name);
+        botReply("🚫 Only video and audio files are allowed", msgid, false);
+        return;
+      }
+    } catch (error) {
+      deleteRequest(request.name);
+      botReply("⛔ Could not find this link's info", msgid, false);
+      console.log("getRequestInfo direct discord error", error);
+      return;
+    }
+  } //direct discord
+
+  if (request.type == "direct supa") {
+    try {
+      let response = await fetch(`https://helper.donk.workers.dev/supa/info?id=${request.id}`);
+      let result = await response.json();
+      console.log(result);
+      request.title = result?.name?.split(".")[0] || "(untitled)";
+      request.channel = "(unknown)";
+      request.channelid = null;
+      request.duration = 0;
+      request.views = null;
+      request.age = null;
+
+      if (result.type.startsWith("video")) {
+        if (!PLAYLIST.allowDirectVideo) {
+          botReply(`🚫 Direct video links are not enabled`, msgid, false);
+          deleteRequest(request.name);
+          return;
+        }
+      }
+      if (result.type.startsWith("audio")) {
+        if (!PLAYLIST.allowDirectAudio) {
+          botReply(`🚫 Direct audio links are not enabled`, msgid, false);
+          deleteRequest(request.name);
+          return;
+        }
+      }
+      if (!result.type.startsWith("audio") && !result.type.startsWith("video")) {
+        deleteRequest(request.name);
+        botReply("🚫 Only video and audio files are allowed", msgid, false);
+        return;
+      }
+
+      if (await checkImage(`https://kappa.lol/t/${request.id}`)) {
+        request.thumbnail = `https://kappa.lol/t/${request.id}`;
+      } else {
+        request.thumbnail = "https://chat.vote/pics/nothumbnail.png";
+      }
+    } catch (error) {
+      deleteRequest(request.name);
+      botReply("⛔ Could not find this link's info", msgid, false);
+      console.log("getRequestInfo direct supa error", error);
+      return;
+    }
+  } //direct supa
+
   if (bannedChannels.get(`${request?.platform}:${request?.channelid}`)) {
     deleteRequest(request.name);
     botReply(`🚫 This channel is banned chatvoDonk`, msgid, false);
@@ -1814,7 +1952,7 @@ async function getRequestInfo(request, msgid) {
     PLAYLIST.maxDuration !== "" &&
     request.duration !== -1 &&
     request.duration !== null &&
-    total_duration + request.duration - request.timestamp > numberAndUnitToSeconds(PLAYLIST.maxDuration, PLAYLIST.maxDurationUnit)
+    playlistLength + request.duration - request.timestamp > numberAndUnitToSeconds(PLAYLIST.maxDuration, PLAYLIST.maxDurationUnit)
   ) {
     if (playlist_open) {
       togglePlaylist();
@@ -1892,10 +2030,13 @@ async function getRequestInfo(request, msgid) {
   } //timestamp check
 
   if (request.duration > 0) {
-    total_duration += request.duration - request.timestamp;
+    playlistLength += request.duration - request.timestamp;
   }
+  //update the total length of the playlist
+
   updatePlaylist(request);
   updateLength();
+
   if (currentItem && request) {
     let reply = "";
     if (request.search) {
@@ -1912,7 +2053,7 @@ async function getRequestInfo(request, msgid) {
         reply += ` | Playing right after the current request (<${secondsToTimeString(currentItem.duration)})`;
         break;
       default:
-        reply += ` | ${requests.size - 1} ${requests.size - 1 == 1 ? "request" : "requests"} ahead of you (${secondsToTimeString(total_duration + currentItem.duration - request.duration)})`;
+        reply += ` | ${requests.size - 1} ${requests.size - 1 == 1 ? "request" : "requests"} ahead of you (${secondsToTimeString(playlistLength + currentItem.duration - request.duration)})`;
         break;
     }
 
@@ -1927,18 +2068,79 @@ async function getRequestInfo(request, msgid) {
 } //getRequestInfo
 
 /**
- * @description gets the video/track/clip/vod id or stream username from a url string
+ * @description gets initial link info from the request url or search query - first step of adding requests
  * @param {string} link
- * @returns {Object}
+ * @param {boolean} search
+ * @returns {Object} link object with request info or null
  */
-async function parseLink(link) {
-  if (link.includes("twitch.tv")) {
-    if (link.includes("/clip/") || link.includes("clips.twitch.tv")) {
-      let clipURL = new URL(link);
+async function parseLink(link, search) {
+  if (search) {
+    if (link.toLowerCase().startsWith("youtube")) {
+      link = link?.toLowerCase().replace("youtube", "").trim();
+      if (link?.includes("start=")) {
+        link = link.split("start=")[0];
+      }
+      if (!link) {
+        return null;
+      }
+      try {
+        let response = await fetch(`https://helper.donk.workers.dev/youtube/search?query=${encodeURIComponent(link.trim())}`);
+        let result = await response.json();
+        console.log(result);
+        if (result?.items?.length == 0 || result?.items?.[0].id?.kind !== "youtube#video") {
+          return null;
+        }
+
+        return { type: "youtube", id: result.items[0].id.videoId, name: `youtube:${result.items[0].id.videoId}`, platform: "youtube", timestamp: 0 };
+      } catch (error) {
+        return null;
+      }
+    } //youtube search
+
+    if (link.toLowerCase().startsWith("vimeo")) {
+      link = link?.toLowerCase().replace("vimeo", "").trim();
+      if (link?.includes("start=")) {
+        link = link.split("start=")[0];
+      }
+      if (!link) {
+        return null;
+      }
+      try {
+        let response = await fetch(`https://helper.donk.workers.dev/vimeo/search?query=${encodeURIComponent(link.trim())}`);
+        let result = await response.json();
+        console.log(result);
+
+        if (
+          !result.data[0] ||
+          result.data[0].type !== "video" ||
+          result.data[0].content_rating_class !== "safe" ||
+          result.data[0].privacy.embed !== "public" ||
+          result.data[0].play.status !== "playable" ||
+          result.data[0].status !== "available" ||
+          result.data[0].is_playable !== true
+        ) {
+          return null;
+        }
+
+        return { type: "vimeo", id: result.data[0].uri.replace("/videos/", ""), name: `vimeo:${result.data[0].uri.replace("/videos/", "")}`, platform: "vimeo", timestamp: 0 };
+      } catch (error) {
+        return null;
+      }
+    } //vimeo search
+  } //search
+
+  let url = parseURL(link);
+
+  if (!url) {
+    return null;
+  }
+
+  const domain = url.hostname.split(".").slice(-2).join(".");
+
+  if (domain === "twitch.tv") {
+    if (link.includes("/clip/") || url.hostname === "clips.twitch.tv") {
       let clipID =
-        clipURL.hostname === "clips.twitch.tv"
-          ? /^\/(\w+(?:\/[A-Z]\w+)?(?:[\-\w]*))(?:\/|$)/.exec(clipURL.pathname)
-          : /^\/\w+\/clip\/(\w+(?:\/[A-Z]\w+)?(?:[\-\w]*))(?:\/|$)/.exec(clipURL.pathname);
+        url.hostname === "clips.twitch.tv" ? /^\/(\w+(?:\/[A-Z]\w+)?(?:[\-\w]*))(?:\/|$)/.exec(url.pathname) : /^\/\w+\/clip\/(\w+(?:\/[A-Z]\w+)?(?:[\-\w]*))(?:\/|$)/.exec(url.pathname);
       if (!clipID || !clipID[1]) {
         return null;
       }
@@ -1950,7 +2152,7 @@ async function parseLink(link) {
       if (!vodID || !parseInt(vodID[1])) {
         return null;
       }
-      let timestamp = timeStringToSeconds(new URLSearchParams(new URL(link).search)?.get("t"));
+      let timestamp = timeStringToSeconds(new URLSearchParams(url.search)?.get("t"));
       return { type: "twitch vod", id: vodID[1], name: `twitch:vod:${vodID[1]}`, platform: "twitch", timestamp: timestamp };
     } //vods
 
@@ -1961,96 +2163,78 @@ async function parseLink(link) {
     return { type: "twitch stream", id: username[1], name: `twitch:stream:${username[1]}`, platform: "twitch", timestamp: 0 };
   } //twitch
 
-  if (link.includes("youtube.com") || link.includes("youtu.be")) {
+  if (domain === "youtube.com" || domain === "youtu.be") {
     const youtubeURLRegex = /(youtu.*be.*)\/(watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$))/gm;
     const videoID = youtubeURLRegex.exec(link) || null;
-    if (videoID[3]?.length != 11) {
+    if (!videoID || videoID[3]?.length != 11) {
       return null;
     }
 
-    let timestamp = parseInt(new URLSearchParams(new URL(link).search)?.get("t"), 10) || 0;
+    let timestamp = parseInt(new URLSearchParams(url.search)?.get("t"), 10) || 0;
     return { type: link.includes("/shorts/") ? "youtube short" : "youtube", id: videoID[3], name: `youtube:${videoID[3]}`, platform: "youtube", timestamp: timestamp };
   } //youtube
 
-  if (link.toLowerCase().startsWith("youtube")) {
-    link = link?.toLowerCase().replace("youtube", "").trim();
-    if (link?.includes("start=")) {
-      link = link.split("start=")[0];
-    }
-    if (!link) {
-      return null;
-    }
-    try {
-      let response = await fetch(`https://helper.donk.workers.dev/youtube/search?query=${encodeURIComponent(link.trim())}`);
-      let result = await response.json();
-      console.log(result);
-      if (result?.items?.length == 0 || result?.items?.[0].id?.kind !== "youtube#video") {
-        return null;
-      }
-
-      return { type: "youtube", id: result.items[0].id.videoId, name: `youtube:${result.items[0].id.videoId}`, platform: "youtube", timestamp: 0 };
-    } catch (error) {
-      return null;
-    }
-  } //youtube search
-
-  if (link.includes("vimeo.com")) {
+  if (domain === "vimeo.com") {
     const vimeoURLRegex = /(?:http|https)?:?\/?\/?(?:www\.)?(?:player\.)?vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|video\/|)(\d+)(?:|\/\?)/g;
     const videoID = vimeoURLRegex.exec(link) || null;
-    if (!videoID[1]) {
+    if (!videoID || !videoID[1]) {
       return null;
     }
-    let timestamp = parseInt(new URL(link)?.hash?.substring(1)?.match(/t=([0-9.]+)/)?.[1], 10) || 0;
+    let timestamp = parseInt(url?.hash?.substring(1)?.match(/t=([0-9.]+)/)?.[1], 10) || 0;
     return { type: "vimeo", id: videoID[1], name: `vimeo:${videoID[1]}`, platform: "vimeo", timestamp: timestamp };
   } //vimeo
 
-  if (link.toLowerCase().startsWith("vimeo")) {
-    link = link?.toLowerCase().replace("vimeo", "").trim();
-    if (link?.includes("start=")) {
-      link = link.split("start=")[0];
-    }
-    if (!link) {
-      return null;
-    }
-    try {
-      let response = await fetch(`https://helper.donk.workers.dev/vimeo/search?query=${encodeURIComponent(link.trim())}`);
-      let result = await response.json();
-      console.log(result);
-
-      if (
-        !result.data[0] ||
-        result.data[0].type !== "video" ||
-        result.data[0].content_rating_class !== "safe" ||
-        result.data[0].privacy.embed !== "public" ||
-        result.data[0].play.status !== "playable" ||
-        result.data[0].status !== "available" ||
-        result.data[0].is_playable !== true
-      ) {
-        return null;
-      }
-
-      return { type: "vimeo", id: result.data[0].uri.replace("/videos/", ""), name: `vimeo:${result.data[0].uri.replace("/videos/", "")}`, platform: "vimeo", timestamp: 0 };
-    } catch (error) {
-      return null;
-    }
-  } //vimeo search
-
-  if (link.includes("tiktok.com")) {
+  if (domain === "tiktok.com") {
     const tiktokURLRegex = /^.*https:\/\/(?:m|www|vm)?\.?tiktok\.com\/((?:.*\b(?:(?:usr|v|embed|user|video)\/|\?shareId=|\&item_id=)(\d+))|\w+)/;
     let id = link.match(tiktokURLRegex);
-    if (!id[2] || !id[1].includes("/video/")) {
+    if (!id || !id[2] || !id[1].includes("/video/")) {
       return null;
     }
     return { type: "tiktok video", id: id[2], url: link.split("?")[0], name: `tiktok:${id[2]}`, platform: "tiktok", timestamp: 0 };
   } //tiktok
 
-  if (link.includes("streamable.com")) {
+  if (domain === "streamable.com") {
     const match = link.match(/streamable\.com\/([a-zA-Z0-9]+)/);
-    if (!match[1]) {
+    if (!match || !match[1]) {
       return null;
     }
     return { type: "streamable", id: match[1], name: `streamable:${match[1]}`, platform: "streamable", timestamp: 0 };
   } //streamable
+
+  if (domain === "discordapp.com" && url.hostname === "cdn.discordapp.com") {
+    const match = url.pathname.match(/^\/attachments\/(\d+)\/(\d+)\/([^/]+)$/);
+    if (!match) {
+      return null;
+    }
+    const ex = url.searchParams.get("ex");
+    const is = url.searchParams.get("is");
+    const hm = url.searchParams.get("hm");
+    if (!/^[0-9a-f]+$/i.test(ex ?? "") || !/^[0-9a-f]+$/i.test(is ?? "") || !/^[0-9a-f]{64}$/i.test(hm ?? "")) {
+      return null;
+    }
+    let expiry = parseInt(ex, 16) * 1000;
+    if (isNaN(expiry)) {
+      return null;
+    }
+    return { type: "direct discord", url: link, name: `direct:${url.origin + url.pathname}`, platform: "direct", timestamp: 0, expiry: expiry };
+  } //direct discord link
+
+  if (
+    domain === "segs.lol" ||
+    domain === "kappa.lol" ||
+    domain === "gachi.gay" ||
+    domain === "femboy.beauty" ||
+    domain === "potat.gay" ||
+    domain === "potat.irish" ||
+    url.hostname === "i.ringomar.com" ||
+    url.hostname === "i.spanix.team"
+  ) {
+    const match = link.match(/https?:\/\/[^\/\s]+\/([A-Za-z0-9]+)/);
+    if (!match[1]) {
+      return null;
+    }
+    return { type: "direct supa", id: match[1], name: `direct:${match[1]}`, platform: "direct", timestamp: 0 };
+  } //new supa sites
 
   return null;
 } //parseLink
@@ -2069,7 +2253,11 @@ async function updateClipMP4(id) {
     return null;
   }
 } //updateClipMP4
-
+/**
+ * @description checks if the link type set in parseLink() is enabled in the settings - second step of adding requests
+ * @param {String} type
+ * @returns {Boolean}
+ */
 function linkTypeAllowed(type) {
   if (type == "twitch clip" && !PLAYLIST.allowTwitchClips) {
     return false;
@@ -2095,6 +2283,12 @@ function linkTypeAllowed(type) {
   if (type == "vimeo" && !PLAYLIST.allowVimeoVideos) {
     return false;
   }
+  if ((type == "direct discord" || type == "direct supa") && !PLAYLIST.allowDirectAudio && !PLAYLIST.allowDirectVideo) {
+    //link type is not known yet so check of both audio and video are disabled for early skipping
+    //link type will be checked in getRequestInfo()
+    return false;
+  }
+
   return true;
 } //linkTypeAllowed
 
@@ -2107,9 +2301,7 @@ function getItemLink(request) {
     case "vimeo":
       return `https://vimeo.com/${request.id}`;
     case "spotify":
-      return `https://open.spotify.com/track/${request.id}`;
-    case "tiktok video":
-      return request.url;
+      return `https://open.spotify.com/track/${request.id}`; //spotify is no longer supported in the playlist but leave this for history links
     case "twitch stream":
       return `https://www.twitch.tv/${request.id}`;
     case "twitch vod":
@@ -2118,6 +2310,12 @@ function getItemLink(request) {
       return `https://clips.twitch.tv/${request.id}`;
     case "streamable":
       return `https://streamable.com/${request.id}`;
+    case "tiktok video":
+    case "direct discord":
+      return request.url;
+    case "direct supa":
+      return `https://kappa.lol/${request.id}`;
+
     default:
       return "";
   }
@@ -2134,6 +2332,9 @@ async function addLink() {
     return;
   }
   let input = elements.link.value?.split(" ").filter(Boolean);
+  if (!input || input.length === 0) {
+    return;
+  }
   let request = input[0];
   let search = false;
   if (input[0].toLowerCase() == "youtube" || input[0].toLowerCase() == "vimeo") {
@@ -2141,7 +2342,7 @@ async function addLink() {
     search = true;
   }
 
-  let link = await parseLink(request);
+  let link = await parseLink(request, search);
   if (!link) {
     showToast("Could not parse your request", "warning", 3000);
     elements.link.value = "";
@@ -2303,18 +2504,32 @@ async function playItem(item) {
       break;
     case "tiktok video":
       elements.tiktokEmbed.style.display = "";
-      elements.tiktokEmbed.innerHTML = `<iframe id="tiktokIframe" src="https://www.tiktok.com/player/v1/${item.id}?autoplay=1&rel=0" preload="auto" height="100%" width="100%"></iframe>`;
+      elements.tiktokEmbed.innerHTML = `<iframe id="tiktokIframe" src="https://www.tiktok.com/player/v1/${item.id}?autoplay=1&rel=0&muted=0&loop=0" preload="auto" height="100%" width="100%"></iframe>`;
       break;
     case "streamable":
       elements.videoEmbed.style.display = "";
       elements.videoEmbed.src = item.video;
+      break;
+    case "direct discord":
+    case "direct video":
+      if (item?.expiry && Date.now() + playlistLength * 1000 >= item.expiry) {
+        showToast("Discord link expired. Skipping...", "danger", 3000);
+        nextItem();
+        return;
+      }
+      elements.videoEmbed.style.display = "";
+      elements.videoEmbed.src = item.url;
+      break;
+    case "direct supa":
+      elements.videoEmbed.style.display = "";
+      elements.videoEmbed.src = `https://kappa.lol/${item.id}`;
       break;
     default:
       break;
   }
 
   if (currentItem.duration !== -1 && currentItem.duration !== null) {
-    total_duration -= currentItem.duration - currentItem.timestamp;
+    playlistLength -= currentItem.duration - currentItem.timestamp;
   }
 
   elements.nowPlaying.innerHTML = `
@@ -2414,35 +2629,40 @@ function downloadFavorites(format) {
     return;
   }
 
-  if (history.length == 0 || favorites.length == 0) {
-    showToast("There is nothing to download", "danger", 3000);
+  if (favorites.length == 0) {
+    showToast("You don't have any favorites", "danger", 3000);
     return;
   }
 
+  let cleanFavorites = [];
+  for (let index = 0; index < history.length; index++) {
+    if (!favorites.includes(history[index].name)) {
+      continue;
+    }
+    cleanFavorites.push({
+      id: history[index].id,
+      title: history[index].title,
+      channel: history[index].channel,
+      duration: history[index].duration,
+      timestamp: history[index].timestamp,
+      views: history[index].views,
+      upload_date: new Date(history[index]?.age || 0).toISOString(),
+      request_date: new Date(history[index].time).toISOString(),
+      requesters: history[index].by.map((requester) => requester.username),
+      url: getItemLink(history[index]),
+    });
+  }
+
+  if (cleanFavorites.length == 0) {
+    showToast("All favorites are missing from the history", "danger", 3000);
+    return;
+  }
+
+  if (cleanFavorites.length !== favorites.length) {
+    showToast("Some favorites are missing from the history", "warning", 3000);
+  }
+
   if (format == "json") {
-    let cleanFavorites = [];
-    for (let index = 0; index < history.length; index++) {
-      if (!favorites.includes(history[index].name)) {
-        continue;
-      }
-      cleanFavorites.push({
-        id: history[index].id,
-        title: history[index].title,
-        channel: history[index].channel,
-        duration: history[index].duration,
-        timestamp: history[index].timestamp,
-        views: history[index].views,
-        upload_date: new Date(history[index]?.age || 0).toISOString(),
-        request_date: new Date(history[index].time).toISOString(),
-        requesters: history[index].by.map((requester) => requester.username),
-        url: getItemLink(history[index]),
-      });
-    }
-
-    if (cleanFavorites.length !== favorites.length) {
-      showToast("Some favorites are missing from the history", "warning", 3000);
-    }
-
     const blob = new Blob([JSON.stringify(cleanFavorites)], { type: "text/json" });
     const link = document.createElement("a");
     link.download = `chatvote playlist favorites - ${new Date().toISOString()}.json`;
@@ -2456,29 +2676,6 @@ function downloadFavorites(format) {
     link.dispatchEvent(event);
     link.remove();
   } else if (format == "csv") {
-    let cleanFavorites = [];
-    for (let index = 0; index < history.length; index++) {
-      if (!favorites.includes(history[index].name)) {
-        continue;
-      }
-      cleanFavorites.push({
-        id: history[index].id,
-        title: history[index].title,
-        channel: history[index].channel,
-        duration: history[index].duration,
-        timestamp: history[index].timestamp,
-        views: history[index].views,
-        upload_date: new Date(history[index]?.age || 0).toISOString(),
-        request_date: new Date(history[index].time).toISOString(),
-        requesters: history[index].by.map((requester) => requester.username),
-        url: getItemLink(history[index]),
-      });
-    }
-
-    if (cleanFavorites.length !== favorites.length) {
-      showToast("Some favorites are missing from the history", "warning", 3000);
-    }
-
     const keys = Object.keys(cleanFavorites[0]);
     const header = keys.join(",") + "\n";
     const rows = cleanFavorites.map((obj) => keys.map((k) => JSON.stringify(obj[k] ?? "")).join(",")).join("\n");
@@ -2885,46 +3082,65 @@ function switchTheme(checkbox) {
   }
 } //switchTheme
 
-function toggleEveryone(allow) {
-  elements.allowPlebs.checked = allow;
-  elements.allowSubs.checked = allow;
-  elements.allowMods.checked = allow;
-  elements.allowVips.checked = allow;
-  elements.allowFirstTimeChatters.checked = allow;
-} //toggleEveryone
-
 function updateWhoCanRequest() {
-  let roles = {
-    "Non subscribers": { allowed: PLAYLIST.allowPlebs, limit: PLAYLIST.plebLimit },
-    Subscribers: { allowed: PLAYLIST.allowSubs, limit: PLAYLIST.subLimit },
-    Mods: { allowed: PLAYLIST.allowMods, limit: PLAYLIST.modLimit },
-    VIPs: { allowed: PLAYLIST.allowVips, limit: PLAYLIST.vipLimit },
-    "First time chatters": { allowed: PLAYLIST.allowFirstTimeChatters, limit: PLAYLIST.firstTimeChatterLimit },
-  };
+  let roles = [
+    { name: "Non subscribers", allowed: PLAYLIST.allowPlebs, limit: PLAYLIST.plebLimit === "" ? "unlimited" : PLAYLIST.plebLimit },
+    { name: "Subscribers", allowed: PLAYLIST.allowSubs, limit: PLAYLIST.subLimit === "" ? "unlimited" : PLAYLIST.subLimit },
+    { name: "Mods", allowed: PLAYLIST.allowMods, limit: PLAYLIST.modLimit === "" ? "unlimited" : PLAYLIST.modLimit },
+    { name: "VIPs", allowed: PLAYLIST.allowVips, limit: PLAYLIST.vipLimit === "" ? "unlimited" : PLAYLIST.vipLimit },
+    { name: "First time chatters", allowed: PLAYLIST.allowFirstTimeChatters, limit: PLAYLIST.firstTimeChatterLimit === "" ? "unlimited" : PLAYLIST.firstTimeChatterLimit },
+  ];
 
-  let allowed = [];
-  let limits = [];
-  let counts = [];
-  for (let [key, value] of Object.entries(roles)) {
-    if (value.allowed) {
-      allowed.push(key);
-      let count = value.limit === "" ? "unlimited" : value.limit;
-      limits.push(`${key} can make ${count} ${count == 1 ? "request" : "requests"}`);
-      counts.push(count);
-    }
-  }
+  let allowed = roles.filter((role) => role.allowed);
+  let notAllowed = roles.filter((role) => !role.allowed);
+  let sameLimit = roles.every((role) => role.limit === roles[0].limit);
 
-  if (allowed.length == 0) {
-    elements.whoCanRequest.innerHTML = `<span class="text-danger">No one will be able to request</span>`;
+  if (allowed.length === 0) {
+    elements.whoCanRequest.innerHTML = `<span class="text-danger">No one will be able to send requests</span>`;
     return;
   }
-  elements.whoCanRequest.innerHTML = `${allowed.length == 1 ? "Only" : ""} ${allowed.length == 5 ? "Everyone" : allowed.join(", ")} will be able to request.<br>
-  ${
-    counts.every((e) => e === counts[0])
-      ? `${counts.length == Object.keys(roles).length ? "Everyone" : "Viewers that can request"} will get ${counts[0]} ${counts[0] == 1 ? "request" : "requests"}.`
-      : limits.join(" - ")
-  }`;
+
+  if (allowed.length === roles.length && sameLimit) {
+    elements.whoCanRequest.innerHTML = `Everyone can send requests (${roles[0].limit} ${roles[0].limit == 1 ? "request" : "requests"})`;
+    return;
+  }
+
+  let limitGroups = {};
+  allowed.forEach((role) => {
+    if (!limitGroups[role.limit]) limitGroups[role.limit] = [];
+    limitGroups[role.limit].push(role.name);
+  });
+
+  let parts = Object.entries(limitGroups).map(([limit, roleNames]) => {
+    return `${roleNames.join(", ")} (${limit} ${limit == 1 ? "request" : "requests"})`;
+  });
+
+  let line1 = `Can request: ${parts.join(" - ")}`;
+  let line2 = "";
+  if (notAllowed.length > 0) {
+    let cantNames = notAllowed.map((role) => role.name).join(", ");
+    line2 = `Can't request: ${cantNames}`;
+  }
+
+  elements.whoCanRequest.innerHTML = line2 ? `${line1}<br>${line2}` : line1;
 } //updateWhoCanRequest
+
+function handleZero(input) {
+  if (input.value !== "" && parseInt(input.value, 10) <= 0) {
+    input.value = "";
+    const row = input.closest("tr");
+    const checkbox = row ? row.querySelector(".form-check-input") : null;
+    checkbox.checked = false;
+    saveSettings();
+  }
+
+  if (input.value !== "" && parseInt(input.value, 10) > 0) {
+    const row = input.closest("tr");
+    const checkbox = row ? row.querySelector(".form-check-input") : null;
+    checkbox.checked = true;
+    saveSettings();
+  }
+}
 
 function checkCommands() {
   let commandElements = [
@@ -3075,6 +3291,8 @@ function playPlaylist(reply) {
       document.getElementById("tiktokIframe").contentWindow.postMessage({ type: "play", "x-tiktok-player": true }, "*");
       break;
     case "streamable":
+    case "direct discord":
+    case "direct supa":
       elements.videoEmbed.play();
       break;
     default:
@@ -3118,6 +3336,8 @@ function pausePlaylist(reply) {
       document.getElementById("tiktokIframe").contentWindow.postMessage({ type: "pause", "x-tiktok-player": true }, "*");
       break;
     case "streamable":
+    case "direct discord":
+    case "direct supa":
       elements.videoEmbed.pause();
       break;
     default:
@@ -3187,15 +3407,6 @@ window.onload = function () {
     }
   };
 
-  elements.selectAll.addEventListener("click", (event) => {
-    toggleEveryone(true);
-    saveSettings();
-  });
-  elements.unselectAll.addEventListener("click", (event) => {
-    toggleEveryone(false);
-    saveSettings();
-  });
-
   elements.link.addEventListener("keydown", async (event) => {
     if (event.key === "Enter") {
       await addLink();
@@ -3246,6 +3457,7 @@ function onYouTubeIframeAPIReady() {
       autoplay: 1,
       enablejsapi: 1,
       playsinline: 1,
+      loop: 0,
       fs: 0,
       rel: 0,
       origin: "chat.vote",
@@ -3321,16 +3533,31 @@ function videoEmbedEventListeners() {
 
 function tiktokEmbedEventListeners() {
   window.addEventListener("message", (event) => {
-    if (!event?.data?.["x-tiktok-player"]) {
+    let data;
+    try {
+      data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+    } catch (error) {
       return;
     }
-    if (event.data.type == "onStateChange" && event.data.value == 0) {
-      nextItem();
+    if (!data || !data["x-tiktok-player"]) {
+      return;
     }
-    if (event.data.type == "onPlayerReady") {
-      //donk embed is muted by default so unmute when it loads
+
+    if (data.type === "onStateChange" && data.value === 0) {
+      if (PLAYLIST.autoplay) {
+        nextItem();
+      }
+    }
+
+    if (data.type === "onPlayerReady") {
+      if (!document.getElementById("tiktokIframe")?.contentWindow) {
+        return;
+      }
+
+      //donk embed is broken and idk if these do anything :)
       document.getElementById("tiktokIframe").contentWindow.postMessage({ type: "unMute", "x-tiktok-player": true }, "*");
       document.getElementById("tiktokIframe").contentWindow.postMessage({ type: "seekTo", value: currentItem.timestamp, "x-tiktok-player": true }, "*");
+      document.getElementById("tiktokIframe").contentWindow.postMessage({ type: "play", "x-tiktok-player": true }, "*");
     }
   });
 } //tiktokEmbedEventListeners

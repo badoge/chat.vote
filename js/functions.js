@@ -300,7 +300,7 @@ function showToast(msg, type, timeout) {
   let id = Date.now();
   let toast = `<div id="${id}" class="toast align-items-center text-bg-${type} border-0" role="alert" data-bs-autohide="false" aria-live="assertive" aria-atomic="true">
       <div class="d-flex">
-      <div class="toast-body" style="font-size:1.2em">${msg}</div>
+      <div class="toast-body" style="font-size:1.2em">${escapeString(msg)}</div>
       <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
       </div>`;
@@ -1050,11 +1050,36 @@ function unescapeString(str) {
 } //unescapeString
 
 function assertString(input) {
-  let isString = typeof input === "string" || input instanceof String;
-  if (!isString) {
-    let invalidType = _typeof(input);
-    if (input === null) invalidType = "null";
-    else if (invalidType === "object") invalidType = input.constructor.name;
-    throw new TypeError("Expected a string but received a ".concat(invalidType));
-  }
+  if (input === undefined || input === null) throw new TypeError("Expected a string but received a ".concat(input));
+  if (input.constructor.name !== "String") throw new TypeError("Expected a string but received a ".concat(input.constructor.name));
 } //assertString
+
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+} //escapeRegex
+
+function parseURL(input) {
+  if (typeof input !== "string") {
+    return null;
+  }
+  const rawUrl = input.trim();
+
+  const hasProtocol = /^https?:\/\//i.test(rawUrl);
+
+  if (!hasProtocol && !rawUrl.includes(".")) {
+    return null;
+  }
+
+  try {
+    const urlString = hasProtocol ? rawUrl : `https://${rawUrl}`;
+    const url = new URL(urlString);
+
+    if (!url.hostname.includes(".")) {
+      return null;
+    }
+
+    return url;
+  } catch {
+    return null;
+  }
+} //parseURL
