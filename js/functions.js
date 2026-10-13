@@ -199,7 +199,7 @@ async function getChannelTwitchEmotes(channel, largeEmotes = false) {
     let broadcaster_id = await getTwitchUserId(channel);
     let response = await fetch(`https://helper.donk.workers.dev/twitch/chat/emotes?broadcaster_id=${broadcaster_id}`);
     let result = await response.json();
-    if (!result.data || result.data.length < 0) {
+    if (!result.data || result.data.length === 0) {
       return [];
     }
 
@@ -478,7 +478,7 @@ async function getGlobalBadges() {
   try {
     let response = await fetch(`https://helper.donk.workers.dev/twitch/chat/badges/global`);
     let result = await response.json();
-    if (!result.data || result.data.length == 0) {
+    if (!result.data || result.data.length === 0) {
       return {};
     }
     if (result.data.length > 0) {

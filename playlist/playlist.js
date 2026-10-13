@@ -3288,7 +3288,7 @@ function playPlaylist(reply) {
       }
       break;
     case "tiktok video":
-      document.getElementById("tiktokIframe").contentWindow.postMessage({ type: "play", "x-tiktok-player": true }, "*");
+      document.getElementById("tiktokIframe")?.contentWindow?.postMessage({ type: "play", "x-tiktok-player": true }, "*");
       break;
     case "streamable":
     case "direct discord":
@@ -3333,7 +3333,7 @@ function pausePlaylist(reply) {
       }
       break;
     case "tiktok video":
-      document.getElementById("tiktokIframe").contentWindow.postMessage({ type: "pause", "x-tiktok-player": true }, "*");
+      document.getElementById("tiktokIframe")?.contentWindow?.postMessage({ type: "pause", "x-tiktok-player": true }, "*");
       break;
     case "streamable":
     case "direct discord":

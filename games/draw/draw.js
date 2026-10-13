@@ -520,7 +520,7 @@ window.onload = async function () {
     brush.width = parseInt(elements.LineWidth.value, 10) || 1;
     let brushsvg = document.getElementsByClassName("brushsvg");
     Array.from(brushsvg).forEach((element) => {
-      element.style.fill = parseInt(this.value, 10);
+      element.style.fill = this.value;
     });
   };
   elements.LineWidth.oninput = function () {

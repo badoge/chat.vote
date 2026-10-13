@@ -99,7 +99,7 @@ window.onload = function () {
   };
   resetGame();
   initGraph();
-  document.getElementById("c4overlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
+  document.getElementById("c4overlay").innerHTML = `<span class="overlayText">${USER.channel || "STREAMER"}'s turn</span>`;
 }; //onload
 
 function initGraph() {
@@ -194,7 +194,7 @@ function reset() {
   document.getElementById("totalvotesc4").innerHTML = `Total votes: 0`;
   start(0, 0);
   document.getElementById("c4chartCanvas").classList = "blur";
-  document.getElementById("c4overlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
+  document.getElementById("c4overlay").innerHTML = `<span class="overlayText">${USER.channel || "STREAMER"}'s turn</span>`;
   document.getElementById("c4output").innerHTML = "";
   CONNECT4.results = [
     { label: "1", data: 0, c1: "#f44336", c2: "#f53337" },
@@ -215,7 +215,7 @@ function playTurn() {
   let donk = document.getElementsByClassName("c4cols");
   let c4cols = Array.prototype.slice.call(donk).map((x) => parseInt(x.innerHTML, 10));
   document.getElementById("c4chartCanvas").classList = "blur";
-  document.getElementById("c4overlay").innerHTML = `<span class="overlaytext">${USER.channel || "STREAMER"}'s turn</span>`;
+  document.getElementById("c4overlay").innerHTML = `<span class="overlayText">${USER.channel || "STREAMER"}'s turn</span>`;
   let list = CONNECT4.results;
   list.sort(function (a, b) {
     return a.data > b.data ? -1 : a.data == b.data ? 0 : 1;

@@ -52,7 +52,7 @@ class AttackProjectile {
           projectile.destroy();
         },
         null,
-        this
+        this,
       );
     }
     // all: react to collision with users
@@ -138,7 +138,7 @@ class ArenaUnit {
         this.canJump = true;
       },
       null,
-      this
+      this,
     );
     // arena vars
     this.bot = {
@@ -159,7 +159,7 @@ class ArenaUnit {
     };
     this.dead = false;
     this.invulnerable = false;
-    this.immmovable = false;
+    this.immovable = false;
     this.disarmed = false;
     this.canAttack = true;
     this.canJump = false;
@@ -367,7 +367,7 @@ class ArenaUnit {
       this.healthbar.setPosition(this.object.x - this.healthbar.width / 2, this.object.y + this.object.displayHeight * 0.75);
       this.healthbar.setFillStyle(
         (arena.internals.HEALTHBAR_COLOR_FLAGS.RED & (arena.internals.HEALTHBAR_COLOR_FLAGS.RED * Math.min(2 - ratio * 2, 1))) +
-          (arena.internals.HEALTHBAR_COLOR_FLAGS.GREEN & (arena.internals.HEALTHBAR_COLOR_FLAGS.GREEN * Math.min(1, ratio * 2)))
+          (arena.internals.HEALTHBAR_COLOR_FLAGS.GREEN & (arena.internals.HEALTHBAR_COLOR_FLAGS.GREEN * Math.min(1, ratio * 2))),
       );
     }
   }
@@ -527,7 +527,7 @@ class ArenaUnit {
     this.object.setTintFill(0xcdcdcd);
     this.dead = true;
     this.invulnerable = true;
-    this.immmovable = true;
+    this.immovable = true;
     this.stats.dead += 1;
 
     // master-or-summon specific actions
@@ -695,7 +695,7 @@ class ArenaHunter extends ArenaUnit {
             this.destroy();
           }
         },
-        this.object
+        this.object,
       );
     };
     // ability: grenade
@@ -752,7 +752,7 @@ class ArenaHunter extends ArenaUnit {
               });
             },
             null,
-            this
+            this,
           );
         },
       });
@@ -786,7 +786,7 @@ class ArenaMage extends ArenaUnit {
             this.destroy();
           }
         },
-        this.object
+        this.object,
       );
     };
     // ability: meteor
@@ -821,7 +821,7 @@ class ArenaMage extends ArenaUnit {
                 scale: { start: 0.4, end: 1.3 },
                 lifespan: 666,
                 follow: this.object,
-              })
+              }),
             );
           });
           // bounce off walls and ceiling:
@@ -835,7 +835,7 @@ class ArenaMage extends ArenaUnit {
               }
               body.gameObject.setFlipX(body.velocity.x < 0);
             },
-            this
+            this,
           );
           // simple collision with plarforms:
           this.source.physics.add.collider(this.object, arena.groups.platforms);
@@ -909,7 +909,7 @@ class ArenaPriest extends ArenaUnit {
             this.destroy();
           }
         },
-        this.object
+        this.object,
       );
     };
     // ability: heal
@@ -1033,7 +1033,7 @@ class ArenaNotification {
       0,
       0,
       text,
-      { font: "bold 60px Arial", fill: color, align: "center" }
+      { font: "bold 60px Arial", fill: color, align: "center" },
     );
     tct.setOrigin(0.5, 0);
     tct.setShadow(0, 0, "#000", 16);
@@ -1051,7 +1051,7 @@ class ArenaNotification {
           category: this.collisionClass,
         },
       },
-      true
+      true,
     );
     this.container.setCollidesWith([this.collisionClass, arena.internals.KILLFEED_COLLISION_MASKS.PADDER]);
     if (!destroyAfter) {
@@ -1111,8 +1111,8 @@ class ArenaKillFeedNotification extends ArenaNotification {
         0,
         0,
         this.killer.name,
-        { font: "bold 14px Arial", fill: this.killer.color, align: "right" }
-      )
+        { font: "bold 14px Arial", fill: this.killer.color, align: "right" },
+      ),
     );
     this.container.add(
       arena.source.add.text(
@@ -1120,8 +1120,8 @@ class ArenaKillFeedNotification extends ArenaNotification {
         0,
         0,
         icon || this.killer.weapon,
-        { font: "14px", fill: "#ff0", align: "right" }
-      )
+        { font: "14px", fill: "#ff0", align: "right" },
+      ),
     );
     this.container.add(
       arena.source.add.text(
@@ -1129,8 +1129,8 @@ class ArenaKillFeedNotification extends ArenaNotification {
         0,
         0,
         victim.name,
-        { font: "bold 14px Arial", fill: victim.color, align: "right" }
-      )
+        { font: "bold 14px Arial", fill: victim.color, align: "right" },
+      ),
     );
     const texts = this.container.getAll();
     let totalWidth = 0;

@@ -1100,7 +1100,7 @@ async function addOption() {
   if (extraoption.startsWith("http")) {
     try {
       let response = await fetch(`https://helper.donk.workers.dev/cors/?${extraoption.split(" ")[0]}`);
-      if (response.headers.get("Content-Type").startsWith("image")) {
+      if (response.headers.get("Content-Type")?.startsWith("image")) {
         extraoption = `<div class='resizable'><img src="${extraoption.split(" ")[0]}"></div> ${extraoption.split(" ").slice(1).join("")}`;
       }
     } catch (error) {
@@ -1721,8 +1721,8 @@ function unpauseTimer() {
 } //unpauseTimer
 
 function stopTimer() {
-  timer.reset();
-  timer.stop();
+  timer?.reset();
+  timer?.stop();
   if (voting_enabled) {
     disableVoteButton();
   }

@@ -1,8 +1,14 @@
-const USERNAME = "forsen";
 const pfp = "https://static-cdn.jtvnw.net/jtv_user_pictures/forsen-profile_image-48b43e1e4f54b5c8-600x600.png";
-const userid = 22484632;
 const raffle_command1 = "!join";
 const raffle_command2 = "!ticket";
+
+const USER = {
+  channel: "forsen",
+  twitchLogin: false,
+  access_token: "",
+  userID: "22484632",
+  platform: "twitch",
+};
 
 let elements = {
   //modals
@@ -83,7 +89,7 @@ function connect() {
   </div>
   </div>`;
   getEmotes();
-  loadBadges(USERNAME);
+  loadBadges(USER.channel);
 
   let options = {
     options: {
@@ -94,7 +100,7 @@ function connect() {
       secure: true,
       reconnect: true,
     },
-    channels: [USERNAME],
+    channels: [USER.channel],
   };
   client = new tmi.client(options);
 
@@ -183,7 +189,7 @@ async function loadPFP() {
   <button type="button" class="btn btn-dark"><img src="${pfp}" alt="profile pic" style="height:2em;"></button>
   <div class="btn-group" role="group">
   <button id="btnGroupDrop1" type="button" class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-  ${USERNAME}
+  ${USER.channel}
   </button>
   <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="btnGroupDrop1">
   <li><a class="dropdown-item" onclick="logout()" href="#"><i class="material-icons notranslate">logout</i>Log out</a></li>
@@ -249,7 +255,7 @@ async function drawRaffleWinner() {
     p.classList.add("h2");
     p.innerHTML = `
     Winner #${raffleWinners.length}: 
-    <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USERNAME}/viewercard/${winner}?popout=","_blank","width=340,height=800")>
+    <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USER.channel}/viewercard/${winner}?popout=","_blank","width=340,height=800")>
     ${winner}
     </a>`;
     elements.raffleOutput.append(p);
@@ -299,7 +305,7 @@ async function drawRaffleWinnerTier3() {
     p.classList.add("h2");
     p.innerHTML = `
     Winner #${raffleWinners.length}: 
-    <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USERNAME}/viewercard/${winnerTier3}?popout=","_blank","width=340,height=800")>
+    <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USER.channel}/viewercard/${winnerTier3}?popout=","_blank","width=340,height=800")>
     ${winnerTier3}
     </a>`;
     elements.raffleOutput.append(p);
@@ -417,7 +423,7 @@ const detectWinner = function () {
 
     let p = document.createElement("p");
     p.classList.add("h2");
-    p.innerHTML = `Winner #${raffleWinners.length}: <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USERNAME}/viewercard/${winnerSlot.username}?popout=","_blank","width=340,height=800")>${winnerSlot.username}</a>`;
+    p.innerHTML = `Winner #${raffleWinners.length}: <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USER.channel}/viewercard/${winnerSlot.username}?popout=","_blank","width=340,height=800")>${winnerSlot.username}</a>`;
     elements.raffleOutput.append(p);
     setTimeout(() => {
       fancyRaffleModal.hide();
@@ -449,7 +455,7 @@ const detectWinnerTier3 = function () {
 
     let p = document.createElement("p");
     p.classList.add("h2");
-    p.innerHTML = `Winner #${raffleWinnersTier3.length}: <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USERNAME}/viewercard/${winnerSlot.username}?popout=","_blank","width=340,height=800")>${winnerSlot.username}</a>`;
+    p.innerHTML = `Winner #${raffleWinnersTier3.length}: <a class="link-success cursorPointer" onclick=window.open("https://www.twitch.tv/popout/${USER.channel}/viewercard/${winnerSlot.username}?popout=","_blank","width=340,height=800")>${winnerSlot.username}</a>`;
     elements.raffleOutputTier3.append(p);
     setTimeout(() => {
       fancyRaffleModal.hide();
@@ -766,16 +772,16 @@ async function getEmotes() {
     let bttv = await getGlobalBTTVEmotes();
     let ffz = await getGlobalFFZEmotes();
     let seventv = await getGlobal7TVEmotes();
-    let bttvChannel = await getChannelBTTVEmotes(userid);
-    let ffzChannel = await getChannelFFZEmotes(userid);
-    let seventvChannel = await getChannel7TVEmotes(userid);
+    let bttvChannel = await getChannelBTTVEmotes(USER.userID);
+    let ffzChannel = await getChannelFFZEmotes(USER.userID);
+    let seventvChannel = await getChannel7TVEmotes(USER.userID);
     thirdPartyEmotes = [...thirdPartyEmotes, ...bttv, ...ffz, ...seventv, ...bttvChannel, ...ffzChannel, ...seventvChannel];
   }, 3000);
 } //getEmotes
 
 async function loadTier3Emotes() {
   try {
-    let response = await fetch(`https://helper.donk.workers.dev/twitch/chat/emotes?broadcaster_id=${userid}`);
+    let response = await fetch(`https://helper.donk.workers.dev/twitch/chat/emotes?broadcaster_id=${USER.userID}`);
     let result = await response.json();
     elements.emotes.innerHTML = "";
     for (let index = 0; index < result.data.length; index++) {

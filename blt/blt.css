@@ -15,7 +15,7 @@ body {
 }
 
 #myBrackets,
-#mytrivia {
+#myTrivia {
   max-height: 50vh;
   overflow: auto;
 }
@@ -130,7 +130,7 @@ body {
   padding: 5px;
 }
 
-#centertitle {
+#centerTitle {
   width: 10vw;
   display: inline-flex;
   font-size: 1.1rem;

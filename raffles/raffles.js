@@ -37,8 +37,6 @@ let elements = {
   //who can join
   whoCanJoinCard: document.getElementById("whoCanJoinCard"),
   whoCanJoin: document.getElementById("whoCanJoin"),
-  selectAll: document.getElementById("selectAll"),
-  unselectAll: document.getElementById("unselectAll"),
   plebBonus: document.getElementById("plebBonus"),
   followerBonus: document.getElementById("followerBonus"),
   subBonus: document.getElementById("subBonus"),
@@ -352,13 +350,9 @@ function restartRaffle() {
   raffle_tickets = [];
   currentRaffleWinner = "";
   raffleWinners = [];
-  if (!!document.getElementById("countdown_raffle")) {
-    document.getElementById("countdown_raffle").remove();
-  }
-  if (timer_raffle) {
-    timer_raffle.reset();
-    timer_raffle.stop();
-  }
+  document.getElementById("countdown_raffle")?.remove();
+  timer_raffle?.reset();
+  timer_raffle?.stop();
   elements.raffleUsers.innerHTML = "";
   elements.raffleOutput.innerHTML = "";
   elements.entrants.innerHTML = "Entrants: 0";
@@ -414,10 +408,10 @@ function connect() {
 
   client.on("message", async (target, context, msg, self) => {
     if (context.username == currentRaffleWinner) {
-      if (RAFFLES.autoRerollEnabled && timer_raffle.isRunning()) {
-        document.getElementById("countdown_raffle").remove();
-        timer_raffle.reset();
-        timer_raffle.stop();
+      if (RAFFLES.autoRerollEnabled && timer_raffle?.isRunning()) {
+        document.getElementById("countdown_raffle")?.remove();
+        timer_raffle?.reset();
+        timer_raffle?.stop();
       }
       raffleWinnerChat(context, msg);
     } //raffle winner chat
@@ -839,7 +833,7 @@ const app = {
     },
     acceleration: 0,
     speed: 0,
-    projectedFPS: 0,
+    projectedFPS: 60,
   },
   spinStarted: false,
   ready: false,
@@ -1125,19 +1119,22 @@ function startRaffleTimer() {
   if (RAFFLES.rerollTimerValueMinutes == 0) {
     return;
   }
-  elements.raffleOutput.innerHTML += `<div class="card border-danger" id="countdown_raffle" style="text-align: center; margin: 10px; display: none;">
-    <div class="card-body">
-    <div class="values" style="font-size: 3em;"></div>
-    </div>
-    </div>`;
+  elements.raffleOutput.insertAdjacentHTML(
+    "beforeend",
+    `<div class="card border-danger" id="countdown_raffle" style="text-align: center; margin: 10px; display: none;">
+      <div class="card-body">
+        <div class="values" style="font-size: 3em;"></div>
+      </div>
+    </div>`,
+  );
   timer_raffle = new easytimer.Timer();
   timer_raffle.addEventListener("secondTenthsUpdated", function (e) {
     document.querySelector("#countdown_raffle .values").innerHTML = "Rerolling in " + timer_raffle.getTimeValues().toString(["minutes", "seconds", "secondTenths"]);
   });
   timer_raffle.addEventListener("targetAchieved", function (e) {
-    document.getElementById("countdown_raffle").remove();
-    timer_raffle.reset();
-    timer_raffle.stop();
+    document.getElementById("countdown_raffle")?.remove();
+    timer_raffle?.reset();
+    timer_raffle?.stop();
     drawRaffleWinner();
   });
   document.querySelector("#countdown_raffle .values").innerHTML = "Rerolling in " + timer_raffle.getTimeValues().toString(["minutes", "seconds", "secondTenths"]);
@@ -1160,7 +1157,6 @@ async function enableRaffleButton() {
     !RAFFLES.allowPlebs &&
     !RAFFLES.allowSubs &&
     !RAFFLES.allowTier1 &&
-    !RAFFLES.allowTier2 &&
     !RAFFLES.allowTier2 &&
     !RAFFLES.allowTier3 &&
     !RAFFLES.allowMods &&
@@ -1342,18 +1338,6 @@ function splitTiers(split) {
   }
 } //splitTiers
 
-function toggleEveryone(allow) {
-  elements.allowPlebs.checked = allow;
-  elements.allowFollowers.checked = allow;
-  elements.allowSubs.checked = allow;
-  elements.allowTier1.checked = allow;
-  elements.allowTier2.checked = allow;
-  elements.allowTier3.checked = allow;
-  elements.allowMods.checked = allow;
-  elements.allowVips.checked = allow;
-  elements.allowFirstTimeChatters.checked = allow;
-} //toggleEveryone
-
 function updateWhoCanJoin() {
   let roles = {
     "Non subscribers": { allowed: RAFFLES.allowPlebs, tickets: 1 + RAFFLES.plebBonus },
@@ -1474,15 +1458,6 @@ window.onload = function () {
 
   elements.titleHint.addEventListener("click", (event) => {
     elements.raffleTitle.focus();
-  });
-
-  elements.selectAll.addEventListener("click", (event) => {
-    toggleEveryone(true);
-    saveSettings();
-  });
-  elements.unselectAll.addEventListener("click", (event) => {
-    toggleEveryone(false);
-    saveSettings();
   });
 
   elements.darkTheme.onchange = function () {
